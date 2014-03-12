@@ -1,0 +1,135 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1107" measuredH="508" mockupW="625" mockupH="400">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="482" y="108" w="625" h="400" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>On-line%20handwriting%20recognition%20of%20mathematical%20formulae%0Ahttp%3A//write-math.com/symbol-recognition</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::TabBar" x="491" y="186" w="606" h="289" measuredW="267" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>recognition-logged-in%26bm%3Brecognition-logged-in.bmml%26bm%3Brecognition-logged-in.bmml%26bm%3Brecognition-logged-in.bmml%2Cprofile%26bm%3Bprofile.bmml%26bm%3Bprofile.bmml%26bm%3Bprofile.bmml%2Cchallenges%26bm%3Bchallenges.bmml%26bm%3Bchallenges.bmml%26bm%3Bchallenges.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2229%2C78%2C111%2C105%22%20href%3D%22recognition-logged-in.bmml%22%20alt%3D%22recognition-logged-in%22%20id%3D%2215%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%22111%2C78%2C160%2C105%22%20href%3D%22profile.bmml%22%20alt%3D%22profile%22%20id%3D%2215%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%22160%2C78%2C238%2C105%22%20href%3D%22challenges.bmml%22%20alt%3D%22challenges%22%20id%3D%2215%22/%3E</map>
+        <selectedIndex>0</selectedIndex>
+        <text>Recognition%2C%20Profile%2CChallenges</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Canvas" x="497" y="218" w="400" h="180" measuredW="100" measuredH="70" zOrder="2" locked="false" isInGroup="-1"/>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::Label" x="911" y="217" w="-1" h="-1" measuredW="74" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Alternatives%3A</text>
+        <underline>true</underline>
+      </controlProperties>
+    </control>
+    <control controlID="27" controlTypeID="com.balsamiq.mockups::Image" x="904" y="186" w="21" h="21" measuredW="120" measuredH="120" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/Martin_Thoma_avatar.jpg</src>
+      </controlProperties>
+    </control>
+    <control controlID="28" controlTypeID="com.balsamiq.mockups::Label" x="931" y="186" w="-1" h="-1" measuredW="76" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>2%2C127%20Karma</text>
+      </controlProperties>
+    </control>
+    <control controlID="29" controlTypeID="com.balsamiq.mockups::Label" x="1019" y="186" w="-1" h="-1" measuredW="78" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>3%20Challenges</text>
+      </controlProperties>
+    </control>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Link" x="911" y="379" w="-1" h="-1" measuredW="29" measuredH="19" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Train</text>
+      </controlProperties>
+    </control>
+    <control controlID="37" controlTypeID="com.balsamiq.mockups::Label" x="497" y="408" w="-1" h="-1" measuredW="39" measuredH="21" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>LaTeX</text>
+      </controlProperties>
+    </control>
+    <control controlID="38" controlTypeID="com.balsamiq.mockups::TextInput" x="578" y="405" w="145" h="-1" measuredW="97" measuredH="27" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%24%5Cvarepsilon%24</text>
+      </controlProperties>
+    </control>
+    <control controlID="39" controlTypeID="com.balsamiq.mockups::Label" x="738" y="408" w="-1" h="-1" measuredW="50" measuredH="21" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Package</text>
+      </controlProperties>
+    </control>
+    <control controlID="40" controlTypeID="com.balsamiq.mockups::TextInput" x="803" y="405" w="94" h="-1" measuredW="68" measuredH="27" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>amsmath</text>
+      </controlProperties>
+    </control>
+    <control controlID="41" controlTypeID="com.balsamiq.mockups::Label" x="497" y="439" w="-1" h="-1" measuredW="57" measuredH="21" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Variant%20of</text>
+      </controlProperties>
+    </control>
+    <control controlID="42" controlTypeID="com.balsamiq.mockups::TextInput" x="578" y="436" w="145" h="-1" measuredW="79" measuredH="27" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>0</borderColor>
+        <color>16777215</color>
+        <text>%24%5Cepsilon%24</text>
+        <underline>false</underline>
+      </controlProperties>
+    </control>
+    <control controlID="43" controlTypeID="com.balsamiq.mockups::Image" x="542" y="244" w="-1" h="-1" measuredW="78" measuredH="103" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/symbol-varepsilon.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="44" controlTypeID="com.balsamiq.mockups::Image" x="911" y="320" w="32" h="32" measuredW="40" measuredH="42" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/latex-varepsilon.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="47" controlTypeID="com.balsamiq.mockups::Image" x="911" y="238" w="32" h="32" measuredW="53" measuredH="57" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/latex-E.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="49" controlTypeID="com.balsamiq.mockups::Label" x="954" y="238" w="-1" h="-1" measuredW="10" measuredH="21" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>E</text>
+      </controlProperties>
+    </control>
+    <control controlID="50" controlTypeID="com.balsamiq.mockups::Label" x="954" y="249" w="-1" h="-1" measuredW="81" measuredH="21" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Variants%3A%20%24E%24</text>
+      </controlProperties>
+    </control>
+    <control controlID="51" controlTypeID="com.balsamiq.mockups::Canvas" x="904" y="311" w="183" h="51" measuredW="100" measuredH="70" zOrder="15" locked="false" isInGroup="-1"/>
+    <control controlID="52" controlTypeID="com.balsamiq.mockups::Label" x="954" y="320" w="-1" h="-1" measuredW="83" measuredH="21" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%24%5Cvarepsilon%24</text>
+      </controlProperties>
+    </control>
+    <control controlID="53" controlTypeID="com.balsamiq.mockups::Image" x="911" y="270" w="32" h="32" measuredW="61" measuredH="61" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/latex-element.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::Label" x="954" y="276" w="-1" h="-1" measuredW="34" measuredH="21" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%24%5Cin%24</text>
+      </controlProperties>
+    </control>
+    <control controlID="55" controlTypeID="com.balsamiq.mockups::Label" x="943" y="335" w="-1" h="-1" measuredW="143" measuredH="21" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Is%20variant%20of%3A%20%24%5Cepsilon%24</text>
+      </controlProperties>
+    </control>
+    <control controlID="56" controlTypeID="com.balsamiq.mockups::Arrow" x="985" y="371" w="10" h="37" measuredW="150" measuredH="100" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <curvature>1</curvature>
+        <direction>top</direction>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+    <control controlID="57" controlTypeID="com.balsamiq.mockups::Paragraph" x="911" y="408" w="172" h="59" measuredW="200" measuredH="80" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>This%20box%20gets%20automatically%20generated%20when%20the%20user%20changes%20LaTeX%20field.</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

@@ -1,0 +1,16 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1107" measuredH="508" mockupW="625" mockupH="400">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="482" y="108" w="625" h="400" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>On-line%20handwriting%20recognition%20of%20mathematical%20formulae%0Ahttp%3A//write-math.com/login</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::Image" x="642" y="239" w="305" h="139" measuredW="466" measuredH="213" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>recognition-logged-in%26bm%3Brecognition-logged-in.bmml%26bm%3Brecognition-logged-in.bmml%26bm%3Brecognition-logged-in.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22160%2C131%2C465%2C270%22%20href%3D%22recognition-logged-in.bmml%22%20alt%3D%22recognition-logged-in%22%20id%3D%2212%22/%3E</map>
+        <src>./images/open-id.png</src>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>
