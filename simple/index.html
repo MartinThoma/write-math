@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Write Math - Simple version</title>
+
+    <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+<script type='text/javascript'>//<![CDATA[ 
+    var VanillaRunOnDomReady = function() {
+        var canvas = new fabric.Canvas('c',{backgroundColor: 'rgb(200,200,200)'});
+        var normalized = new fabric.Canvas('normalized',{backgroundColor: 'rgb(200,200,200)'});
+        var lastPoint = undefined;
+        canvas.isDrawingMode = true;
+        var rect = new fabric.Rect();
+
+canvas.add(rect); // add object
+
+canvas.on('mouse:down', function(options) {
+    startRecording();
+});
+
+var lines = [];
+
+
+function startRecording(){
+    var line = [];
+    canvas.on('mouse:move', recordMoment);
+    canvas.on("mouse:up", stopRecording);
+    
+    function recordMoment(event){
+        line.push({x: event.e.x, y: event.e.y});
+        console.log(event.e.x + " " + event.e.y);
+        if (lastPoint != undefined){
+                normalized.add(new fabric.Line([lastPoint[0], lastPoint[1], event.e.x, event.e.y], 
+                    {
+                        stroke: 'red'
+                    }
+                    )
+                );
+        }
+        lastPoint = [event.e.x, event.e.y];
+    }
+    function stopRecording(){
+        lines.push(line);
+        canvas.off('mouse:move', recordMoment);
+        canvas.off("mouse:up", stopRecording);
+    }
+}
+
+
+}
+
+var alreadyrunflag = 0;
+
+if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", function(){
+        alreadyrunflag=1; 
+        VanillaRunOnDomReady();
+    }, false);
+else if (document.all && !window.opera) {
+    document.write('<script type="text/javascript" id="contentloadtag" defer="defer" src="javascript:void(0)"><\/script>');
+    var contentloadtag = document.getElementById("contentloadtag")
+    contentloadtag.onreadystatechange=function(){
+        if (this.readyState=="complete"){
+            alreadyrunflag=1;
+            VanillaRunOnDomReady();
+        }
+    }
+}
+
+window.onload = function(){
+    setTimeout("if (!alreadyrunflag){VanillaRunOnDomReady}", 0);
+}//]]>  
+
+</script>
+
+
+</head>
+<body>
+<table>
+    <tr>
+        <td><canvas id="c"> </canvas></td>
+        <td><canvas id="normalized"> </canvas></td>
+    </tr>
+</table>
+    <a href="index.html">Reset</a>
+</body>
+</html>

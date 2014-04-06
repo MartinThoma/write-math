@@ -149,5 +149,28 @@
         <text>Users%20who%20could%20not%20get%20the%20correct%20result%20from%20the%20database%20can%20create%20%22user%20challanges%22%20that%20other%20users%20can%20answer.%20The%20image%20is%20what%20the%20user%20has%20entered.</text>
       </controlProperties>
     </control>
+    <control controlID="43" controlTypeID="com.balsamiq.mockups::Title" x="733" y="419" w="-1" h="-1" measuredW="117" measuredH="21" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>18</size>
+        <text>My%20challenges</text>
+      </controlProperties>
+    </control>
+    <control controlID="44" controlTypeID="com.balsamiq.mockups::Image" x="733" y="440" w="92" h="28" measuredW="885" measuredH="166" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./images/formula.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="45" controlTypeID="com.balsamiq.mockups::Paragraph" x="829" y="444" w="200" h="31" measuredW="200" measuredH="80" zOrder="27" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>I%20want%20to%20display%20the%20integral%20of%20the%20function...</text>
+      </controlProperties>
+    </control>
+    <control controlID="46" controlTypeID="com.balsamiq.mockups::Link" x="925" y="456" w="-1" h="-1" measuredW="92" measuredH="19" zOrder="28" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>user-generated-challenge%26bm%3Buser-generated-challenge.bmml%26bm%3Buser-generated-challenge.bmml%26bm%3Buser-generated-challenge.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22443%2C348%2C535%2C367%22%20href%3D%22user-generated-challenge.bmml%22%20alt%3D%22user-generated-challenge%22%20id%3D%2246%22/%3E</map>
+        <text>Go%20to%20challenge</text>
+      </controlProperties>
+    </control>
   </controls>
 </mockup>

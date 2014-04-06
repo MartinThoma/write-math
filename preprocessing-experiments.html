@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preprocessing experiments</title>
+    <script src="js/fabric.js"></script>
+</head>
+<body>
+
+<div class="canvas-container" style="width: 500px; height: 500px; position: relative; -webkit-user-select: none;"><canvas id="c" width="500" height="500" style="border: 1px solid rgb(170, 170, 170); position: absolute; width: 500px; height: 500px; left: 0px; top: 0px; -webkit-user-select: none;" class="lower-canvas"></canvas><canvas class="upper-canvas " width="500" height="500" style="border: 1px solid rgb(170, 170, 170); position: absolute; width: 500px; height: 500px; left: 0px; top: 0px; -webkit-user-select: none; cursor: crosshair;"></canvas></div>
+
+<div style="display: inline-block; margin-left: 10px">
+  <button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
+  <button id="clear-canvas" class="btn btn-info">Clear</button><br>
+
+  <div id="drawing-mode-options">
+    <label for="drawing-mode-selector">Mode:</label>
+    <select id="drawing-mode-selector">
+      <option>Pencil</option>
+      <option>Circle</option>
+      <option>Spray</option>
+      <option>Pattern</option>
+
+      <option>hline</option>
+      <option>vline</option>
+      <option>square</option>
+      <option>diamond</option>
+      <option>texture</option>
+    </select><br>
+
+    <label for="drawing-line-width">Line width:</label>
+    <span class="info">30</span><input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
+
+    <label for="drawing-color">Line color:</label>
+    <input type="color" value="#005E7A" id="drawing-color"><br>
+
+    <label for="drawing-shadow-color">Shadow color:</label>
+    <input type="color" value="#005E7A" id="drawing-shadow-color"><br>
+
+    <label for="drawing-shadow-width">Shadow width:</label>
+    <span class="info">0</span><input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
+
+    <label for="drawing-shadow-offset">Shadow offset:</label>
+    <span class="info">0</span><input type="range" value="0" min="0" max="50" id="drawing-shadow-offset"><br>
+  </div>
+</div>
+
+
+    <script type="text/javascript">
+(function() {
+  var $ = function(id){return document.getElementById(id)};
+
+  var canvas = this.__canvas = new fabric.Canvas('c', {
+    isDrawingMode: true
+  });
+
+  fabric.Object.prototype.transparentCorners = false;
+
+  var drawingModeEl = $('drawing-mode'),
+      drawingOptionsEl = $('drawing-mode-options'),
+      drawingColorEl = $('drawing-color'),
+      drawingShadowColorEl = $('drawing-shadow-color'),
+      drawingLineWidthEl = $('drawing-line-width'),
+      drawingShadowWidth = $('drawing-shadow-width'),
+      drawingShadowOffset = $('drawing-shadow-offset'),
+      clearEl = $('clear-canvas');
+
+  clearEl.onclick = function() { canvas.clear() };
+
+  drawingModeEl.onclick = function() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    if (canvas.isDrawingMode) {
+      drawingModeEl.innerHTML = 'Cancel drawing mode';
+      drawingOptionsEl.style.display = '';
+    }
+    else {
+      drawingModeEl.innerHTML = 'Enter drawing mode';
+      drawingOptionsEl.style.display = 'none';
+    }
+  };
+
+  $('drawing-mode-selector').onchange = function() {
+
+    if (this.value === 'hline') {
+      canvas.freeDrawingBrush = vLinePatternBrush;
+    }
+    else if (this.value === 'vline') {
+      canvas.freeDrawingBrush = hLinePatternBrush;
+    }
+    else if (this.value === 'square') {
+      canvas.freeDrawingBrush = squarePatternBrush;
+    }
+    else if (this.value === 'diamond') {
+      canvas.freeDrawingBrush = diamondPatternBrush;
+    }
+    else if (this.value === 'texture') {
+      canvas.freeDrawingBrush = texturePatternBrush;
+    }
+    else {
+      canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
+    }
+
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = drawingColorEl.value;
+      canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+      canvas.freeDrawingBrush.shadowBlur = parseInt(drawingShadowWidth.value, 10) || 0;
+    }
+  };
+
+  drawingColorEl.onchange = function() {
+    canvas.freeDrawingBrush.color = this.value;
+  };
+  drawingShadowColorEl.onchange = function() {
+    canvas.freeDrawingBrush.shadowColor = this.value;
+  };
+  drawingLineWidthEl.onchange = function() {
+    canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+    this.previousSibling.innerHTML = this.value;
+  };
+  drawingShadowWidth.onchange = function() {
+    canvas.freeDrawingBrush.shadowBlur = parseInt(this.value, 10) || 0;
+    this.previousSibling.innerHTML = this.value;
+  };
+  drawingShadowOffset.onchange = function() {
+    canvas.freeDrawingBrush.shadowOffsetX =
+    canvas.freeDrawingBrush.shadowOffsetY = parseInt(this.value, 10) || 0;
+    this.previousSibling.innerHTML = this.value;
+  };
+
+  if (canvas.freeDrawingBrush) {
+    canvas.freeDrawingBrush.color = drawingColorEl.value;
+    canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+    canvas.freeDrawingBrush.shadowBlur = 0;
+  }
+})();
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple example</title>
+    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+    <script type='text/javascript'>
+window.onload=function(){
+var canvas = new fabric.Canvas('sheet');
+canvas.isDrawingMode = true;
+canvas.freeDrawingBrush.width = 5;
+canvas.freeDrawingBrush.color = "#ff0000";
+}
+</script>
+  </head>
+  <body>
+    <canvas id="sheet" style="border:1px solid black;"></canvas>
+  </body>
+</html>
