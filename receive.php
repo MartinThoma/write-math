@@ -1,13 +1,8 @@
 <?php
-$dbhost = "localhost"; 
-$dbuname = "root";  // Database username
-$dbpass = "";   // Database password
-$dbname = "mydb";   // Database NAME
-
 require("config.php");
-
-$link = mysql_connect ($server, $username, $password) or die("Could not connect to database.");
-mysql_select_db('write-math', $link) or die('Could not select database.');
+$link = mysql_connect ($server, $username, $password)
+                      or die("Could not connect to database.");
+mysql_select_db($dbname, $link) or die('Could not select database.');
 
 /**
  * Parse JSON encoded data string that represents a set of handdrawn lines.
