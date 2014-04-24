@@ -1,0 +1,79 @@
+{% extends "base.twig" %}
+
+{% block header %}
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+<script type='text/javascript'>
+    var lines = [];
+
+    window.onload=function(){
+        var canvas = new fabric.Canvas('sheet');
+       canvas.isDrawingMode = true;
+       canvas.freeDrawingBrush.width = 5;
+       canvas.freeDrawingBrush.color = "#ff0000";
+
+        var template = new fabric.Canvas('template');
+        fabric.loadSVGFromURL('../view/?id={{ formula_id }}',
+                              function(objects, options) {
+            var loadedObject = fabric.util.groupSVGElements(objects, options);
+            loadedObject.scale(Math.min(template.height / loadedObject.height, 
+                                        template.width / loadedObject.width));
+            loadedObject.set({left : 0, top : 0});
+            loadedObject.setCoords();
+            template.add(loadedObject).renderAll();
+            loadedObject.center();
+           }
+        );
+
+        canvas.on('mouse:down', function(options) {
+          startRecording();
+        });
+
+        function startRecording(){
+            var line = [];
+            canvas.on('mouse:move', recordMoment);
+            canvas.on("mouse:up", stopRecording);
+
+            function recordMoment(event){
+                line.push({x: event.e.x, y: event.e.y});
+            }
+            function stopRecording(){
+                lines.push(line);
+                canvas.off('mouse:move', recordMoment);
+                canvas.off("mouse:up", stopRecording);
+            }
+        }
+    }
+
+
+    function addCanvas() {
+        var drawnJSON = document.getElementById('drawnJSON');
+        drawnJSON.value = JSON.stringify(lines);
+        return true;
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+
+{% if formula_id != "" %}
+    <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
+    <input type="hidden" name="symbol_id" value="{{ symbol_id }}"/>
+    <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
+    <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
+    <table>
+        <tr>
+            <th>Draw here:</th>
+            <th>Draw this:</th>
+        </tr>
+        <tr>
+            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"/></td>
+            <td><canvas id="template" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"/></td>
+        </tr>
+    </table>
+    </canvas>
+    <input type="submit" />
+    </form>
+{% else %}
+<a href="?formula_id=1">1</a>
+{% endif %}
+{% endblock %}

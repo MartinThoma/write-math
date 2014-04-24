@@ -4,7 +4,7 @@ include 'init.php';
 function does_user_exist($uname) {
     global $mysqli;
 
-    if (!($stmt = $mysqli->prepare("SELECT `id` FROM `users` WHERE `display_name` = (?)"))) {
+    if (!($stmt = $mysqli->prepare("SELECT `id` FROM `wm_users` WHERE `display_name` = (?)"))) {
         echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         return false;
     }
@@ -40,7 +40,7 @@ function rand_string( $length ) {
 function create_new_user($uname, $email, $pw, $salt) {
     global $mysqli;
 
-    if (!($stmt = $mysqli->prepare("INSERT INTO  `write-math`.`users` (".
+    if (!($stmt = $mysqli->prepare("INSERT INTO  `write-math`.`wm_users` (".
                                    "`display_name` ,".
                                    "`email` ,".
                                    "`password` ,".

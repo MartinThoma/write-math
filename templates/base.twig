@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,7 +14,7 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
-    <link href="starter-template.css" rel="stylesheet">
+    <link href="../jumbotron.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -25,6 +24,7 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    {% block header %}{% endblock %}
   </head>
 
   <body>
@@ -38,26 +38,40 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Write Math</a>
+          <a class="navbar-brand" href="http://write-math.com">Write Math</a>
         </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+        <div class="navbar-collapse collapse">
+        {% if logged_in %}
+          <ul class="nav navbar-nav navbar-left">
+            <li {% if file == 'train' %}class="active"{% endif %}  ><a href="../train">Train</a></li>
+            <li {% if file == 'gallery' %}class="active"{% endif %}><a href="../gallery">Gallery</a></li>
+            <li {% if file == 'about' %}class="active"{% endif %}  ><a href="../about">About</a></li>
           </ul>
-        </div><!--/.nav-collapse -->
+        {% endif %}
+        {% if logged_in %}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="http://write-math.com/profile.php">{{ username }}</a></li>
+          </ul>
+        {% else %}
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        {% endif %}
+        </div><!--/.navbar-collapse -->
       </div>
     </div>
 
     <div class="container">
+      <h1>{{ heading }}</h1>
+      {% block content %}{% endblock %}
+    </div>
 
-      <div class="starter-template">
-        <h1>{{ heading }}</h1>
-        {% block content %}{% endblock %}
-      </div>
-
-    </div><!-- /.container -->
 
 
     <!-- Bootstrap core JavaScript
