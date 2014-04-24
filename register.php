@@ -81,27 +81,27 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
 ?>
 
 <html>
-    <head>
-        <title>Register</title>
-    </head>
-    <body>
-        <?php include 'header.php'; ?>
-        <h1>Register</h1>
-        <form action="register.php" method="post">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username"
-                   pattern=".{4,20}" required title="4 to 20 characters"/>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <?php include 'header.php'; ?>
+    <h1>Register</h1>
+    <form action="register.php" method="post">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username"
+               pattern=".{4,20}" required title="4 to 20 characters"/>
 
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" 
-                   pattern=".{5,}" required title="5 characters minimum"/>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" 
+               pattern=".{5,}" required title="5 characters minimum"/>
 
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" />
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" />
 
-            <input type="submit" />
-        </form>
+        <input type="submit" />
+    </form>
 
-        <?php readfile('footer.php'); ?>
-    </body>
+    <?php include 'footer.php'; ?>
+</body>
 </html>

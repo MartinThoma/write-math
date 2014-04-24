@@ -49,7 +49,7 @@ if (isset($_POST['uname']) && isset($_POST['upass'])) {
             $_SESSION['uname'] = $uname;
             $_SESSION['upass'] = $upass;
             $_SESSION['is_logged_in'] = true;
-            header('Location: register.php');
+            header('Location: train.php');
         } else {
             $_SESSION['is_logged_in'] = false;
         }
