@@ -37,3 +37,6 @@ nosetests.xml
 
 config.php
 papers
+cache/*
+composer.lock
+vendor/*

@@ -1,24 +1,12 @@
 <?php
+require_once 'vendor/autoload.php';
 include 'init.php';
-?>
 
-<html>
-<head>
-    <title>Train</title>
-</head>
-<body>
-    <?php include 'header.php'; ?>
-    <h1>Train</h1>
-    <table>
-        <tr>
-            <th>Draw here:</th>
-            <th>Draw this:</th>
-        </tr>
-        <tr>
-            <td><canvas/></td>
-            <td><canvas/></td>
-        </tr>
-    </table>
-    <?php include 'footer.php'; ?>
-</body>
-</html>
+$loader = new Twig_Loader_Filesystem('templates');
+$twig = new Twig_Environment($loader, array(
+    'cache' => 'cache',
+));
+
+echo $twig->render('train.html', array('heading' => 'Train'));
+
+?>
