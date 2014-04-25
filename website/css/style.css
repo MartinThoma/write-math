@@ -1,0 +1,31 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+/* Wikipedia image gallery */
+ul.gallery {
+    margin: 2px;
+    padding: 2px;
+    display: block;
+}
+
+li.gallerybox {
+    vertical-align: top;
+    display: inline-block;
+}
+
+li.gallerybox div.thumb {
+    text-align: center;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    margin: 2px;
+}
+
+div.gallerytext {
+    overflow: hidden;
+    font-size: 94%;
+    padding: 2px 4px;
+    word-wrap:break-word;
+}

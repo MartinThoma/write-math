@@ -35,8 +35,8 @@ nosetests.xml
 .project
 .pydevproject
 
-config.php
+website/config.php
 papers
-cache/*
-composer.lock
-vendor/*
+website/cache/*
+website/composer.lock
+website/vendor/*

@@ -76,7 +76,7 @@ function rand_string( $length ) {
 function create_new_user($display_name, $email, $pw, $salt) {
     global $mysqli;
 
-    if (!($stmt = $mysqli->prepare("INSERT INTO  `write-math`.`wm_users` (".
+    if (!($stmt = $mysqli->prepare("INSERT INTO  `wm_users` (".
                                    "`display_name` ,".
                                    "`email` ,".
                                    "`password` ,".

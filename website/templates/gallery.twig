@@ -1,0 +1,49 @@
+{% extends "base.twig" %}
+
+{% block header %}
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+
+ <script type='text/javascript'>
+     window.onload=function(){
+ {% for image in userimages %}
+    var canvas = new fabric.Canvas('galleryImage{{ loop.index }}');
+    var obj = JSON.parse('{{ image.image|raw}}');
+    for (var line in obj) {
+        var lastPoint = undefined;
+        for (var point in obj[line]) {
+            point = obj[line][point];
+            if (lastPoint != undefined){
+                var lineObj = new fabric.Line([lastPoint[0], lastPoint[1], point.x, point.y], 
+                        {
+                            stroke: 'red'
+                        }
+                        )
+                canvas.add(lineObj);
+            }
+            lastPoint = [point.x, point.y];
+        }
+    }
+
+    canvas.renderAll();
+    {% endfor %}
+}
+ </script>
+{% endblock %}
+
+{% block content %}
+   <ul class="gallery mw-gallery-traditional">
+    {% for image in userimages %}
+     <li class="gallerybox" style="width: 155px">
+       <div style="width: 155px">
+         <div class="thumb" style="width: 150px;">
+           <div style="margin:21px auto;">
+             <canvas id="galleryImage{{ loop.index }}" class="gallerycanvas" width="140" height="140">
+             </canvas>
+           </div>
+         </div>
+         <div class="gallerytext">{{ image.creation_date }}</div>
+       </div>
+     </li>
+    {% endfor %}
+   </ul>
+{% endblock %}

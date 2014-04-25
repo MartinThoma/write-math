@@ -14,7 +14,7 @@ if (!is_logged_in()) {
 function insert_userdrawing($user_id, $data, $formula_id) {
     global $mysqli;
 
-    if (!($stmt = $mysqli->prepare("INSERT INTO  `write-math`.`wm_raw_draw_data` (".
+    if (!($stmt = $mysqli->prepare("INSERT INTO `wm_raw_draw_data` (".
                                    "`user_id` ,".
                                    "`data` ,".
                                    "`creation_date` ,".

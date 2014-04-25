@@ -6,7 +6,7 @@
     var lines = [];
 
     window.onload=function(){
-        var canvas = new fabric.Canvas('sheet');
+       var canvas = new fabric.Canvas('sheet');
        canvas.isDrawingMode = true;
        canvas.freeDrawingBrush.width = 5;
        canvas.freeDrawingBrush.color = "#ff0000";
@@ -54,7 +54,26 @@
 {% endblock %}
 
 {% block content %}
-    {% for image in userimages %}
-        {{ image.creation_date }}
-    {% endfor %}
+
+{% if formula_id != "" %}
+    <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
+    <input type="hidden" name="symbol_id" value="{{ symbol_id }}"/>
+    <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
+    <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
+    <table>
+        <tr>
+            <th>Draw here:</th>
+            <th>Draw this:</th>
+        </tr>
+        <tr>
+            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"/></td>
+            <td><canvas id="template" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"/></td>
+        </tr>
+    </table>
+    </canvas>
+    <input type="submit" />
+    </form>
+{% else %}
+<a href="?formula_id=1">1</a>
+{% endif %}
 {% endblock %}
