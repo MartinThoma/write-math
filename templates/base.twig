@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
-    <title>{{ title }}</title>
+    <title>{{ heading }}</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -50,15 +50,21 @@
         {% endif %}
         {% if logged_in %}
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="http://write-math.com/profile.php">{{ username }}</a></li>
+            <li><a href="../profile">{{ display_name }}</a></li>
           </ul>
         {% else %}
-          <form class="navbar-form navbar-right" role="form">
+          <form class="navbar-form navbar-right" role="form" method="post" action="../login/index.php">
             <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
+              <input type="text"
+                     placeholder="Email"
+                     class="form-control"
+                     name="email" />
             </div>
             <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
+              <input type="password"
+                     placeholder="Password"
+                     class="form-control"
+                     name="password" />
             </div>
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
@@ -69,6 +75,9 @@
 
     <div class="container">
       <h1>{{ heading }}</h1>
+      {% for m in msg %}
+        <div class="alert {{ m.class }}">{{ m.text }}</div>
+      {% endfor %}
       {% block content %}{% endblock %}
     </div>
 

@@ -54,5 +54,7 @@
 {% endblock %}
 
 {% block content %}
-
+    {% for image in userimages %}
+        {{ image.creation_date }}
+    {% endfor %}
 {% endblock %}

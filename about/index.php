@@ -9,7 +9,7 @@ $twig = new Twig_Environment($loader, array(
 
 echo $twig->render('about.twig', array('heading' => 'About',
                                        'logged_in' => is_logged_in(),
-                                       'username' => $_SESSION['uname'],
+                                       'display_name' => $_SESSION['display_name'],
                                        'file'=> "about"
                                        )
                   );

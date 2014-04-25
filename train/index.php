@@ -7,6 +7,10 @@ $twig = new Twig_Environment($loader, array(
     'cache' => '../cache',
 ));
 
+if (!is_logged_in()) {
+    header("Location: ../login");
+}
+
 function insert_userdrawing($user_id, $data, $formula_id) {
     global $mysqli;
 
@@ -59,7 +63,7 @@ if (isset($_POST['formula_id'])) {
 
 echo $twig->render('train.twig', array('heading' => 'Train',
                                        'logged_in' => is_logged_in(),
-                                       'username' => $_SESSION['uname'],
+                                       'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
                                        'symbol_id' => $_GET['formula_id'],
                                        'formula_id' => $_GET['formula_id']

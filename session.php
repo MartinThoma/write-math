@@ -3,55 +3,42 @@
 function is_logged_in() {
     global $mysqli;
 
-    if ($_SESSION['is_logged_in']) {
-        $uname = $_SESSION['uname'];
-        $upass = $_SESSION['upass'];
+    $email = $_SESSION['email'];
+    $upass = $_SESSION['password'];
 
-        if (!($stmt = $mysqli->prepare("SELECT `id`, `salt` FROM `wm_users` WHERE `display_name` = ?"))) {
-            echo "Prepare for salt selection failed: (" . $mysqli->errno . ") " . $mysqli->error;
-            return false;
-        }
+    if (!($stmt = $mysqli->prepare("SELECT `id`, `display_name` FROM `wm_users` ".
+                                   "WHERE `email` = ? AND `password` = ?"))) {
+        echo "Prepare for salt selection failed: (" . $mysqli->errno . ") " . $mysqli->error;
+        return false;
+    }
 
-        if (!$stmt->bind_param("s", $uname)) {
-            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-            return false;
-        }
+    if (!$stmt->bind_param("ss", $email, $upass)) {
+        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        return false;
+    }
 
-        if (!$stmt->execute()) {
-            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-            $stmt->close();
-            return false;
+    if (!$stmt->execute()) {
+        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        $stmt->close();
+        return false;
+    } else {
+        /* Bind results */
+        $stmt -> bind_result($id, $display_name);
+
+        /* Fetch the value */
+        $stmt -> fetch();
+
+        if ($id > 0) {
+            $_SESSION['uid'] = $id;
+            $_SESSION['display_name'] = $display_name;
+            $_SESSION['upass'] = $upass;
+            $_SESSION['is_logged_in'] = true;
+            return true;
         } else {
-            $stmt->close();
-            /* Bind results */
-            $stmt -> bind_result($id, $salt);
-
-            /* Fetch the value */
-            $stmt -> fetch();
-
-            if (!($stmt = $mysqli->prepare("SELECT `id` FROM `wm_users` WHERE `id` = ? AND `password` = ?")) ){
-                echo "Prepare for user id selection failed: (" . $mysqli->errno . ") " . $mysqli->error;
-                return false;
-            }
-
-            if (!$stmt->bind_param("is", $id, md5($upass.$salt))) {
-                echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-                return false;
-            }
-            
-            $stmt->execute();
-            $stmt -> bind_result($uid);
-            $stmt -> fetch();
-
-            if ($id == $uid) {
-                $_SESSION['uid'] = $uid;
-                $_SESSION['uname'] = $uname;
-                $_SESSION['upass'] = $upass;
-                $_SESSION['is_logged_in'] = true;
-                return true;
-            } else {
-                $_SESSION['is_logged_in'] = false;
-            }
+            $_SESSION['is_logged_in'] = false;
+            $_SESSION['uid'] = NULL;
+            $_SESSION['display_name'] = NULL;
+            $_SESSION['upass'] = NULL;
         }
     }
 
