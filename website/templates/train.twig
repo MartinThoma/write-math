@@ -12,7 +12,7 @@
        canvas.freeDrawingBrush.color = "#ff0000";
 
         var template = new fabric.Canvas('template');
-        fabric.loadSVGFromURL('../view/?id={{ formula_id }}',
+        fabric.loadSVGFromURL('../view-api/?id={{ formula_id }}',
                               function(objects, options) {
             var loadedObject = fabric.util.groupSVGElements(objects, options);
             loadedObject.scale(Math.min(template.height / loadedObject.height, 
@@ -74,6 +74,10 @@
     <input type="submit" />
     </form>
 {% else %}
-<a href="?formula_id=1">1</a>
+    <ul>
+    {% for formula in formula_ids %}
+        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] }}</a></li>
+    {% endfor %}
+    </ul>
 {% endif %}
 {% endblock %}

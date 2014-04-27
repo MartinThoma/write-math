@@ -7,24 +7,23 @@
      window.onload=function(){
  {% for image in userimages %}
     var canvas = new fabric.Canvas('galleryImage{{ loop.index }}');
+    var group = new fabric.Group();
+    canvas.add(group);
+/*    TODO: hier stimmt was nicht ... die loops sind glaube ich nicht nötig. Mit 7 testen*/
     var obj = JSON.parse('{{ image.image|raw}}');
     for (var line in obj) {
         var lastPoint = undefined;
         for (var point in obj[line]) {
-            point = obj[line][point];
-            if (lastPoint != undefined){
-                var lineObj = new fabric.Line([lastPoint[0], lastPoint[1], point.x, point.y], 
-                        {
-                            stroke: 'red'
-                        }
-                        )
-                canvas.add(lineObj);
-            }
-            lastPoint = [point.x, point.y];
+            var path = new fabric.Path('{{ image.path}}');
+            path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+            path.scale(Math.min(canvas.height / path.height, 
+                                        canvas.width  / path.width));
+            canvas.add(path);
         }
     }
 
     canvas.renderAll();
+    path.center();
     {% endfor %}
 }
  </script>
@@ -41,7 +40,7 @@
              </canvas>
            </div>
          </div>
-         <div class="gallerytext">{{ image.creation_date }}</div>
+         <div class="gallerytext"><a href="../view?id={{ image.id }}">{{ image.creation_date }}</a></div>
        </div>
      </li>
     {% endfor %}

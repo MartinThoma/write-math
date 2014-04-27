@@ -1,5 +1,6 @@
 <?php
 require_once '../vendor/autoload.php';
+require_once '../svg.php';
 include '../init.php';
 
 $loader = new Twig_Loader_Filesystem('../templates');
@@ -11,7 +12,7 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
-if (!($stmt = $mysqli->prepare("SELECT `data`, `creation_date` FROM `wm_raw_draw_data` WHERE `user_id` = ?"))) {
+if (!($stmt = $mysqli->prepare("SELECT `id`, `data`, `creation_date` FROM `wm_raw_draw_data` WHERE `user_id` = ?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
@@ -23,12 +24,16 @@ if (!$stmt->execute()) {
     echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 } else {
 
-  $stmt -> bind_result($data, $creation_date);
-  $userimages = array();
+    $stmt -> bind_result($id, $data, $creation_date);
+    $userimages = array();
 
-  while ($row = $stmt->fetch()) {
-    array_push($userimages, array("image" => $data, "creation_date" => $creation_date));
-  }
+    while ($row = $stmt->fetch()) {
+        $path = get_path($data);
+        array_push($userimages, array("id" => $id,
+                                      "image" => $data,
+                                      "creation_date" => $creation_date,
+                                      "path" => $path));
+    }
 }
 
 $stmt -> close();

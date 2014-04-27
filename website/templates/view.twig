@@ -1,0 +1,31 @@
+{% extends "base.twig" %}
+
+{% block header %}
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+<script type='text/javascript'>
+    window.onload=function(){
+        var canvas = new fabric.Canvas('galleryImage');
+        var path = new fabric.Path('{{ path}}');
+        path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+        path.scale(0.9*Math.min(canvas.height / path.height, 
+        canvas.width  / path.width));
+        canvas.add(path);
+
+        canvas.renderAll();
+        path.center();
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+   <table style="width:100%">
+       <tr>
+       <td><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas>
+       </td>
+       <td>
+           Creation Date: {{ creation_date }}<br/>
+           User-ID: {{ user_id }}<br/>
+           accepted_formula_id: {{ accepted_formula_id }}
+       </td>
+   </table>
+{% endblock %}

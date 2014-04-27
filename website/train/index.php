@@ -38,24 +38,36 @@ function insert_userdrawing($user_id, $data, $formula_id) {
     return $mysqli->insert_id;
 }
 
-if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_symbols` WHERE  `id` = ?;"))) {
-    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-}
+$formula_ids = array();
 
-if (!$stmt->bind_param("i", $_GET['symbol_id'])) {
-    echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-}
+if (isset($_GET['formula_id'])) {
+    if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_symbols` WHERE  `id` = ?;"))) {
+        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
 
-if (!$stmt->execute()) {
-    echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+    if (!$stmt->bind_param("i", $_GET['formula_id'])) {
+        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    }
+
+    if (!$stmt->execute()) {
+        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+    } else {
+      /* Bind results */
+      $stmt -> bind_result($svg);
+
+      /* Fetch the value */
+      $stmt -> fetch();
+
+      $stmt -> close();
+    }
 } else {
-  /* Bind results */
-  $stmt -> bind_result($svg);
-
-  /* Fetch the value */
-  $stmt -> fetch();
+    if ($result = $mysqli->query("SELECT `id` ,  `formula_name` FROM `wm_formula` ", MYSQLI_USE_RESULT)) {
+        while($obj = $result->fetch_assoc()){ 
+            array_push($formula_ids, $obj);
+        } 
+        $result->close();
+    }
 }
-//$stmt->close();
 
 if (isset($_POST['formula_id'])) {
     insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
@@ -66,7 +78,8 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
                                        'symbol_id' => $_GET['formula_id'],
-                                       'formula_id' => $_GET['formula_id']
+                                       'formula_id' => $_GET['formula_id'],
+                                       'formula_ids' => $formula_ids
                                        )
                   );
 
