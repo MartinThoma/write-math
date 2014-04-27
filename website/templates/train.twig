@@ -57,7 +57,6 @@
 
 {% if formula_id != "" %}
     <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
-    <input type="hidden" name="symbol_id" value="{{ symbol_id }}"/>
     <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <table>

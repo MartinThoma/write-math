@@ -41,7 +41,7 @@ function insert_userdrawing($user_id, $data, $formula_id) {
 $formula_ids = array();
 
 if (isset($_GET['formula_id'])) {
-    if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_symbols` WHERE  `id` = ?;"))) {
+    if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_formula` WHERE  `id` = ?;"))) {
         echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
 
@@ -77,7 +77,6 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
-                                       'symbol_id' => $_GET['formula_id'],
                                        'formula_id' => $_GET['formula_id'],
                                        'formula_ids' => $formula_ids
                                        )

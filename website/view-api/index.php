@@ -7,7 +7,7 @@ $twig = new Twig_Environment($loader, array(
     'cache' => '../cache',
 ));
 
-if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_symbols` WHERE  `id` = ?;"))) {
+if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_formula` WHERE  `id` = ?;"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
     return false;
 }
