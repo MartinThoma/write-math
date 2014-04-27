@@ -40,4 +40,4 @@ papers
 website/cache/*
 website/composer.lock
 website/vendor/*
-website/symbol-generator/dbconfig.py
+symbol-generator/dbconfig.py
