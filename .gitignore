@@ -35,9 +35,10 @@ nosetests.xml
 .project
 .pydevproject
 
-website/config.php
+# Project specific
 papers
+symbol-generator/dbconfig.py
+website/config.php
 website/cache/*
 website/composer.lock
 website/vendor/*
-symbol-generator/dbconfig.py
