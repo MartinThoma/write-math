@@ -50,3 +50,8 @@ function get_uid() {
     is_logged_in();
     return $_SESSION['uid'];
 }
+
+function get_email() {
+    is_logged_in();
+    return $_SESSION['email'];
+}
