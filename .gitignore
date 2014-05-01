@@ -38,7 +38,12 @@ nosetests.xml
 # Project specific
 papers
 symbol-generator/dbconfig.py
+symbol-generator/tmp.tex
+symbol-generator/tmp.log
+symbol-generator/tmp.aux
+symbol-generator/tmp.pdf
 website/config.php
 website/cache/*
 website/composer.lock
 website/vendor/*
+website/write-math.sublime-workspace

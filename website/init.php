@@ -2,7 +2,7 @@
 require_once '../vendor/autoload.php';
 session_start();
 require("config.php");
-$dsn = "mysql:host=$host;dbname=$dbname";
+$dsn = "mysql:host=$server;dbname=$dbname";
 
 try { 
     $pdo = new PDO($dsn, $username, $password);

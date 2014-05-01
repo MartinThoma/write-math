@@ -15,9 +15,29 @@ function add_classification($user_id, $raw_data_id, $latex) {
 
     if($formula_id == 0) {
         // it was not in the database. Add it.
+        $sql = "INSERT INTO `wm_formula` (".
+               "`formula_in_latex`, `is_single_symbol`".
+               ") VALUES (".
+               ":latex, '2');";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':latex', trim($latex), PDO::PARAM_STR);
+        $stmt->execute();
+        $formula_id = $pdo->lastInsertId;
     }
 
-    // check if raw_data_id 
+    $sql = "INSERT INTO  `write-math`.`wm_raw_data2formula` (".
+           "`raw_data_id` ,".
+           "`formula_id` ,".
+           "`user_id`".
+           ") VALUES (".
+           ":raw_data_id, :formula_id, :user_id".
+           ");";
+    $stmt = $pdo->prepare($sql);
+    echo $formula_id;
+    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
+    $stmt->execute();
 }
 
 if (isset($_GET['raw_data_id'])) {

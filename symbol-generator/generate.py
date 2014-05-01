@@ -40,9 +40,23 @@ if __name__ == "__main__":
     with open('symbol.tex') as f:
         content = f.read()
 
-    for i in range(ord('A'), ord('Z') + 1):
+    # Create big letters
+    # for i in range(ord('A'), ord('Z') + 1):
+    #     with open('tmp.tex', "w") as f:
+    #         tmp = content.replace("{{ content }}", chr(i))
+    #         f.write(tmp)
+
+    #     create_svg("tmp")
+    #     new_filename = chr(i) + ".svg"
+    #     os.rename("tmp.svg", new_filename)
+    #     with open(new_filename) as f:
+    #         svg = f.read()
+    #     upload_new_symbol(chr(i), chr(i), svg)
+    #     os.remove(new_filename)
+
+    for latex in ["$\\rightarrow$"]:
         with open('tmp.tex', "w") as f:
-            tmp = content.replace("{{ content }}", chr(i))
+            tmp = content.replace("{{ content }}", latex)
             f.write(tmp)
 
         create_svg("tmp")
@@ -50,5 +64,5 @@ if __name__ == "__main__":
         os.rename("tmp.svg", new_filename)
         with open(new_filename) as f:
             svg = f.read()
-        upload_new_symbol(chr(i), chr(i), svg)
+        upload_new_symbol(latex, latex, svg)
         os.remove(new_filename)
