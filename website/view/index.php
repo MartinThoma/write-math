@@ -41,6 +41,18 @@ function add_classification($user_id, $raw_data_id, $latex) {
 }
 
 if (isset($_GET['raw_data_id'])) {
+    if (isset($_GET['accept'])) {
+        $sql = "UPDATE `wm_raw_draw_data` ".
+               "SET `accepted_formula_id` = :accepted_id ".
+               "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
+               "`user_id` = :uid";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+        $stmt->bindParam(':accepted_id', $_GET['accept'], PDO::PARAM_INT);
+        $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
     $raw_data_id = $_GET['raw_data_id'];
     $sql = "SELECT `user_id`, `data`, `creation_date`, ".
                                    "`accepted_formula_id` ".

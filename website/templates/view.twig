@@ -15,15 +15,15 @@
         path.center();
 
          {% for answer in answers %}
-            var template = new fabric.Canvas('answer{{ loop.index }}');
+            var template{{ loop.index }} = new fabric.Canvas('answer{{ loop.index }}');
             fabric.loadSVGFromURL('../view-api/?id={{ answer.formula_id }}',
                                   function(objects, options) {
                 var loadedObject = fabric.util.groupSVGElements(objects, options);
-                loadedObject.scale(Math.min(template.height / loadedObject.height, 
-                                            template.width / loadedObject.width));
+                loadedObject.scale(Math.min(template{{ loop.index }}.height / loadedObject.height, 
+                                            template{{ loop.index }}.width / loadedObject.width));
                 loadedObject.set({left : 0, top : 0});
                 loadedObject.setCoords();
-                template.add(loadedObject).renderAll();
+                template{{ loop.index }}.add(loadedObject).renderAll();
                 loadedObject.center();
                }
             );
@@ -46,13 +46,25 @@
 
    <h2>Possible classifications</h2>
     {% for answer in answers %}
-       <div style="width: 155px">
-         <div>
-             <canvas id="answer{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas>
-           </div>
-         <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre>
-         <p><a href="../profile?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
-       </div>
+    <div class="container-fluid">
+      <table>
+        <tr>
+          <td><canvas id="answer{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas></td>
+          <td>
+              <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
+              <p><a href="../profile?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
+          </td>
+          <td>
+            {% if answer.formula_id == accepted_formula_id %}
+              <img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" />
+            {% else %}
+          <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
+"src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div><br/>
     {% endfor %}
 
    <h2>Add a new answer</h2>

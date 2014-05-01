@@ -74,7 +74,7 @@
 {% else %}
     <ul>
     {% for formula in formula_ids %}
-        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] }}</a></li>
+        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] | raw }}</a></li>
     {% endfor %}
     </ul>
 {% endif %}
