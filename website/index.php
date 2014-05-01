@@ -1,3 +1,3 @@
 <?php
-header("Location: train")
+header("Location: train");
 ?>

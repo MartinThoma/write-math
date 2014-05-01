@@ -1,72 +1,40 @@
 <?php
-require_once '../vendor/autoload.php';
 include '../init.php';
-
-$loader = new Twig_Loader_Filesystem('../templates');
-$twig = new Twig_Environment($loader, array(
-    'cache' => '../cache',
-));
 
 if (!is_logged_in()) {
     header("Location: ../login");
 }
 
 function insert_userdrawing($user_id, $data, $formula_id) {
-    global $mysqli;
+    global $pdo;
 
-    if (!($stmt = $mysqli->prepare("INSERT INTO `wm_raw_draw_data` (".
-                                   "`user_id` ,".
-                                   "`data` ,".
-                                   "`creation_date` ,".
-                                   "`accepted_formula_id`".
-                                   ") VALUES (?, ?, CURRENT_TIMESTAMP , ?);"
-                                   )
-          )
-       ) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-    }
-
-    if (!$stmt->bind_param("isi", $user_id, $data, $formula_id)) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        return 0;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        return 0;
-    }
-    return $mysqli->insert_id;
+    $sql = "INSERT INTO `wm_raw_draw_data` (".
+                   "`user_id` ,".
+                   "`data` ,".
+                   "`creation_date` ,".
+                   "`accepted_formula_id`".
+                   ") VALUES (:uid, :data, CURRENT_TIMESTAMP , :formula_id);";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':data', $data, PDO::PARAM_STR);
+    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $pdo->lastInsertId;
 }
 
 $formula_ids = array();
 
 if (isset($_GET['formula_id'])) {
-    if (!($stmt = $mysqli->prepare("SELECT `svg` FROM  `wm_formula` WHERE  `id` = ?;"))) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-    }
-
-    if (!$stmt->bind_param("i", $_GET['formula_id'])) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-    } else {
-      /* Bind results */
-      $stmt -> bind_result($svg);
-
-      /* Fetch the value */
-      $stmt -> fetch();
-
-      $stmt -> close();
-    }
+    $sql = "SELECT `svg` FROM  `wm_formula` WHERE  `id` = :id;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $svg = $stmt->fetchObject()->svg;
 } else {
-    if ($result = $mysqli->query("SELECT `id` ,  `formula_name` FROM `wm_formula` ", MYSQLI_USE_RESULT)) {
-        while($obj = $result->fetch_assoc()){ 
-            array_push($formula_ids, $obj);
-        } 
-        $result->close();
-    }
+    $sql = "SELECT `id` ,  `formula_name` FROM `wm_formula`";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $formula_ids = $stmt->fetchAll();
 }
 
 if (isset($_POST['formula_id'])) {

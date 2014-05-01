@@ -1,10 +1,19 @@
 <?php
+require_once '../vendor/autoload.php';
 session_start();
 require("config.php");
-$mysqli = new mysqli($server, $username, $password, $dbname);
+$dsn = "mysql:host=$host;dbname=$dbname";
 
-/* check connection */
-if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+try { 
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) { 
+    echo 'Connection failed: ' . $e->getMessage(); 
 }
+
 include 'session.php';
+
+$loader = new Twig_Loader_Filesystem('../templates');
+$twig = new Twig_Environment($loader, array(
+    'cache' => '../cache',
+));

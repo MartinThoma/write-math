@@ -54,28 +54,9 @@
 {% endblock %}
 
 {% block content %}
-
-{% if formula_id != "" %}
-    <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
-    <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
+    <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
-    <table>
-        <tr>
-            <th>Draw here:</th>
-            <th>Draw this:</th>
-        </tr>
-        <tr>
-            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
-            <td><canvas id="template" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
-        </tr>
-    </table>
-    <input type="submit" />
+    <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
+    <button type="submit" class="btn btn-default">Submit</button>
     </form>
-{% else %}
-    <ul>
-    {% for formula in formula_ids %}
-        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] }}</a></li>
-    {% endfor %}
-    </ul>
-{% endif %}
 {% endblock %}

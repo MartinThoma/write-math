@@ -1,32 +1,58 @@
 <?php
-require_once '../vendor/autoload.php';
 require_once '../svg.php';
 include '../init.php';
 
-$loader = new Twig_Loader_Filesystem('../templates');
-$twig = new Twig_Environment($loader, array(
-    'cache' => '../cache',
-));
+function add_classification($user_id, $raw_data_id, $latex) {
+    global $pdo;
 
-if (isset($_GET['id'])) {
-    if (!($stmt = $mysqli->prepare("SELECT `user_id`, `data`, `creation_date`, ".
+    // Get formula id if it is already in the database
+    $sql = "SELECT `id` FROM `wm_formula` ".
+           "WHERE `formula_in_latex` = :latex";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
+    $stmt->execute();
+    $formula_id = $stmt->fetchObject()->id;
+
+    if($formula_id == 0) {
+        // it was not in the database. Add it.
+    }
+
+    // check if raw_data_id 
+}
+
+if (isset($_GET['raw_data_id'])) {
+    $raw_data_id = $_GET['raw_data_id'];
+    $sql = "SELECT `user_id`, `data`, `creation_date`, ".
                                    "`accepted_formula_id` ".
-                                   "FROM `wm_raw_draw_data` WHERE `id` = ?"))) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+                                   "FROM `wm_raw_draw_data` WHERE `id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchObject();
+
+    $user_id = $row->user_id;
+    $data = $row->data;
+    $creation_date = $row->creation_date;
+    $accepted_formula_id = $row->accepted_formula_id;
+
+    // Add a new classification
+    if (isset($_POST['latex'])) {
+        $user_id = get_uid();
+        $latex = $_POST['latex'];
+        $raw_data_id = $_GET['raw_data_id'];
+        add_classification($user_id, $raw_data_id, $latex);
     }
 
-    if (!$stmt->bind_param("i", $_GET['id'])) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-    } else {
-        $stmt->bind_result($user_id, $data, $creation_date, $accepted_formula_id);
-        $stmt->fetch();
-    }
-
-    $stmt -> close();
+    // Get all probable classifications
+    $sql = "SELECT `display_name`, `formula_in_latex`, `formula_id` ".
+           "FROM `wm_raw_data2formula`".
+           "INNER JOIN `wm_users` ON `wm_raw_data2formula`.`user_id` = `wm_users`.`id`".
+           "INNER JOIN `wm_formula` ON `wm_raw_data2formula`.`formula_id` = `wm_formula`.`id`".
+           "WHERE `raw_data_id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $answers = $stmt->fetchAll();
 }
 
 echo $twig->render('view.twig', array('heading' => 'View',
@@ -36,7 +62,9 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'path' => get_path($data),
                                        'user_id' => $user_id,
                                        'creation_date' => $creation_date,
-                                       'accepted_formula_id' => $accepted_formula_id
+                                       'accepted_formula_id' => $accepted_formula_id,
+                                       'raw_data_id' => $raw_data_id,
+                                       'answers' => $answers
                                        )
                   );
 

@@ -13,6 +13,21 @@
 
         canvas.renderAll();
         path.center();
+
+         {% for answer in answers %}
+            var template = new fabric.Canvas('answer{{ loop.index }}');
+            fabric.loadSVGFromURL('../view-api/?id={{ answer.formula_id }}',
+                                  function(objects, options) {
+                var loadedObject = fabric.util.groupSVGElements(objects, options);
+                loadedObject.scale(Math.min(template.height / loadedObject.height, 
+                                            template.width / loadedObject.width));
+                loadedObject.set({left : 0, top : 0});
+                loadedObject.setCoords();
+                template.add(loadedObject).renderAll();
+                loadedObject.center();
+               }
+            );
+         {% endfor %}
     }
 </script>
 {% endblock %}
@@ -28,4 +43,27 @@
            accepted_formula_id: {{ accepted_formula_id }}
        </td>
    </table>
+
+   <h2>Possible classifications</h2>
+    {% for answer in answers %}
+       <div style="width: 155px">
+         <div>
+             <canvas id="answer{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas>
+           </div>
+         <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre>
+         <p><a href="../profile?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
+       </div>
+    {% endfor %}
+
+   <h2>Add a new answer</h2>
+   <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal">
+     <input type="hidden" name="raw_data_id" value="" />
+     <div class="control-group">
+       <label class="control-label" for="latex">LaTeX</label>
+       <div class="controls"> 
+         <textarea name="latex" id="latex" style="width:100%"></textarea>
+       </div>
+     </div>
+     <button type="submit" class="btn btn-default">Submit</button>
+   </form>
 {% endblock %}

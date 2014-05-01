@@ -1,12 +1,6 @@
 <?php
-require_once '../vendor/autoload.php';
 require_once '../svg.php';
 include '../init.php';
-
-$loader = new Twig_Loader_Filesystem('../templates');
-$twig = new Twig_Environment($loader, array(
-    'cache' => '../cache',
-));
 
 echo $twig->render('profile.twig', array('heading' => 'Profile',
                                        'file' => "profile",
