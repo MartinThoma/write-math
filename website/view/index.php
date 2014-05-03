@@ -33,7 +33,6 @@ function add_classification($user_id, $raw_data_id, $latex) {
            ":raw_data_id, :formula_id, :user_id".
            ");";
     $stmt = $pdo->prepare($sql);
-    echo $formula_id;
     $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
     $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
     $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
@@ -54,9 +53,8 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     $raw_data_id = $_GET['raw_data_id'];
-    $sql = "SELECT `user_id`, `data`, `creation_date`, ".
-                                   "`accepted_formula_id` ".
-                                   "FROM `wm_raw_draw_data` WHERE `id` = :id";
+    $sql = "SELECT `user_id`, `data`, `creation_date`, `accepted_formula_id` ".
+           "FROM `wm_raw_draw_data` WHERE `id` = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();

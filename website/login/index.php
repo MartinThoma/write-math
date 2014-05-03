@@ -9,67 +9,41 @@ $twig = new Twig_Environment($loader, array(
 $msg = array();
 
 function login($email, $upass) {
-    global $msg, $mysqli;
+    global $msg, $pdo;
 
-    if (!($stmt = $mysqli->prepare("SELECT `id`, `salt` FROM `wm_users` ".
-                                   "WHERE `email` = ?")) ){
-        echo "Prepare login failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    $sql = "SELECT `id`, `salt` FROM `wm_users` WHERE `email` = :email";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $row = $stmt->fetchObject();
+    $uid = $row->id;
+    $salt = $row->salt;
+
+    if ( !((int)$uid == $uid && (int)$uid > 0) ) {
+        array_push($msg, array("class" => "alert-warning",
+                               "text" => "Email '$email' not known."));
         return false;
     }
 
-    if (!$stmt->bind_param("s", $email)) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
-    }
+    $sql = "SELECT `id` FROM `wm_users` WHERE `id` = :id AND `password` = :pw";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':pw', md5($upass.$salt), PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetchObject();
+    $id = $row->id;
 
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
+    if ($id == $uid) {
+        $_SESSION['email'] = $email;
+        $_SESSION['password'] = md5($upass.$salt);
+        $_SESSION['is_logged_in'] = true;
+        header('Location: ../train');
     } else {
-        /* Bind results */
-        $stmt -> bind_result($uid, $salt);
-
-        /* Fetch the value */
-        $stmt -> fetch();
-        $stmt->close();
-
-        if ( !((int)$uid == $uid && (int)$uid > 0) ) {
-            array_push($msg, array("class" => "alert-warning",
-                                   "text" => "Email '$email' not known."));
-            return false;
-        }
-
-        if (!($stmt = $mysqli->prepare("SELECT `id` FROM `wm_users` ".
-                                       "WHERE `id` = ? AND `password` = ?")) ){
-            echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-            return false;
-        }
-
-        echo $upass."<br/>";
-        echo $salt."<br/>";
-        echo md5($upass.$salt);
-
-        if (!$stmt->bind_param("is", $uid, md5($upass.$salt))) {
-            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-            return false;
-        }
-        
-        $stmt->execute();
-        $stmt -> bind_result($id);
-        $stmt -> fetch();
-        $stmt->close();
-
-        if ($id == $uid) {
-            $_SESSION['email'] = $email;
-            $_SESSION['password'] = md5($upass.$salt);
-            $_SESSION['is_logged_in'] = true;
-            header('Location: ../train');
-        } else {
-            $_SESSION['is_logged_in'] = false;
-            array_push($msg, array("class" => "alert-warning",
-                                   "text" => "Logging in failed. The email ".
-                                             "did not match the password."));
-        }
+        $_SESSION['is_logged_in'] = false;
+        array_push($msg, array("class" => "alert-warning",
+                               "text" => "Logging in failed. The email ".
+                                         "did not match the password."));
     }
 }
 

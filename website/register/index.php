@@ -1,67 +1,26 @@
 <?php
-require_once '../vendor/autoload.php';
 include '../init.php';
 
-$loader = new Twig_Loader_Filesystem('../templates');
-$twig = new Twig_Environment($loader, array(
-    'cache' => '../cache',
-));
-$msg = array();
-
 function does_user_exist($display_name) {
-    global $mysqli;
+    global $pdo;
 
-    if (!($stmt = $mysqli->prepare("SELECT `id` FROM `wm_users` ".
-                                   "WHERE `display_name` = (?)"))) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-        return false;
-    }
-
-    if (!$stmt->bind_param("s", $display_name)) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
-    } else {
-      /* Bind results */
-      $stmt -> bind_result($result);
-
-      /* Fetch the value */
-      $stmt -> fetch();
-
-      return !($result == 0);
-    }
+    $sql = "SELECT `id` FROM `wm_users` WHERE `display_name` = :display_name";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetchObject();
+    return !($row->id == 0);
 }
 
 function does_email_exist($email) {
-    global $mysqli;
+    global $pdo;
 
-    if (!($stmt = $mysqli->prepare("SELECT `id` FROM `wm_users` ".
-                                   "WHERE `email` = (?)"))) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-        return false;
-    }
-
-    if (!$stmt->bind_param("s", $email)) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        return false;
-    } else {
-      /* Bind results */
-      $stmt -> bind_result($result);
-
-      /* Fetch the value */
-      $stmt -> fetch();
-
-      return !($result == 0);
-    }
+    $sql = "SELECT `id` FROM `wm_users` WHERE `email` = :email";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetchObject();
+    return !($row->id == 0);
 }
 
 function rand_string( $length ) {
@@ -74,30 +33,22 @@ function rand_string( $length ) {
 }
 
 function create_new_user($display_name, $email, $pw, $salt) {
-    global $mysqli;
+    global $pdo;
 
-    if (!($stmt = $mysqli->prepare("INSERT INTO  `wm_users` (".
-                                   "`display_name` ,".
-                                   "`email` ,".
-                                   "`password` ,".
-                                   "`salt`".
-                                   ") VALUES (?, ?, ?, ?);"
-                                   )
-          )
-       ) {
-        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-    }
+    $sql = "INSERT INTO  `wm_users` (".
+           "`display_name` ,".
+           "`email` ,".
+           "`password` ,".
+           "`salt`".
+           ") VALUES (:display_name, :email, :password, :salt);";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->bindParam(':password', $pw, PDO::PARAM_STR);
+    $stmt->bindParam(':salt', $salt, PDO::PARAM_STR);
+    $stmt->execute();
 
-    if (!$stmt->bind_param("ssss", $display_name, $email, md5($pw.$salt), $salt)) {
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        return 0;
-    }
-
-    if (!$stmt->execute()) {
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        return 0;
-    }
-    return $mysqli->insert_id;
+    return $pdo->lastInsertId();
 }
 
 if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['password'])) {
