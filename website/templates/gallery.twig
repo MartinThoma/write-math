@@ -37,4 +37,22 @@
      </li>
     {% endfor %}
    </ul>
+
+<ul class="pagination">
+  {% if page > 1 %}
+      <li><a href="?page={{ page-1 }}">&laquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&laquo;</a></li>
+  {% endif %}
+
+  {% for i in 1..(pages+1) %}
+    <li {% if i == page %}class="active"{% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+  {% endfor %}
+
+  {% if page < total %}
+      <li><a href="?page={{ page+1 }}">&raquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&raquo;</a></li>
+  {% endif %}
+</ul>
 {% endblock %}

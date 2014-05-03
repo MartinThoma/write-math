@@ -85,16 +85,19 @@ if (isset($_GET['raw_data_id'])) {
     $answers = $stmt->fetchAll();
 }
 
+$epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
+
 echo $twig->render('view.twig', array('heading' => 'View',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file' => "view",
-                                       'path' => get_path($data),
+                                       'path' => get_path($data, $epsilon),
                                        'user_id' => $user_id,
                                        'creation_date' => $creation_date,
                                        'accepted_formula_id' => $accepted_formula_id,
                                        'raw_data_id' => $raw_data_id,
-                                       'answers' => $answers
+                                       'answers' => $answers,
+                                       'epsilon' => $epsilon
                                        )
                   );
 

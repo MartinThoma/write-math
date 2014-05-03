@@ -41,6 +41,11 @@
            Creation Date: {{ creation_date }}<br/>
            User-ID: {{ user_id }}<br/>
            accepted_formula_id: {{ accepted_formula_id }}
+
+           <form action="?raw_data_id={{ raw_data_id }}" method="post">
+              <input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/>
+              <button type="submit" class="btn btn-default">Submit</button>
+          </form>
        </td>
    </table>
 
