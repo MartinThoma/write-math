@@ -32,9 +32,12 @@
             var line = [];
             canvas.on('mouse:move', recordMoment);
             canvas.on("mouse:up", stopRecording);
+            var start = new Date().getTime();
 
             function recordMoment(event){
-                line.push({x: event.e.x, y: event.e.y});
+                var end = new Date().getTime();
+                var time = end - start;
+                line.push({x: event.e.x, y: event.e.y, time: time});
             }
             function stopRecording(){
                 lines.push(line);

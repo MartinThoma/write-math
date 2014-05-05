@@ -40,3 +40,25 @@ function get_email() {
     is_logged_in();
     return $_SESSION['email'];
 }
+
+function get_language() {
+    global $pdo;
+    $sql = "SELECT `language` FROM `wm_users` ".
+           "WHERE `id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_SESSION['uid'], PDO::PARAM_INT);
+    $stmt->execute();
+    $row =$stmt->fetchObject();
+    return $row->language;
+}
+
+function get_handedness() {
+    global $pdo;
+    $sql = "SELECT `handedness` FROM `wm_users` ".
+           "WHERE `id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_SESSION['uid'], PDO::PARAM_INT);
+    $stmt->execute();
+    $row =$stmt->fetchObject();
+    return $row->handedness;
+}

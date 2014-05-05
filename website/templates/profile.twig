@@ -9,21 +9,74 @@
         </div>
         
         <div class="span8">
-            <h3>{{ display_name }}</h3>
-            <h6>Email: {{ email }}</h6>
-        </div>
-        
-        <div class="span2">
-            <div class="btn-group">
-                <a class="btn dropdown-toggle btn-info" data-toggle="dropdown" href="#">
-                    Action 
-                    <span class="icon-cog icon-white"></span><span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#"><span class="icon-wrench"></span> Modify</a></li>
-                    <li><a href="#"><span class="icon-trash"></span> Delete</a></li>
-                </ul>
-            </div>
+            <form action="" method="post" role="form">
+              <div class="form-group">
+                <label for="display_name" class="col-sm-2 control-label">Display name</label>
+                <div class="col-sm-10">
+                  <input type="text"
+                         class="form-control"
+                         id="display_name"
+                         name="display_name"
+                         placeholder="John Smith"
+                         value="{{ display_name }}" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="col-sm-2 control-label">Email</label>
+                <div class="col-sm-10">
+                  <input type="email"
+                         class="form-control"
+                         id="email"
+                         name="email"
+                         placeholder="john.smith@yahoo.com"
+                         value="{{ email }}" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="language" class="col-sm-2 control-label">Language</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="language">
+                        {% if language == NULL %}
+                          <option selected="selected" value="NULL">Not set</option>
+                        {% else %}
+                          <option value="NULL">Not set</option>
+                        {% endif %}
+                        {% for lang in languages %}
+                            {% if language == lang.language_code %}
+                              <option value="{{ lang.language_code }}" selected="selected">{{ lang.english_language_name }}</option>
+                            {% else %}
+                              <option value="{{ lang.language_code }}">{{ lang.english_language_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="handedness" class="col-sm-2 control-label">Handedness</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="handedness">
+                        {% if handedness == NULL %}
+                          <option selected="selected" value="NULL">Not set</option>
+                          <option value="l">left</option>
+                          <option value="r">right</option>
+                        {% elseif handedness == 'r' %}
+                          <option value="NULL">Not set</option>
+                          <option value="l">left</option>
+                          <option value="r" selected="selected">right</option>
+                        {% elseif handedness == 'l' %}
+                          <option value="NULL">Not set</option>
+                          <option value="l" selected="selected">left</option>
+                          <option value="r">right</option>
+                        {% endif %}
+                    </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
 </div>
 </div>
