@@ -1,0 +1,53 @@
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+<script type='text/javascript'>
+    var lines = [];
+
+    window.onload=function(){
+       var canvas = new fabric.Canvas('sheet');
+       canvas.isDrawingMode = true;
+       canvas.freeDrawingBrush.width = 5;
+       canvas.freeDrawingBrush.color = "#ff0000";
+
+        var template = new fabric.Canvas('template');
+        fabric.loadSVGFromURL('../view-api/?id={{ formula_id }}',
+                              function(objects, options) {
+            var loadedObject = fabric.util.groupSVGElements(objects, options);
+            loadedObject.scale(Math.min(template.height / loadedObject.height, 
+                                        template.width / loadedObject.width));
+            loadedObject.set({left : 0, top : 0});
+            loadedObject.setCoords();
+            template.add(loadedObject).renderAll();
+            loadedObject.center();
+           }
+        );
+
+        canvas.on('mouse:down', function(options) {
+          startRecording();
+        });
+
+        function startRecording(){
+            var line = [];
+            canvas.on('mouse:move', recordMoment);
+            canvas.on("mouse:up", stopRecording);
+            var start = new Date().getTime();
+
+            function recordMoment(event){
+                var end = new Date().getTime();
+                var time = end - start;
+                line.push({x: event.e.x, y: event.e.y, time: time});
+            }
+            function stopRecording(){
+                lines.push(line);
+                canvas.off('mouse:move', recordMoment);
+                canvas.off("mouse:up", stopRecording);
+            }
+        }
+    }
+
+
+    function addCanvas() {
+        var drawnJSON = document.getElementById('drawnJSON');
+        drawnJSON.value = JSON.stringify(lines);
+        return true;
+    }
+</script>

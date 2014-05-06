@@ -4,7 +4,7 @@
 		{
 			"follow_symlinks": true,
 			"path": ".",
-            "folder_exclude_patterns": ["cache", "vendor", "css"],
+            "folder_exclude_patterns": ["cache", "vendor", "css", "icons"],
             "file_exclude_patterns": ["*.lock"]
 		}
 	],

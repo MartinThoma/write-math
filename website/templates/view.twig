@@ -54,6 +54,11 @@
     <div class="container-fluid">
       <table>
         <tr>
+          <td>
+              <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=1">Upvote</a><br/>
+              {{ answer.votes }}<br/>
+              <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=-1">Downvote</a>
+          </td>
           <td><canvas id="answer{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas></td>
           <td>
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>

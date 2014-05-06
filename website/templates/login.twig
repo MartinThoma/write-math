@@ -1,11 +1,6 @@
 {% extends "base.twig" %}
 
 {% block content %}
-
-    {% for m in msg %}
-        <div class="alert {{ m.class }}">{{ m.text }}</div>
-    {% endfor %}
-
     {% if logged_in %}
         <div class="alert alert-info">You are already logged in as 
             '{{ display_name }}' with email '{{ email }}'.

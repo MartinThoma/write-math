@@ -50,6 +50,26 @@ if (isset($_GET['raw_data_id'])) {
         $stmt->bindParam(':accepted_id', $_GET['accept'], PDO::PARAM_INT);
         $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
         $stmt->execute();
+    } elseif (isset($_GET['vote'])) {
+        // TODO: Check if user has right to vote
+        
+        $vote = intval($_GET['vote']);
+        $id = intval($_GET['raw_data2formula_id']);
+        if ($vote == 1 || $vote == -1) {
+            try {
+                $sql = "INSERT INTO `wm_votes` ".
+                        "(`user_id`, `raw_data2formula_id`, `vote`)".
+                        "VALUES (:uid,  :raw_data2formula_id, :vote);";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+                $stmt->bindParam(':raw_data2formula_id', $id, PDO::PARAM_INT);
+                $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
+                $stmt->execute();
+            } catch (Exception $e) {
+                array_push($msg, array("class" => "alert-warning",
+                                       "text" => "You've already casted a vote."));
+            }
+        }
     }
 
     $raw_data_id = $_GET['raw_data_id'];
@@ -74,11 +94,17 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     // Get all probable classifications
-    $sql = "SELECT `display_name`, `formula_in_latex`, `formula_id` ".
-           "FROM `wm_raw_data2formula`".
-           "INNER JOIN `wm_users` ON `wm_raw_data2formula`.`user_id` = `wm_users`.`id`".
-           "INNER JOIN `wm_formula` ON `wm_raw_data2formula`.`formula_id` = `wm_formula`.`id`".
-           "WHERE `raw_data_id` = :id";
+    $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
+           "`formula_in_latex`, `formula_id`, COALESCE(sum(`vote`), 0) as `votes` ".
+           "FROM `wm_raw_data2formula` ".
+           "LEFT JOIN `wm_votes` ".
+              "ON `wm_votes`.`raw_data2formula_id` = `wm_raw_data2formula`.`id` ".
+           "LEFT JOIN `wm_raw_draw_data` ".
+              "ON `wm_raw_draw_data`.`id` = `wm_raw_data2formula`.`raw_data_id` ".
+          "LEFT JOIN `wm_users` ON `wm_raw_data2formula`.`user_id` = `wm_users`.`id` ".
+          "LEFT JOIN `wm_formula` ON `wm_raw_data2formula`.`formula_id` = `wm_formula`.`id` ".
+          "WHERE raw_data_id=:id ".
+          "GROUP BY `formula_id`";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
@@ -97,7 +123,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'accepted_formula_id' => $accepted_formula_id,
                                        'raw_data_id' => $raw_data_id,
                                        'answers' => $answers,
-                                       'epsilon' => $epsilon
+                                       'epsilon' => $epsilon,
+                                       'msg' => $msg
                                        )
                   );
 
