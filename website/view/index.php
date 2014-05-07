@@ -39,6 +39,16 @@ function add_classification($user_id, $raw_data_id, $latex) {
     $stmt->execute();
 }
 
+if (isset($_GET['delete'])) {
+    $sql = "DELETE FROM `wm_raw_draw_data` ".
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id AND user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':raw_id', $_GET['delete'], PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
+    $stmt->execute();
+    header("Location: ../gallery/");
+}
+
 if (isset($_GET['raw_data_id'])) {
     if (isset($_GET['accept'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
@@ -124,7 +134,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'raw_data_id' => $raw_data_id,
                                        'answers' => $answers,
                                        'epsilon' => $epsilon,
-                                       'msg' => $msg
+                                       'msg' => $msg,
+                                       'uid' => $_SESSION['uid']
                                        )
                   );
 

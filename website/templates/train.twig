@@ -20,7 +20,8 @@
             <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
         </tr>
     </table>
-    <input type="submit" />
+    <button type="submit" class="btn btn-default">Submit</button>
+    <a href="?formula_id={{ formula_id }}" class="btn btn-default">Clear</a>
     </form>
 {% elseif challenge_id != "" %}
     <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">
@@ -36,7 +37,8 @@
             <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
         </tr>
     </table>
-    <input type="submit" />
+    <button type="submit" class="btn btn-default">Submit</button>
+    <a href="?challenge_id={{ challenge_id }}&i={{ i }}" class="btn btn-default">Clear</a>
     </form>
 {% else %}
     <h2>Challenges</h2>
@@ -58,6 +60,11 @@
         <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] | raw }}</a>
         {% if formula['counter'] > 0 %}
             <img src="../icons/accept.png" alt="{{ formula['counter'] }} times drawn" />
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" aria-valuenow="{{ formula['counter'] }}" aria-valuemin="0" aria-valuemax="50" style="width: {{ formula['counter'] / 50 * 100 }}%;">
+                {{ formula['counter'] / 50 * 100 }}%
+              </div>
+            </div>
         {% endif %}
         </li>
     {% endfor %}

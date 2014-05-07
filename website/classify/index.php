@@ -34,7 +34,6 @@ echo $twig->render('classify.twig', array('heading' => 'Classify',
                                        'file'=> "classify",
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
-                                       'formula_id' => $_GET['formula_id'],
                                        'formula_ids' => $formula_ids
                                        )
                   );

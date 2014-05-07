@@ -38,9 +38,26 @@
        <td><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas>
        </td>
        <td>
-           Creation Date: {{ creation_date }}<br/>
-           User-ID: {{ user_id }}<br/>
-           accepted_formula_id: {{ accepted_formula_id }}
+           <table role="table">
+              <tr>
+                <th>Creation Date</th>
+                <td>{{ creation_date }}</td>
+              </tr>
+              <tr>
+                <th>User-ID</th>
+                <td>{{ user_id }}</td>
+              </tr>
+              <tr>
+                <th>accepted_formula_id</th>
+                <td>{{ accepted_formula_id }}</td>
+              </tr>
+              {% if user_id == uid%}
+              <tr>
+                <th>Operations</th>
+                <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</button></td>
+              </tr>
+              {% endif %}
+           </table>
 
            <form action="?raw_data_id={{ raw_data_id }}" method="post">
               <input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/>

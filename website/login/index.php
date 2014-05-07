@@ -48,7 +48,8 @@ echo $twig->render('login.twig', array('heading' => 'Login',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "login",
-                                       'msg' => $msg
+                                       'msg' => $msg,
+                                       'email' => $_SESSION['email']
                                        )
                   );
 ?>
