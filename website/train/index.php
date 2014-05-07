@@ -19,22 +19,97 @@ function insert_userdrawing($user_id, $data, $formula_id) {
     $stmt->bindParam(':data', $data, PDO::PARAM_STR);
     $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
     $stmt->execute();
-    return $pdo->lastInsertId;
+    $raw_data_id = $pdo->lastInsertId('id');
+
+    $sql = "INSERT INTO `wm_raw_data2formula` (".
+                   "`raw_data_id` ,".
+                   "`formula_id` ,".
+                   "`user_id`".
+                   ") VALUES (".
+                   ":raw_data_id, :formula_id, :uid);";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+    $stmt->execute();
 }
 
 $formula_ids = array();
 
 if (isset($_GET['formula_id'])) {
+    $formula_id = $_GET['formula_id'];
     $sql = "SELECT `svg` FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
     $stmt->execute();
     $svg = $stmt->fetchObject()->svg;
-} else {
-    $sql = "SELECT `id` ,  `formula_name` FROM `wm_formula`";
+} elseif (isset($_GET['challenge_id']) && isset($_GET['i'])) {
+    $i = intval($_GET['i']);
+    $challenge_id = intval($_GET['challenge_id']);
+
+    while (true) {
+        $sql = "SELECT `formula_id` FROM `wm_formula2challenge` ".
+               "WHERE `challenge_id` = :challenge_id ".
+               "ORDER BY `formula_id` LIMIT $i, 1";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':challenge_id', $challenge_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $formula_id = $stmt->fetchObject()->formula_id;
+
+        if ($formula_id == 0) {
+            // This challenge is finished!
+            header("Location: ..");
+        } else {
+            // Has the user already written this symbol?
+            $sql = "SELECT `raw_data_id` FROM `wm_raw_data2formula` ".
+                   "WHERE `formula_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
+            $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+            $stmt->execute();
+            $raw_data_id = $stmt->fetchObject()->raw_data_id;
+    
+            if ($raw_data_id > 0) {
+                $i += 1;
+            } else {
+                break;
+            }
+        }
+    }
+
+    $sql = "SELECT `svg` FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $formula_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $svg = $stmt->fetchObject()->svg;
+
+    $challenge_id = intval($_GET['challenge_id']);
+} else {
+    $sql = "SELECT `wm_formula`.`id` ,  `formula_name`, ".
+           "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
+           "FROM `wm_formula` ".
+           "LEFT JOIN `wm_raw_data2formula` ".
+           "ON `formula_id` = `wm_formula`.`id` AND `user_id` = :uid ".
+           "GROUP BY formula_name ".
+           "ORDER BY `wm_formula`.`id` ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
     $stmt->execute();
     $formula_ids = $stmt->fetchAll();
+
+    $sql = "SELECT `wm_challenges`.`id` , `challenge_name`, ".
+           "sum(case when `raw_data_id` is null then 1 else 0 end) as `missing` ".
+           "FROM `wm_challenges` ".
+           "JOIN `wm_formula2challenge` ".
+           "ON `challenge_id` = `wm_challenges`.`id` ".
+           "LEFT JOIN `wm_raw_data2formula` ".
+           "ON `wm_raw_data2formula`.`formula_id` = `wm_formula2challenge`.`formula_id` ".
+           "AND `user_id` = 10 ".
+           "GROUP BY `challenge_name` ".
+           "ORDER BY `challenge_name` ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $challenges = $stmt->fetchAll();
 }
 
 if (isset($_POST['formula_id'])) {
@@ -45,8 +120,11 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
-                                       'formula_id' => $_GET['formula_id'],
-                                       'formula_ids' => $formula_ids
+                                       'formula_id' => $formula_id,
+                                       'formula_ids' => $formula_ids,
+                                       'challenges' => $challenges,
+                                       'i' => ($i+1),
+                                       'challenge_id' => $challenge_id
                                        )
                   );
 

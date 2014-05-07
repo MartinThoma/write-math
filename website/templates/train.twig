@@ -6,7 +6,7 @@
 
 {% block content %}
 
-{% if formula_id != "" %}
+{% if challenge_id == "" and formula_id != "" %}
     <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
     <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
@@ -17,15 +17,49 @@
         </tr>
         <tr>
             <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
-            <td><canvas id="template" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
+            <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
+        </tr>
+    </table>
+    <input type="submit" />
+    </form>
+{% elseif challenge_id != "" %}
+    <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">
+    <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
+    <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
+    <table>
+        <tr>
+            <th>Draw here:</th>
+            <th>Draw this:</th>
+        </tr>
+        <tr>
+            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
+            <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
         </tr>
     </table>
     <input type="submit" />
     </form>
 {% else %}
+    <h2>Challenges</h2>
+    <ul>
+    {% for challenge in challenges %}
+        <li><a href="?challenge_id={{ challenge['id'] }}&i=0">{{ challenge['challenge_name'] | raw }}</a>
+        {% if challenge['missing'] == 0 %}
+            <img src="../icons/accept.png" alt="challenge done" />
+        {% else %}
+            - {{ challenge['missing'] }} missing
+        {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+
+    <h2>Symbols</h2>
     <ul>
     {% for formula in formula_ids %}
-        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] | raw }}</a></li>
+        <li><a href="?formula_id={{ formula['id'] }}">{{ formula['formula_name'] | raw }}</a>
+        {% if formula['counter'] > 0 %}
+            <img src="../icons/accept.png" alt="{{ formula['counter'] }} times drawn" />
+        {% endif %}
+        </li>
     {% endfor %}
     </ul>
 {% endif %}
