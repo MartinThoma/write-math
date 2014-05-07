@@ -1,0 +1,19 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>User</th>
+        <th>Written formulas</th>
+        <th>Distinct symbols</th>
+    </tr>
+    {% for user in users_by_raw_data %}
+     <tr>
+        <td>{{ loop.index }}</td>
+        <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
+        <td>{{ user.written_formulas }}</td>
+        <td>{{ user.distinct_symbols }}</td>
+    {% endfor %}
+    </table>
+{% endblock %}

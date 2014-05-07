@@ -41,8 +41,10 @@ symbol-generator/dbconfig.py
 symbol-generator/tmp.tex
 symbol-generator/tmp.log
 symbol-generator/tmp.aux
-symbol-generator/tmp.pdf
+symbol-generator/*.pdf
 symbol-generator/*.svg
+symbol-generator/manual/*.pdf
+symbol-generator/manual/*.svg
 website/config.php
 website/cache/*
 website/composer.lock

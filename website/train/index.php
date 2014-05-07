@@ -5,6 +5,10 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+$challenge_id = "";
+$i = "";
+$formula_id = "";
+
 function insert_userdrawing($user_id, $data, $formula_id) {
     global $pdo;
 
@@ -12,12 +16,14 @@ function insert_userdrawing($user_id, $data, $formula_id) {
                    "`user_id` ,".
                    "`data` ,".
                    "`creation_date` ,".
+                   "`user_agent`, ".
                    "`accepted_formula_id`".
-                   ") VALUES (:uid, :data, CURRENT_TIMESTAMP , :formula_id);";
+                   ") VALUES (:uid, :data, CURRENT_TIMESTAMP, :user_agent, :formula_id);";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
     $stmt->bindParam(':data', $data, PDO::PARAM_STR);
     $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
     $stmt->execute();
     $raw_data_id = $pdo->lastInsertId('id');
 
@@ -35,6 +41,10 @@ function insert_userdrawing($user_id, $data, $formula_id) {
 }
 
 $formula_ids = array();
+
+if (isset($_POST['formula_id'])) {
+    insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
+}
 
 if (isset($_GET['formula_id'])) {
     $formula_id = $_GET['formula_id'];
@@ -54,26 +64,33 @@ if (isset($_GET['formula_id'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':challenge_id', $challenge_id, PDO::PARAM_INT);
         $stmt->execute();
-        $formula_id = $stmt->fetchObject()->formula_id;
+        $formula_id = $stmt->fetchObject();
+
+        if (empty($formula_id)) {
+            // This challenge is finished!
+            header("Location: ..");
+        }
+
+        $formula_id = $formula_id->formula_id;
 
         if ($formula_id == 0) {
             // This challenge is finished!
             header("Location: ..");
+        }
+
+        // Has the user already written this symbol?
+        $sql = "SELECT `raw_data_id` FROM `wm_raw_data2formula` ".
+               "WHERE `formula_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
+        $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+        $stmt->execute();
+        $raw_data_id = $stmt->fetchObject()->raw_data_id;
+
+        if ($raw_data_id > 0) {
+            $i += 1;
         } else {
-            // Has the user already written this symbol?
-            $sql = "SELECT `raw_data_id` FROM `wm_raw_data2formula` ".
-                   "WHERE `formula_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
-            $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
-            $stmt->execute();
-            $raw_data_id = $stmt->fetchObject()->raw_data_id;
-    
-            if ($raw_data_id > 0) {
-                $i += 1;
-            } else {
-                break;
-            }
+            break;
         }
     }
 
@@ -110,10 +127,6 @@ if (isset($_GET['formula_id'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $challenges = $stmt->fetchAll();
-}
-
-if (isset($_POST['formula_id'])) {
-    insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
 }
 
 echo $twig->render('train.twig', array('heading' => 'Train',

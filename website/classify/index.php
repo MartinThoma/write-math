@@ -9,14 +9,16 @@ function insert_userdrawing($user_id, $data) {
     global $pdo;
 
     $sql = "INSERT INTO `wm_raw_draw_data` (".
-           "`user_id` ,".
-           "`data` ,".
-           "`creation_date` ,".
+           "`user_id`, ".
+           "`data`, ".
+           "`creation_date`, ".
+           "`user_agent`, ".
            "`accepted_formula_id`".
-           ") VALUES (:user_id, :data, CURRENT_TIMESTAMP , NULL);";
+           ") VALUES (:user_id, :data, CURRENT_TIMESTAMP, :user_agent, NULL);";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
     $stmt->bindParam(':data', $data, PDO::PARAM_STR);
+    $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
     $stmt->execute();
 
     return $pdo->lastInsertId();

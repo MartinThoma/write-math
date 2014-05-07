@@ -1,0 +1,69 @@
+{% extends "base.twig" %}
+
+{% block content %}
+
+<div class="container-fluid well span6">
+  <div class="row-fluid">
+        <div class="span2" >
+          <img src="{{ gravatar }}?s=140&r=g&d=mm" class="img-circle">
+        </div>
+        
+        <div class="span8">
+            <form action="" method="post" role="form">
+              <div class="form-group">
+                <label for="display_name" class="col-sm-2 control-label">Display name</label>
+                <div class="col-sm-10">
+                  <input type="text"
+                         class="form-control"
+                         id="display_name"
+                         name="display_name"
+                         placeholder="John Smith"
+                         value="{{ user.display_name }}" disabled/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="language" class="col-sm-2 control-label">Language</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="language" disabled>
+                        {% if language == NULL %}
+                          <option selected="selected" value="NULL">Not set</option>
+                        {% else %}
+                          <option value="NULL">Not set</option>
+                        {% endif %}
+                        {% for lang in languages %}
+                            {% if user.language == lang.language_code %}
+                              <option value="{{ lang.language_code }}" selected="selected">{{ lang.english_language_name }}</option>
+                            {% else %}
+                              <option value="{{ lang.language_code }}">{{ lang.english_language_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="handedness" class="col-sm-2 control-label">Handedness</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="handedness" disabled>
+                        {% if user.handedness == NULL %}
+                          <option selected="selected" value="NULL">Not set</option>
+                          <option value="l">left</option>
+                          <option value="r">right</option>
+                        {% elseif user.handedness == 'r' %}
+                          <option value="NULL">Not set</option>
+                          <option value="l">left</option>
+                          <option value="r" selected="selected">right</option>
+                        {% elseif user.handedness == 'l' %}
+                          <option value="NULL">Not set</option>
+                          <option value="l" selected="selected">left</option>
+                          <option value="r">right</option>
+                        {% endif %}
+                    </select>
+                </div>
+              </div>
+            </form>
+        </div>
+</div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@ from dbconfig import mysql  # a dictionary with the connection information
 
 def create_svg(name):
     os.system("pdflatex %s.tex -output-format=pdf" % name)
-    os.system("inkscape %s.pdf --export-plain-svg=%s.svg" % (name, name))
+    os.system("pdf2svg %s.pdf %s.svg" % (name, name))
 
 
 def upload_new_symbol(symbol, latex):
@@ -75,7 +75,18 @@ if __name__ == "__main__":
             f.write(tmp)
         upload_new_symbol(chr(i), chr(i))
 
-    for latex in [r"$\rightarrow$", r"$\pi$", r"$\alpha$", r"$\beta$", "$\sum$", "$\sigma$", "$\Sigma$"]:
+    for latex in [r"$\rightarrow$", r"$\pi$", r"$\alpha$", r"$\beta$", r"$\sum$", r"$\sigma$", r"$\Sigma$",
+    r"$\gamma$", r"$\Gamma$", r"$\delta$", r"$\Delta$", r"$\zeta$", r"$\eta$",
+    r"$\theta$", r"$\Theta$", r"$\epsilon$", r"$\varepsilon$", r"$\iota$",
+    "$\kappa$", r"$\varkappa$", r"$\lambda$", "$\Lambda$", "$\mu$",
+    r"$\nu$", r"$\xi$", r"$\Xi$", r"$\pi$", r"$\Pi$", r"$\rho$", r"$\varrho$",
+    r"$\sigma$", r"$\Sigma$", r"$\tau$", r"$\upsilon$", r"$\Upsilon$",
+    r"$\phi$", r"$\Phi$", r"$\varphi$", r"$\chi$", r"$\psi$", r"$\Psi$", r"$\omega$",
+    r"$\Omega$",
+    r"$\partial$", r"$\int$", r"$\cdot$", r"$\leq$", r"$\geq$", r"$<$", r"$>$",
+    r"$\subset$", r"$\supset$", r"$\subseteq$", r"$\supseteq$", r"$\cong$", r"$\propto$",
+    r"$-$", r"$+$"]:
+
         with open('tmp.tex', "w") as f:
             tmp = content.replace("{{ content }}", latex)
             f.write(tmp)
