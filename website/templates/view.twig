@@ -38,7 +38,7 @@
        <td><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas>
        </td>
        <td>
-           <table role="table">
+           <table class="table" role="table">
               <tr>
                 <th>Creation Date</th>
                 <td>{{ creation_date }}</td>
@@ -61,7 +61,7 @@
 
            <form action="?raw_data_id={{ raw_data_id }}" method="post">
               <input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/>
-              <button type="submit" class="btn btn-default">Submit</button>
+              <button type="submit" class="btn btn-success">Adjust Epsilon</button>
           </form>
        </td>
    </table>
@@ -95,14 +95,14 @@
     {% endfor %}
 
    <h2>Add a new answer</h2>
-   <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal">
+   <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal" role="form">
      <input type="hidden" name="raw_data_id" value="" />
      <div class="control-group">
        <label class="control-label" for="latex">LaTeX</label>
        <div class="controls"> 
-         <textarea name="latex" id="latex" style="width:100%"></textarea>
+         <textarea name="latex" id="latex" class="form-control" rows="3"></textarea>
        </div>
      </div>
-     <button type="submit" class="btn btn-default">Submit</button>
+     <button type="submit" class="btn btn-success">Submit</button>
    </form>
 {% endblock %}
