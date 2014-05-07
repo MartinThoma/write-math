@@ -10,35 +10,53 @@
     <form method="post" action="?formula_id={{ formula_id }}" onsubmit="return addCanvas();" id="form">
     <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
-    <table>
-        <tr>
-            <th>Draw here:</th>
-            <th>Draw this:</th>
-        </tr>
-        <tr>
-            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
-            <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
-        </tr>
-    </table>
-    <button type="submit" class="btn btn-default">Submit</button>
-    <a href="?formula_id={{ formula_id }}" class="btn btn-default">Clear</a>
+    <div class="row-fluid">
+        <div class="span6 pull-left panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Draw here
+            <button type="submit" class="offset1 btn btn-success">Submit</button>
+            <a href="?formula_id={{ formula_id }}" class="btn btn-danger">Clear</a></h3>
+          </div>
+          <div class="panel-body">
+            <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
+          </div>
+        </div>
+
+        <div class="span6 pull-right panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Draw this</h3>
+          </div>
+          <div class="panel-body">
+            <img src="../view-api/?id={{ formula_id }}" width="400" style="width:400px;height:400px;" />
+          </div>
+        </div>
+    </div>
     </form>
 {% elseif challenge_id != "" %}
     <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">
     <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
-    <table>
-        <tr>
-            <th>Draw here:</th>
-            <th>Draw this:</th>
-        </tr>
-        <tr>
-            <td><canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas></td>
-            <td><img src="../view-api/?id={{ formula_id }}" width="400" style="border:1px solid black;width:400px;height:400px;" /></td>
-        </tr>
-    </table>
-    <button type="submit" class="btn btn-default">Submit</button>
-    <a href="?challenge_id={{ challenge_id }}&i={{ i }}" class="btn btn-default">Clear</a>
+    <div class="row-fluid">
+        <div class="span6 pull-left panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Draw here
+            <button type="submit" class="offset1 btn btn-success">Submit</button>
+            <a href="?challenge_id={{ challenge_id }}&i={{ i }}" class="btn btn-danger">Clear</a></h3>
+          </div>
+          <div class="panel-body">
+            <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
+          </div>
+        </div>
+
+        <div class="span6 pull-right panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Draw this</h3>
+          </div>
+          <div class="panel-body">
+            <img src="../view-api/?id={{ formula_id }}" width="400" style="width:400px;height:400px;" />
+          </div>
+        </div>
+    </div>
     </form>
 {% else %}
     <h2>Challenges</h2>
@@ -70,4 +88,28 @@
     {% endfor %}
     </ul>
 {% endif %}
+
+    <script type='text/javascript'>
+        var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+
+        width *= 0.8;
+        height *= 0.8;
+
+        if (width > 400) {
+            width = 400;
+        }
+
+        if (height > 400) {
+            height = 400;
+        }
+
+        var canvas = document.getElementById("sheet");
+        var image = document.getElementById("imgid");
+        console.log(width);
+        canvas.width = width;
+        canvas.height = height;
+        image.width = width;
+        image.height = height;
+    </script>
 {% endblock %}

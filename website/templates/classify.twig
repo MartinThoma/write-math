@@ -8,6 +8,27 @@
     <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
-    <button type="submit" class="btn btn-default">Submit</button>
+    <button type="submit" class="btn btn-success">Submit</button>
+    <a href="?formula_id={{ formula_id }}" class="btn btn-danger">Clear</a></h3>
     </form>
+    <script type='text/javascript'>
+        var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+
+        width *= 0.9;
+        height *= 0.9;
+
+        if (width > 400) {
+            width = 400;
+        }
+
+        if (height > 400) {
+            height = 400;
+        }
+
+        var canvas = document.getElementById("sheet");
+        console.log(width);
+        canvas.width = width;
+        canvas.height = height;
+    </script>
 {% endblock %}
