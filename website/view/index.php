@@ -147,11 +147,15 @@ if (isset($_GET['raw_data_id'])) {
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 
+$path = get_path($data, $epsilon);
+$lines_nr = substr_count($path, 'M');
+$control_points = substr_count($path, 'L') + $lines_nr;
+
 echo $twig->render('view.twig', array('heading' => 'View',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file' => "view",
-                                       'path' => get_path($data, $epsilon),
+                                       'path' => $path,
                                        'user_id' => $user_id,
                                        'creation_date' => $creation_date,
                                        'accepted_formula_id' => $accepted_formula_id,
@@ -159,7 +163,9 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'answers' => $answers,
                                        'epsilon' => $epsilon,
                                        'msg' => $msg,
-                                       'uid' => $_SESSION['uid']
+                                       'uid' => $_SESSION['uid'],
+                                       'lines_nr' => $lines_nr,
+                                       'control_points' => $control_points
                                        )
                   );
 

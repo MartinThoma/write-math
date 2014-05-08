@@ -39,6 +39,14 @@
 <form action="?raw_data_id={{ raw_data_id }}" method="post">
 <table class="table" role="table">
   <tr>
+    <th>lines</th>
+    <td>{{ lines_nr }}</td>
+  </tr>
+  <tr>
+    <th>control points</th>
+    <td>{{ control_points }}</td>
+  </tr>
+  <tr>
     <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
     <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
   </tr>

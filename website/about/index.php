@@ -22,9 +22,10 @@ $stmt->execute();
 $unclassified_count = $stmt->fetchObject()->unclassified_count;
 
 echo $twig->render('about.twig', array('heading' => 'About',
+                                       'file'=> "about",
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
-                                       'file'=> "about",
+                                       'msg' => $msg,
                                        'user_count' => $user_count,
                                        'formula_count' => $formula_count,
                                        'raw_data_count' => $raw_data_count,
