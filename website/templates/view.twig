@@ -33,38 +33,37 @@
 {% endblock %}
 
 {% block content %}
-   <table style="width:100%">
-       <tr>
-       <td><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas>
-       </td>
-       <td>
-           <table class="table" role="table">
-              <tr>
-                <th>Creation Date</th>
-                <td>{{ creation_date }}</td>
-              </tr>
-              <tr>
-                <th>User-ID</th>
-                <td>{{ user_id }}</td>
-              </tr>
-              <tr>
-                <th>accepted_formula_id</th>
-                <td>{{ accepted_formula_id }}</td>
-              </tr>
-              {% if user_id == uid%}
-              <tr>
-                <th>Operations</th>
-                <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</button></td>
-              </tr>
-              {% endif %}
-           </table>
-
-           <form action="?raw_data_id={{ raw_data_id }}" method="post">
-              <input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/>
-              <button type="submit" class="btn btn-success">Adjust Epsilon</button>
-          </form>
-       </td>
-   </table>
+<div class="row">
+<div class="col-md-6"><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas></div>
+<div class="col-md-6">
+<form action="?raw_data_id={{ raw_data_id }}" method="post">
+<table class="table" role="table">
+  <tr>
+    <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
+    <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
+  </tr>
+  <tr>
+    <th>Creation Date</th>
+    <td>{{ creation_date }}</td>
+  </tr>
+  <tr>
+    <th>User-ID</th>
+    <td>{{ user_id }}</td>
+  </tr>
+  <tr>
+    <th>accepted_formula_id</th>
+    <td>{{ accepted_formula_id }}</td>
+  </tr>
+  {% if user_id == uid%}
+  <tr>
+    <th>Operations</th>
+    <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
+  </tr>
+  {% endif %}
+</table>
+</form>
+</div>
+</div>
 
    <h2>Possible classifications</h2>
     {% for answer in answers %}
@@ -105,4 +104,27 @@
      </div>
      <button type="submit" class="btn btn-success">Submit</button>
    </form>
+
+
+
+
+<script type='text/javascript'>
+    var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+
+    width *= 0.8;
+    height *= 0.8;
+
+    if (width > 400) {
+        width = 400;
+    }
+
+    if (height > 400) {
+        height = 400;
+    }
+
+    var canvas = document.getElementById("galleryImage");
+    canvas.width = width;
+    canvas.height = height;
+</script>
 {% endblock %}

@@ -20,6 +20,7 @@ $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
        "FROM `wm_raw_draw_data` ".
        "WHERE `user_id` = :uid ".
+       "ORDER BY `creation_date` DESC ".
        "LIMIT ".(($page-1)*14).", 14";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':uid', get_uid(), PDO::PARAM_STR);

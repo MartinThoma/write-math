@@ -3,7 +3,7 @@ include '../init.php';
 
 $sql = "SELECT `wm_users`.`id`, `display_name`, ".
        "COUNT(`wm_users`.`id`) as `written_formulas`, ".
-       "COUNT(`accepted_formula_id`) as `distinct_symbols` ".
+       "COUNT(DISTINCT `accepted_formula_id`) as `distinct_symbols` ".
        "FROM `wm_raw_draw_data` ".
        "RIGHT JOIN `wm_users` ON `wm_users`.`id` = `user_id` ".
        "GROUP BY `user_id` ".
