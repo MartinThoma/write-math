@@ -1,23 +1,17 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.6deb1
+-- version 3.5.4
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Erstellungszeit: 07. Mai 2014 um 16:05
--- Server Version: 5.5.37-0ubuntu0.13.10.1
--- PHP-Version: 5.5.3-1ubuntu2.3
+-- Host: 134.0.30.203:3306
+-- Erstellungszeit: 08. Mai 2014 um 18:22
+-- Server Version: 5.5.28a-MariaDB
+-- PHP-Version: 5.3.19
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 --
--- Datenbank: `write-math`
+-- Datenbank: `20080912003-1`
 --
 
 -- --------------------------------------------------------
@@ -45,6 +39,22 @@ CREATE TABLE IF NOT EXISTS `wm_challenges` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `challenge_name` (`challenge_name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=9 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `wm_flags`
+--
+
+CREATE TABLE IF NOT EXISTS `wm_flags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `raw_data_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_flags` (`user_id`,`raw_data_id`),
+  KEY `user_id` (`user_id`),
+  KEY `raw_data_id` (`raw_data_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -81,6 +91,21 @@ CREATE TABLE IF NOT EXISTS `wm_formula2challenge` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `wm_invalid_formula_requests`
+--
+
+CREATE TABLE IF NOT EXISTS `wm_invalid_formula_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `last_request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `requests` int(11) NOT NULL DEFAULT '1',
+  `latex` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `latex` (`latex`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=3 ;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `wm_languages`
 --
 
@@ -89,21 +114,6 @@ CREATE TABLE IF NOT EXISTS `wm_languages` (
   `english_language_name` varchar(255) COLLATE utf8_bin NOT NULL,
   `native_language_name` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`language_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_openid`
---
-
-CREATE TABLE IF NOT EXISTS `wm_openid` (
-  `id` int(11) NOT NULL,
-  `openid_url` varchar(255) COLLATE utf8_bin NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `openid_url_2` (`openid_url`),
-  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -122,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_data2formula` (
   KEY `raw_data_id` (`raw_data_id`,`formula_id`,`user_id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=140 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=241 ;
 
 -- --------------------------------------------------------
 
@@ -140,48 +150,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `accepted_formula_id` (`accepted_formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=205 ;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_tag2formula`
---
-
-CREATE TABLE IF NOT EXISTS `wm_tag2formula` (
-  `tag_id` int(11) NOT NULL,
-  `formula_id` int(11) NOT NULL,
-  PRIMARY KEY (`tag_id`,`formula_id`),
-  KEY `formula_id` (`formula_id`),
-  KEY `tag_id` (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_tag2user`
---
-
-CREATE TABLE IF NOT EXISTS `wm_tag2user` (
-  `user_id` int(11) NOT NULL,
-  `tag_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`tag_id`),
-  KEY `tag_id` (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_tags`
---
-
-CREATE TABLE IF NOT EXISTS `wm_tags` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tag_name` varchar(255) COLLATE utf8_bin NOT NULL,
-  `tag_description` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `tag_name` (`tag_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=298 ;
 
 -- --------------------------------------------------------
 
@@ -217,11 +186,18 @@ CREATE TABLE IF NOT EXISTS `wm_votes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uservote` (`user_id`,`raw_data2formula_id`),
   KEY `raw_data2formula_id` (`raw_data2formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=18 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=20 ;
 
 --
 -- Constraints der exportierten Tabellen
 --
+
+--
+-- Constraints der Tabelle `wm_flags`
+--
+ALTER TABLE `wm_flags`
+  ADD CONSTRAINT `wm_flags_ibfk_2` FOREIGN KEY (`raw_data_id`) REFERENCES `wm_raw_draw_data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `wm_flags_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `wm_formula2challenge`
@@ -229,12 +205,6 @@ CREATE TABLE IF NOT EXISTS `wm_votes` (
 ALTER TABLE `wm_formula2challenge`
   ADD CONSTRAINT `wm_formula2challenge_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `wm_formula2challenge_ibfk_2` FOREIGN KEY (`challenge_id`) REFERENCES `wm_challenges` (`id`) ON DELETE CASCADE;
-
---
--- Constraints der Tabelle `wm_openid`
---
-ALTER TABLE `wm_openid`
-  ADD CONSTRAINT `wm_openid_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`);
 
 --
 -- Constraints der Tabelle `wm_raw_data2formula`
@@ -252,20 +222,6 @@ ALTER TABLE `wm_raw_draw_data`
   ADD CONSTRAINT `wm_raw_draw_data_ibfk_2` FOREIGN KEY (`accepted_formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `wm_tag2formula`
---
-ALTER TABLE `wm_tag2formula`
-  ADD CONSTRAINT `wm_tag2formula_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`),
-  ADD CONSTRAINT `wm_tag2formula_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `wm_tags` (`id`);
-
---
--- Constraints der Tabelle `wm_tag2user`
---
-ALTER TABLE `wm_tag2user`
-  ADD CONSTRAINT `wm_tag2user_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`),
-  ADD CONSTRAINT `wm_tag2user_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `wm_tags` (`id`);
-
---
 -- Constraints der Tabelle `wm_users`
 --
 ALTER TABLE `wm_users`
@@ -277,7 +233,3 @@ ALTER TABLE `wm_users`
 ALTER TABLE `wm_votes`
   ADD CONSTRAINT `uservote_rawdata2formula_id` FOREIGN KEY (`raw_data2formula_id`) REFERENCES `wm_raw_data2formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `uservote_userid` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
