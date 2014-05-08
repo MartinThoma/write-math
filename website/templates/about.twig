@@ -3,6 +3,8 @@
 {% block content %}
 <p>This is project part of the bachelor thesis of <a href="http://martin-thoma.com/author/martin-thoma/">Martin Thoma</a>. All source files are on <a href="https://github.com/MartinThoma/write-math">GitHub</a>.</p>
 
+<p>You can contact me via info@martin-thoma.de.</p>
+
 <h2>What's the aim of this project?</h2>
 <p>I want to get a good on-line recognition of handwritten mathematical formulae.
 (Currently, I focus on single symbols.)
@@ -31,9 +33,9 @@ can use the API. You have to call it like this:</p>
     <li><code>?task=api-list-unclassified</code>: List IDs of all unclassified formulas, e.g. <code>["11","16","18","20"]</code></li>
     <li><code>?task=view-formula&id=[formula id]</code>: Receive an SVG of the formula</li>
     <li><code>?task=view-formula&latex=[latex code]</code>: Receive an SVG of the formula if it is already in the database</li>
-    <li><code>api-get-formula-id/?latex=[latex]</code>: Get the formula id by latex code (TODO: Directly with api-view?)</li>
-    <li><code>view-raw-data</code>: View raw data either as point-list, SVG path or as
+    <li><code>?task=view-raw-data</code>: View raw data either as point-list, SVG path or as
     complete SVG</li>
+    <li><code>?task=classify</code>: Add a classification for raw data.</li>
 </ul>
 
 <h2>How is the project structured</h2>

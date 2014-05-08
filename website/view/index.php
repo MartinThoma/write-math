@@ -47,6 +47,30 @@ if (isset($_GET['delete'])) {
     $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
     $stmt->execute();
     header("Location: ../gallery/");
+} elseif (isset($_GET['flag'])) {
+    $sql = "INSERT INTO `wm_flags` (`user_id`, `raw_data_id`)".
+           "VALUES (:uid,  :raw_data_id);";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+    $stmt->bindParam(':uid', $_GET['flag'], PDO::PARAM_INT);
+    try {
+        $result = $stmt->execute();
+    } catch (Exception $e) {
+        var_dump($e);
+    }
+
+    if ($result) {
+        mail ("themoosemind@gmail.com", "[Write-Math] flagged symbol",
+              "Hallo Martin,\ngerade wurde das Symbol '".intval($_GET['flag']).
+              "' geflaggt.");
+        $msg[] = array("class" => "alert-info",
+                        "text" => "Thank you for flagging this symbol. A ".
+                                  "moderator will take a look at it soon.");
+    } else {
+        $msg[] = array("class" => "alert-warning",
+                        "text" => "Flagging did not work. Did you probably ".
+                                  "already flag it?");
+    }
 }
 
 if (isset($_GET['raw_data_id'])) {

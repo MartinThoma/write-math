@@ -59,6 +59,11 @@
     <th>Operations</th>
     <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
   </tr>
+  {% elseif logged_in %}
+  <tr>
+    <th>Operations</th>
+    <td><a href="?flag={{ raw_data_id }}" type="button" class="btn btn-danger">Flag</a></td>
+  </tr>
   {% endif %}
 </table>
 </form>
