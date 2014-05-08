@@ -1,7 +1,8 @@
 <?php
 include '../init.php';
 
-$tasks = array("list-unclassified", "view-raw-data", "view-formula", "delete", "classify");
+$tasks = array("list-unclassified", "view-raw-data", "view-formula", "delete",
+               "classify", "export");
 
 function invalid_latex_request($latex) {
     global $pdo;
@@ -204,6 +205,41 @@ if ($_GET['task'] == "list-unclassified") {
         } else {
             add_classification($row->id, $_GET['raw_data_id']);
         }
+    }
+} elseif ($_GET['task'] == "export") {
+    $tables = array('wm_formula', 'wm_raw_draw_data', 'wm_raw_data2formula');
+    if (!isset($_GET['table']) || !in_array($_GET['table'], $tables)) {
+        echo "You have to specify a 'table':";
+        echo "<ul>";
+        foreach ($tables as $table) {
+            $url = '?task='.$_GET['task'].'&table='.$table;
+            echo "<li><a href=\"$url\">$url</a></li>";
+        }
+        echo "</ul>";
+        exit(-1);
+    }
+
+    if ($_GET['table'] == 'wm_formula') {
+        $sql = "SELECT `id`, `formula_name`, `description`, `formula_in_latex` ".
+               "FROM `wm_formula`";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($data);
+    } elseif ($_GET['table'] == 'wm_raw_draw_data') {
+        $sql = "SELECT `id`, `data`, `accepted_formula_id` ".
+               "FROM `wm_raw_draw_data`";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($data);
+    } elseif ($_GET['table'] == 'wm_raw_data2formula') {
+        $sql = "SELECT `id`, `raw_data_id`, `formula_id` ".
+               "FROM `wm_raw_data2formula`";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($data);
     }
 } else {
     echo "Task is not implemented yet.";

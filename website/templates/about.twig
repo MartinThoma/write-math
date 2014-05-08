@@ -36,14 +36,19 @@ can use the API. You have to call it like this:</p>
     <li><code>?task=view-raw-data</code>: View raw data either as point-list, SVG path or as
     complete SVG</li>
     <li><code>?task=classify</code>: Add a classification for raw data.</li>
+    <li><code>?task=export</code>: Export data.</li>
 </ul>
 
 <h3>How is the data structured?</h3>
 <img src="https://raw.githubusercontent.com/MartinThoma/write-math/master/database/big-picture-database.png" />
 
 <h3>How can I get the data?</h3>
-TODO
+<p>The interesting information is in <code>wm_formula</code>,
+<code>wm_raw_draw_data</code> and <code>wm_raw_data2formula</code>.
+You can use the <a href="http://www.martin-thoma.de/write-math/api/?task=export">Export API</a> to get the latest data.</p>
 
+<p>Alternatively, you can get a complete dump (except Email addresses) via
+<a href="https://github.com/MartinThoma/write-math/tree/master/database">GitHub</a>.</p>
 
 <h2>How is the project structured</h2>
 <table class="table" role="table">
@@ -67,7 +72,7 @@ TODO
         <th>Framework / Library</th>
         <td>Fabric.js and vanilla JS</td>
         <td>&nbsp;</td>
-        <td>MySQL + PDO</td>
+        <td>MySQL (MariaDB) + PDO</td>
         <td>Bootstrap + Twig</td>
         <td>&nbsp;</td>
     </tr>
