@@ -1,9 +1,67 @@
 {% extends "base.twig" %}
 
 {% block content %}
-<p>This is project part of the bachelor thesis of Martin Thoma.</p>
+<p>This is project part of the bachelor thesis of <a href="http://martin-thoma.com/author/martin-thoma/">Martin Thoma</a>. All source files are on <a href="https://github.com/MartinThoma/write-math">GitHub</a>.</p>
 
-<p>I want to get a good on-line recognition of handwritten mathematical symbols.</p>
+<h2>What's the aim of this project?</h2>
+<p>I want to get a good on-line recognition of handwritten mathematical formulae.
+(Currently, I focus on single symbols.)
+On-line recognition means it is recorded how the formula is drawn. This means
+this information can be used to get better results for the classification task.</p>
+
+<h2>Workflow from a users perspective</h2>
+<p>The client access responsive web pages to draw the symbol he would like to get
+the LaTeX code for. He goes to "classification", draws the symbol and clicks on
+"submit".</p>
+
+<p>After some time, he can come back, click on "Gallery", on
+"unclassified" and then on the symbol he has drawn. There will be multiple
+answers with possible classifications. He can accept one of those
+classifications.</p> <!-- (TODO!) -->
+
+<h2>Workflow from a researchers perspective</h2>
+<p>A researcher who wants to get train a classifier / help people with classification
+can use the API. You have to call it like this:</p>
+
+<p><code>/<a href="../api">api</a>/?task=[task]</code></p>
+
+<p>Valid tasks are:</p>
+
+<ul>
+    <li><code>api-list-unclassified</code>: List IDs of all unclassified formulas, e.g. <code>["11","16","18","20"]</code></li>
+    <li><code>api-view/?id=[formula id]</code>: Receive an SVG of the formula (TODO)</li>
+    <li><code>api-get-formula-id/?latex=[latex]</code>: Get the formula id by latex code (TODO: Directly with api-view?)</li>
+    <li><code>view-raw-data</code>: View raw data either as point-list, SVG path or as
+    complete SVG</li>
+</ul>
+
+<h2>How is the project structured</h2>
+<table class="table" role="table">
+    <tr>
+        <th>Task</th>
+        <td>Drawing</td>
+        <td>Processing information</td>
+        <td>Storing Information</td>
+        <td>Displaying stuff</td>
+        <td>Symbol recognition</td>
+    </tr>
+    <tr>
+        <th>Technology</th>
+        <td>JavaScript</td>
+        <td>PHP</td>
+        <td>SQL Database</td>
+        <td>HTML + CSS + JS</td>
+        <td>Python?</td>
+    </tr>
+    <tr>
+        <th>Framework / Library</th>
+        <td>Fabric.js and vanilla JS</td>
+        <td>&nbsp;</td>
+        <td>MySQL + PDO</td>
+        <td>Bootstrap + Twig</td>
+        <td>&nbsp;</td>
+    </tr>
+</table>
 
 <h2>Statistics</h2>
 <ul>
