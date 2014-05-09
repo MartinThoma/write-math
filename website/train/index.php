@@ -121,10 +121,11 @@ if (isset($_GET['formula_id'])) {
            "ON `challenge_id` = `wm_challenges`.`id` ".
            "LEFT JOIN `wm_raw_data2formula` ".
            "ON `wm_raw_data2formula`.`formula_id` = `wm_formula2challenge`.`formula_id` ".
-           "AND `user_id` = 10 ".
+           "AND `user_id` = :uid ".
            "GROUP BY `challenge_name` ".
            "ORDER BY `challenge_name` ASC";
     $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
     $stmt->execute();
     $challenges = $stmt->fetchAll();
 }

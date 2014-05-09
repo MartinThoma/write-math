@@ -44,7 +44,7 @@ function create_new_user($display_name, $email, $pw, $salt) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->bindParam(':password', $pw, PDO::PARAM_STR);
+    $stmt->bindParam(':password', md5($pw.$salt), PDO::PARAM_STR);
     $stmt->bindParam(':salt', $salt, PDO::PARAM_STR);
     $stmt->execute();
 

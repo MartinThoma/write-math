@@ -3,6 +3,10 @@
 function is_logged_in() {
     global $pdo;
 
+    if (!isset($_SESSION['email']) || !($_SESSION['password'])) {
+        return false;
+    }
+
     $email = $_SESSION['email'];
     $upass = $_SESSION['password'];
 
