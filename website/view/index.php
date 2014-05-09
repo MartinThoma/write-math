@@ -25,7 +25,7 @@ function add_classification($user_id, $raw_data_id, $latex) {
         $formula_id = $pdo->lastInsertId;
     }
 
-    $sql = "INSERT INTO  `write-math`.`wm_raw_data2formula` (".
+    $sql = "INSERT INTO `wm_raw_data2formula` (".
            "`raw_data_id` ,".
            "`formula_id` ,".
            "`user_id`".

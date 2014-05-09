@@ -1,6 +1,8 @@
 <?php
 include '../init.php';
 
+$raw_data_id = "";
+
 if (!is_logged_in()) {
     header("Location: ../login");
 }
@@ -27,14 +29,15 @@ function insert_userdrawing($user_id, $data) {
 $formula_ids = array();
 
 if (isset($_POST['drawnJSON'])) {
-    insert_userdrawing(get_uid(), $_POST['drawnJSON']);
+    $raw_data_id = insert_userdrawing(get_uid(), $_POST['drawnJSON']);
 }
 
 echo $twig->render('classify.twig', array('heading' => 'Classify',
                                        'file'=> "classify",
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
-                                       'formula_ids' => $formula_ids
+                                       'formula_ids' => $formula_ids,
+                                       'raw_data_id' => $raw_data_id
                                        )
                   );
 

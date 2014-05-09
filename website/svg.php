@@ -70,6 +70,11 @@ function DouglasPeucker($PointList, $epsilon) {
 function get_path($data, $epsilon=0) {
     $path = "";
     $data = json_decode($data);
+    if (!is_array($data)) {
+		echo "This was not an array!"; // TODO debug message
+        var_dump($data);
+        return false;
+    }
     if ($epsilon > 0) {
         for ($i=0; $i < count($data); $i++) {
             $data[$i] = DouglasPeucker($data[$i], $epsilon);

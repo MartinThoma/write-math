@@ -80,7 +80,7 @@
         <h1>{{ heading }}</h1>
       </div>
       {% for m in msg %}
-        <div class="alert {{ m.class }}">{{ m.text }}</div>
+        <div class="alert {{ m.class }}">{{ m.text| raw }}</div>
       {% endfor %}
       {% block content %}{% endblock %}
     </div>
