@@ -1,6 +1,7 @@
 {
     "require": {
         "monolog/monolog": ">=1.0.0",
-        "twig/twig": "1.*"
+        "twig/twig": "1.*",
+        "ircmaxell/password-compat": ">=1.0.3"
     }
 }

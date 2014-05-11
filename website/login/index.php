@@ -4,39 +4,32 @@ include '../init.php';
 function login($email, $upass) {
     global $msg, $pdo;
 
-    $sql = "SELECT `id`, `salt` FROM `wm_users` WHERE `email` = :email";
+    $sql = "SELECT `id`, `status`, `password` ".
+           "FROM `wm_users` WHERE `email` = :email";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
 
-    $row = $stmt->fetchObject();
-    $uid = $row->id;
-    $salt = $row->salt;
+    $user = $stmt->fetchObject();
+    $uid = $user->id;
+    $status = $user->status;
 
-    if ( !((int)$uid == $uid && (int)$uid > 0) ) {
-        array_push($msg, array("class" => "alert-warning",
-                               "text" => "Email '$email' not known."));
+    if (!((int)$uid == $uid && (int)$uid > 0)) {
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "Email '$email' not known.");
         return false;
     }
 
-    $sql = "SELECT `id` FROM `wm_users` WHERE `id` = :id AND `password` = :pw";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $uid, PDO::PARAM_INT);
-    $stmt->bindParam(':pw', md5($upass.$salt), PDO::PARAM_STR);
-    $stmt->execute();
-    $row = $stmt->fetchObject();
-    $id = $row->id;
-
-    if ($id == $uid) {
+    if ($user->id > 0 && password_verify($_POST['password'], $user->password)) {
         $_SESSION['email'] = $email;
-        $_SESSION['password'] = md5($upass.$salt);
+        $_SESSION['password'] = $user->password;
         $_SESSION['is_logged_in'] = true;
         header('Location: ../train');
     } else {
         $_SESSION['is_logged_in'] = false;
-        array_push($msg, array("class" => "alert-warning",
-                               "text" => "Logging in failed. The email ".
-                                         "did not match the password."));
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "Logging in failed. The email ".
+                                 "did not match the password.");
     }
 }
 

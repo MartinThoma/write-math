@@ -9,31 +9,29 @@
         <div class="form-group">
             <label for="display_name" class="col-sm-2 control-label">Display name</label>
             <div class="col-sm-10">
-                <input type="text"
-                       id="display_name"
-                       name="display_name"
-                       class="form-control"
-                       pattern=".{4,20}"
-                       required
-                       title="4 to 20 characters"/>
+                <input type="text" class="form-control"
+                       id="display_name" name="display_name"
+                       pattern=".{3,20}" required
+                       placeholder="John Smith"
+                       title="3 to 20 characters (A-Z, a-Z, -, _ and spaces), beginning with a character"/>
             </div>
         </div>
         <div class="form-group">
             <label for="email" class="col-sm-2 control-label">Email</label>
             <div class="col-sm-10">
-                <input type="email" id="email" name="email" class="form-control"/>
+              <input type="email" class="form-control"
+                     id="email" name="email"
+                     maxlength="255" required
+                     placeholder="john.smith@gmail.com" />
             </div>
         </div>
         <div class="form-group">
             <label for="password" class="col-sm-2 control-label">Password</label>
             <div class="col-sm-10">
-                <input type="password"
-                       id="password"
-                       name="password"
-                       class="form-control"
-                       pattern=".{5,}"
-                       required
-                       title="5 characters minimum"/>
+                <input type="password" class="form-control"
+                       id="password" name="password"
+                       pattern=".{6,60}" required
+                       title="6 characters minimum"/>
             </div>
         </div>
         <div class="form-group">

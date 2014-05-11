@@ -23,32 +23,32 @@ function does_email_exist($email) {
     return !($row->id == 0);
 }
 
-function rand_string( $length ) {
-    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    $size = strlen( $chars );
-    for( $i = 0; $i < $length; $i++ ) {
-        $str .= $chars[ rand( 0, $size - 1 ) ];
-    }
-    return $str;
+function validate_display_name($name) {
+    return preg_match('/^[A-Za-z]{1}[A-Za-z0-9_ ]{1,}[A-Za-z0-9]{1}$/',$name);
 }
 
-function create_new_user($display_name, $email, $pw, $salt) {
+function create_new_user($display_name, $email, $pw) {
     global $pdo;
 
     $sql = "INSERT INTO  `wm_users` (".
            "`display_name` ,".
            "`email` ,".
-           "`password` ,".
-           "`salt`".
-           ") VALUES (:display_name, :email, :password, :salt);";
+           "`password`, ".
+           "`confirmation_code`, ".
+           "`status` ".
+           ") VALUES (".
+           ":display_name, :email, :password, ".
+           ":confirmation_code, 'deactivated');";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->bindParam(':password', md5($pw.$salt), PDO::PARAM_STR);
-    $stmt->bindParam(':salt', $salt, PDO::PARAM_STR);
+    $hash = password_hash($pw, PASSWORD_BCRYPT, array("cost" => 10));
+    $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
+    $code = md5(rand());
+    $stmt->bindParam(':confirmation_code', $code, PDO::PARAM_STR);
     $stmt->execute();
 
-    return $pdo->lastInsertId();
+    return array("id" => $pdo->lastInsertId(), "confirmation_code" => $code);
 }
 
 if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['password'])) {
@@ -56,20 +56,58 @@ if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['pas
     $pw    = $_POST['password'];
     $email = $_POST['email'];
 
-    if (does_user_exist($display_name)) {
-        array_push($msg, array("class" => "alert-warning",
-                               "text" => "There is already a user with ".
-                                         "display name '".$display_name."'."));
+    if (!validate_display_name($display_name)) {
+        $msg[] = array("class" => "alert-warning",
+               "text" => "Your username didn't validate. It has to have at ".
+                         "least 3 symbols, where the first and the last is ".
+                         "a character. You may only use A-Z, a-z, 0-9, _, ".
+                         "spaces and -.");
+    } elseif (does_user_exist($display_name)) {
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "There is already a user with ".
+                                 "display name '".$display_name."'.");
     } elseif (does_email_exist($email)) {
-        array_push($msg, array("class" => "alert-warning",
-                               "text" => "There is already a user with ".
-                                         "email '".$email."'."));
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "There is already a user with ".
+                                 "email '".$email."'.");
     } else {
-        $salt = rand_string(8);
-        $user_id = create_new_user($display_name, $email, $pw, $salt);
-        $_SESSION['uid'] = $user_id;
-        array_push($msg, array("class" => "alert-success",
-                               "text" => "Your account has been created."));
+        $return = create_new_user($display_name, $email, $pw);
+        $user_id = $return["id"];
+        $code = $return["confirmation_code"];
+
+        $message = "Hello ".$display_name."\n\n".
+                   "You can activate your account for http://write-math.com ".
+                   "with the following link:\n".
+                   "http://write-math.com/register/?id=$user_id&code=$code\n\n".
+                   "Please note that I will use and publish everything ".
+                   "you enter except your email address and your password. ".
+                   "As I share everything (for free) entering data cannot be ".
+                   "removed.\n\n".
+                   "Best regards,\n".
+                   "Martin Thoma";
+       $headers = 'From: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
+                  'Reply-To: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
+                  'X-Mailer: PHP/' . phpversion();
+        mail($email, "[Write-Math] Confirm account creation", $message,
+             $headers);
+        $msg[] = array("class" => "alert-success",
+                       "text" => "Your account has been created. An ".
+                                 "activation Email was sent to the given ".
+                                 "address.");
+    }
+}
+
+if (isset($_GET['id']) && isset($_GET['code'])) {
+    $sql = "UPDATE `wm_users` ".
+           "SET status = 'activated' ".
+           "WHERE `id` = :id AND `confirmation_code` = :code";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':code', $_GET['code'], PDO::PARAM_STR);
+    $stmt->execute();
+    if ($stmt->rowCount() == 1) {
+        $msg[] = array("class" => "alert-success",
+                       "text" => "Congratulations. Your account was activated.");
     }
 }
 

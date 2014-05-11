@@ -100,8 +100,8 @@ if (isset($_GET['raw_data_id'])) {
                 $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
                 $stmt->execute();
             } catch (Exception $e) {
-                array_push($msg, array("class" => "alert-warning",
-                                       "text" => "You've already casted a vote."));
+                $msg[] = array("class" => "alert-warning",
+                               "text" => "You've already casted a vote.");
             }
         }
     }
