@@ -1,0 +1,17 @@
+{% extends "base.twig" %}
+
+{% block content %}
+{% if password_changed %}
+    <p><a href="../login">Login</a></p>
+{% else %}
+<form action="." method="get" role="form">
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" maxlength="60"
+               placeholder="john.smith@gmail.com"
+               id="email" name="email" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+{% endif %}
+{% endblock %}

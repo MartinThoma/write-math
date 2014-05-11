@@ -29,11 +29,12 @@ function login($email, $upass) {
         $_SESSION['is_logged_in'] = false;
         $msg[] = array("class" => "alert-warning",
                        "text" => "Logging in failed. The email ".
-                                 "did not match the password.");
+                                 "did not match the password. Did you ".
+                                 "<a href=\"../forgot/?email=$email\">forget your password</a>?");
     }
 }
 
-if (isset($_POST['email']) && isset($_POST['password'])) {
+if (isset($_POST['email']) && $_POST['email'] != "" && isset($_POST['password'])) {
     login($_POST['email'], $_POST['password']);
 }
 

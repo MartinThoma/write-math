@@ -10,7 +10,8 @@ if (!is_logged_in()) {
 $sql = "SELECT COUNT(`id`) as counter FROM `wm_raw_draw_data` ".
        "WHERE `user_id` = :uid";
 $stmt = $pdo->prepare($sql);
-$stmt->bindParam(':uid', get_uid(), PDO::PARAM_STR);
+$uid = get_uid();
+$stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
 $stmt->execute();
 $row = $stmt->fetchObject();
 $total = $row->counter;
@@ -23,7 +24,8 @@ $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
        "ORDER BY `creation_date` DESC ".
        "LIMIT ".(($page-1)*14).", 14";
 $stmt = $pdo->prepare($sql);
-$stmt->bindParam(':uid', get_uid(), PDO::PARAM_STR);
+$uid = get_uid();
+$stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
 $stmt->execute();
 $userimages = $stmt->fetchAll();
 

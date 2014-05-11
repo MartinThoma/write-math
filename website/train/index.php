@@ -102,6 +102,7 @@ if (isset($_GET['formula_id'])) {
 
     $challenge_id = intval($_GET['challenge_id']);
 } else {
+    $uid = get_uid();
     $sql = "SELECT `wm_formula`.`id` ,  `formula_name`, ".
            "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
            "FROM `wm_formula` ".
@@ -110,7 +111,7 @@ if (isset($_GET['formula_id'])) {
            "GROUP BY formula_name ".
            "ORDER BY `wm_formula`.`id` ASC";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->execute();
     $formula_ids = $stmt->fetchAll();
 
@@ -125,7 +126,7 @@ if (isset($_GET['formula_id'])) {
            "GROUP BY `challenge_name` ".
            "ORDER BY `challenge_name` ASC";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->execute();
     $challenges = $stmt->fetchAll();
 }

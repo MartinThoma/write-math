@@ -78,7 +78,7 @@ if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['pas
         $message = "Hello ".$display_name."\n\n".
                    "You can activate your account for http://write-math.com ".
                    "with the following link:\n".
-                   "http://write-math.com/register/?id=$user_id&code=$code\n\n".
+                   "http://write-math.com/register/?email=$email&code=$code\n\n".
                    "Please note that I will use and publish everything ".
                    "you enter except your email address and your password. ".
                    "As I share everything (for free) entering data cannot be ".
@@ -97,12 +97,12 @@ if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['pas
     }
 }
 
-if (isset($_GET['id']) && isset($_GET['code'])) {
+if (isset($_GET['email']) && isset($_GET['code'])) {
     $sql = "UPDATE `wm_users` ".
            "SET status = 'activated' ".
-           "WHERE `id` = :id AND `confirmation_code` = :code";
+           "WHERE `email` = :email AND `confirmation_code` = :code";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':email', $_GET['email'], PDO::PARAM_STR);
     $stmt->bindParam(':code', $_GET['code'], PDO::PARAM_STR);
     $stmt->execute();
     if ($stmt->rowCount() == 1) {
