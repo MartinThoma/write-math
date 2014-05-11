@@ -7,6 +7,8 @@ $A = "";
 $results = "";
 
 function pointList($linelistP) {
+    global $msg;
+
     $linelist = json_decode($linelistP);
     $pointlist = array();
     foreach ($linelist as $line) {
@@ -26,11 +28,6 @@ function pointList($linelistP) {
 
 function scale_and_center($pointlist) {
     global $msg;
-    if (count($pointlist) == 0) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "Pointlist was empty.");
-        return $pointlist;
-    }
 
     $minx = $pointlist[0]["x"];
     $maxx = $pointlist[0]["x"];

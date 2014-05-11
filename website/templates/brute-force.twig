@@ -45,7 +45,14 @@
                 <th>DTW distance</th>
                 <td>
                     {% for result in results %}
-                        {{ result.dtw }} - <a href="../view/?raw_data_id={{ result.id }}">{{ result.latex }}</a><br/>
+                        {% if result.dtw < 1 %}
+                            <p class="bg-success">
+                        {% elseif result.dtw < 5 %}
+                            <p class="bg-warning">
+                        {% else %}
+                            <p class="bg-danger">
+                        {% endif %}
+                        {{ result.dtw }} - <a href="../view/?raw_data_id={{ result.id }}">{{ result.latex }}</a></p>
                     {% endfor %}
                 </td>
             </tr>

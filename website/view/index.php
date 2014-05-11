@@ -13,7 +13,7 @@ function add_classification($user_id, $raw_data_id, $latex) {
     $stmt->execute();
     $formula_id = $stmt->fetchObject()->id;
 
-    if($formula_id == 0) {
+    if($formula_id == 0 || $formula_id == null) {
         // it was not in the database. Add it.
         $sql = "INSERT INTO `wm_formula` (".
                "`formula_in_latex`, `is_single_symbol`".
@@ -35,7 +35,8 @@ function add_classification($user_id, $raw_data_id, $latex) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
     $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
-    $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
 }
 
@@ -80,7 +81,8 @@ if (isset($_GET['raw_data_id'])) {
                "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
                "`user_id` = :uid";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+        $uid = get_uid();
+        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
         $stmt->bindParam(':accepted_id', $_GET['accept'], PDO::PARAM_INT);
         $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
         $stmt->execute();
@@ -95,7 +97,8 @@ if (isset($_GET['raw_data_id'])) {
                         "(`user_id`, `raw_data2formula_id`, `vote`)".
                         "VALUES (:uid,  :raw_data2formula_id, :vote);";
                 $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+                $uid = get_uid();
+                $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
                 $stmt->bindParam(':raw_data2formula_id', $id, PDO::PARAM_INT);
                 $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
                 $stmt->execute();

@@ -10,6 +10,8 @@ if (!is_logged_in()) {
 function insert_userdrawing($user_id, $data) {
     global $pdo;
 
+    # TODO: Check if data has at least one point!
+
     $sql = "INSERT INTO `wm_raw_draw_data` (".
            "`user_id`, ".
            "`data`, ".
