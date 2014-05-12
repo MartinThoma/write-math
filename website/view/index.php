@@ -59,7 +59,7 @@ function sanitize_packages($packages) {
     }
 
     $packages = array_map(trim, $packages);
-
+    $packages = array_map(remove_usepackage, $packages);
 
     return $packages;
 }
