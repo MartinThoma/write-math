@@ -8,7 +8,7 @@ make:
 	make clean
 
 clean:
-	rm -rf  $(TARGET) *.class *.html *.log *.aux *.data *.gnuplot *.tmp *.pdf *.svg *.pyc tmp.tex
+	rm -rf  $(TARGET) *.class *.html *.log *.aux *.data *.gnuplot *.tmp *.pdf *.svg *.pyc tmp.tex *.dvi
 
 gif:
 	pdfcrop $(SOURCE).pdf

@@ -5,6 +5,7 @@ import os
 import MySQLdb
 import MySQLdb.cursors
 from dbconfig import mysql  # a dictionary with the connection information
+import yaml
 
 
 def create_svg(name):
@@ -12,7 +13,7 @@ def create_svg(name):
     os.system("pdf2svg %s.pdf %s.svg" % (name, name))
 
 
-def upload_new_symbol(symbol, latex):
+def upload_new_symbol(symbol, latex, package='', mode='bothmodes'):
     try:
         connection = MySQLdb.connect(host=mysql['host'], user=mysql['user'],
                                      passwd=mysql['pwd'], db=mysql['dbname'],
@@ -31,6 +32,15 @@ def upload_new_symbol(symbol, latex):
         print(latex)
 
         if result == 0:
+            with open('symbol.tex') as f:
+                tmp = f.read()
+            with open('tmp.tex', "w") as f:
+                if mode == 'mathmode':
+                    tmp = tmp.replace("{{ content }}", '$' + latex + '$')
+                else:
+                    tmp = tmp.replace("{{ content }}", '$' + latex + '$')
+                tmp = tmp.replace("{{ packages }}", package)
+                f.write(tmp)
             create_svg("tmp")
             new_filename = "tmp.svg"
             os.rename("tmp.svg", new_filename)
@@ -39,15 +49,17 @@ def upload_new_symbol(symbol, latex):
 
             # insert, if not
             sql = ("INSERT INTO `wm_formula` ("
-                   "`formula_name` ,"
-                   "`description` ,"
-                   "`formula_in_latex` ,"
-                   "`svg` ,"
-                   "`is_single_symbol`"
+                   "`formula_name`, "
+                   "`description`, "
+                   "`formula_in_latex`, "
+                   "`svg`, "
+                   "`is_single_symbol`, "
+                   "`mode`, "
+                   "`package` "
                    ") VALUES ("
-                   "%s, %s,  %s, %s, '1'"
+                   "%s, %s,  %s, %s, '1', %s, %s"
                    ");")
-            cursor.execute(sql, (symbol, symbol, latex, svg))
+            cursor.execute(sql, (symbol, symbol, latex, svg, mode, package))
             connection.commit()
 
 if __name__ == "__main__":
@@ -75,20 +87,33 @@ if __name__ == "__main__":
             f.write(tmp)
         upload_new_symbol(chr(i), chr(i))
 
-    for latex in [r"$\rightarrow$", r"$\pi$", r"$\alpha$", r"$\beta$", r"$\sum$", r"$\sigma$", r"$\Sigma$",
-    r"$\gamma$", r"$\Gamma$", r"$\delta$", r"$\Delta$", r"$\zeta$", r"$\eta$",
-    r"$\theta$", r"$\Theta$", r"$\epsilon$", r"$\varepsilon$", r"$\iota$",
-    "$\kappa$", r"$\varkappa$", r"$\lambda$", "$\Lambda$", "$\mu$",
-    r"$\nu$", r"$\xi$", r"$\Xi$", r"$\pi$", r"$\Pi$", r"$\rho$", r"$\varrho$",
-    r"$\sigma$", r"$\Sigma$", r"$\tau$", r"$\upsilon$", r"$\Upsilon$",
-    r"$\phi$", r"$\Phi$", r"$\varphi$", r"$\chi$", r"$\psi$", r"$\Psi$", r"$\omega$",
-    r"$\Omega$",
-    r"$\partial$", r"$\int$", r"$\cdot$", r"$\leq$", r"$\geq$", r"$<$", r"$>$",
-    r"$\subset$", r"$\supset$", r"$\subseteq$", r"$\supseteq$", r"$\cong$", r"$\propto$",
-    r"$-$", r"$+$"]:
+    counter = 0
+    print("Start yaml library:")
+    stream = open("symbols.yaml", 'r')
+    for first in yaml.load(stream):
+        if type(first) is dict:
+            if first.has_key('fontenc'):
+                continue
 
-        with open('tmp.tex', "w") as f:
-            tmp = content.replace("{{ content }}", latex)
-            f.write(tmp)
+            if first.has_key('package'):
+                package = first['package']
+            else:
+                package = ""
 
-        upload_new_symbol(latex, latex)
+            if first.has_key('mathmode'):
+                for latex in first['mathmode']:
+                    upload_new_symbol(latex, latex, package, 'mathmode')
+                    counter += 1
+            if first.has_key('textmode'):
+                for latex in first['textmode']:
+                    upload_new_symbol(latex, latex, package, 'textmode')
+                    counter += 1
+
+            if first.has_key('bothmodes'):
+                for latex in first['bothmodes']:
+                    upload_new_symbol(latex, latex, package, 'bothmodes')
+                    counter += 1
+        else:
+            print(first)
+
+print(counter)
