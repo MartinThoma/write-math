@@ -55,23 +55,33 @@ function scale_and_center($pointlist) {
     $factorY = 1;
     if ($width == 0) {
         $msg[] = array("class" => "alert-warning",
-                       "text" => "Width was 0!");
+                       "text" => "Width was 0!"); // TODO: fix this! 
     } else {
         $factorX = 1./$width;
     }
 
     if ($height == 0) {
         $msg[] = array("class" => "alert-warning",
-                       "text" => "Width was 0!");
+                       "text" => "Width was 0!"); // TODO: fix this! 
     } else {
         $factorY = 1./$height;
     }
 
     $factor = min($factorX, $factorY);
+    $addx = 0;
+    $addy = 0;
+
+/*    $add = (1 - (max($factorX, $factorY) / $factor)) / 2;
+
+    if ($factor == $factorX) {
+        $addy = $add; //TODO
+    } else {
+        $addx = $add; //TODO
+    }*/
 
     foreach ($pointlist as $key => $p) {
-        $pointlist[$key] = array("x" => ($p["x"] - $minx)*$factor,
-                                 "y" => ($p["y"] - $miny)*$factor);
+        $pointlist[$key] = array("x" => ($p["x"] - $minx)*$factor + $addx,
+                                 "y" => ($p["y"] - $miny)*$factor + $addy);
     }
 
     return $pointlist;
