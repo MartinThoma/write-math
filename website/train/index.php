@@ -8,6 +8,9 @@ if (!is_logged_in()) {
 $challenge_id = "";
 $i = "";
 $formula_id = "";
+$formula_name = "";
+$formula_description = "";
+$random_mode = false;
 
 function insert_userdrawing($user_id, $data, $formula_id) {
     global $pdo;
@@ -46,13 +49,28 @@ if (isset($_POST['formula_id'])) {
     insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
 }
 
-if (isset($_GET['formula_id'])) {
+if (isset($_GET['rand'])) {
+    $random_mode = true;
+    $sql = "SELECT `id`, `formula_name`, `description`, `svg` ".
+           "FROM  `wm_formula` ORDER BY RAND( ) LIMIT 0, 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $formula = $stmt->fetchObject();
+    $svg = $formula->svg;
+    $formula_id = $formula->id;
+    $formula_name = $formula->formula_name;
+    $formula_description = $formula->description;
+} elseif (isset($_GET['formula_id'])) {
     $formula_id = $_GET['formula_id'];
-    $sql = "SELECT `svg` FROM  `wm_formula` WHERE  `id` = :id;";
+    $sql = "SELECT `formula_name`, `description`, `svg` ".
+           "FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
     $stmt->execute();
-    $svg = $stmt->fetchObject()->svg;
+    $formula = $stmt->fetchObject();
+    $svg = $formula->svg;
+    $formula_name = $formula->formula_name;
+    $formula_description = $formula->description;
 } elseif (isset($_GET['challenge_id']) && isset($_GET['i'])) {
     $i = intval($_GET['i']);
     $challenge_id = intval($_GET['challenge_id']);
@@ -139,7 +157,10 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'formula_ids' => $formula_ids,
                                        'challenges' => $challenges,
                                        'i' => ($i+1),
-                                       'challenge_id' => $challenge_id
+                                       'challenge_id' => $challenge_id,
+                                       'formula_name' => $formula_name,
+                                       'formula_description' => $formula_description,
+                                       'random_mode' => $random_mode
                                        )
                   );
 
