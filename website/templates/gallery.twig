@@ -45,18 +45,18 @@
    </ul>
 
 <ul class="pagination">
-  {% if page > 1 %}
-      <li><a href="?page={{ page-1 }}&tab={{ tab }}">&laquo;</a></li>
+  {% if currentPage > 1 %}
+      <li><a href="?page={{ currentPage-1 }}&tab={{ tab }}">&laquo;</a></li>
   {% else %}
       <li class="disabled"><a href="#">&laquo;</a></li>
   {% endif %}
 
   {% for i in 1..(pages+1) %}
-    <li {% if i == page %}class="active"{% endif %}><a href="?page={{ i }}&tab={{ tab }}">{{ i }}</a></li>
+    <li {% if i == currentPage %}class="active"{% endif %}><a href="?page={{ i }}&tab={{ tab }}">{{ i }}</a></li>
   {% endfor %}
 
-  {% if page < total %}
-      <li><a href="?page={{ page+1 }}&tab={{ tab }}">&raquo;</a></li>
+  {% if currentPage < total %}
+      <li><a href="?page={{ currentPage+1 }}&tab={{ tab }}">&raquo;</a></li>
   {% else %}
       <li class="disabled"><a href="#">&raquo;</a></li>
   {% endif %}

@@ -16,12 +16,12 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `accepted_formula_id` IS NULL ".
            "ORDER BY `creation_date` DESC ".
-           "LIMIT ".(($page-1)*14).", 14";
+           "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $userimages = $stmt->fetchAll();
@@ -39,11 +39,11 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "ORDER BY `creation_date` DESC ".
-           "LIMIT ".(($page-1)*14).", 14";
+           "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $userimages = $stmt->fetchAll();
@@ -64,12 +64,12 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `user_id` = :uid ".
            "ORDER BY `creation_date` DESC ".
-           "LIMIT ".(($page-1)*14).", 14";
+           "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);
     $uid = get_uid();
     $stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
@@ -89,7 +89,7 @@ echo $twig->render('gallery.twig', array('heading' => 'Gallery',
                                          'userimages' => $userimages,
                                          'total' => $total,
                                          'pages' => floor(($total)/14),
-                                         'page' => $page,
+                                         'currentPage' => $currentPage,
                                          'tab' => $tab
                                         )
                   );

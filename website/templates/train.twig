@@ -16,7 +16,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Draw here
             <button type="submit" class="btn btn-success">Submit</button>
-            <a href="?formula_id={{ formula_id }}" class="btn btn-danger">Clear</a></h3>
+            <a href="?formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" class="btn btn-danger">Clear</a></h3>
           </div>
           <div class="panel-body">
             <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
@@ -25,7 +25,18 @@
 
         <div class="span6 pull-right panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title">Draw '{{ formula_name }}'</h3>
+            <h3 class="panel-title">Draw '{{ formula_name }}'
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                Report problem <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="?missing_formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="m" alt="Alt+m">Rendering is missing</a></li>
+                <li><a href="?wrong_rendering_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+w">Rendering looks wrong</a></li>
+                <li><a href="?unknown_formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+u">I never needed this formula</a></li>
+              </ul>
+            </div>
+            </h3>
           </div>
           <div class="panel-body">
             <img src="../api/?task=view-formula&id={{ formula_id }}" width="400" style="width:400px;height:400px;" />
@@ -35,6 +46,7 @@
     </form>
 
     <p><b>Description:</b> {{ formula_description }}</p>
+    <p><b>Mode:</b> {{ formula_mode }}</p>
 {% elseif challenge_id != "" %}
     <!-- Train a single formula as part of a challenge -->
     <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">
@@ -64,6 +76,7 @@
     </form>
 
     <p><b>Description:</b> {{ formula_description }}</p>
+    <p><b>Mode:</b> {{ formula_mode }}</p>
 {% else %}
     <h2>Train random symbol</h2>
     <p><a href="?rand">Train a random symbol</a>: This also helps you to

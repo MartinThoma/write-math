@@ -11,6 +11,7 @@ $formula_id = "";
 $formula_name = "";
 $formula_description = "";
 $random_mode = false;
+$formula_mode = '';
 
 function insert_userdrawing($user_id, $data, $formula_id) {
     global $pdo;
@@ -49,20 +50,95 @@ if (isset($_POST['formula_id'])) {
     insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
 }
 
+if (isset($_GET['missing_formula_id']) || isset($_GET['wrong_rendering_id'])) {
+    if($_GET['wrong_rendering_id']) {
+        $ptype = 'rendering wrong';
+        $fid = $_GET['wrong_rendering_id'];
+    } else {
+        $ptype = 'svg missing';
+        $fid = $_GET['missing_formula_id'];
+    }
+
+    $sql = "INSERT INTO `wm_formula_svg_missing` (".
+           "`user_id`, ".
+           "`formula_id`, ".
+           "`time`, ".
+           "`useragent`, ".
+           "`problem_type` ".
+           ")".
+           "VALUES (:uid, :fid, CURRENT_TIMESTAMP, :user_agent, :ptype);";
+    $stmt = $pdo->prepare($sql);
+    $user_id = get_uid();
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':fid', $fid, PDO::PARAM_INT);
+    $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
+    $stmt->bindParam(':ptype', $ptype, PDO::PARAM_STR);
+    try {
+        $stmt->execute();
+        $msg[] = array("class" => "alert-success",
+                   "text" => "Your notice has been recorded and a moderator ".
+                             "will fix the issue as soon as possible. I'm ".
+                             "sorry for the inconvenience.");
+    } catch (Exception $e) {
+        if ($ptype == 'svg missing') {
+          $msg[] = array("class" => "alert-warning",
+              "text" => "You've already mentioned that this symbol is missing.");
+        } else {
+          $msg[] = array("class" => "alert-warning",
+              "text" => "You've already mentioned this looks wrong.");
+        }
+    }
+} elseif (isset($_GET['unknown_formula_id'])) {
+    $sql = "INSERT INTO `wm_user_unknown_formula` (".
+           "`user_id` , `formula_id` , `time`) ".
+           "VALUES (:uid, :fid, CURRENT_TIMESTAMP)";
+    $stmt = $pdo->prepare($sql);
+    $user_id = get_uid();
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':fid', $_GET['unknown_formula_id'], PDO::PARAM_INT);
+    try {
+        $stmt->execute();
+        $msg[] = array("class" => "alert-success",
+                   "text" => "Thank you for mentioning that you don't know ".
+                             "this symbol. It's better to mention it than ".
+                             "trying to draw it, because this way I get more ".
+                             "of the 'important' symbols and less crap that ".
+                             "nobody needs.");
+    } catch (Exception $e) {
+        $msg[] = array("class" => "alert-warning",
+            "text" => "You've already mentioned that you don't know this symbol.");
+    }
+}
+
 if (isset($_GET['rand'])) {
     $random_mode = true;
-    $sql = "SELECT `id`, `formula_name`, `description`, `svg` ".
-           "FROM  `wm_formula` ORDER BY RAND( ) LIMIT 0, 1";
+    $sql = "SELECT `id`, `formula_name`, `description`, `svg`, `mode` ".
+           "FROM  `wm_formula` ".
+           "WHERE `id` NOT IN (".
+               "SELECT `formula_id` FROM wm_formula_svg_missing ".
+               "WHERE   user_id = :uid ".
+           ") AND `id` NOT IN ( ".
+               "SELECT `formula_id` ".
+               "FROM  `wm_raw_data2formula` ".
+               "WHERE `user_id` = :uid".
+           ") AND `id` NOT IN ( ".
+               "SELECT `formula_id` ".
+               "FROM  `wm_user_unknown_formula` ".
+               "WHERE `user_id` = :uid".
+           ") ORDER BY RAND( ) LIMIT 0, 1";
     $stmt = $pdo->prepare($sql);
+    $user_id = get_uid();
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $formula = $stmt->fetchObject();
     $svg = $formula->svg;
     $formula_id = $formula->id;
     $formula_name = $formula->formula_name;
     $formula_description = $formula->description;
+    $formula_mode = $formula->mode;
 } elseif (isset($_GET['formula_id'])) {
     $formula_id = $_GET['formula_id'];
-    $sql = "SELECT `formula_name`, `description`, `svg` ".
+    $sql = "SELECT `formula_name`, `description`, `svg`, `mode` ".
            "FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
@@ -71,6 +147,7 @@ if (isset($_GET['rand'])) {
     $svg = $formula->svg;
     $formula_name = $formula->formula_name;
     $formula_description = $formula->description;
+    $formula_mode = $formula->mode;
 } elseif (isset($_GET['challenge_id']) && isset($_GET['i'])) {
     $i = intval($_GET['i']);
     $challenge_id = intval($_GET['challenge_id']);
@@ -101,7 +178,8 @@ if (isset($_GET['rand'])) {
                "WHERE `formula_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
-        $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+        $user_id = get_uid();
+        $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $raw_data_id = $stmt->fetchObject()->raw_data_id;
 
@@ -153,6 +231,7 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
+                                       'msg' => $msg,
                                        'formula_id' => $formula_id,
                                        'formula_ids' => $formula_ids,
                                        'challenges' => $challenges,
@@ -160,6 +239,7 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'challenge_id' => $challenge_id,
                                        'formula_name' => $formula_name,
                                        'formula_description' => $formula_description,
+                                       'formula_mode' => $formula_mode,
                                        'random_mode' => $random_mode
                                        )
                   );
