@@ -20,7 +20,8 @@ function insert_userdrawing($user_id, $data) {
            "`accepted_formula_id`".
            ") VALUES (:user_id, :data, CURRENT_TIMESTAMP, :user_agent, NULL);";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':data', $data, PDO::PARAM_STR);
     $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
     $stmt->execute();

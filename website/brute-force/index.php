@@ -51,18 +51,22 @@ function scale_and_center($pointlist) {
     $width = $maxx - $minx;
     $height = $maxy - $miny;
 
+    $factorX = 1;
+    $factorY = 1;
     if ($width == 0) {
         $msg[] = array("class" => "alert-warning",
                        "text" => "Width was 0!");
+    } else {
+        $factorX = 1./$width;
     }
 
     if ($height == 0) {
         $msg[] = array("class" => "alert-warning",
                        "text" => "Width was 0!");
+    } else {
+        $factorY = 1./$height;
     }
 
-    $factorX = 1./$width;
-    $factorY = 1./$height;
     $factor = min($factorX, $factorY);
 
     foreach ($pointlist as $key => $p) {
@@ -77,6 +81,10 @@ function d($p1, $p2) {
     $dx = $p1["x"] - $p2["x"];
     $dy = $p1["y"] - $p2["y"];
     return $dx*$dx + $dy*$dy;
+}
+
+function maximum_dtw($var) {
+    return($var['dtw'] < 20);
 }
 
 function greedyMatchingDTW($A, $B) {
@@ -157,6 +165,7 @@ if (!isset($_GET['A'])) {
         $dtw[$key] = $row['dtw'];
     }
     array_multisort($dtw, SORT_ASC, $results);
+    $results = array_filter($results, "maximum_dtw");
 }
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
