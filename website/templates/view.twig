@@ -41,11 +41,11 @@
   </tr>
   <tr>
     <th>Creation Date</th>
-    <td>{{ creation_date }}</td>
+    <td>{{ image_data.creation_date }}</td>
   </tr>
   <tr>
-    <th>User-ID</th>
-    <td>{{ user_id }}</td>
+    <th>User</th>
+    <td><a href="../user/?id={{ image_data.user_id }}">{{ image_data.display_name }}</a></td>
   </tr>
   <tr>
     <th>Brute-Force</th>
@@ -53,9 +53,9 @@
   </tr>
   <tr>
     <th>accepted_formula_id</th>
-    <td>{{ accepted_formula_id }}</td>
+    <td>{{ image_data.accepted_formula_id }}</td>
   </tr>
-  {% if user_id == uid%}
+  {% if image_data.user_id == uid%}
   <tr>
     <th>Operations</th>
     <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
@@ -122,10 +122,29 @@
      </div>
      <div class="control-group">
        <label class="control-label" for="packages">Packages</label>
-       <div class="controls"> 
-         <input type="text" class="form-control" placeholder="amsmath" name="packages" id="packages"/>
+       <div class="controls">
+         <datalist id="latex_packages">
+           <option value="amsmath">amsmath</option>
+           <option value="amssymb">amssymb</option>
+           <option value="bbold">bbold</option>
+           <option value="cmll">cmll</option>
+           <option value="dsfont">dsfont</option>
+           <option value="esint">esint</option>
+           <option value="gensymb">gensymb</option>
+           <option value="latexsym">latexsym</option>
+           <option value="marvosym">marvosym</option>
+           <option value="mathdots">mathdots</option>
+           <option value="mathrsfs">mathrsfs</option>
+           <option value="skull">skull</option>
+           <option value="stmaryrd">stmaryrd</option>
+           <option value="textcomp">textcomp</option>
+           <option value="tipa">tipa</option>
+           <option value="upgreek">upgreek</option>
+           <option value="wasysym">wasysym</option>
+         </datalist>
+         <input type="text" class="form-control" placeholder="amsmath" name="packages" id="packages" list="latex_packages"/>
        </div>
-       <p class="help-block">Separate packages by <code>;</code>.</p>
+       <p class="help-block">Separate packages by spaces.</p>
      </div>
      <button type="submit" class="btn btn-success">Submit</button>
    </form>

@@ -16,7 +16,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
+    $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `accepted_formula_id` IS NULL ".
@@ -39,7 +39,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
+    $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "ORDER BY `creation_date` DESC ".
@@ -64,7 +64,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $total = $row->counter;
 
     // Get all raw data of this user
-    $currentPage = isset($_GET['currentPage']) ? intval($_GET['currentPage']) : 1;
+    $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `user_id` = :uid ".

@@ -1,7 +1,28 @@
 {% extends "base.twig" %}
 
-{% block content %}
+{% block header %}
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
 
+ <script type='text/javascript'>
+     window.onload=function(){
+ {% for image in userimages %}
+    var canvas = new fabric.Canvas('galleryImage{{ loop.index }}');
+    var group = new fabric.Group();
+    canvas.add(group);
+
+    var path = new fabric.Path('{{ image.path}}');
+    path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+    path.scale(Math.min(canvas.height / path.height, 
+                                canvas.width  / path.width));
+    canvas.add(path);
+    canvas.renderAll();
+    path.center();
+ {% endfor %}
+}
+ </script>
+{% endblock %}
+
+{% block content %}
 <div class="container-fluid well span6">
   <div class="row-fluid">
         <div class="span2" >
@@ -66,4 +87,37 @@
         </div>
 </div>
 </div>
+
+ <ul class="gallery mw-gallery-traditional">
+  {% for image in userimages %}
+   <li class="gallerybox" style="width: 155px">
+     <div style="width: 155px">
+       <div class="thumb" style="width: 150px;">
+         <div style="margin:21px auto;">
+           <a href="../view?raw_data_id={{ image.id }}"><canvas id="galleryImage{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas></a>
+         </div>
+       </div>
+       <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>
+     </div>
+   </li>
+  {% endfor %}
+ </ul>
+
+<ul class="pagination">
+  {% if currentPage > 1 %}
+      <li><a href="?page={{ currentPage-1 }}">&laquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&laquo;</a></li>
+  {% endif %}
+
+  {% for i in 1..(pages+1) %}
+    <li {% if i == currentPage %}class="active"{% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+  {% endfor %}
+
+  {% if currentPage < total %}
+      <li><a href="?page={{ currentPage+1 }}">&raquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&raquo;</a></li>
+  {% endif %}
+</ul>
 {% endblock %}

@@ -14,6 +14,10 @@ function LotrechterAbstand($p1, $p2, $p3) {
     $py = $p2['y']-$p1['y'];
 
     $something = $px*$px + $py*$py;
+    if ($something == 0) {
+        // TODO: really?
+        return 0;
+    }
 
     $u =  (($x3 - $p1['x']) * $px + ($y3 - $p1['y']) * $py) / $something;
 

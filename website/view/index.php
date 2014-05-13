@@ -135,17 +135,15 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     $raw_data_id = $_GET['raw_data_id'];
-    $sql = "SELECT `user_id`, `data`, `creation_date`, `accepted_formula_id` ".
-           "FROM `wm_raw_draw_data` WHERE `id` = :id";
+    $sql = "SELECT `user_id`, `display_name`, `data`, ".
+           "`creation_date`, `accepted_formula_id` ".
+           "FROM `wm_raw_draw_data` ".
+           "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
+           "WHERE `wm_raw_draw_data`.`id` = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
-    $row = $stmt->fetchObject();
-
-    $user_id = $row->user_id;
-    $data = $row->data;
-    $creation_date = $row->creation_date;
-    $accepted_formula_id = $row->accepted_formula_id;
+    $image_data = $stmt->fetchObject();
 
     // Add a new classification
     if (isset($_POST['latex'])) {
@@ -177,13 +175,13 @@ if (isset($_GET['raw_data_id'])) {
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 
-$path = get_path($data, $epsilon);
+$path = get_path($image_data->data, $epsilon);
 $lines_nr = substr_count($path, 'M');
 $control_points = substr_count($path, 'L') + $lines_nr;
 if ($epsilon > 0) {
-    $result_path = apply_douglas_peucker(pointLineList($data), $epsilon);
+    $result_path = apply_douglas_peucker(pointLineList($image_data->data), $epsilon);
 } else {
-    $result_path = pointLineList($data);
+    $result_path = pointLineList($image_data->data);
 }
 $bounding_box = get_dimensions(list_of_pointlists2pointlist($result_path));
 
@@ -192,9 +190,7 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'display_name' => $_SESSION['display_name'],
                                        'file' => "view",
                                        'path' => $path,
-                                       'user_id' => $user_id,
-                                       'creation_date' => $creation_date,
-                                       'accepted_formula_id' => $accepted_formula_id,
+                                       'image_data' => $image_data,
                                        'raw_data_id' => $raw_data_id,
                                        'answers' => $answers,
                                        'epsilon' => $epsilon,
