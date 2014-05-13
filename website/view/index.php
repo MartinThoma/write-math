@@ -111,6 +111,19 @@ if (isset($_GET['raw_data_id'])) {
         $stmt->bindParam(':accepted_id', $_GET['accept'], PDO::PARAM_INT);
         $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
         $stmt->execute();
+        if ($stmt->rowCount() == 1) {
+            $msg[] = array("class" => "alert-success",
+                           "text" => "Thank you for accepting an answer. ".
+                                     "This helps getting better automatic ".
+                                     "classifications.");
+        } else {
+            $msg[] = array("class" => "alert-warning",
+                           "text" => "You could not accept that answer. ".
+                                     "This happens when you try to accept ".
+                                     "a classification of a formula you ".
+                                     "did not write. ".
+                                     "Or multiple form submission.");
+        }
     } elseif (isset($_GET['vote'])) {
         // TODO: Check if user has right to vote
         
@@ -157,7 +170,8 @@ if (isset($_GET['raw_data_id'])) {
 
     // Get all probable classifications
     $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
-           "`formula_in_latex`, `formula_id`, COALESCE(sum(`vote`), 0) as `votes` ".
+           "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
+           "COALESCE(sum(`vote`), 0) as `votes` ".
            "FROM `wm_raw_data2formula` ".
            "LEFT JOIN `wm_votes` ".
               "ON `wm_votes`.`raw_data2formula_id` = `wm_raw_data2formula`.`id` ".
