@@ -1,5 +1,5 @@
 <?php
-
+require_once '../classification.php';
 /**
  * Calculate the distance from $p3 to the line defined by $p1 and $p2.
  * @param array $p1 associative array with "x" and "y" (start of line)
@@ -7,15 +7,15 @@
  * @param array $p3 associative array with "x" and "y" (point)
  */
 function LotrechterAbstand($p1, $p2, $p3) {
-    $x3 = $p3->x;
-    $y3 = $p3->y;
+    $x3 = $p3['x'];
+    $y3 = $p3['y'];
 
-    $px = $p2->x-$p1->x;
-    $py = $p2->y-$p1->y;
+    $px = $p2['x']-$p1['x'];
+    $py = $p2['y']-$p1['y'];
 
     $something = $px*$px + $py*$py;
 
-    $u =  (($x3 - $p1->x) * $px + ($y3 - $p1->y) * $py) / $something;
+    $u =  (($x3 - $p1['x']) * $px + ($y3 - $p1['y']) * $py) / $something;
 
     if ($u > 1) {
         $u = 1;
@@ -23,8 +23,8 @@ function LotrechterAbstand($p1, $p2, $p3) {
         $u = 0;
     }
 
-    $x = $p1->x + $u * $px;
-    $y = $p1->y + $u * $py;
+    $x = $p1['x'] + $u * $px;
+    $y = $p1['y'] + $u * $py;
 
     $dx = $x - $x3;
     $dy = $y - $y3;
@@ -67,26 +67,36 @@ function DouglasPeucker($PointList, $epsilon) {
     return $ResultList;
 }
 
+/**
+ * Apply the Douglas-Peucker algorithm to each line of $pointlist seperately.
+ * @param  array $pointlist see pointList()
+ * @return pointlist
+ */
+function apply_douglas_peucker($pointlist, $epsilon) {
+    for ($i=0; $i < count($pointlist); $i++) {
+        $pointlist[$i] = DouglasPeucker($pointlist[$i], $epsilon);
+    }
+    return $pointlist;
+}
+
 function get_path($data, $epsilon=0) {
     $path = "";
-    $data = json_decode($data);
+    $data = pointLineList($data);
     if (!is_array($data)) {
 		echo "This was not an array!"; // TODO debug message
         var_dump($data);
         return false;
     }
     if ($epsilon > 0) {
-        for ($i=0; $i < count($data); $i++) {
-            $data[$i] = DouglasPeucker($data[$i], $epsilon);
-        }
+        $data = apply_douglas_peucker($data, $epsilon);
     }
 
     foreach ($data as $line) {
         foreach ($line as $i => $point) {
             if ($i == 0) {
-                $path .= " M ".$point->x." ".$point->y;
+                $path .= " M ".$point['x']." ".$point['y'];
             } else {
-                $path .= " L ".$point->x." ".$point->y;
+                $path .= " L ".$point['x']." ".$point['y'];
             }
         }
     }

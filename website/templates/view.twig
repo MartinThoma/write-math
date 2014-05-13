@@ -32,6 +32,10 @@
     <td>{{ control_points }}</td>
   </tr>
   <tr>
+    <th>Bounding box (w &times; h)</th>
+    <td>{{ bounding_box.width }} &times; {{ bounding_box.height }}</td>
+  </tr>
+  <tr>
     <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
     <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
   </tr>

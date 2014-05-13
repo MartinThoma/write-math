@@ -1,5 +1,6 @@
 <?php
 require_once '../svg.php';
+require_once '../classification.php';
 include '../init.php';
 
 function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode", 
@@ -179,6 +180,12 @@ $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 $path = get_path($data, $epsilon);
 $lines_nr = substr_count($path, 'M');
 $control_points = substr_count($path, 'L') + $lines_nr;
+if ($epsilon > 0) {
+    $result_path = apply_douglas_peucker(pointLineList($data), $epsilon);
+} else {
+    $result_path = pointLineList($data);
+}
+$bounding_box = get_dimensions(list_of_pointlists2pointlist($result_path));
 
 echo $twig->render('view.twig', array('heading' => 'View',
                                        'logged_in' => is_logged_in(),
@@ -194,7 +201,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'msg' => $msg,
                                        'uid' => $_SESSION['uid'],
                                        'lines_nr' => $lines_nr,
-                                       'control_points' => $control_points
+                                       'control_points' => $control_points,
+                                       'bounding_box' => $bounding_box
                                        )
                   );
 

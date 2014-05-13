@@ -1,52 +1,16 @@
 <?php
 
 require_once '../svg.php';
+require_once '../classification.php';
 include '../init.php';
 
 $A = "";
 $results = "";
 
-function pointList($linelistP) {
-    global $msg;
-
-    $linelist = json_decode($linelistP);
-    $pointlist = array();
-    foreach ($linelist as $line) {
-        foreach ($line as $p) {
-            $pointlist[] = array("x"=>$p->x, "y"=>$p->y);
-        }
-    }
-
-    if (count($pointlist) == 0) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "Pointlist was empty. Search for '".
-                                 $linelistP."' in `wm_raw_draw_data`.");
-    }
-
-    return $pointlist;
-}
-
 function scale_and_center($pointlist) {
     global $msg;
 
-    $minx = $pointlist[0]["x"];
-    $maxx = $pointlist[0]["x"];
-    $miny = $pointlist[0]["y"];
-    $maxy = $pointlist[0]["y"];
-    foreach ($pointlist as $p) {
-        if ($p["x"] < $minx) {
-            $minx = $p["x"];
-        }
-        if ($p["x"] > $maxx) {
-            $maxx = $p["x"];
-        }
-        if ($p["y"] < $miny) {
-            $miny = $p["y"];
-        }
-        if ($p["y"] > $maxy) {
-            $maxy = $p["y"];
-        }
-    }
+    extract(get_bounding_box($pointlist));
 
     $width = $maxx - $minx;
     $height = $maxy - $miny;
@@ -98,8 +62,6 @@ function maximum_dtw($var) {
 }
 
 function greedyMatchingDTW($A, $B) {
-    $A = scale_and_center(pointList($A));
-    $B = scale_and_center(pointList($B));
     $a = array_shift($A);
     $b = array_shift($B);
     $d = d($a, $b);
@@ -140,6 +102,8 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+$epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
+
 if (!isset($_GET['A'])) {
     $msg[] = array("class" => "alert-warning",
                    "text" => "Please provide 'A' and 'B' with a raw_data_id. ".
@@ -151,7 +115,14 @@ if (!isset($_GET['A'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':ida', $_GET['A'], PDO::PARAM_INT);
     $stmt->execute();
-    $A = $stmt->fetchObject()->data;
+
+    $A_data = $stmt->fetchObject()->data;
+    if ($epsilon > 0) {
+        $result_path = apply_douglas_peucker(pointLineList($A_data), $epsilon);
+    } else {
+        $result_path = pointLineList($A_data);
+    }
+    $A = scale_and_center(list_of_pointlists2pointlist($result_path));
 
     # Check all other stuff
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data`, `accepted_formula_id`, `formula_in_latex` ".
@@ -164,7 +135,14 @@ if (!isset($_GET['A'])) {
     $results = array();
 
     foreach ($datasets as $key => $dataset) {
-        $results[] = array("dtw" => greedyMatchingDTW($A, $dataset['data']),
+        $B = $dataset['data'];
+        if ($epsilon > 0) {
+            $B = apply_douglas_peucker(pointLineList($B), $epsilon);
+        } else {
+            $B = pointLineList($B);
+        }
+        $B = scale_and_center(list_of_pointlists2pointlist($B));
+        $results[] = array("dtw" => greedyMatchingDTW($A, $B),
                            "latex" => $dataset['accepted_formula_id'],
                            "id" => $dataset['id'],
                            "latex" => $dataset['formula_in_latex']);
@@ -178,14 +156,12 @@ if (!isset($_GET['A'])) {
     $results = array_filter($results, "maximum_dtw");
 }
 
-$epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
-
 echo $twig->render('brute-force.twig', array('heading' => 'Brute Force DTW',
                                          'file'=> 'brute-force',
                                          'logged_in' => is_logged_in(),
                                          'display_name' => $_SESSION['display_name'],
                                          'msg' => $msg,
-                                         'pathA' => get_path($A, $epsilon),
+                                         'pathA' => get_path($A_data, $epsilon),
                                          'epsilon' => $epsilon,
                                          'results' => $results
                                        )
