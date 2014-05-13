@@ -48,7 +48,7 @@ if (isset($_POST['language'])) {
             $hash = password_hash($_POST['password'], PASSWORD_BCRYPT, array("cost" => 10));
             $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
             $stmt->execute();
-            Location("../login");
+            header("Location: ../login");
         }
     }
 
