@@ -17,17 +17,11 @@ function scale_and_center($pointlist) {
 
     $factorX = 1;
     $factorY = 1;
-    if ($width == 0) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "Width was 0!"); // TODO: fix this! 
-    } else {
+    if ($width != 0) {
         $factorX = 1./$width;
     }
 
-    if ($height == 0) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "Width was 0!"); // TODO: fix this! 
-    } else {
+    if ($height != 0) {
         $factorY = 1./$height;
     }
 

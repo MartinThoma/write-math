@@ -128,6 +128,55 @@
 </div>
 </div>
 
+{% if userworkers|length > 0 %}
+<h2>Workers</h2>
+<table class="table">
+  <tr>
+    <th>Name</th>
+    <th>API</th>
+    <th>URL</th>
+    <th>Description</th>
+    <th>Latest Heartbeat</th>
+    <th>Operations</th>
+  </tr>
+  {% for worker in userworkers %}
+  <tr>
+    <td>{{ worker.worker_name }}</td>
+    <td>{{ worker.API_key }}</td>
+    <td>{{ worker.url }}</td>
+    <td>{{ worker.description }}</td>
+    <td>{{ worker.heartbeat }} (TODO: Request, if none)</td>
+    <td>TODO (delete, edit)</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<h2>Create a new Worker</h2>
+
+<div class="container-fluid well span6">
+  <form role="form" method="post">
+    <div class="form-group">
+      <label for="worker_name">Name</label>
+      <input type="text" class="form-control" required
+             id="worker_name" name="worker_name"
+             placeholder="Neural Netter" />
+    </div>
+    <div class="form-group">
+      <label for="url">API URL</label>
+      <input type="url" class="form-control" required
+             id="url" name="url"
+             placeholder="http://myurl.com/api.php" />
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea class="form-control" rows="3"
+                id="description" name="description"
+                placeholder="This project is documentet at www.example.com"></textarea>
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+  </form>
+</div>
 
  <ul class="gallery mw-gallery-traditional">
   {% for image in userimages %}

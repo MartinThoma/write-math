@@ -82,13 +82,48 @@ if (isset($_POST['language'])) {
     }
 }
 
+# Insert a new worker
+if (isset($_POST['worker_name'])) {
+    $sql = "INSERT INTO `wm_workers` ( ".
+           "`user_id`, ".
+           "`API_key`, ".
+           "`worker_name`, ".
+           "`description`, ".
+           "`url` ".
+           ") VALUES (:uid, :api_key, :worker_name, :description, :url);";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':api_key', uniqid(), PDO::PARAM_STR);
+    $stmt->bindParam(':worker_name', $_POST['worker_name'], PDO::PARAM_STR);
+    $stmt->bindParam(':description', $_POST['description'], PDO::PARAM_STR);
+    $stmt->bindParam(':url', $_POST['url'], PDO::PARAM_STR);
+    if ($stmt->execute()) {
+        $msg[] = array("class" => "alert-success",
+                       "text" => "Your client was successfully inserted.");
+    } else {
+        $msg[] = array("class" => "alert-danger",
+                       "text" => "Your client could not be inserted. ".
+                                 "Probably the name was already taken?");
+    }
+}
+
+// Get all workers of this user
+$sql = "SELECT `id`, `API_key`, `worker_name`, `description`, `url`, ".
+       "`latest_heartbeat` ".
+       "FROM `wm_workers` WHERE `user_id` = :uid";
+$stmt = $pdo->prepare($sql);
+$uid = get_uid();
+$stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+$stmt->execute();
+$userworkers = $stmt->fetchAll();
 
 // Get total number of elements for pagination
 $sql = "SELECT COUNT(`id`) as counter FROM `wm_raw_draw_data` ".
        "WHERE `user_id` = :uid";
 $stmt = $pdo->prepare($sql);
 $uid = get_uid();
-$stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
+$stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
 $stmt->execute();
 $row = $stmt->fetchObject();
 $total = $row->counter;
@@ -116,6 +151,7 @@ echo $twig->render('profile.twig', array('heading' => 'Profile',
                                        'display_name' => $_SESSION['display_name'],
                                        'user_id' => get_uid(),
                                        'email' => get_email(),
+                                       'msg' => $msg,
                                        'gravatar' => "http://www.gravatar.com/avatar/".md5(get_email()),
                                        'language' => get_language(),
                                        'handedness' => get_handedness(),
@@ -124,6 +160,7 @@ echo $twig->render('profile.twig', array('heading' => 'Profile',
                                        'total' => $total,
                                        'pages' => floor(($total)/14),
                                        'currentPage' => $currentPage,
+                                       'userworkers' => $userworkers
                                        )
                   );
 
