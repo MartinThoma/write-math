@@ -17,6 +17,12 @@
     canvas.add(path);
     canvas.renderAll();
     path.center();
+    /* Make sure that touch events do nothing */
+    canvas.deactivateAll();
+    canvas.selection = false;
+    canvas.forEachObject(function(o) {
+        o.selectable = false;
+    });
  {% endfor %}
 }
  </script>
@@ -105,17 +111,17 @@
 
 <ul class="pagination">
   {% if currentPage > 1 %}
-      <li><a href="?page={{ currentPage-1 }}">&laquo;</a></li>
+      <li><a href="?id={{ user_id }}&page={{ currentPage-1 }}">&laquo;</a></li>
   {% else %}
       <li class="disabled"><a href="#">&laquo;</a></li>
   {% endif %}
 
   {% for i in 1..(pages+1) %}
-    <li {% if i == currentPage %}class="active"{% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+    <li {% if i == currentPage %}class="active"{% endif %}><a href="?id={{ user_id }}&page={{ i }}">{{ i }}</a></li>
   {% endfor %}
 
   {% if currentPage < total %}
-      <li><a href="?page={{ currentPage+1 }}">&raquo;</a></li>
+      <li><a href="?id={{ user_id }}&page={{ currentPage+1 }}">&raquo;</a></li>
   {% else %}
       <li class="disabled"><a href="#">&raquo;</a></li>
   {% endif %}

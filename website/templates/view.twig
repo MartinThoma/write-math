@@ -13,6 +13,12 @@
 
         canvas.renderAll();
         path.center();
+        /* Make sure that touch events do nothing */
+        canvas.deactivateAll();
+        canvas.selection = false;
+        canvas.forEachObject(function(o) {
+            o.selectable = false;
+        });
     }
 </script>
 {% endblock %}

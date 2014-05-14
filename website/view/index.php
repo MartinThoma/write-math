@@ -18,8 +18,8 @@ function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
     if($formula_id == 0 || $formula_id == null) {
         // it was not in the database. Add it.
         $sql = "INSERT INTO `wm_formula` (".
-               "`formula_in_latex`, `is_single_symbol`, `mode`".
-               ") VALUES (:latex, '2', :mode);";
+               "`formula_in_latex`, `mode`".
+               ") VALUES (:latex, :mode);";
         $stmt = $pdo->prepare($sql);
         $latex = trim($latex);
 

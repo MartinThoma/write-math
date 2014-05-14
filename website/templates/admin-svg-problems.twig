@@ -1,0 +1,29 @@
+{% extends "base.twig" %}
+{% block content %}
+    {% if problematic_formulas == "" %}
+    <!-- Train a single formula, but not part of a challenge -->
+    <form method="post" action="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" onsubmit="return addCanvas();" id="form">
+    <input type="hidden" name="formula_id" value="{{ formula.id }}"/>
+    <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
+    <div class="row-fluid">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">'{{ formula.formula_name }}'
+            <a href="?formula_id={{ formula.id }}&is_ok" type="button" class="btn btn-success">Formula is ok</a>
+            </h3>
+          </div>
+          <div class="panel-body">
+            <img src="../api/?task=view-formula&id={{ formula.id }}" width="400" style="width:400px;height:400px;" />
+            <p><b>Description:</b> {{ formula.description }}</p>
+            <p><b>Mode:</b> {{ formula.mode }}</p>
+          </div>
+        </div>
+    </div>
+    </form>
+    {% else %}
+        <p>{{ problematic_formulas|length }} formulas are problematic.</p>
+        {% for formula in problematic_formulas %}
+            <li><a href="?formula_id={{ formula.formula_id }}">{{ formula.formula_id }}</a>: {{ formula.problem_type }}</li>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

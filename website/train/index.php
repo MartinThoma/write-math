@@ -163,14 +163,14 @@ if (isset($_GET['rand'])) {
 
         if (empty($formula_id)) {
             // This challenge is finished!
-            header("Location: ..");
+            header("Location: ../train/");
         }
 
         $formula_id = $formula_id->formula_id;
 
         if ($formula_id == 0) {
             // This challenge is finished!
-            header("Location: ..");
+            header("Location: ../train/");
         }
 
         // Has the user already written this symbol?
