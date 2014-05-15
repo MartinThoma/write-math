@@ -5,19 +5,14 @@
 {% endblock %}
 
 {% block content %}
-    {% if raw_data_id != '' %}
-    <div class="alert alert-info">
-        <p>You can check classification <a href="../brute-force/?A={{ raw_data_id }}">here</a>.</p>
-    </div>
-    {% endif %}
-
-
     <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
     <button type="submit" class="btn btn-success">Submit</button>
     <a href="?formula_id={{ formula_id }}" class="btn btn-danger">Clear</a></h3>
     </form>
+
+    <div id="results"></div>
     <script type='text/javascript'>
         var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
         var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;

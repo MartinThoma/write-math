@@ -132,49 +132,66 @@
 <h2>Workers</h2>
 <table class="table">
   <tr>
+    <th>&nbsp;</th>
     <th>Name</th>
     <th>API</th>
     <th>URL</th>
     <th>Description</th>
     <th>Latest Heartbeat</th>
-    <th>Operations</th>
   </tr>
   {% for worker in userworkers %}
   <tr>
+    <td>
+      <a href="?edit={{ worker.id }}"><img src="../icons/pencil.png" alt="edit" /></a>
+      &nbsp;
+      <a href="?delete={{ worker.id }}"><img src="../icons/cross.png" alt="delete" /></a>
+    </td>
     <td>{{ worker.worker_name }}</td>
     <td>{{ worker.API_key }}</td>
     <td>{{ worker.url }}</td>
     <td>{{ worker.description }}</td>
-    <td>{{ worker.heartbeat }} (TODO: Request, if none)</td>
-    <td>TODO (delete, edit)</td>
+    <td>{% if worker.latest_heartbeat is null %}
+          <a href="?request_heartbeat={{ worker.id }}">Request</a>
+        {% else %}{{ worker.latest_heartbeat }}{% endif%}</td>
   </tr>
   {% endfor %}
 </table>
 {% endif %}
 
-<h2>Create a new Worker</h2>
+
+{% if edit_id > 0 %}
+    <h2>Edit worker '{{worker.worker_name}}'</h2>
+{% else %}
+    <h2>Create a new Worker</h2>
+{% endif %}
 
 <div class="container-fluid well span6">
   <form role="form" method="post">
+    {% if edit_id > 0 %}
+        <input type="hidden" name="worker_id" value="{{ edit_id }}"/>
+    {% endif%}
     <div class="form-group">
       <label for="worker_name">Name</label>
       <input type="text" class="form-control" required
              id="worker_name" name="worker_name"
-             placeholder="Neural Netter" />
+             placeholder="Neural Netter"
+             {% if edit_id > 0 %}value="{{ worker.worker_name}}"{% endif %} />
     </div>
     <div class="form-group">
       <label for="url">API URL</label>
       <input type="url" class="form-control" required
              id="url" name="url"
-             placeholder="http://myurl.com/api.php" />
+             placeholder="http://myurl.com/api.php"
+             {% if edit_id > 0 %}value="{{ worker.url}}"{% endif %} />
     </div>
     <div class="form-group">
       <label for="description">Description</label>
       <textarea class="form-control" rows="3"
                 id="description" name="description"
-                placeholder="This project is documentet at www.example.com"></textarea>
+                placeholder="This project is documentet at www.example.com">{% if edit_id > 0 %}{{ worker.description}}{% endif %}</textarea>
     </div>
-    <button type="submit" class="btn btn-default">Submit</button>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="../profile" class="btn btn-danger">Cancel</a>
   </form>
 </div>
 

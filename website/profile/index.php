@@ -6,6 +6,8 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+$edit_id = 0;
+
 function validate_display_name($name) {
     return preg_match('/^[A-Za-z]{1}[A-Za-z0-9_ ]{1,}[A-Za-z0-9]{1}$/',$name);
 }
@@ -82,8 +84,28 @@ if (isset($_POST['language'])) {
     }
 }
 
-# Insert a new worker
-if (isset($_POST['worker_name'])) {
+if (isset($_POST['worker_id'])) {
+    $sql = "UPDATE `wm_workers` SET ".
+           "`worker_name` = :name, ".
+           "`description` = :description, ".
+           "`url` = :url ".
+           "WHERE `id` = :id AND user_id = :uid;";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $_POST['worker_id'], PDO::PARAM_INT);
+    $stmt->bindParam(':name', trim($_POST['worker_name']), PDO::PARAM_STR);
+    $stmt->bindParam(':description', trim($_POST['description']), PDO::PARAM_STR);
+    $stmt->bindParam(':url', trim($_POST['url']), PDO::PARAM_STR);
+    if ($stmt->execute()) {
+        $msg[] = array("class" => "alert-success",
+                       "text" => "Your client was successfully edited.");
+    } else {
+        $msg[] = array("class" => "alert-danger",
+                       "text" => "Your client could not be edited.");
+    }
+} elseif (isset($_POST['worker_name'])) {
+    # Insert a new worker
     $sql = "INSERT INTO `wm_workers` ( ".
            "`user_id`, ".
            "`API_key`, ".
@@ -106,6 +128,61 @@ if (isset($_POST['worker_name'])) {
                        "text" => "Your client could not be inserted. ".
                                  "Probably the name was already taken?");
     }
+} elseif (isset($_GET['request_heartbeat'])) {
+    # Make a heartbeat
+    $sql = "SELECT `url` FROM `wm_workers` ".
+           "WHERE `user_id` = :uid AND `id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $_GET['request_heartbeat'], PDO::PARAM_INT);
+    $stmt->execute();
+    $worker = $stmt->fetchObject();
+
+    # Make the heartbeat
+    $random_msg = uniqid();
+    $answer = file_get_contents(($worker->url) . "?heartbeat=" . $random_msg,
+                                false,
+                                NULL,
+                                -1,
+                                strlen($random_msg));
+    if ($answer != $random_msg) {
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "The server didn't answer correct. ".
+                                 "It's answer was '".htmlentities($answer)."' and should ".
+                                 "have been '$random_msg'.<br/>".
+                                 "The response headers were:<br/><pre>".
+                                 implode("<br/>", $http_response_header).
+                                 "</pre>");
+    } else {
+        $sql = "UPDATE `wm_workers` SET ".
+               "`latest_heartbeat` = CURRENT_TIMESTAMP ".
+               "WHERE  `wm_workers`.`id` = :id AND `user_id` =:uid;";
+        $stmt = $pdo->prepare($sql);
+        $uid = get_uid();
+        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $_GET['request_heartbeat'], PDO::PARAM_INT);
+        $stmt->execute();
+        $msg[] = array("class" => "alert-success",
+                       "text" => "The heartbeat was successful." );
+    }
+} elseif (isset($_GET['edit'])) {
+    $sql = "SELECT `id`, `worker_name`, `url`, `description` FROM `wm_workers` ".
+           "WHERE `user_id` = :uid AND `id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $_GET['edit'], PDO::PARAM_INT);
+    $stmt->execute();
+    $worker = $stmt->fetchObject();
+    $edit_id = $worker->id;
+} elseif (isset($_GET['delete'])) {
+    $sql = "DELETE FROM `wm_workers` WHERE `id` = :wid AND `user_id` = :uid";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':wid', $_GET['delete'], PDO::PARAM_INT);
+    $stmt->execute();
 }
 
 // Get all workers of this user
@@ -160,7 +237,9 @@ echo $twig->render('profile.twig', array('heading' => 'Profile',
                                        'total' => $total,
                                        'pages' => floor(($total)/14),
                                        'currentPage' => $currentPage,
-                                       'userworkers' => $userworkers
+                                       'userworkers' => $userworkers,
+                                       'worker' => $worker,
+                                       'edit_id' => $edit_id
                                        )
                   );
 

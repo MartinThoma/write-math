@@ -77,6 +77,38 @@
 </div>
 </div>
 
+
+<h2>Automatic Classifications</h2>
+    {% for answer in automatic_answers %}
+    <div class="pull-left">
+      <table>
+        <tr>
+          <td>
+            <img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="400" style="width:100px;height:100px;" />
+          </td>
+          <td>
+              <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
+              <p>Mode: {{answer.mode}}</p>
+              {% if answer.package != '' %}
+              <p>Package: {{answer.package}}</p>
+              {% endif %}
+              <p><a href="../profile?id={{ answer.worker_id }}">{{ answer.worker_name }}</a></p>
+              <p>Probability: {{ answer.probability }}%</p>
+          </td>
+          <td>
+            {% if answer.formula_id == image_data.accepted_formula_id %}
+              <img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" />
+            {% else %}
+          <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
+"src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>
+    {% endfor %}
+    <br style="clear:both;" />
+
    <h2>Possible classifications</h2>
     {% for answer in answers %}
     <div class="container-fluid">

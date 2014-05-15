@@ -199,6 +199,20 @@ if ($epsilon > 0) {
 }
 $bounding_box = get_dimensions(list_of_pointlists2pointlist($result_path));
 
+// Get all automatic classificaitons:
+$sql = "SELECT `formula_id`, `formula_name`, `formula_in_latex`, ".
+       "`mode`, `package`, ROUND(`probability`*100, 2) as `probability`, ".
+       "`worker_id`, `worker_name` ".
+       "FROM `wm_worker_answers`  ".
+       "JOIN `wm_workers` ON `wm_workers`.`id` = `worker_id` ".
+       "JOIN `wm_formula` ON `wm_formula`.`id` = `formula_id` ".
+       "WHERE `raw_data_id` = :raw_data_id ".
+       "ORDER BY `probability` DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+$stmt->execute();
+$automatic_answers = $stmt->fetchAll();
+
 echo $twig->render('view.twig', array('heading' => 'View',
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
@@ -212,7 +226,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'uid' => $_SESSION['uid'],
                                        'lines_nr' => $lines_nr,
                                        'control_points' => $control_points,
-                                       'bounding_box' => $bounding_box
+                                       'bounding_box' => $bounding_box,
+                                       'automatic_answers' => $automatic_answers
                                        )
                   );
 
