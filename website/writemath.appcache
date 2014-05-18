@@ -1,0 +1,32 @@
+CACHE MANIFEST
+# v2 - 2014-05-17
+
+# Explicitly cached 'master entries'.
+CACHE:
+icons/accept.png
+icons/cross.png
+icons/Crystal_Clear_action_apply.png
+icons/Crystal_Clear_action_apply-gray.png
+icons/pencil.png
+icons/offline.svg
+favicon.ico
+nice-highres.png
+niceicon.png
+css/style.css
+
+# Resources that require the user to be online.
+NETWORK:
+register/
+login/
+gallery/
+train/
+ranking/
+classify/
+about/
+
+# static.html will be served if main.py is inaccessible
+# offline.jpg will be served in place of all images in images/large/
+# offline.html will be served in place of all other .html files
+FALLBACK:
+*.svg icons/offline.svg
+http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css css/bootstrap.min.css
