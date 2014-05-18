@@ -15,9 +15,23 @@ function login($email, $upass) {
     $status = $user->status;
 
     if (!((int)$uid == $uid && (int)$uid > 0)) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "Email '$email' not known.");
-        return false;
+        $email = strtolower($email);
+        // try again with lower case
+        $sql = "SELECT `id`, `status`, `password` ".
+       "FROM `wm_users` WHERE `email` = :email";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $user = $stmt->fetchObject();
+        $uid = $user->id;
+        $status = $user->status;
+
+        if (!((int)$uid == $uid && (int)$uid > 0)) {
+            $msg[] = array("class" => "alert-warning",
+                           "text" => "Email '$email' not known.");
+            return false;
+        }
     }
 
     if ($user->id > 0 && password_verify($_POST['password'], $user->password)) {
