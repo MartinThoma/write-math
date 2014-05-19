@@ -88,11 +88,11 @@
 
 <h2>Automatic Classifications</h2>
     {% for answer in automatic_answers %}
-    <div class="pull-left">
+    <div class="pull-left" style="height:200px;">
       <table>
         <tr>
           <td>
-            <img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="400" style="width:100px;height:100px;" />
+            <img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="150" style="width:150px;max-height:150px;" />
           </td>
           <td>
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
@@ -128,7 +128,7 @@
               <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=-1">Downvote</a>
           </td>
           <td>
-            <img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="400" style="width:400px;height:400px;" />
+            <a href="../symbol/?id={{ answer.formula_id }}"><img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="150" style="width:150px;max-height:150px;" /></a>
           </td>
           <td>
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>

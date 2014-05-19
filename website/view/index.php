@@ -171,6 +171,7 @@ if (isset($_GET['raw_data_id'])) {
     // Get all probable classifications
     $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
            "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
+           "`formula_type`, ".
            "COALESCE(sum(`vote`), 0) as `votes` ".
            "FROM `wm_raw_data2formula` ".
            "LEFT JOIN `wm_votes` ".
