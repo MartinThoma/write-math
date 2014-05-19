@@ -42,6 +42,18 @@
     <td>{{ bounding_box.width }} &times; {{ bounding_box.height }}</td>
   </tr>
   <tr>
+    <th>Min. Time Delta</th>
+    <td>{{ '%02.2f'|format(time_resolution.min_time_resolution) }} ms</td>
+  </tr>
+  <tr>
+    <th>Avg. Time Delta</th>
+    <td>{{ '%02.2f'|format(time_resolution.average_time_resolution) }} ms</td>
+  </tr>
+  <tr>
+    <th>Max. Time Delta</th>
+    <td>{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms</td>
+  </tr>
+  <tr>
     <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
     <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
   </tr>
@@ -52,10 +64,6 @@
   <tr>
     <th>User</th>
     <td><a href="../user/?id={{ image_data.user_id }}">{{ image_data.display_name }}</a></td>
-  </tr>
-  <tr>
-    <th>Classifiers</th>
-    <td><a href="../brute-force/?A={{ raw_data_id }}">Brute-Force</a></td>
   </tr>
   <tr>
     <th>accepted_formula_id</th>

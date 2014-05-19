@@ -198,6 +198,7 @@ if ($epsilon > 0) {
     $result_path = pointLineList($image_data->data);
 }
 $bounding_box = get_dimensions(list_of_pointlists2pointlist($result_path));
+$time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $lines_nr);
 
 // Get all automatic classificaitons:
 $sql = "SELECT `formula_id`, `formula_name`, `formula_in_latex`, ".
@@ -227,7 +228,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                        'lines_nr' => $lines_nr,
                                        'control_points' => $control_points,
                                        'bounding_box' => $bounding_box,
-                                       'automatic_answers' => $automatic_answers
+                                       'automatic_answers' => $automatic_answers,
+                                       'time_resolution' => $time_resolution
                                        )
                   );
 

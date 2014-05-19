@@ -8,7 +8,7 @@ function pointLineList($linelistP) {
     foreach ($linelist as $line) {
         $l = array();
         foreach ($line as $p) {
-            $l[] = array("x"=>$p->x, "y"=>$p->y);
+            $l[] = array("x"=>$p->x, "y"=>$p->y, "time"=>$p->time);
         }
         $pointlist[] = $l;
     }
@@ -75,5 +75,33 @@ function list_of_pointlists2pointlist($data) {
 function get_dimensions($pointlist) {
     extract(get_bounding_box($pointlist));
     return array("width" => $maxx - $minx, "height" => $maxy - $miny);
+}
+
+function get_time_resolution($pointlist, $lines_nr) {
+    $min_time_resolution = $pointlist[1]["time"]-$pointlist[0]["time"];
+    $max_time_resolution = $min_time_resolution;
+
+    $n = count($pointlist);
+    $timesum = 0.0;
+    $counter = 0;
+
+    for ($i= $n-1; $i >= 1; $i--) {
+        $delta = $pointlist[$i]["time"] - $pointlist[$i-1]["time"];
+        if ($delta < 0) {
+            continue;
+        }
+        $timesum += $delta;
+        $counter += 1;
+        if ($delta < $min_time_resolution) {
+            $min_time_resolution = $delta;
+        }
+        if ($delta > $max_time_resolution) {
+            $max_time_resolution = $delta;
+        }
+    }
+
+    return array("min_time_resolution" => $min_time_resolution,
+                 "max_time_resolution" => $max_time_resolution,
+                 "average_time_resolution" => $timesum / ($n-$lines_nr));
 }
 ?>
