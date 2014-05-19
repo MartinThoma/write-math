@@ -24,6 +24,11 @@
                 var x = event.e.x;
                 var y = event.e.y;
                 if (typeof(x) != 'number') {
+                    console.log(event);
+                    x = event.e.screenX;
+                    y = event.e.screenY;
+                }
+                if (typeof(x) != 'number') {
                     x = event.e.touches[0].clientX;
                     y = event.e.touches[0].clientY;
                 }

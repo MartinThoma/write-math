@@ -22,31 +22,42 @@ function insert_userdrawing($user_id, $data) {
     if (count($pointlist) == 0) {
         $msg[] = array("class" => "alert-danger",
                        "text" => "This could not be inserted. It didn't even ".
-                                 "have a single point. You sent:<br/>".
+                                 "have a single point (ERR 2). You sent:<br/>".
                                  "<pre>".$data."</pre>");
         return false;
     } else {
-        $sql = "INSERT INTO `wm_raw_draw_data` (".
-               "`user_id`, ".
-               "`data`, ".
-               "`creation_date`, ".
-               "`user_agent`, ".
-               "`accepted_formula_id`".
-               ") VALUES (:user_id, :data, CURRENT_TIMESTAMP, :user_agent, NULL);";
-        $stmt = $pdo->prepare($sql);
-        $uid = get_uid();
-        $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
-        $stmt->bindParam(':data', $data, PDO::PARAM_STR);
-        $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
-        $stmt->execute();
-        return $pdo->lastInsertId();
+        if ($data != "[[]]") {
+            $sql = "INSERT INTO `wm_raw_draw_data` (".
+                   "`user_id`, ".
+                   "`data`, ".
+                   "`creation_date`, ".
+                   "`user_agent`, ".
+                   "`accepted_formula_id`".
+                   ") VALUES (:user_id, :data, CURRENT_TIMESTAMP, :user_agent, NULL);";
+            $stmt = $pdo->prepare($sql);
+            $uid = get_uid();
+            $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+            $stmt->bindParam(':data', $data, PDO::PARAM_STR);
+            $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
+            $stmt->execute();
+            return $pdo->lastInsertId();
+        } else {
+            $msg[] = array("class" => "alert-danger",
+                           "text" => "This could not be inserted. It didn't even ".
+                                     "have a single point (ERR 1). You sent:<br/>".
+                                     "<pre>".$data."</pre>");
+            return false;
+        }
     }
 }
 
-$formula_ids = array();
+function classify() {
+    global $msg, $pdo;
 
-if (isset($_POST['drawnJSON'])) {
     $raw_data_id = insert_userdrawing(get_uid(), $_POST['drawnJSON']);
+    if ($raw_data_id == false) {
+        return;
+    }
     # Get a list of all workers
     $sql = "SELECT `id`, `worker_name`, `url` ".
            "FROM `wm_workers` WHERE `latest_heartbeat` IS NOT NULL";
@@ -134,6 +145,12 @@ if (isset($_POST['drawnJSON'])) {
             }
         }
     }
+}
+
+$formula_ids = array();
+
+if (isset($_POST['drawnJSON'])) {
+    classify();
 }
 
 echo $twig->render('classify.twig', array('heading' => 'Classify',
