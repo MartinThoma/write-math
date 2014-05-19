@@ -47,6 +47,11 @@
 
     <p><b>Description:</b> {{ formula_description }}</p>
     <p><b>Mode:</b> {{ formula_mode }}</p>
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="{{ formula.counter }}" aria-valuemin="0" aria-valuemax="50" style="width: {{ formula.counter / 50 * 100 }}%;">
+        {{ formula.counter / 50 * 100 }}%
+      </div>
+    </div>
 {% elseif challenge_id != "" %}
     <!-- Train a single formula as part of a challenge -->
     <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">

@@ -138,12 +138,21 @@ if (isset($_GET['rand'])) {
     $formula_mode = $formula->mode;
 } elseif (isset($_GET['formula_id'])) {
     $formula_id = $_GET['formula_id'];
-    $sql = "SELECT `formula_name`, `description`, `svg`, `mode` ".
-           "FROM  `wm_formula` WHERE  `id` = :id;";
+    $sql = "SELECT `formula_name`, `description`, `svg`, `mode`, ".
+           "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
+           "FROM `wm_formula` ".
+           "LEFT JOIN `wm_raw_data2formula` ".
+           "ON `formula_id` = `wm_formula`.`id` AND `user_id` = :uid ".
+           "WHERE `wm_formula`.`id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
+    $user_id = get_uid();
+    $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $formula = $stmt->fetchObject();
+
+    // get formula count
+
     $svg = $formula->svg;
     $formula_name = $formula->formula_name;
     $formula_description = $formula->description;
@@ -237,6 +246,7 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'challenges' => $challenges,
                                        'i' => ($i+1),
                                        'challenge_id' => $challenge_id,
+                                       'formula' => $formula,
                                        'formula_name' => $formula_name,
                                        'formula_description' => $formula_description,
                                        'formula_mode' => $formula_mode,

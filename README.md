@@ -13,3 +13,10 @@ Client-Side:
 
 Server-Side:
 * ? (Haskell, Scala, Python, PHP, Java, C, C++?)
+
+
+## TODO
+
+http://scikit-learn.org/stable/modules/hmm.html
+
+webdemo.myscript.com - seems to be pretty good!
