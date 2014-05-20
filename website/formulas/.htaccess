@@ -1,2 +1,3 @@
 Options +Indexes
 IndexOptions +FancyIndexing
+ErrorDocument 404 /write-math/website/formulas/cache-404.php

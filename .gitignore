@@ -50,3 +50,4 @@ website/cache/*
 website/composer.lock
 website/vendor/*
 website/write-math.sublime-workspace
+website/formulas/*.svg

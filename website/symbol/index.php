@@ -45,7 +45,16 @@ if (isset($_POST['id']) && get_uid() == 10) {
         $stmt->execute();
         $rendering_id = $pdo->lastInsertId('id');
         # create svg file
-        file_put_contents ("../formulas/$formula_id-$rendering_id.svg", $svg_new);
+        $return = file_put_contents ("../formulas/$formula_id-$rendering_id.svg", $svg_new);
+
+        if ($return === false) {
+            $msg[] = array("class" => "alert-danger",
+                   "text" => "Writing was not successful.");
+        } else {
+            $msg[] = array("class" => "alert-success",
+                   "text" => "../formulas/$formula_id-$rendering_id.svg was ".
+                             "written successfully");
+        }
 
         # adjust best rendering id
         $sql = "UPDATE `wm_formula` ".
@@ -56,6 +65,11 @@ if (isset($_POST['id']) && get_uid() == 10) {
         $stmt->execute();
     }
 
+    $formula_name = trim($_POST['formula_name']);
+    $formula_type = trim($_POST['formula_type']);
+    $description = trim($_POST['description']);
+    $svg = trim($_POST['svg']);
+
     $sql = "UPDATE `wm_formula` SET ".
            "`formula_name` = :formula_name, ".
            "`description` = :description, ".
@@ -64,18 +78,17 @@ if (isset($_POST['id']) && get_uid() == 10) {
            "WHERE `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
-    $stmt->bindParam(':formula_name', trim($_POST['formula_name']), PDO::PARAM_STR);
-    $stmt->bindParam(':description', trim($_POST['description']), PDO::PARAM_STR);
+    $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
+    $stmt->bindParam(':description', $description, PDO::PARAM_STR);
     $stmt->bindParam(':mode', $_POST['mode'], PDO::PARAM_STR);
-    $stmt->bindParam(':svg', trim($_POST['svg']), PDO::PARAM_STR);
-    $stmt->bindParam(':formula_type', trim($_POST['formula_type']), PDO::PARAM_STR);
+    $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
     $stmt->execute();
 }
 
 $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, `formula_in_latex`, ".
        "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
        "FROM `wm_formula` ".
-       "JOIN `wm_renderings` ON `formula_id`=`best_rendering` ".
+       "JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
        "WHERE `wm_formula`.`id` = :id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);

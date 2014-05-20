@@ -6,7 +6,7 @@
 
 {% block content %}
 
-{% if challenge_id == "" and formula_id != "" %}
+{% if challenge_id == "" and formula.id != "" %}
     <!-- Train a single formula, but not part of a challenge -->
     <form method="post" action="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" onsubmit="return addCanvas();" id="form">
     <input type="hidden" name="formula_id" value="{{ formula.id }}"/>
