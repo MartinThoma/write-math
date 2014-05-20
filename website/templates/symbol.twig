@@ -1,8 +1,9 @@
 {% extends "base.twig" %}
 
 {% block content %}
-<img src="../api/?task=view-formula&id={{ formula.id }}" width="150px" />
+<img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="150px" />
 <p><b>Name</b>: {{formula.formula_name}}</p>
+<p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
 <p><b>Mode</b>: {{formula.mode}}</p>
 <p><b>Type</b>: {{formula.formula_type}}</p>
 {% if formula.package != '' %}
@@ -98,12 +99,16 @@
     <div class="control-group">
         <label class="control-label" for="svg">SVG</label>
         <div class="controls"> 
-            <textarea class="form-control" rows="7" name="svg" id="svg">{{ formula.svg }}</textarea>
+            <textarea class="form-control" rows="20" name="svg" id="svg">{{ formula.svg }}</textarea>
         </div>
     </div>
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
 {% else %}
-<a href="../symbol/?id={{ formula.id }}&edit">edit</a>
+
+{% if uid == 10 %}
+<a href="../symbol/?id={{ formula.id }}&edit">edit</a><br/><br/><br/>
+<a href="../symbol/?delete={{ formula.id }}">delete</a>
+{% endif %}
 {% endif %}
 {% endblock %}

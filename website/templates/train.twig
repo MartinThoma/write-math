@@ -8,15 +8,15 @@
 
 {% if challenge_id == "" and formula_id != "" %}
     <!-- Train a single formula, but not part of a challenge -->
-    <form method="post" action="?formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" onsubmit="return addCanvas();" id="form">
-    <input type="hidden" name="formula_id" value="{{ formula_id }}"/>
+    <form method="post" action="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" onsubmit="return addCanvas();" id="form">
+    <input type="hidden" name="formula_id" value="{{ formula.id }}"/>
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <div class="row-fluid">
         <div class="span6 pull-left panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Draw here
             <button type="submit" class="btn btn-success">Submit</button>
-            <a href="?formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" class="btn btn-danger">Clear</a></h3>
+            <a href="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" class="btn btn-danger">Clear</a></h3>
           </div>
           <div class="panel-body">
             <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
@@ -25,28 +25,28 @@
 
         <div class="span6 pull-right panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title">Draw '{{ formula_name }}'
+            <h3 class="panel-title">Draw '{{ formula.formula_name }}'
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                 Report problem <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="?missing_formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="m" alt="Alt+m">Rendering is missing</a></li>
-                <li><a href="?wrong_rendering_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+w">Rendering looks wrong</a></li>
-                <li><a href="?unknown_formula_id={{ formula_id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+u">I never needed this formula</a></li>
+                <li><a href="?missing_formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" accesskey="m" alt="Alt+m">Rendering is missing</a></li>
+                <li><a href="?wrong_rendering_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+w">Rendering looks wrong</a></li>
+                <li><a href="?unknown_formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" accesskey="u" alt="Alt+u">I never needed this formula</a></li>
               </ul>
             </div>
             </h3>
           </div>
           <div class="panel-body">
-            <img src="../api/?task=view-formula&id={{ formula_id }}" width="400" style="width:400px;height:400px;" />
+            <a href="../symbol/?id={{ formula.id }}"><img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="400" style="width:400px;height:400px;" /></a>
           </div>
         </div>
     </div>
     </form>
 
-    <p><b>Description:</b> {{ formula_description }}</p>
-    <p><b>Mode:</b> {{ formula_mode }}</p>
+    <p><b>Description:</b> {{ formula.description }}</p>
+    <p><b>Mode:</b> {{ formula.mode }}</p>
     <div class="progress">
       <div class="progress-bar" role="progressbar" aria-valuenow="{{ formula.counter }}" aria-valuemin="0" aria-valuemax="50" style="width: {{ formula.counter / 50 * 100 }}%;">
         {{ formula.counter / 50 * 100 }}%
@@ -71,17 +71,17 @@
 
         <div class="span6 pull-right panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title">Draw '{{ formula_name }}'</h3>
+            <h3 class="panel-title">Draw '{{ formula.formula_name }}'</h3>
           </div>
           <div class="panel-body">
-            <img src="../api/?task=view-formula&id={{ formula_id }}" width="400" style="width:400px;height:400px;" />
+            <a href="../symbol/?id={{ formula.id }}"><img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="400" style="width:400px;height:400px;" /></a>
           </div>
         </div>
     </div>
     </form>
 
-    <p><b>Description:</b> {{ formula_description }}</p>
-    <p><b>Mode:</b> {{ formula_mode }}</p>
+    <p><b>Description:</b> {{ formula.description }}</p>
+    <p><b>Mode:</b> {{ formula.mode }}</p>
 {% else %}
     <h2>Train random symbol</h2>
     <p><a href="?rand">Train a random symbol</a>: This also helps you to

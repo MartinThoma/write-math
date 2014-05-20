@@ -92,9 +92,11 @@
       <table>
         <tr>
           <td>
-            <img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="150" style="width:150px;max-height:150px;" />
+            <a href="../symbol/?id={{ answer.formula_id }}"><img 
+              src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
+                 width="150" style="width:150px;max-height:150px;" /></a>
           </td>
-          <td>
+          <td width="135px;">
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
               <p>Mode: {{answer.mode}}</p>
               {% if answer.package != '' %}
@@ -128,7 +130,9 @@
               <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=-1">Downvote</a>
           </td>
           <td>
-            <a href="../symbol/?id={{ answer.formula_id }}"><img src="../api/?task=view-formula&id={{ answer.formula_id }}" width="150" style="width:150px;max-height:150px;" /></a>
+            <a href="../symbol/?id={{ answer.formula_id }}"><img
+                src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
+                width="150" style="width:150px;max-height:150px;" /></a>
           </td>
           <td>
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>

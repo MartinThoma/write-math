@@ -25,7 +25,8 @@ if (isset($_GET['is_ok']) && isset($_GET['formula_id'])) {
 }
 
 if (isset($_GET['formula_id'])) {
-    $sql = "SELECT `id`, `formula_name`, `description`, `svg`, `mode` ".
+    $sql = "SELECT `id`, `formula_name`, `description`, `mode`, ".
+           "`best_rendering` ".
            "FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);

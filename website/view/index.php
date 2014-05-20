@@ -171,7 +171,7 @@ if (isset($_GET['raw_data_id'])) {
     // Get all probable classifications
     $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
            "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
-           "`formula_type`, ".
+           "`formula_type`, `best_rendering`, ".
            "COALESCE(sum(`vote`), 0) as `votes` ".
            "FROM `wm_raw_data2formula` ".
            "LEFT JOIN `wm_votes` ".
@@ -204,7 +204,7 @@ $time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path
 // Get all automatic classificaitons:
 $sql = "SELECT `formula_id`, `formula_name`, `formula_in_latex`, ".
        "`mode`, `package`, ROUND(`probability`*100, 2) as `probability`, ".
-       "`worker_id`, `worker_name` ".
+       "`worker_id`, `worker_name`, `best_rendering` ".
        "FROM `wm_worker_answers`  ".
        "JOIN `wm_workers` ON `wm_workers`.`id` = `worker_id` ".
        "JOIN `wm_formula` ON `wm_formula`.`id` = `formula_id` ".

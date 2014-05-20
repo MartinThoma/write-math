@@ -141,25 +141,29 @@ if ($_GET['task'] == "list-unclassified") {
     }
 
     if (isset($_GET['id'])) {
-        $sql = "SELECT `svg` FROM `wm_formula` WHERE `id` = :id";
+        $sql = "SELECT `best_rendering` FROM `wm_formula` WHERE `id` = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
         $stmt->execute();
-        $svg = $stmt->fetchObject()->svg;
+        $obj = $stmt->fetchObject();
         header('Content-type: image/svg+xml');
-        echo $svg;
+        $filename = "../formulas/".$_GET['id']."-".$obj->best_rendering.".svg";
+        echo file_get_contents($filename);
+        // TODO: Render if not exists
     } elseif (isset($_GET['latex'])) {
-        $sql = "SELECT `svg` FROM `wm_formula` WHERE `formula_in_latex` = :latex";
+        $sql = "SELECT `best_rendering` FROM `wm_formula` WHERE `formula_in_latex` = :latex";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':latex', $_GET['latex'], PDO::PARAM_STR);
         $stmt->execute();
-        $svg = $stmt->fetchObject();
-        if ($svg === false) {
+        $obj = $stmt->fetchObject();
+        if ($obj === false) {
             // This request was invalid. Probably a candidate to add?
             invalid_latex_request($_GET['latex']);
         } else {
             header('Content-type: image/svg+xml');
-            echo $svg->svg;
+            $filename = "../formulas/".$_GET['id']."-".$obj->best_rendering.".svg";
+            echo file_get_contents($filename);
+            // TODO: Render if not exists
         }
     } else {
         echo "Nothing here.";
