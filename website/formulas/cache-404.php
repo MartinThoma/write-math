@@ -13,5 +13,6 @@ $svg = $stmt->fetchObject()->svg;
 
 if (strlen($svg) > 50) {
     file_put_contents ("../formulas/$formula_id-$rendering_id.svg", $svg);
+    header("Location: ../formulas/$formula_id-$rendering_id.svg");
 }
 ?>
