@@ -72,9 +72,11 @@ if (isset($_POST['id']) && get_uid() == 10) {
     $stmt->execute();
 }
 
-$sql = "SELECT `id`, `formula_name`, `description`, `formula_in_latex`, ".
-       "`mode`, `package`, `formula_type`, `best_rendering` ".
-       "FROM `wm_formula` WHERE `id` = :id";
+$sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, `formula_in_latex`, ".
+       "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
+       "FROM `wm_formula` ".
+       "JOIN `wm_renderings` ON `formula_id`=`best_rendering` ".
+       "WHERE `wm_formula`.`id` = :id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
 $stmt->execute();

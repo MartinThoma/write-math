@@ -1,0 +1,60 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <p>Some symbols can only be destingushed by context.</p>
+
+    <p>Positive examples for this phenomenon are below. Most well-known might
+       be <code>\Sigma</code> and <code>\sum</code>.</p>
+
+    <p>Negative examples are:</p>
+
+    <ul>
+        <li><code>s</code> and <code>S</code></li>
+        <li><code>0</code> and <code>O</code> (some people make a slash through the zero)</li>
+    </ul>
+
+
+    <table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>Base symbol</th>
+        <th>Similar symbol</th>
+        <th>Comment</th>
+    </tr>
+    {% for symbol in symbols %}
+     <tr>
+        <td>{{ loop.index }}</td>
+        <td><a href="../train/?formula_id={{ symbol.base_symbol }}"><img 
+                src="../api/?task=view-formula&id={{ symbol.base_symbol}}" 
+                width="25" style="width:25px;height:25px;"></a></td>
+        <td><a href="../train/?formula_id={{ symbol.similar_symbol }}"><img 
+                src="../api/?task=view-formula&id={{ symbol.similar_symbol}}" 
+                width="25" style="width:25px;height:25px;"></a></td>
+        <td>{{ symbol.comment_choice }}</td>
+    {% endfor %}
+    </table>
+
+
+    <form role="form" method="post">
+      <div class="form-group">
+        <label for="base_symbol_id">Base Symbol ID</label>
+        <input type="number" class="form-control"
+               min="1" step="1" pattern="\d+" required
+               id="base_symbol_id" name="base_symbol_id" placeholder="31">
+      </div>
+      <div class="form-group">
+        <label for="similar_symbol_id">Similar Symbol ID</label>
+        <input type="number" class="form-control"
+               id="similar_symbol_id" name="similar_symbol_id"
+               min="1" step="1" pattern="\d+" required
+               placeholder="32">
+      </div>
+      <div class="form-group">
+        <label for="description">Comment</label>
+        <textarea class="form-control" rows="3" id="description" name="description"></textarea>
+        <p class="help-block">Explain why you think the base symbol should be the base (and not the similar).</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

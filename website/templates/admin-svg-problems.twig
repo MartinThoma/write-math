@@ -13,7 +13,7 @@
             </h3>
           </div>
           <div class="panel-body">
-            <img src="../api/?task=view-formula&id={{ formula.id }}" width="400" style="width:400px;height:400px;" />
+            <a href="../symbol/?id={{ formula.id }}"><img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="400" style="width:400px;height:400px;" /></a>
             <p><b>Description:</b> {{ formula.description }}</p>
             <p><b>Mode:</b> {{ formula.mode }}</p>
           </div>
