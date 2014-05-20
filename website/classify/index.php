@@ -1,6 +1,7 @@
 <?php
 include '../init.php';
 require_once '../classification.php';
+require_once '../svg.php';
 
 $raw_data_id = "";
 
@@ -40,7 +41,11 @@ function insert_userdrawing($user_id, $data) {
             $stmt->bindParam(':data', $data, PDO::PARAM_STR);
             $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'], PDO::PARAM_STR);
             $stmt->execute();
-            return $pdo->lastInsertId();
+            $raw_data_id = $pdo->lastInsertId();
+
+            create_raw_data_svg($raw_data_id, $data);
+
+            return $raw_data_id;
         } else {
             $msg[] = array("class" => "alert-danger",
                            "text" => "This could not be inserted. It didn't even ".
@@ -65,19 +70,10 @@ function classify() {
     $stmt->execute();
     $workers = $stmt->fetchAll();
 
+    # TODO: Make this asynchronous
     # Send classification request to all workers
     foreach ($workers as $worker) {
         $request_url = $worker['url'];
-/*        $postdata = http_build_query(array("classify" => ));
-        $opts = array('http' =>
-            array(
-                'method'  => 'POST',
-                'header'  => 'Content-type: application/x-www-form-urlencoded',
-                'content' => $postdata
-            )
-        );
-        $context = stream_context_create($opts);*/
-
         // contact worker
         //set POST variables
         $url = $request_url;
@@ -105,8 +101,6 @@ function classify() {
         curl_close($ch);
         // end contact worker
 
-        //$answer = file_get_contents($request_url, false, $context);
-        //
         $answer_json = json_decode($answer, true);
 
         if (!(json_last_error() == JSON_ERROR_NONE)) {
@@ -118,10 +112,6 @@ function classify() {
                          "...";
              # TODO: The user should not see this. This should be logged, though.
         } else {
-/*            $msg[] = array("class" => "alert-success",
-               "text" => "Worker '".$worker['worker_name']."' answered ".
-                         $answer);*/
-
             foreach ($answer_json as $key => $object) {
                 $formula_id = array_keys($object)[0];
                 $probability = $object[$formula_id];

@@ -50,4 +50,7 @@ website/cache/*
 website/composer.lock
 website/vendor/*
 website/write-math.sublime-workspace
+
+# Both of these folders have to be writable
 website/formulas/*.svg
+website/raw-data

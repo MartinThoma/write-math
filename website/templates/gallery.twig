@@ -41,7 +41,7 @@
        <div style="width: 155px">
          <div class="thumb" style="width: 150px;">
            <div style="margin:21px auto;">
-             <a href="../view?raw_data_id={{ image.id }}"><canvas id="galleryImage{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas></a>
+             <a href="../view?raw_data_id={{ image.id }}"><!--<canvas id="galleryImage{{ loop.index }}" class="gallerycanvas" width="140" height="140"></canvas>--><img src="../raw-data/{{ image.id }}.svg" style="width:140px;height:140px;"/></a>
            </div>
          </div>
          <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>

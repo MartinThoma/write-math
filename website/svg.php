@@ -1,5 +1,43 @@
 <?php
 require_once '../classification.php';
+
+function create_raw_data_svg($raw_data_id, $data) {
+    # Move drawing so that the smallest x-value is 0 and the smallest y value
+    # is 0.
+    $pointList = pointLineList($data);
+    $a = list_of_pointlists2pointlist($pointList);
+    $b = get_bounding_box($a);
+    extract($b);
+    $linewidth = 5;
+    $width  = $linewidth*3 + $maxx - $minx;
+    $height = $linewidth*3 + $maxy - $miny;
+
+    $newList = array();
+    foreach ($pointList as $line) {
+        $newLine = array();
+        foreach ($line as $point) {
+            $newLine[] = array("x" => $linewidth + $point["x"] - $minx,
+                               "y" => $linewidth + $point["y"] - $miny);
+        }
+        $newList[] = $newLine;
+    }
+
+    $path = get_path(json_encode($newList));
+
+    # Create SVG and store it for later usage
+    $filename = "../classify/svg-template.svg";
+    $handle = fopen($filename, "r");
+    $contents = fread($handle, filesize($filename));
+    fclose($handle);
+
+    $contents = str_replace("{{ width }}", $width, $contents);
+    $contents = str_replace("{{ height }}", $height, $contents);
+    $contents = str_replace("{{ path }}", $path, $contents);
+
+    file_put_contents ("../raw-data/$raw_data_id.svg", $contents);
+}
+
+
 /**
  * Calculate the distance from $p3 to the line defined by $p1 and $p2.
  * @param array $p1 associative array with "x" and "y" (start of line)

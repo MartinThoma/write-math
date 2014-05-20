@@ -25,7 +25,7 @@
 
 {% block content %}
 <div class="row">
-<div class="col-md-6"><canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas></div>
+<div class="col-md-6"><!-- <canvas id="galleryImage" width="400" height="400" style="border:1px solid black;"></canvas> --><img src="../raw-data/{{ raw_data_id }}.svg" style="width:400px;height:400px;border:1px solid black;"/></div>
 <div class="col-md-6">
 <form action="?raw_data_id={{ raw_data_id }}" method="post">
 <table class="table" role="table">
