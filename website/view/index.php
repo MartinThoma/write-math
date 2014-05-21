@@ -18,15 +18,16 @@ function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
     if($formula_id == 0 || $formula_id == null) {
         // it was not in the database. Add it.
         $sql = "INSERT INTO `wm_formula` (".
-               "`formula_in_latex`, `mode`".
-               ") VALUES (:latex, :mode);";
+               "`formula_name`, `formula_in_latex`, `mode`, `package` ".
+               ") VALUES (:latex, :latex, :mode, :package);";
         $stmt = $pdo->prepare($sql);
         $latex = trim($latex);
 
         $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
         $stmt->bindParam(':mode', $mode, PDO::PARAM_STR);
+        $stmt->bindParam(':package', $packages, PDO::PARAM_STR);
         $stmt->execute();
-        $formula_id = $pdo->lastInsertId;
+        $formula_id = $pdo->lastInsertId('id');
     }
 
     $sql = "INSERT INTO `wm_raw_data2formula` (".
@@ -67,7 +68,8 @@ function sanitize_packages($packages) {
 
 if (isset($_GET['delete'])) {
     $sql = "DELETE FROM `wm_raw_draw_data` ".
-           "WHERE `wm_raw_draw_data`.`id` = :raw_id AND user_id = :user_id";
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id AND ".
+           "(user_id = :user_id OR :user_id = 10)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':raw_id', $_GET['delete'], PDO::PARAM_INT);
     $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
@@ -77,8 +79,9 @@ if (isset($_GET['delete'])) {
     $sql = "INSERT INTO `wm_flags` (`user_id`, `raw_data_id`)".
            "VALUES (:uid,  :raw_data_id);";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
-    $stmt->bindParam(':uid', $_GET['flag'], PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['flag'], PDO::PARAM_INT);
     try {
         $result = $stmt->execute();
     } catch (Exception $e) {
@@ -88,7 +91,8 @@ if (isset($_GET['delete'])) {
     if ($result) {
         mail ("themoosemind@gmail.com", "[Write-Math] flagged symbol",
               "Hallo Martin,\ngerade wurde das Symbol '".intval($_GET['flag']).
-              "' geflaggt.");
+              "' geflaggt:\n\n".
+              "http://write-math.com/view/?raw_data_id=".$_GET['flag']);
         $msg[] = array("class" => "alert-info",
                         "text" => "Thank you for flagging this symbol. A ".
                                   "moderator will take a look at it soon.");
@@ -104,7 +108,7 @@ if (isset($_GET['raw_data_id'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
                "SET `accepted_formula_id` = :accepted_id ".
                "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
-               "`user_id` = :uid";
+               "(`user_id` = :uid OR :uid = 10)";
         $stmt = $pdo->prepare($sql);
         $uid = get_uid();
         $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
@@ -161,10 +165,10 @@ if (isset($_GET['raw_data_id'])) {
     // Add a new classification
     if (isset($_POST['latex'])) {
         $user_id = get_uid();
-        $latex = $_POST['latex'];
+        $latex = trim($_POST['latex']);
         $raw_data_id = $_GET['raw_data_id'];
-        $mode = $_POST['mode'];
-        $packages = $_POST['packages'];
+        $mode = trim($_POST['mode']);
+        $packages = trim($_POST['packages']);
         add_classification($user_id, $raw_data_id, $latex, $mode, $packages);
     }
 
@@ -191,7 +195,8 @@ if (isset($_GET['raw_data_id'])) {
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 
 # TODO: Should I remove the epsilon thing?
-# $path = get_path($image_data->data, $epsilon);
+# Currently, it is still necessary for the next two lines.
+$path = get_path($image_data->data, $epsilon);
 $lines_nr = substr_count($path, 'M');
 $control_points = substr_count($path, 'L') + $lines_nr;
 if ($epsilon > 0) {
@@ -217,22 +222,22 @@ $stmt->execute();
 $automatic_answers = $stmt->fetchAll();
 
 echo $twig->render('view.twig', array('heading' => 'View',
-                                       'logged_in' => is_logged_in(),
-                                       'display_name' => $_SESSION['display_name'],
-                                       'file' => "view",
-                                       'path' => $path,
-                                       'image_data' => $image_data,
-                                       'raw_data_id' => $raw_data_id,
-                                       'answers' => $answers,
-                                       'epsilon' => $epsilon,
-                                       'msg' => $msg,
-                                       'uid' => $_SESSION['uid'],
-                                       'lines_nr' => $lines_nr,
-                                       'control_points' => $control_points,
-                                       'bounding_box' => $bounding_box,
-                                       'automatic_answers' => $automatic_answers,
-                                       'time_resolution' => $time_resolution
-                                       )
+                                      'logged_in' => is_logged_in(),
+                                      'display_name' => $_SESSION['display_name'],
+                                      'file' => "view",
+                                      'path' => $path,
+                                      'image_data' => $image_data,
+                                      'raw_data_id' => $raw_data_id,
+                                      'answers' => $answers,
+                                      'epsilon' => $epsilon,
+                                      'msg' => $msg,
+                                      'uid' => $_SESSION['uid'],
+                                      'lines_nr' => $lines_nr,
+                                      'control_points' => $control_points,
+                                      'bounding_box' => $bounding_box,
+                                      'automatic_answers' => $automatic_answers,
+                                      'time_resolution' => $time_resolution
+                                      )
                   );
 
 ?>

@@ -90,7 +90,7 @@ if (isset($_GET['id'])) {
     $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, `formula_in_latex`, ".
            "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
            "FROM `wm_formula` ".
-           "JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
+           "LEFT JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
            "WHERE `wm_formula`.`id` = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);

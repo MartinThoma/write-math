@@ -46,7 +46,7 @@
     <th>accepted_formula_id</th>
     <td>{{ image_data.accepted_formula_id }}</td>
   </tr>
-  {% if image_data.user_id == uid%}
+  {% if image_data.user_id == uid or uid == 10 %}
   <tr>
     <th>Operations</th>
     <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
@@ -134,7 +134,7 @@
 
    <h2>Add a new answer</h2>
    <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal" role="form">
-     <input type="hidden" name="raw_data_id" value="" />
+     <input type="hidden" name="raw_data_id" value="{{ raw_data_id }}" />
      <div class="control-group">
        <label class="control-label" for="latex">LaTeX</label>
        <div class="controls"> 

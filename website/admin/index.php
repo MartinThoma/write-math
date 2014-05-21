@@ -21,12 +21,20 @@ foreach ($images as $image) {
     }
 }
 
+$sql = "SELECT `wm_flags`.`id`, `user_id`, `raw_data_id`, `display_name` ".
+       "FROM `wm_flags` ".
+       "JOIN `wm_users` ON `wm_users`.`id` = `user_id`";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$flags = $stmt->fetchAll();
+
 echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'file' => "admin",
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'user_id' => $user->id,
-                                       'many_lines' => $many_lines
+                                       'many_lines' => $many_lines,
+                                       'flags' => $flags
                                        )
                   );
 
