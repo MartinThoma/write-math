@@ -218,10 +218,6 @@ $stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
 $stmt->execute();
 $userimages = $stmt->fetchAll();
 
-foreach ($userimages as $key => $value) {
-    $userimages[$key]["path"] = get_path($value["image"]);
-}
-
 echo $twig->render('profile.twig', array('heading' => 'Profile',
                                        'file' => "profile",
                                        'logged_in' => is_logged_in(),

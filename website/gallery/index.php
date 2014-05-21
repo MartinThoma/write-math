@@ -26,9 +26,6 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $stmt->execute();
     $userimages = $stmt->fetchAll();
 
-    foreach ($userimages as $key => $value) {
-        $userimages[$key]["path"] = get_path($value["image"]);
-    }
     $tab = "unclassified";
 } elseif (isset($_GET['tab']) && $_GET['tab'] == 'all') {
     // Get total number of elements for pagination
@@ -48,9 +45,6 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $stmt->execute();
     $userimages = $stmt->fetchAll();
 
-    foreach ($userimages as $key => $value) {
-        $userimages[$key]["path"] = get_path($value["image"]);
-    }
     $tab = "all";
 } else {
     // Get total number of elements for pagination
@@ -75,10 +69,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $stmt->bindParam(':uid', $uid, PDO::PARAM_STR);
     $stmt->execute();
     $userimages = $stmt->fetchAll();
-
-    foreach ($userimages as $key => $value) {
-        $userimages[$key]["path"] = get_path($value["image"]);
-    }
+    
     $tab = "my_raw_data";
 }
 

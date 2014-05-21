@@ -190,7 +190,8 @@ if (isset($_GET['raw_data_id'])) {
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 
-$path = get_path($image_data->data, $epsilon);
+# TODO: Should I remove the epsilon thing?
+# $path = get_path($image_data->data, $epsilon);
 $lines_nr = substr_count($path, 'M');
 $control_points = substr_count($path, 'L') + $lines_nr;
 if ($epsilon > 0) {

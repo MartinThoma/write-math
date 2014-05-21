@@ -30,10 +30,10 @@
     <th>Max. Time Delta</th>
     <td>{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms</td>
   </tr>
-  <tr>
+<!--   <tr>
     <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
     <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
-  </tr>
+  </tr> -->
   <tr>
     <th>Creation Date</th>
     <td>{{ image_data.creation_date }}</td>
@@ -79,7 +79,7 @@
               {% if answer.package != '' %}
               <p>Package: {{answer.package}}</p>
               {% endif %}
-              <p><a href="../profile?id={{ answer.worker_id }}">{{ answer.worker_name }}</a></p>
+              <p><a href="../worker?id={{ answer.worker_id }}">{{ answer.worker_name }}</a></p>
               <p>Probability: {{ answer.probability }}%</p>
           </td>
           <td>

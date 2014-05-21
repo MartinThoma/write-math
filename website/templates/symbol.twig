@@ -11,6 +11,43 @@
 {% endif %}
 
 <p><b>Description</b>: {{formula.description}}</p>
+<p><b>Total handdrawn symbols</b>: {{ total }}</p>
+
+ <ul class="gallery mw-gallery-traditional">
+  {% for image in images %}
+   <li class="gallerybox" style="width: 155px">
+     <div style="width: 155px">
+       <div class="thumb" style="width: 150px;">
+         <div style="margin:21px auto;">
+           <a href="../view?raw_data_id={{ image.id }}"><img src="../raw-data/{{ image.id }}.svg"
+              width="140px"
+              height="140px"
+              style="width:140px;height:140px;"/></a>
+         </div>
+       </div>
+       <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>
+     </div>
+   </li>
+  {% endfor %}
+ </ul>
+
+<ul class="pagination">
+  {% if currentPage > 1 %}
+      <li><a href="?id={{ formula.id }}&page={{ currentPage-1 }}">&laquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&laquo;</a></li>
+  {% endif %}
+
+  {% for i in 1..(pages+1) %}
+    <li {% if i == currentPage %}class="active"{% endif %}><a href="?id={{ formula.id }}&page={{ i }}">{{ i }}</a></li>
+  {% endfor %}
+
+  {% if currentPage < total %}
+      <li><a href="?id={{ formula.id }}&page={{ currentPage+1 }}">&raquo;</a></li>
+  {% else %}
+      <li class="disabled"><a href="#">&raquo;</a></li>
+  {% endif %}
+</ul>
 
 <hr/>
 

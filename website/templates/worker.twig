@@ -1,0 +1,27 @@
+{% extends "base.twig" %}
+
+
+{% block content %}
+<table class="table">
+    <tr>
+        <th>Worker</th>
+        <td>{{ worker.worker_name }}</td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{ worker.description }}</td>
+    </tr>
+    <tr>
+        <th>URL</th>
+        <td>{{ worker.url }}</td>
+    </tr>
+    <tr>
+        <th>Latest Heartbeat</th>
+        <td>{{ worker.latest_heartbeat }}</td>
+    </tr>
+    <tr>
+        <th>Created by</th>
+        <td><a href="../user/?id={{ worker.user_id }}">{{ worker.display_name }}</a></td>
+    </tr>
+</table>
+{% endblock %}

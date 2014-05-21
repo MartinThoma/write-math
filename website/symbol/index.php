@@ -2,6 +2,7 @@
 include '../init.php';
 
 $edit_flag = false;
+$images = false;
 
 if (isset($_GET['edit'])) {
     $edit_flag = true;
@@ -85,15 +86,41 @@ if (isset($_POST['id']) && get_uid() == 10) {
     $stmt->execute();
 }
 
-$sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, `formula_in_latex`, ".
-       "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
-       "FROM `wm_formula` ".
-       "JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
-       "WHERE `wm_formula`.`id` = :id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
-$stmt->execute();
-$formula = $stmt->fetchObject();
+if (isset($_GET['id'])) {
+    $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, `formula_in_latex`, ".
+           "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
+           "FROM `wm_formula` ".
+           "JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
+           "WHERE `wm_formula`.`id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $formula = $stmt->fetchObject();
+
+    // Get total number of elements for pagination
+    $sql = "SELECT COUNT(`id`) as counter FROM `wm_raw_draw_data` ".
+           "WHERE `accepted_formula_id` = :fid ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':fid', $_GET['id'], PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetchObject();
+    $total = $row->counter;
+
+    // Get all raw data of this user
+    $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
+           "FROM `wm_raw_draw_data` ".
+           "WHERE `accepted_formula_id` = :fid ".
+           "ORDER BY `creation_date` DESC ".
+           "LIMIT ".(($currentPage-1)*14).", 14";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':fid', $_GET['id'], PDO::PARAM_STR);
+    $stmt->execute();
+    $images = $stmt->fetchAll();
+} else {
+        $msg[] = array("class" => "alert-warning",
+               "text" => "Please set an ID (e.g. <a href=\"../symbol/?id=31\">like this</a>)");
+}
 
 echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'logged_in' => is_logged_in(),
@@ -102,7 +129,11 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'file'=> "symbol",
                                        'msg' => $msg,
                                        'formula' => $formula,
-                                       'edit_flag' => $edit_flag
+                                       'edit_flag' => $edit_flag,
+                                       'images' => $images,
+                                       'total' => $total,
+                                       'pages' => floor(($total)/14),
+                                       'currentPage' => $currentPage
                                        )
                   );
 
