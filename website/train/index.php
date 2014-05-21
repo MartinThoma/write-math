@@ -154,7 +154,8 @@ if (isset($_GET['rand'])) {
         }
     }
 
-    $sql = "SELECT `id`, `best_rendering` FROM  `wm_formula` WHERE  `id` = :id;";
+    $sql = "SELECT `id`, `best_rendering`, `formula_name`, `description`, ".
+           "`mode` FROM  `wm_formula` WHERE  `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $formula_id, PDO::PARAM_INT);
     $stmt->execute();

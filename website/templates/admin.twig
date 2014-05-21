@@ -1,0 +1,8 @@
+{% extends "base.twig" %}
+{% block content %}
+    <ul>
+        {% for drawing in many_lines %}
+            <li>Lines: <a href="../view/?raw_data_id={{ drawing.id }}">{{ drawing.lines }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

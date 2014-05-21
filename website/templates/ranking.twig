@@ -1,6 +1,10 @@
 {% extends "base.twig" %}
 
 {% block content %}
+
+    <p class="bg-info">Only users with at least 5 written formulas will be
+        listed below.</p>
+
     <table class="table table-striped">
     <tr>
         <th>#</th>
@@ -9,11 +13,14 @@
         <th>Distinct symbols</th>
     </tr>
     {% for user in users_by_raw_data %}
-     <tr>
-        <td>{{ loop.index }}</td>
-        <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
-        <td>{{ user.written_formulas }}</td>
-        <td>{{ user.distinct_symbols }}</td>
+        {% if user.written_formulas >= 5 %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
+                <td>{{ user.written_formulas }}</td>
+                <td>{{ user.distinct_symbols }}</td>
+            </tr>
+        {% endif %}
     {% endfor %}
     </table>
 {% endblock %}
