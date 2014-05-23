@@ -40,19 +40,19 @@ $stmt->bindParam(':uid', $_GET['id'], PDO::PARAM_STR);
 $stmt->execute();
 $userimages = $stmt->fetchAll();
 
-echo $twig->render('user.twig', array('heading' => 'User',
-                                       'file' => "user",
-                                       'logged_in' => is_logged_in(),
-                                       'display_name' => $_SESSION['display_name'],
-                                       'user_id' => $user->id,
-                                       'gravatar' => "http://www.gravatar.com/avatar/".md5($user->email),
-                                       'user' => $user,
-                                       'languages' => $languages,
-                                       'userimages' => $userimages,
-                                       'total' => $total,
-                                       'pages' => floor(($total)/14),
-                                       'currentPage' => $currentPage
-                                       )
+echo $twig->render('user.twig', array('heading' => 'User \''.$user->display_name.'\'',
+                                      'file' => "user",
+                                      'logged_in' => is_logged_in(),
+                                      'display_name' => $_SESSION['display_name'],
+                                      'user_id' => $user->id,
+                                      'gravatar' => "http://www.gravatar.com/avatar/".md5($user->email),
+                                      'user' => $user,
+                                      'languages' => $languages,
+                                      'userimages' => $userimages,
+                                      'total' => $total,
+                                      'pages' => floor(($total)/14),
+                                      'currentPage' => $currentPage
+                                      )
                   );
 
 ?>
