@@ -100,8 +100,18 @@ function get_time_resolution($pointlist, $lines_nr) {
         }
     }
 
+    $divisor = $n-$lines_nr;
+
+    if ($divisor == 0) {
+        $avg_time_resolution = 0;
+        $min_time_resolution = 0;
+        $max_time_resolution = 0;
+    } else {
+        $avg_time_resolution = $timesum / $divisor;
+    }
+
     return array("min_time_resolution" => $min_time_resolution,
                  "max_time_resolution" => $max_time_resolution,
-                 "average_time_resolution" => $timesum / ($n-$lines_nr));
+                 "average_time_resolution" => $avg_time_resolution);
 }
 ?>

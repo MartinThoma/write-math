@@ -19,14 +19,17 @@ function endsWith($haystack, $needle) {
 }
 
 if (isset($_GET['cache-flush'])) {
-    $files = glob('../cache/*'); // get all file names
-    foreach($files as $file){ // iterate files and folders
-        system('/bin/rm -rf ' . escapeshellarg($file));
-    }
-    $files = glob('../raw-data/*');
-    foreach($files as $file){
-        if(is_file($file) && endsWith($file, ".svg")) {
-            unlink($file);
+    if ($_GET['cache-flush'] == 'raw') {
+        $files = glob('../raw-data/*');
+        foreach($files as $file){
+            if(is_file($file) && endsWith($file, ".svg")) {
+                unlink($file);
+            }
+        }
+    } elseif ($_GET['cache-flush'] == 'templates') {
+        $files = glob('../cache/*'); // get all file names
+        foreach($files as $file){ // iterate files and folders
+            system('/bin/rm -rf ' . escapeshellarg($file));
         }
     }
 }

@@ -1,7 +1,11 @@
 {% extends "base.twig" %}
 
 {% block content %}
-<a href="?cache-flush">Flush cache</a>
+<ul>
+    <li><a href="?cache-flush=templates">Flush cache templates</a></li>
+    <li><a href="?cache-flush=raw">Flush cache raw</a></li>
+</ul>
+
 
 {% if flags|length > 0 %}
 <h2>Flags</h2>
