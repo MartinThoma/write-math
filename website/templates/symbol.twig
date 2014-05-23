@@ -4,12 +4,14 @@
 <img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="150px" />
 <p><b>Name</b>: {{formula.formula_name|raw}} (<code>{{formula.formula_name}}</code>)</p>
 <p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
-<p><b>Mode</b>: {{formula.mode}}</p>
-<p><b>Type</b>: {{formula.formula_type}}</p>
+<p><b>Mode</b>: {{ formula.mode }}</p>
+<p><b>Type</b>: {{ formula.formula_type }}</p>
 {% if formula.package != '' %}
-    <p><b>Package</b>: {{formula.package}}</p>
+    <p><b>Package</b>: {{ formula.package }}</p>
 {% endif %}
-
+{% if formula.preamble != '' %}
+    <p><b>Preamble</b>: <code>{{ formula.preamble }}</code></p>
+{% endif %}
 <p><b>Description</b>: {{formula.description}}</p>
 <p><b>Total handdrawn symbols</b>: {{ total }}</p>
 

@@ -27,7 +27,7 @@ function insert_userdrawing($user_id, $data) {
                                  "<pre>".$data."</pre>");
         return false;
     } else {
-        if ($data != "[[]]") {
+        if (strpos($data, "[]") === false) {
             $sql = "INSERT INTO `wm_raw_draw_data` (".
                    "`user_id`, ".
                    "`data`, ".
@@ -47,11 +47,14 @@ function insert_userdrawing($user_id, $data) {
 
             return $raw_data_id;
         } else {
-            $msg[] = array("class" => "alert-danger",
-                           "text" => "This could not be inserted. It didn't even ".
-                                     "have a single point (ERR 1). You sent:<br/>".
-                                     "<pre>".$data."</pre>");
-            return false;
+        $msg[] = array("class" => "alert-danger",
+                       "text" => "This could not be inserted. It didn't even ".
+                                 "have a single point. You sent:<br/>".
+                                 "<pre>".$data."</pre> ".
+                                 "At the moment I have problems with single ".
+                                 "points. This might be a symptom of those ".
+                                 "problems. See <a href=\"https://github.com/MartinThoma/write-math/issues/6\">issue 6</a>.");
+        return false;
         }
     }
 }

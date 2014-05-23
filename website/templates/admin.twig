@@ -1,20 +1,29 @@
 {% extends "base.twig" %}
 
 {% block content %}
+<a href="?cache-flush">Flush cache</a>
+
+{% if flags|length > 0 %}
 <h2>Flags</h2>
 <ul>
     {% for flag in flags %}
-        <li><a href="../view/?raw_data_id={{ flag.raw_data_id }}">{{ flag.raw_data_id }}</a> 
+        <li><a href="?delete={{ flag.id }}"><img src="../icons/cross.png" alt="delete" /></a> - 
+          <a href="../view/?raw_data_id={{ flag.raw_data_id }}">{{ flag.raw_data_id }}</a> 
             by <a href="../user/?id={{ flag.user_id }}">{{ flag.display_name }}</a>
         </li>
     {% endfor %}
 </ul>
+{% endif %}
 
 <h2>Many lines</h2>
+{% if many_lines|length > 0 %}
 <ul>
     {% for drawing in many_lines %}
         <li>Lines: <a href="../view/?raw_data_id={{ drawing.id }}">{{ drawing.lines }}</a></li>
     {% endfor %}
 </ul>
+{% else %}
+    <p class="bg-danger"><a href="?many_lines">Show all drawings with at least 5 lines.</a></p>
+{% endif %}
 
 {% endblock %}

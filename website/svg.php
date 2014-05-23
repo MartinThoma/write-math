@@ -11,13 +11,18 @@ function create_raw_data_svg($raw_data_id, $data) {
     $linewidth = 5;
     $width  = $linewidth*3 + $maxx - $minx;
     $height = $linewidth*3 + $maxy - $miny;
+    $dots = "";
 
     $newList = array();
     foreach ($pointList as $line) {
         $newLine = array();
         foreach ($line as $point) {
-            $newLine[] = array("x" => $linewidth + $point["x"] - $minx,
-                               "y" => $linewidth + $point["y"] - $miny);
+            $newx = $linewidth + $point["x"] - $minx;
+            $newy = $linewidth + $point["y"] - $miny;
+            $newLine[] = array("x" => $newx, "y" => $newy);
+        }
+        if (count($line) == 1) {
+            $dots .= '<circle cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:#ff0000;stroke:#ff0000;"/>';
         }
         $newList[] = $newLine;
     }
@@ -33,6 +38,7 @@ function create_raw_data_svg($raw_data_id, $data) {
     $contents = str_replace("{{ width }}", $width, $contents);
     $contents = str_replace("{{ height }}", $height, $contents);
     $contents = str_replace("{{ path }}", $path, $contents);
+    $contents = str_replace("{{ dots }}", $dots, $contents);
 
     file_put_contents ("../raw-data/$raw_data_id.svg", $contents);
 }

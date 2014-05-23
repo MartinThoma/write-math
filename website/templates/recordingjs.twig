@@ -7,24 +7,36 @@
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush.width = 5;
         canvas.freeDrawingBrush.color = "#ff0000";
+        canvas.on('mouse:down', startRecording);
 
-        canvas.on('mouse:down', function(options) {
-            startRecording();
-        });
-
-        function startRecording() {
+        function startRecording(event) {
+			// directly add first point
+            var x = event.e.x;
+            var y = event.e.y;
+            var time = new Date().getTime();
+            if (typeof(x) != 'number') {
+                console.log(event);
+                x = event.e.screenX;
+                y = event.e.screenY;
+            }
+            if (typeof(x) != 'number') {
+                x = event.e.touches[0].clientX;
+                y = event.e.touches[0].clientY;
+            }
             var line = [];
-            canvas.on('mouse:move', recordMoment);
+            line.push({
+                x: x,
+                y: y,
+                time: time
+            });
+            canvas.on("mouse:move", recordMoment);
             canvas.on("mouse:up", stopRecording);
-            var start = new Date().getTime();
 
             function recordMoment(event) {
-                var end = new Date().getTime();
-                var time = end - start;
                 var x = event.e.x;
                 var y = event.e.y;
+                var time = new Date().getTime();
                 if (typeof(x) != 'number') {
-                    console.log(event);
                     x = event.e.screenX;
                     y = event.e.screenY;
                 }
@@ -41,7 +53,7 @@
 
             function stopRecording() {
                 lines.push(line);
-                canvas.off('mouse:move', recordMoment);
+                canvas.off("mouse:move", recordMoment);
                 canvas.off("mouse:up", stopRecording);
             }
         }

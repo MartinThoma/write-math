@@ -62,9 +62,10 @@
 </div>
 </div>
 
-
+{% if automatic_answers|length > 0 %}
 <h2>Automatic Classifications</h2>
     {% for answer in automatic_answers %}
+    {% if answer.probability > 1 %}
     <div class="pull-left" style="height:200px;">
       <table>
         <tr>
@@ -93,10 +94,13 @@
         </tr>
       </table>
     </div>
+    {% endif %}
     {% endfor %}
     <br style="clear:both;" />
+{% endif %}
 
-   <h2>Possible classifications</h2>
+{% if answers|length > 0 %}
+   <h2>User contributed answers</h2>
     {% for answer in answers %}
     <div class="container-fluid">
       <table>
@@ -131,6 +135,7 @@
       </table>
     </div><br/>
     {% endfor %}
+{% endif %}
 
    <h2>Add a new answer</h2>
    <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal" role="form">
@@ -179,27 +184,4 @@
      </div>
      <button type="submit" class="btn btn-success">Submit</button>
    </form>
-
-
-
-
-<script type='text/javascript'>
-    var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-    var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-
-    width *= 0.8;
-    height *= 0.8;
-
-    if (width > 400) {
-        width = 400;
-    }
-
-    if (height > 400) {
-        height = 400;
-    }
-
-    var canvas = document.getElementById("galleryImage");
-    canvas.width = width;
-    canvas.height = height;
-</script>
 {% endblock %}
