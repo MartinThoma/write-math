@@ -7,6 +7,7 @@ if (!is_logged_in()) {
 }
 
 $edit_id = 0;
+$worker = "";
 
 function validate_display_name($name) {
     return preg_match('/^[A-Za-z]{1}[A-Za-z0-9_ ]{1,}[A-Za-z0-9]{1}$/',$name);
@@ -183,11 +184,27 @@ if (isset($_POST['worker_id'])) {
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':wid', $_GET['delete'], PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_GET['deactivate'])) {
+    $sql = "UPDATE `wm_workers` SET `status` =  'deactivated' ".
+           "WHERE `id` = :wid AND `user_id` = :uid;";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':wid', $_GET['deactivate'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['activate'])) {
+    $sql = "UPDATE `wm_workers` SET `status` =  'active' ".
+           "WHERE `id` = :wid AND `user_id` = :uid;";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':wid', $_GET['activate'], PDO::PARAM_INT);
+    $stmt->execute();
 }
 
 // Get all workers of this user
 $sql = "SELECT `id`, `API_key`, `worker_name`, `description`, `url`, ".
-       "`latest_heartbeat` ".
+       "`latest_heartbeat`, `status` ".
        "FROM `wm_workers` WHERE `user_id` = :uid";
 $stmt = $pdo->prepare($sql);
 $uid = get_uid();

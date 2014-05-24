@@ -118,6 +118,12 @@
       <a href="?edit={{ worker.id }}"><img src="../icons/pencil.png" alt="edit" /></a>
       &nbsp;
       <a href="?delete={{ worker.id }}"><img src="../icons/cross.png" alt="delete" /></a>
+      &nbsp;
+      {% if worker.status == 'active' %}
+      <a href="?deactivate={{ worker.id }}">deactivate</a>
+      {% else %}
+      <a href="?activate={{ worker.id }}">activate</a>
+      {% endif %}
     </td>
     <td>{{ worker.worker_name }}</td>
     <td>{{ worker.API_key }}</td>

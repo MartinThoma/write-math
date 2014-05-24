@@ -68,7 +68,8 @@ function classify() {
     }
     # Get a list of all workers
     $sql = "SELECT `id`, `worker_name`, `url` ".
-           "FROM `wm_workers` WHERE `latest_heartbeat` IS NOT NULL";
+           "FROM `wm_workers` ".
+           "WHERE `latest_heartbeat` IS NOT NULL AND status = 'active'";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $workers = $stmt->fetchAll();
@@ -134,10 +135,10 @@ function classify() {
                 } catch (Exception $e) {
                   var_dump($e);
                 }
-                header("Location: ../view/?raw_data_id=".$raw_data_id);
             }
         }
     }
+    header("Location: ../view/?raw_data_id=".$raw_data_id);
 }
 
 $formula_ids = array();
