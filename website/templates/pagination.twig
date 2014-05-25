@@ -1,0 +1,35 @@
+{% macro pagination(currentPage, append_information, total, pages, delta) %}
+    <ul class="pagination">
+      {% if pages >= 2*delta %}
+          <li><a href="?page=1{{ append_information }}">1</a></li>
+      {% endif %}
+      {% if currentPage > 1 %}
+          <li><a href="?page={{ currentPage-1 }}{{ append_information }}">&laquo;</a></li>
+      {% else %}
+          <li class="disabled"><a href="#">&laquo;</a></li>
+      {% endif %}
+
+      {% set leftdots = false %}
+      {% set rightdots = false %}
+      {% for i in 1..(pages+1) %}
+        {% if (0<=i-currentPage and i-currentPage <= delta) or (0<= currentPage-i and currentPage-i <= delta) %}
+        <li {% if i == currentPage %}class="active"{% endif %}><a href="?page={{ i }}{{ append_information }}">{{ i }}</a></li>
+        {% elseif (0 <= currentPage-i) and (leftdots == false)%}
+        <li><a href="#">...</a></li>
+        {% set leftdots = true %}
+        {% elseif (0 <= i-currentPage) and (rightdots == false)%}
+        <li><a href="#">...</a></li>
+        {% set rightdots = true %}
+        {% endif %}
+      {% endfor %}
+
+      {% if currentPage < total %}
+          <li><a href="?page={{ currentPage+1 }}{{ append_information }}">&raquo;</a></li>
+      {% else %}
+          <li class="disabled"><a href="#">&raquo;</a></li>
+      {% endif %}
+      {% if pages >= 2*delta %}
+        <li><a href="?page={{ (pages+1) }}{{ append_information }}">{{ (pages+1) }}</a></li>
+      {% endif %}
+    </ul>
+{% endmacro %}

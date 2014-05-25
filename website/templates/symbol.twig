@@ -1,4 +1,5 @@
 {% extends "base.twig" %}
+{% import "pagination.twig" as pagination %}
 
 {% block content %}
 <img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="150px" />
@@ -33,23 +34,7 @@
   {% endfor %}
  </ul>
 
-<ul class="pagination">
-  {% if currentPage > 1 %}
-      <li><a href="?id={{ formula.id }}&page={{ currentPage-1 }}">&laquo;</a></li>
-  {% else %}
-      <li class="disabled"><a href="#">&laquo;</a></li>
-  {% endif %}
-
-  {% for i in 1..(pages+1) %}
-    <li {% if i == currentPage %}class="active"{% endif %}><a href="?id={{ formula.id }}&page={{ i }}">{{ i }}</a></li>
-  {% endfor %}
-
-  {% if currentPage < total %}
-      <li><a href="?id={{ formula.id }}&page={{ currentPage+1 }}">&raquo;</a></li>
-  {% else %}
-      <li class="disabled"><a href="#">&raquo;</a></li>
-  {% endif %}
-</ul>
+{{ pagination.pagination(currentPage, '&id=' ~ formula.id, total, pages, 5) }}
 
 <hr/>
 
