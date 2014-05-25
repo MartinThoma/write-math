@@ -2,69 +2,7 @@
 require_once '../svg.php';
 require_once '../classification.php';
 include '../init.php';
-
-function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode", 
-                            $packages="") {
-    global $pdo;
-
-    // Get formula id if it is already in the database
-    $sql = "SELECT `id` FROM `wm_formula` ".
-           "WHERE `formula_in_latex` = :latex";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
-    $stmt->execute();
-    $formula_id = $stmt->fetchObject()->id;
-
-    if($formula_id == 0 || $formula_id == null) {
-        // it was not in the database. Add it.
-        $sql = "INSERT INTO `wm_formula` (".
-               "`formula_name`, `formula_in_latex`, `mode`, `package` ".
-               ") VALUES (:latex, :latex, :mode, :package);";
-        $stmt = $pdo->prepare($sql);
-        $latex = trim($latex);
-
-        $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
-        $stmt->bindParam(':mode', $mode, PDO::PARAM_STR);
-        $stmt->bindParam(':package', $packages, PDO::PARAM_STR);
-        $stmt->execute();
-        $formula_id = $pdo->lastInsertId('id');
-    }
-
-    $sql = "INSERT INTO `wm_raw_data2formula` (".
-           "`raw_data_id` ,".
-           "`formula_id` ,".
-           "`user_id`".
-           ") VALUES (".
-           ":raw_data_id, :formula_id, :user_id".
-           ");";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
-    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
-    $uid = get_uid();
-    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
-    $stmt->execute();
-}
-
-function remove_usepackage($package) {
-    if (0 === strpos($package, '\usepackage{') && substr($package, -1) == '}') {
-        $package = substr($package, strlen('\usepackage{'));
-        $package = rtrim($package, '}');
-    }
-    return $package;
-}
-
-function sanitize_packages($packages) {
-    if (strpos($packages, ';') !== false) {
-        $packages = explode(';', $packages);
-    } else {
-        $packages = array($packages);
-    }
-
-    $packages = array_map(trim, $packages);
-    $packages = array_map(remove_usepackage, $packages);
-
-    return $packages;
-}
+include 'functions.php';
 
 if (isset($_GET['delete'])) {
     $sql = "DELETE FROM `wm_raw_draw_data` ".
@@ -72,9 +10,20 @@ if (isset($_GET['delete'])) {
            "(user_id = :user_id OR :user_id = 10)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':raw_id', $_GET['delete'], PDO::PARAM_INT);
-    $stmt->bindParam(':user_id', get_uid(), PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
     header("Location: ../gallery/");
+} elseif (isset($_GET['delete_answer'])) {
+    $sql = "DELETE FROM `wm_raw_data2formula` ".
+           "WHERE `id` = :id AND (user_id = :user_id OR :user_id = 10)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['delete_answer'], PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+    $msg[] = array("class" => "alert-info",
+                    "text" => "Your answer was deleted.");
 } elseif (isset($_GET['flag'])) {
     $sql = "INSERT INTO `wm_flags` (`user_id`, `raw_data_id`)".
            "VALUES (:uid,  :raw_data_id);";
@@ -134,19 +83,30 @@ if (isset($_GET['raw_data_id'])) {
         $vote = intval($_GET['vote']);
         $id = intval($_GET['raw_data2formula_id']);
         if ($vote == 1 || $vote == -1) {
-            try {
-                $sql = "INSERT INTO `wm_votes` ".
-                        "(`user_id`, `raw_data2formula_id`, `vote`)".
-                        "VALUES (:uid,  :raw_data2formula_id, :vote);";
-                $stmt = $pdo->prepare($sql);
-                $uid = get_uid();
-                $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-                $stmt->bindParam(':raw_data2formula_id', $id, PDO::PARAM_INT);
-                $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
-                $stmt->execute();
-            } catch (Exception $e) {
+            $sql = "SELECT `user_id` FROM `wm_raw_data2formula` ".
+                   "WHERE `id` = :id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetchObject();
+            if ($row->user_id == get_uid()) {
                 $msg[] = array("class" => "alert-warning",
-                               "text" => "You've already casted a vote.");
+                               "text" => "You can't upvote your own answer.");
+            } else {
+                try {
+                    $sql = "INSERT INTO `wm_votes` ".
+                            "(`user_id`, `raw_data2formula_id`, `vote`)".
+                            "VALUES (:uid,  :raw_data2formula_id, :vote);";
+                    $stmt = $pdo->prepare($sql);
+                    $uid = get_uid();
+                    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+                    $stmt->bindParam(':raw_data2formula_id', $id, PDO::PARAM_INT);
+                    $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
+                    $stmt->execute();
+                } catch (Exception $e) {
+                    $msg[] = array("class" => "alert-warning",
+                                   "text" => "You've already casted a vote.");
+                }
             }
         }
     }
@@ -175,7 +135,7 @@ if (isset($_GET['raw_data_id'])) {
     // Get all probable classifications
     $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
            "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
-           "`formula_type`, `best_rendering`, ".
+           "`formula_type`, `best_rendering`, `wm_users`.`id` as `user_id`, ".
            "COALESCE(sum(`vote`), 0) as `votes` ".
            "FROM `wm_raw_data2formula` ".
            "LEFT JOIN `wm_votes` ".

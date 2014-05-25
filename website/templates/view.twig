@@ -130,6 +130,10 @@
           <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
 "src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
             {% endif %}
+            {% if answer.user_id == uid %}
+            <br/>
+            <a href="?raw_data_id={{ raw_data_id }}&delete_answer={{ answer.id }}">Delete answer</a>
+            {% endif %}
           </td>
         </tr>
       </table>
