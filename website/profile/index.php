@@ -6,6 +6,11 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: ../login");
+}
+
 $edit_id = 0;
 $worker = "";
 
