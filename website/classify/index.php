@@ -31,10 +31,12 @@ function insert_userdrawing($user_id, $data) {
             $sql = "INSERT INTO `wm_raw_draw_data` (".
                    "`user_id`, ".
                    "`data`, ".
+                   "`md5data`, ".
                    "`creation_date`, ".
                    "`user_agent`, ".
                    "`accepted_formula_id`".
-                   ") VALUES (:user_id, :data, CURRENT_TIMESTAMP, :user_agent, NULL);";
+                   ") VALUES (:user_id, :data, MD5(data), ".
+                   "CURRENT_TIMESTAMP, :user_agent, NULL);";
             $stmt = $pdo->prepare($sql);
             $uid = get_uid();
             $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
