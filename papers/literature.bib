@@ -110,6 +110,41 @@
   Timestamp                = {2014.06.04}
 }
 
+@InProceedings{Guerfali1995,
+  Title                    = {The Delta LogNormal theory for the generation and modeling of cursive characters},
+  Author                   = {Guerfali, W. and Plamondon, R.},
+  Booktitle                = {Document Analysis and Recognition, 1995., Proceedings of the Third International Conference on},
+  Year                     = {1995},
+  Month                    = {Aug},
+  Pages                    = {495-498 vol.1},
+  Volume                   = {1},
+
+  __markedentry            = {[Martin Thoma:6]},
+  Abstract                 = {We exploit the Delta LogNormal theory, a powerful tool for the generation and modeling of rapid movements to generate curvilinear strokes and constituting letters that respect both the dynamics and the appearance of movements made by a human. A theoretical analysis of the effects of the various parameters of the model is carried out: first, to reduce the size of the representation space of the letter models; and second, to select the parameters that constitute the optimal conditions for representing various symbols},
+  Doi                      = {10.1109/ICDAR.1995.599042},
+  File                     = {:var/www/write-math/papers/the-delta-lognormal-theory-for-the-generation-and-modeling-of-cursive-characters.pdf:PDF},
+  Keywords                 = {character sets;log normal distribution;Delta LogNormal theory;constituting letters;cursive characters;curvilinear strokes;letter models;optimal conditions;representation space;Angular velocity;Character generation;Context modeling;Delay effects;Humans;Information analysis;Neuromuscular;Psychology;Shape;Timing},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10},
+  Url                      = {http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=599042}
+}
+
+@Article{Guerfali93,
+  Title                    = {Normalizing and Restoring On-Line Handwriting},
+  Author                   = {Wacef Guerfali AND Réjean Plamondon},
+  Journal                  = {Pattern Recognition},
+  Year                     = {1993},
+  Number                   = {3},
+  Pages                    = {419--431},
+  Volume                   = {26},
+
+  Abstract                 = {Preprocessing and normalization techniques for on-line handwriting analysis are crucial steps that usually compromise the success of recognition algorithms. These steps are often neglected and presented as solved problems, but this is far from the truth. An overview is presented of the principal on-line techniques for handwriting preprocessing and word normalization, covering the major difficulties encountered and the various approaches usually used to resolve these problems. Some measurable definitions for handwriting characteristics are proposed, such as baseline orientation, character slant and handwriting zones. These definitions are used to measure and quantify the performance of the normalization algorithms. An approach to enhancing and restoring handwriting text is also presented, and an objective evaluation of all the processing results.},
+  File                     = {:var/www/write-math/papers/normalizing-and-restoring-on-line-handwriting.pdf:PDF},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10},
+  Url                      = {http://dx.doi.org/10.1016/0031-3203(93)90169-W}
+}
+
 @InProceedings{Hild93,
   Title                    = {Connected Letter Recognition with a Multi-State Time Delay Neural Network},
   Author                   = {Hermann Hild and Alex Waibel},
@@ -124,9 +159,30 @@
   Url                      = {http://isl.anthropomatik.kit.edu/downloads/0712-1_Kopie_.pdf}
 }
 
+@InCollection{Huang06,
+  Title                    = {An HMM-SNN Method for Online Handwriting Symbol Recognition},
+  Author                   = {Huang, B.Q. and Kechadi, M.-T.},
+  Booktitle                = {Image Analysis and Recognition},
+  Publisher                = {Springer Berlin Heidelberg},
+  Year                     = {2006},
+  Editor                   = {Campilho, Aurélio and Kamel, Mohamed},
+  Pages                    = {897-905},
+  Series                   = {Lecture Notes in Computer Science},
+  Volume                   = {4142},
+
+  Abstract                 = {This paper presents a combined approach for online handwriting symbols recognition. The basic idea of this approach is to employ a set of left-right HMMs to generate a new feature vector as input, and then use SNN as a classifier to finally identify unknown symbols. The new feature vector consists of global features and several pairs of maximum probabilities with their associated different model labels for an observation pattern. A recogniser based on this method inherits the practical and dynamical modeling abilities from HMM, and robust discriminating ability from SNN for classification tasks. This hybrid technique also reduces the dimensions of feature vectors significantly, complexity, and solves size problem when using only SNN. The experimental results show that this approach outperforms several classifiers reported in recent research, and can achieve recognition rates of 97.41%, 91.81% and 91.63% for digits and upper/lower case characters respectively on the UNIPEN database benchmarks.},
+  Comment                  = {Seems to explain the HMM / NN approach pretty well (p. 899f) HMMs are used to generate a new (fixed-length) features for NN.},
+  Doi                      = {10.1007/11867661_81},
+  File                     = {:var/www/write-math/papers/an-hmm-snn-method-for-online-handwriting-symbol-recognition.pdf:PDF},
+  ISBN                     = {978-3-540-44894-5},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10},
+  Url                      = {http://dx.doi.org/10.1007/11867661_81}
+}
+
 @InCollection{Huang09,
   Title                    = {Preprocessing Techniques for Online Handwriting Recognition},
-  Author                   = {Huang, BingQuan and Zhang, Y.B. and Kechadi, M.-T.},
+  Author                   = {Huang, Bing Quan and Zhang, Y.B. and Kechadi, M.-T.},
   Booktitle                = {Intelligent Text Categorization and Clustering},
   Publisher                = {Springer Berlin Heidelberg},
   Year                     = {2009},
@@ -234,6 +290,26 @@
   Url                      = {https://cs.uwaterloo.ca/~glabahn/Papers/MathBrush-1.pdf}
 }
 
+@Article{Li98,
+  Title                    = {Segmentation and reconstruction of on-line handwritten scripts},
+  Author                   = {Xiaolin Li and Marc Parizeau and Réjean Plamondon},
+  Journal                  = {Pattern Recognition },
+  Year                     = {1998},
+  Number                   = {6},
+  Pages                    = {675 - 684},
+  Volume                   = {31},
+
+  __markedentry            = {[Martin Thoma:]},
+  Abstract                 = {On-line handwritten scripts consist of sequences of components that are pen tip traces from pen-down to pen-up positions. This paper presents a segmentation and reconstruction procedure which segments components of a script into sequences of static strokes, and then reconstructs the script from these sequences. The segmentation is based on the extrema of curvature and inflection points in individual components. The static strokes are derived from the delta log-normal model of handwriting generation and are used in component representation and reconstruction. The performance of the procedure is measured in terms of root-mean-square reconstruction error and data compression rate. },
+  Doi                      = {http://dx.doi.org/10.1016/S0031-3203(97)00086-1},
+  File                     = {:var/www/write-math/papers/segmentation-and-reconstruction-of-on-line-handwritten-scripts.pdf:PDF},
+  ISSN                     = {0031-3203},
+  Keywords                 = {Delta log-normal model},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10},
+  Url                      = {http://www.sciencedirect.com/science/article/pii/S0031320397000861}
+}
+
 @MastersThesis{Littin95,
   Title                    = {Mathematical expression recognition: Parsing pen/tablet input in real-time using LR techniques.},
   Author                   = {Richard Henry Littin},
@@ -312,6 +388,39 @@
   File                     = {:1994_Combining_Bitmaps_With_Dynamic_Writing_Information_For_On-Line_Handwriting_Recognition_Reihenfolge.pdf:PDF},
   Owner                    = {moose},
   Timestamp                = {2014.06.04}
+}
+
+@InProceedings{Morita2002,
+  Title                    = {An HMM-MLP hybrid system to recognize handwritten dates},
+  Author                   = {Morita, M. and Oliveira, L.S. and Sabourin, R. and Bortolozzi, F. and Suen, C.Y.},
+  Booktitle                = {Neural Networks, 2002. IJCNN '02. Proceedings of the 2002 International Joint Conference on},
+  Year                     = {2002},
+  Pages                    = {867-872},
+  Volume                   = {1},
+
+  Abstract                 = {Presents an HMM-MLP hybrid system to process complex date images written on Brazilian bank cheques. The system first segments implicitly a date image into sub-fields through the recognition process based on an HMM approach. Afterwards, a recognition and verification strategy is proposed to recognize the three obligatory date sub-fields (day, month and year) using different classifiers. Markovian and neural approaches have been adopted to recognize and verify words and strings of digits respectively. We also introduce the concept of meta-classes of digits, which is used to reduce the lexicon size of the day and year and improve the precision of their segmentation and recognition. Experiments show interesting results on date recognition},
+  Doi                      = {10.1109/IJCNN.2002.1005588},
+  File                     = {:var/www/write-math/papers/an-hmm-mlp-hybrid-system-to-recognize-handwritten-dates.pdf:PDF},
+  ISSN                     = {1098-7576},
+  Keywords                 = {handwritten character recognition;hidden Markov models;image segmentation;multilayer perceptrons;Brazilian bank cheques;HMM-MLP hybrid system;complex date images;handwritten dates recognition;lexicon size;segmentation;verification strategy;Character recognition;Cities and towns;Handwriting recognition;Hidden Markov models;Image analysis;Image recognition;Image segmentation;Machine intelligence;Particle separators;Text recognition},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10}
+}
+
+@InProceedings{Rabiner89,
+  Title                    = {A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition},
+  Author                   = {Lawrence R. Rabiner},
+  Booktitle                = {PROCEEDINGS OF THE IEEE},
+  Year                     = {1989},
+  Month                    = {2},
+  Number                   = {2},
+  Pages                    = {257--286},
+  Volume                   = {77},
+
+  File                     = {:var/www/write-math/papers/a-tutorial-on-hidden-markov-models-and-selected-applications-in-speech-recognition.pdf:PDF},
+  Owner                    = {Martin Thoma},
+  Timestamp                = {2014.06.10},
+  Url                      = {http://www.cs.ubc.ca/~murphyk/Bayes/rabiner.pdf}
 }
 
 @InProceedings{Shah07,
