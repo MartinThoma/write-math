@@ -4,8 +4,8 @@
 		{
 			"follow_symlinks": true,
 			"path": ".",
-            "folder_exclude_patterns": ["logos"],
-            "file_exclude_patterns": ["*.aux", "*.log", "*.toc", "*.cls", "*.out", "*.blg", "*.bbl", "*.pdf"]
+            "folder_exclude_patterns": [],
+            "file_exclude_patterns": ["*.aux", "*.log", "*.toc", "*.out", "*.blg", "*.bbl", "*.pdf", "*.gls", "*.ist", "*.glg", "*.glo"]
 		}
 	]
 }
