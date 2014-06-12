@@ -54,3 +54,12 @@ website/write-math.sublime-workspace
 # Both of these folders have to be writable
 website/formulas/*.svg
 website/raw-data
+
+
+# Latex
+bachelor-arbeit/*.aux
+bachelor-arbeit/*.log
+bachelor-arbeit/*.toc
+bachelor-arbeit/*.out
+bachelor-arbeit/*.blg
+bachelor-arbeit/*.bbl

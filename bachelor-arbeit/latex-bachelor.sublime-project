@@ -1,0 +1,11 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": ".",
+            "folder_exclude_patterns": ["logos"],
+            "file_exclude_patterns": ["*.aux", "*.log", "*.toc", "*.cls", "*.out", "*.blg", "*.bbl"]
+		}
+	]
+}
