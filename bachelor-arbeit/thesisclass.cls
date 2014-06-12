@@ -28,10 +28,15 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{vmargin}          % Adjust margins in a simple way
 \usepackage{fancyhdr}         % Define simple headings
-\usepackage{subfigure}
 \usepackage{url}
 \usepackage[absolute,overlay]{textpos}
+\usepackage{enumitem}       % Better than \usepackage{enumerate}, because it allows to set references
+\usepackage{braket}         % needed for \Set
+\usepackage{csquotes}       % \enquote{}
+\usepackage{subfig}         % multiple figures in one
+\usepackage{pgfplots}
 \usepackage{tikz}
+\usetikzlibrary{shapes, calc, shapes, arrows}
 \usepackage{algorithm}		  % Code-Listings
 \usepackage{algorithmic}	  % Code-Listings
 % see http://www.ctan.org/tex-archive/macros/latex/contrib/algorithm2e/algorithm2e.pdf
@@ -49,7 +54,10 @@
 						colorlinks=false,						
 						linkbordercolor={0 0.61 0.50},   
 						citebordercolor={0 0.61 0.50}]{hyperref}  %{0.57 0.74 0.57}
-						
+\usepackage[nameinlink,noabbrev]{cleveref} % has to be after hyperref, ntheorem, amsthm
+\usepackage{glossaries}
+\makeglossaries
+
 \usepackage[fixlanguage]{babelbib}	% sets german style for literature entries
 \selectbiblanguage{ngerman}			% for \bibliographystyle{babalpha}
 %% --- End of Packages ---

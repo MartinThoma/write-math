@@ -2,7 +2,7 @@ DOKUMENT = thesis
 
 make:
 	pdflatex $(DOKUMENT).tex -interaction=batchmode -output-format=pdf # aux-files for makeindex / makeglossaries
-	makeindex $(DOKUMENT)
+	makeglossaries $(DOKUMENT)
 	bibtex $(DOKUMENT)
 	pdflatex $(DOKUMENT).tex -interaction=batchmode -output-format=pdf # include index
 	pdflatex $(DOKUMENT).tex -interaction=batchmode -output-format=pdf # include symbol table
@@ -23,4 +23,4 @@ all:
 
 
 clean:
-	rm -rf  $(TARGET) *.class *.html *.log *.aux *.out *.thm *.idx *.toc *.ind *.ilg figures/torus.tex *.glg *.glo *.gls *.ist *.xdy *.fdb_latexmk *.bak *.blg *.bbl
+	rm -rf  $(TARGET) *.class *.html *.log *.aux *.out *.thm *.idx *.toc *.ind *.ilg figures/torus.tex *.glg *.glo *.gls *.ist *.xdy *.fdb_latexmk *.bak *.blg *.bbl *.glsdefs *.acn *.acr *.alg *.nls *.nlo

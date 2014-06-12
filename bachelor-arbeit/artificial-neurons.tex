@@ -1,0 +1,33 @@
+\section{Artificial neurons}
+\label{ch:Content2:sec:Section1}
+%% ===========================
+
+Artificial neurons are inspired by biological neurons.
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Biological Neuron]{
+        \resizebox{0.45\linewidth}{!}{\input{figures/todo.tex}}
+        \label{fig:biological-neuron}
+    }%
+    \subfloat[Artificial Neuron]{
+        \resizebox{0.45\linewidth}{!}{\input{figures/artificial-neuron.tex}}
+        \label{fig:artificial-neuron}
+    }%
+    \label{Neilsche-Parabel}
+    \caption{Both neurons receive weighted input, apply a function to that and give output}
+\end{figure}
+
+They receive at least one
+input and at least one output. Those inputs might get weighted as well as the
+output.
+
+The neurons apply a function to the sum of all weighted inputs. This function
+is called \textit{activaiton function}.
+
+An artificial neuron using the unit step function (see \cref{f:unitstep}) is called
+a \textit{perceptron}.
+
+
+The artificial neuron sums all weighted inputs $x_i \cdot w_i$ up
+             and applies its activation function $f$ to it.
