@@ -63,3 +63,7 @@ bachelor-arbeit/*.toc
 bachelor-arbeit/*.out
 bachelor-arbeit/*.blg
 bachelor-arbeit/*.bbl
+bachelor-arbeit/*.glg
+bachelor-arbeit/*.glo
+bachelor-arbeit/*.ist
+bachelor-arbeit/*.gls
