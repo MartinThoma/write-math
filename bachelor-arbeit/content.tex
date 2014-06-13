@@ -5,6 +5,15 @@
 
 
 A system for symbol recognition was already written and is described in \cite{Kirsch}.
+It uses an algorithm called greedy matching which is similar to \Gls{DTW}.
+
+The Greedy Matching algorithm takes two series of points $(A, B)$ and matches
+the first points $(a,b)$ of $A$ to $B$. The distance that point had to be moved is
+measured. Afterwards, it tries to match the next point $a'$ of $A$ to $b$ as
+well as the next point $b'$ of $B$ and $b'$ to $a$. It takes the matching in
+which the points had to be moved the shortest distance and continues like that.
+
+Pseudocode is on \cpageref{alg:greedy-matching}.
 
 \input{preprocessing}
 

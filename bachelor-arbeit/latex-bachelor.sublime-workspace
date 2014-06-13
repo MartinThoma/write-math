@@ -307,6 +307,54 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "feedforward.tex",
+			"settings":
+			{
+				"buffer_size": 4940,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "activation-functions.tex",
+			"settings":
+			{
+				"buffer_size": 1738,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "glossary.tex",
+			"settings":
+			{
+				"buffer_size": 155,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "figures/artificial-neuron.tex",
+			"settings":
+			{
+				"buffer_size": 1127,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "preprocessing.tex",
+			"settings":
+			{
+				"buffer_size": 2421,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "thesis.bib",
+			"settings":
+			{
+				"buffer_size": 41599,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -476,20 +524,30 @@
 	},
 	"file_history":
 	[
-		"/var/www/write-math/bachelor-arbeit/latex-bachelor.sublime-project",
-		"/var/www/write-math/bachelor-arbeit/activation-functions.tex",
+		"/var/www/write-math/bachelor-arbeit/figures/feedforward.tex",
+		"/home/moose/Downloads/0.bib",
+		"/var/www/write-math/bachelor-arbeit/thesis.bib",
+		"/var/www/write-math/bachelor-arbeit/thesisclass.cls",
+		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/GeoTopo.tex",
+		"/var/www/write-math/bachelor-arbeit/thesis.tex",
 		"/var/www/write-math/bachelor-arbeit/evaluation.tex",
 		"/var/www/write-math/bachelor-arbeit/content.tex",
+		"/var/www/write-math/bachelor-arbeit/appendix.tex",
+		"/var/www/write-math/bachelor-arbeit/preprocessing.tex",
+		"/var/www/write-math/bachelor-arbeit/glossary.tex",
+		"/var/www/write-math/bachelor-arbeit/shortcuts.sty",
+		"/home/moose/Downloads/bwinf/32.2/buschfeuer.tex",
+		"/home/moose/Downloads/bwinf/32.2/my_def.tex",
+		"/var/www/dtw-python/classification.py",
+		"/var/www/write-math/bachelor-arbeit/artificial-neurons.tex",
+		"/var/www/write-math/bachelor-arbeit/titlepage.tex",
+		"/var/www/write-math/bachelor-arbeit/latex-bachelor.sublime-project",
+		"/var/www/write-math/bachelor-arbeit/activation-functions.tex",
 		"/var/www/write-math/bachelor-arbeit/introduction.tex",
 		"/home/moose/Downloads/LaTeX-examples/images/scaling/scaling.tex",
 		"/var/www/write-math/bachelor-arbeit/acknowledgement.tex",
-		"/var/www/write-math/bachelor-arbeit/appendix.tex",
-		"/var/www/write-math/bachelor-arbeit/artificial-neurons.tex",
 		"/var/www/write-math/bachelor-arbeit/conclusion.tex",
 		"/var/www/write-math/bachelor-arbeit/feedforward.tex",
-		"/var/www/write-math/bachelor-arbeit/glossary.tex",
-		"/var/www/write-math/bachelor-arbeit/thesisclass.cls",
-		"/var/www/write-math/bachelor-arbeit/figures/feedforward.tex",
 		"/var/www/write-math/bachelor-arbeit/figures/todo.tex",
 		"/var/www/write-math/.gitignore",
 		"/home/moose/Downloads/LaTeX-examples/tikz/feed-forward-perceptron/feed-forward-perceptron.tex",
@@ -497,16 +555,12 @@
 		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/figures/smaller-angle.tex",
 		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/figures/topology-oktaeder.tex",
 		"/var/www/write-math/bachelor-arbeit/Makefile",
-		"/var/www/write-math/bachelor-arbeit/thesis.tex",
 		"/home/moose/Downloads/LaTeX-examples/tikz/artificial-neuron/Readme.md",
 		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/Kapitel2.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/GeoTopo.tex",
 		"/home/moose/Downloads/LaTeX-examples/tikz/hard-limit-function/hard-limit-function.tex",
 		"/home/moose/Downloads/LaTeX-examples/tikz/artificial-neuron/artificial-neuron.tex",
 		"/home/moose/Downloads/LaTeX-examples/tikz/artificial-neuron/Makefile",
 		"/home/moose/Downloads/LaTeX-examples/tikz/sigmoid-function/sigmoid-function.tex",
-		"/var/www/write-math/bachelor-arbeit/thesis.bib",
-		"/var/www/write-math/bachelor-arbeit/titlepage.tex",
 		"/var/www/write-math/bachelor-arbeit/thesis.log",
 		"/var/www/write-math/bachelor-arbeit/thesis.blg",
 		"/var/www/write-math/bachelor-arbeit/thesis.bbl",
@@ -518,14 +572,12 @@
 		"/var/www/nn-python/mlp.py",
 		"/var/www/dtw-python/README.md",
 		"/var/www/dtw-python/selftest.py",
-		"/var/www/dtw-python/classification.py",
 		"/var/www/write-math/website/raw-data/17.svg",
 		"/var/www/svg-png-converter/convert.py",
 		"/home/moose/Downloads/bla.bib",
 		"/home/moose/Downloads/10.1007%2F11867661_81.bib",
 		"/var/www/nn-python/logistic_sgd.py",
 		"/home/moose/Desktop/pin.txt",
-		"/home/moose/Downloads/0.bib",
 		"/var/www/nn-python/nn.py",
 		"/home/moose/Downloads/MartinThoma.github.io/_drafts/2014-04-07-interact.md",
 		"/var/www/nn-python/test.py",
@@ -599,11 +651,7 @@
 		"/home/moose/Downloads/LaTeX-examples/documents/confirmation-zwischenmiete/Makefile",
 		"/home/moose/Downloads/MartinThoma.github.io/_posts/2014-05-10-discussions-with-friends.md",
 		"/home/moose/Downloads/LaTeX-examples/documents/confirmation-zwischenmiete/zwischenmiete-vertrag.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/time-conversion/Makefile",
-		"/var/www/write-math/deeplearning/logistic-regression/logistic_sgd.py",
-		"/var/www/write-math/deeplearning/logistic-regression/logistic-regression.py",
-		"/home/moose/Downloads/LaTeX-examples/documents/minimal-working-example-mwe/minimal-working-example-mwe.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/2048/2048.tex"
+		"/home/moose/Downloads/LaTeX-examples/documents/time-conversion/Makefile"
 	],
 	"find":
 	{
@@ -622,6 +670,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"bib",
+			"todo",
+			"\\reflectbox{\\rotatebox[origin=c]{-90}{$\\in$}}",
+			"ams",
+			"si",
+			"si{",
+			"moose",
 			"csquote",
 			"enume",
 			"sub",
@@ -742,14 +797,7 @@
 			"count",
 			"is_in_top_ten",
 			"$key",
-			"maximum_dtw",
-			"eps",
-			"todo",
-			"maximum_dtw",
-			"url_get_contents",
-			"curl",
-			"url_get_contents",
-			"echo"
+			"maximum_dtw"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -757,6 +805,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"\\mathrel{\\reflectbox{\\rotatebox[origin=c]{-90}{$in$}}}}",
+			"Martin Thoma",
 			"b2",
 			"a2",
 			"\"",
@@ -790,8 +840,471 @@
 	"groups":
 	[
 		{
+			"selected": 0,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "feedforward.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4940,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2192,
+								2192
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 887.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "activation-functions.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1738,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1251,
+								1251
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 360.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "glossary.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 155,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								154,
+								154
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "figures/artificial-neuron.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1127,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1016,
+								1016
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "preprocessing.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2421,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2125,
+								2125
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 480.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "thesis.bib",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 41599,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10034,
+								10034
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close"
+							],
+							"syntax": "Packages/LaTeX/Bibtex.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3828.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -845,7 +1358,7 @@
 	"project": "latex-bachelor.sublime-project",
 	"replace":
 	{
-		"height": 52.0
+		"height": 66.0
 	},
 	"save_all_on_build": true,
 	"select_file":

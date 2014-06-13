@@ -19,15 +19,15 @@
             ylabel=y,
             tick align=outside,
             enlargelimits=true]
-          \addplot[domain=-5:5, green, ultra thick,samples=500] {x < 0 ? 0 : 1};
+          \addplot[domain=-5:5, green, ultra thick,samples=500] {x < 0 ? -1 : 1};
           \addplot[domain=-5:5, red, ultra thick,samples=500, dashed] {1/(1+exp(-x))};
           \addplot[domain=-5:5, blue, ultra thick,samples=500, dotted] {tanh(x)};
-          \addlegendentry{$f(x)$} %TODO: \begin{cases} 0, & x < 0, \\ 1, & x \ge 0, \end{cases} (spacing)
+          \addlegendentry{$f(x)$}
           \addlegendentry{$g(x)=\frac{1}{1+e^{-x}}$}
           \addlegendentry{$h(x)=\tanh(x)$}
         \end{axis} 
     \end{tikzpicture}
-    \caption{The unit step function $f$, the sigmoid function $g$ and the hyperbolic tangend $h$.}
+    \caption{A variation of the sign function $f$ with $f(0) = -1$, the sigmoid function $g$ and the hyperbolic tangend $h$.}
     \label{fig:logistic-function}
 \end{figure}
 

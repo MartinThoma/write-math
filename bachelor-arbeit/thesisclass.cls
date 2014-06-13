@@ -20,12 +20,16 @@
 %% -------------------------------
 %% |          Packages           |
 %% -------------------------------
+\usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage[utf8]{inputenc} % this is needed for umlauts
 \usepackage[english]{babel} % this is needed for umlauts
 \usepackage[T1]{fontenc}    % this is needed for correct output of umlauts in pdf
 
 \usepackage{ae}               % Almost european, virtual T1-Font
 \usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+\usepackage{rotating}
 \usepackage{vmargin}          % Adjust margins in a simple way
 \usepackage{fancyhdr}         % Define simple headings
 \usepackage{url}
@@ -33,14 +37,19 @@
 \usepackage{enumitem}       % Better than \usepackage{enumerate}, because it allows to set references
 \usepackage{braket}         % needed for \Set
 \usepackage{csquotes}       % \enquote{}
+
+\usepackage{algorithm,algpseudocode}
+\algtext*{EndIf}        % Remove "end if" text
+\algtext*{EndWhile}     % Remove "end while" text
+\algtext*{EndFunction}  % Remove "end function" text
+\algtext*{EndFor}       % Remove "end for" text
+
+\usepackage{siunitx}
 \usepackage{subfig}         % multiple figures in one
 \usepackage{pgfplots}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes, calc, shapes, arrows}
-\usepackage{algorithm}		  % Code-Listings
-\usepackage{algorithmic}	  % Code-Listings
-% see http://www.ctan.org/tex-archive/macros/latex/contrib/algorithm2e/algorithm2e.pdf
-% for more sophisticated algorithm listings
 
 \usepackage[raiselinks=true,
 						bookmarks=true,
@@ -57,7 +66,7 @@
 \usepackage[nameinlink,noabbrev]{cleveref} % has to be after hyperref, ntheorem, amsthm
 \usepackage{glossaries}
 \makeglossaries
-
+\usepackage{shortcuts}
 \usepackage[fixlanguage]{babelbib}	% sets german style for literature entries
 \selectbiblanguage{ngerman}			% for \bibliographystyle{babalpha}
 %% --- End of Packages ---

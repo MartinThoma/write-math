@@ -12,20 +12,102 @@
 {\addchap{Anhang}}	% german style
 
 
-\section{First Appendix Section}
-		\label{Anhang-Implementierung}
-		
+\section{Algorithms}\label{appendix:algorithms}
+\begin{algorithm}[h]
+  \begin{algorithmic}
+    \State $a \gets \text{next from}~A$
+    \State $b \gets \text{next from}~B$
+    \State $d \gets \delta(a,b)$
+    \State $a' \gets \text{next from}~A$
+    \State $b' \gets \text{next from}~B$
+    \While{points left in $A$ $\wedge$ points left in $B$}
+      \State $l, m, r \gets \delta(a',b), \delta(a', b'), \delta(a, b')$
+      \State $\mu \gets \min ~\{l, m, r\}$
+      %\COMMENT{ Important line }
+      \State $d \gets d + \mu$
+      \If{$l = \mu$}
+        \State $a \gets a'$
+        \State $a' \gets \text{next from}~A$
+      \ElsIf{$r = \mu$}
+        \State $b \gets b'$
+        \State $b' \gets \text{next from}~B$
+      \Else
+        \State $a \gets a'$
+        \State $b \gets b'$
+        \State $a' \gets \text{next from}~A$
+        \State $b' \gets \text{next from}~B$
+      \EndIf
+    \EndWhile
+    \If{no points left in $A$}
+      \ForAll{points $p$ in $B$}
+        \State $d \gets d + \delta(a',p)$
+      \EndFor
+    \ElsIf{no points left in $B$}
+      \ForAll{points $p$ in $A$}
+        \State $d \gets d + \delta(b',p)$
+      \EndFor
+    \EndIf
+  \end{algorithmic}
+  \caption{Greedy matching as described in \cite{Kirsch}}
+  \label{alg:greedy-matching}
+\end{algorithm}
+
+\begin{algorithm}[h]
+    \begin{algorithmic}
+        \Function{scale\_and\_shift}{$pointlist$}
+            \State $min_x, min_y = pointlist[0]['x'], pointlist[0]['y']$
+            \State $max_x, max_y = pointlist[0]['x'], pointlist[0]['y']$
+            \ForAll{$lines$ in $pointlist$}
+                \ForAll{$p$ in $lines$}
+                    \If{$p['x'] < min_x$}
+                        \State $min_x \gets p['x']$
+                    \ElsIf{$p['x'] > max_x$}
+                        \State $max_x \gets p['x']$
+                    \EndIf
+
+                    \If{$p['y'] < min_y$}
+                        \State $min_y \gets p['y']$
+                    \ElsIf{$p['y'] > max_y$}
+                        \State $max_y \gets p['y']$
+                    \EndIf
+                \EndFor
+            \EndFor
+
+            \State $width, height \gets max_x - min_x, max_y - min_y$
+
+            \State $factor = 1$
+
+            \If{$width \neq 0$}
+                \State $factor_x = \frac{1}{width}$
+            \EndIf
+
+            \If{$height \neq 0$}
+                \State $factor_y = \frac{1}{height}$
+            \EndIf
+
+            \State $factor = \min(factor_x, factor_y)$
+            \State $add_x, add_y = 0, 0$
+
+            \ForAll{$lines$ in $pointlist$}
+                \ForAll{$p$ in $lines$}
+                    \State $p['x'] \gets (p["x"] - minx) \cdot factor$
+                    \State $p['y'] \gets (p["y"] - miny) \cdot factor$
+                \EndFor
+            \EndFor
+
+            \Return $pointlist$
+        \EndFunction
+    \end{algorithmic}
+\caption{Scale and shift a list of lines to the $(0,1) \times (0, 1)$ unit square}
+\label{alg:scale-and-shift}
+\end{algorithm}
+
+\section{Figures}\label{appendix:figures}
 \setcounter{figure}{0}
-		
+% TODO
 \begin{figure} [ht]
-  \centering
-   ein Bild
-  \caption{A figure}
-  \label{fig:BPMNBeispiela}
+    \centering
+    ein Bild
+    \caption{A figure}
+    \label{fig:BPMNBeispiela}
 \end{figure}
-
-
-\dots
-
-
-
