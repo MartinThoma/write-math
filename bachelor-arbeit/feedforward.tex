@@ -22,22 +22,24 @@ symbol recognition that would be about $\si{1076}$ neurons.
 The number of input neurons is equal to the number of features.
 
 \section{Notation}
+Let $n_i$ be the number of neurons in the $i$-th layer and $\layernumber$ be the
+number of layers of the \gls{MLP}.
+
 Two neighboring layers of neurons are fully connected and have weights between
 two layers. This means you can store those weights in form of matrices.
-Assuming you have $n$ neurons in layer $i$ and $m$ neurons in layer $i + 1$,
-you would have a matrix
+So the weights between layer $i$ and layer $i+1$ are
 
 \[W_i = \begin{pmatrix}
-    w_{1,1} & w_{1,2} & \dots & w_{1,m}\\
-    w_{2,1} & w_{2,2} & \dots & w_{2,m}\\
-    w_{3,1} & w_{3,2} & \dots & w_{3,m}\\
+    w_{1,1} & w_{1,2} & \dots & w_{1,n_{i+1}}\\
+    w_{2,1} & w_{2,2} & \dots & w_{2,n_{i+1}}\\
+    w_{3,1} & w_{3,2} & \dots & w_{3,n_{i+1}}\\
     \vdots  &         & \ddots& \vdots \\
-    w_{n,1} & w_{n,2} & \dots & w_{n,m}
+    w_{n_{i},1} & w_{n_{i},2} & \dots & w_{n_{i},n_{i+1}}
 \end{pmatrix}\]
 
 Let $w_{i,j,k}$ be the value $w_{i,j}$ in $W_k$.
 
-So $W_i \in \mdr^{n \times m}$ is the matrix denoting the weights between layer
+So $W_i \in \mdr^{n_i \times n_{i+1}}$ is the matrix denoting the weights between layer
 $i$ and layer $i+1$.
 
 The unweighted output of layer $i$ is denoted by $x_i$; the weighted output
@@ -51,13 +53,18 @@ I denote the activation function of layer $i$ by $\varphi_i$. Although $\varphi_
 is defined for single neurons, I will in the following apply it to vectors. In
 its meant to be applied pointwise.
 
-Let $n_i$ be the number of neurons in the $i$-th layer and $\layernumber$ be the number of layers of the
-\gls{MLP}.
+The activation function is a function 
+
+\[\varphi_i: \mdr \rightarrow \mdr \]
+
+but because of the short-notation it can be applied pointwise to all neurons
+of layer $i$ it is also a function
+
+\[\varphi_i: \mdr^{n_{i}} \rightarrow \mdr^{n_{i}}\]
 
 \section{Evaluation}
-Let $x_1 \in \mdr^{1 \times n}$ be an unweighted output of layer $1$. So it's
-simply the input of our neural net with $n$ features. Let 
-$m \in \mdn{N}_{\geq 1}$ be the number of neurons in layer $2$.
+Let $x_1 \in \mdr^{1 \times n_1}$ be an unweighted output of layer $1$. So it's
+simply the input of our neural net with $n_1$ features.
 
 Given $x_1$ one can easily compute the weighted input for layer $2$:
 
@@ -65,7 +72,7 @@ Given $x_1$ one can easily compute the weighted input for layer $2$:
 \begin{array}{@{}c@{\;}c@{\;}c@{\;}c@{\;}c@{}}
 x_1 & \cdot & W_{1} & = & \net_1 \\
 \vin && \vin && \vin \\
-\mathbb{R}^{1\times n} && \mathbb{R}^{n\times m} && \mathbb{R}^{1\times m}
+\mathbb{R}^{1\times n_1} && \mathbb{R}^{n_1\times n_2} && \mathbb{R}^{1\times n_2}
 \end{array}
 \]
 
@@ -80,7 +87,8 @@ computed by
 The output of a general \gls{MLP} can be computed by
 
 \begin{align*}
-    \Phi(x, 2) &:= \varphi_{2}(x_1 \cdot W_{1})\\
+    \Phi(x, n) &: \mdr^{n_1} \rightarrow \mdr^{n_n}\\
+    \Phi(x_1, 2) &:= \varphi_{2}(x_1 \cdot W_{1})\\
     \Phi(x, n) &:= \varphi_{n} \big (\Phi(x, n-1) \cdot W_{n-1} \big)
 \end{align*}
 
@@ -142,7 +150,14 @@ error function:
     &= \frac{\partial}{\partial w_{ijk}} \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
     &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
     &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} 2 \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )\\
-    &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (\varphi_{\layernumber-1}(\Phi(x, \layernumber-1) \cdot W_{\layernumber-1})^{(p)} \right)
+    &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}}
+    \left (
+        \varphi_{\layernumber}(
+            \underbrace{\Phi(x, \layernumber-1)}_{\stackrel{\vin}{\mdr^{1 \times n_{\layernumber-1}}}}
+            \cdot 
+            \underbrace{W_{\layernumber-1}}_{\stackrel{\vin}{\mdr^{n_{\layernumber-1, \layernumber}}}}
+        )^{(p)}
+    \right)
 \end{align}
 
 At this point, it doesn't get simpler except if you know where $w_{ijk}$ is.
