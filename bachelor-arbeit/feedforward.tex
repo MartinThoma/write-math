@@ -155,15 +155,28 @@ error function:
         \varphi_{\layernumber}(
             \underbrace{\Phi(x, \layernumber-1)}_{\stackrel{\vin}{\mdr^{1 \times n_{\layernumber-1}}}}
             \cdot 
-            \underbrace{W_{\layernumber-1}}_{\stackrel{\vin}{\mdr^{n_{\layernumber-1, \layernumber}}}}
+            \underbrace{W_{\layernumber-1}}_{\stackrel{\vin}{\mdr^{n_{\layernumber-1}, n_\layernumber}}}
         )^{(p)}
     \right)
 \end{align}
 
-At this point, it doesn't get simpler except if you know where $w_{ijk}$ is.
-If $w_{ijk}$ is for example a weight for an output layer ($k = \layernumber$), you can apply the chain
-rule\footnote{$(f(g))' = f'(g) \cdot g'$} once:
+The function $\varphi_{\layernumber}$ is applied component wise and we are
+only interested in the result of the $p$-th element of the result vector. So we
+can completely ignore that we have a vector but instead think of it as a function
+$\varphi_l: \mdr \rightarrow \mdr$:
 
 \begin{align}
-    \frac{\partial E_{\Set{x}}}{\partial w_{ijk}} &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \left ( \frac{\partial}{\partial w_{ijk}} \varphi_{\layernumber-1} \right )(\Phi(x, \layernumber-1) \cdot W_{\layernumber-1})^{(p)}\\
+    0 &\stackrel{!}{=}
+    \frac{\partial}{\partial w_{ijk}}
+        \varphi_{\layernumber} \left (
+            \sum_{i=1}^{n_{\layernumber-1}} \Phi(x, \layernumber-1)^{(i)}
+            \cdot 
+            W_{\layernumber-1}^{(i)}
+        \right )
+    \\
+    &= \varphi_{\layernumber}' \left (
+            \sum_{i=1}^{n_{\layernumber-1}} \Phi(x, \layernumber-1)^{(i)}
+       \right )
+       \cdot
+       \Phi(x, \layernumber - 1) % TODO!!!
 \end{align}
