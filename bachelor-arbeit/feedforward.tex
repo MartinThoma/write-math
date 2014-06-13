@@ -142,13 +142,13 @@ error function:
     &= \frac{\partial}{\partial w_{ijk}} \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
     &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
     &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} 2 \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )\\
-    &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (\varphi_{n-1}(\Phi(x, n-1) \cdot W_{n-1,n})^{(p)} \right)
+    &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (\varphi_{\layernumber-1}(\Phi(x, \layernumber-1) \cdot W_{\layernumber-1})^{(p)} \right)
 \end{align}
 
 At this point, it doesn't get simpler except if you know where $w_{ijk}$ is.
-If $w_{ijk}$ is for example a weight for an output node, you can apply the chain
+If $w_{ijk}$ is for example a weight for an output layer ($k = \layernumber$), you can apply the chain
 rule\footnote{$(f(g))' = f'(g) \cdot g'$} once:
 
 \begin{align}
-    \frac{\partial E_{\Set{x}}}{\partial w_{ijk}} &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \left ( \frac{\partial}{\partial w_{ijk}} \varphi_{n-1} \right )(\Phi(x, n-1) \cdot W_{n-1,n})^{(p)}\\
+    \frac{\partial E_{\Set{x}}}{\partial w_{ijk}} &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \left ( \frac{\partial}{\partial w_{ijk}} \varphi_{\layernumber-1} \right )(\Phi(x, \layernumber-1) \cdot W_{\layernumber-1})^{(p)}\\
 \end{align}
