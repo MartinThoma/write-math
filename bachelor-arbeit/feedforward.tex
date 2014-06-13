@@ -21,12 +21,13 @@ symbol recognition that would be about $\si{1076}$ neurons.
 
 The number of input neurons is equal to the number of features.
 
+\section{Notation}
 Two neighboring layers of neurons are fully connected and have weights between
 two layers. This means you can store those weights in form of matrices.
 Assuming you have $n$ neurons in layer $i$ and $m$ neurons in layer $i + 1$,
 you would have a matrix
 
-\[W_{i} = \begin{pmatrix}
+\[W_i = \begin{pmatrix}
     w_{1,1} & w_{1,2} & \dots & w_{1,m}\\
     w_{2,1} & w_{2,2} & \dots & w_{2,m}\\
     w_{3,1} & w_{3,2} & \dots & w_{3,m}\\
@@ -34,47 +35,70 @@ you would have a matrix
     w_{n,1} & w_{n,2} & \dots & w_{n,m}
 \end{pmatrix}\]
 
-This means you can easily get the input for layer $i+1$. As the input neurons
-output is $x \in \mdr^{1 \times n}$ you can simply multiply $x \cdot W_1$
-to get the output $x \cdot W_1 := \net_j \in \mdr^{1 \times m}$.
+Let $w_{i,j,k}$ be the value $w_{i,j}$ in $W_k$.
 
-After that, you can apply the activation function $\varphi$ to $_i$.
-As I assume that the activation function will be the same foreach node in the
-same layer $l$, I will simply write $\varphi_l(o)$. This means that $\varphi_l$ is applied
-componentwise to each $o_i$ with $i \in 1, \dots, m$.
+So $W_i \in \mdr^{n \times m}$ is the matrix denoting the weights between layer
+$i$ and layer $i+1$.
 
-So the output vector $o$ of a 3-layer (input, hidden, output) neural net can be
+The unweighted output of layer $i$ is denoted by $x_i$; the weighted output
+by $\net_i$. Instead of $x_1$ I will write $x$.
+The output of the \gls{MLP} for the input $x$ is denoted by $o_x$.
+
+In principle each neuron might have a different activation function, but in
+practice each neuron in one layer has the same activation function. However,
+activation functions might differ from layer to layer. This is the reason why
+I denote the activation function of layer $i$ by $\varphi_i$. Although $\varphi_i$
+is defined for single neurons, I will in the following apply it to vectors. In
+its meant to be applied pointwise.
+
+Let $n_i$ be the number of neurons in the $i$-th layer and $\layernumber$ be the number of layers of the
+\gls{MLP}.
+
+\section{Evaluation}
+Let $x_1 \in \mdr^{1 \times n}$ be an unweighted output of layer $1$. So it's
+simply the input of our neural net with $n$ features. Let 
+$m \in \mdn{N}_{\geq 1}$ be the number of neurons in layer $2$.
+
+Given $x_1$ one can easily compute the weighted input for layer $2$:
+
+\[
+\begin{array}{@{}c@{\;}c@{\;}c@{\;}c@{\;}c@{}}
+x_1 & \cdot & W_{1} & = & \net_1 \\
+\vin && \vin && \vin \\
+\mathbb{R}^{1\times n} && \mathbb{R}^{n\times m} && \mathbb{R}^{1\times m}
+\end{array}
+\]
+
+After that, you can apply the activation function $\varphi_{i+1}$ pointwise
+to $\net_i$. %TODO: Is that really called "pointwise" application?
+
+So the output vector $x_3$ of a 3-layer (input, hidden, output) neural net can be
 computed by
 
-\[o = \varphi_2(\varphi_1(x \cdot W_{1,2}) \cdot W_{2,3})\]
+\[x_3 = \varphi_3(\varphi_2(x_1 \cdot W_{1}) \cdot W_{2})\]
 
 The output of a general \gls{MLP} can be computed by
 
 \begin{align*}
-    \Phi(x, 1) &:= \varphi_{1}(x \cdot W_{1,2})\\
-    \Phi(x, n) &:= \varphi_{n-1} \big (\Phi(x, n-1) \cdot W_{n-1, n} \big)
+    \Phi(x, 2) &:= \varphi_{2}(x_1 \cdot W_{1})\\
+    \Phi(x, n) &:= \varphi_{n} \big (\Phi(x, n-1) \cdot W_{n-1} \big)
 \end{align*}
 
-\subsection{Supervised Training with Backpropagation}
-The backpropagation algorithm is a supervised algorithm for training an
-\gls{MLP}. This means the trainigset $T$ consists of tuples $(x, t)$
+\section{Supervised Training with Backpropagation}\label{sec:training}
+The backpropagation algorithm is a supervised algorithm for training
+\glspl{MLP}. This means the trainigset $T$ consists of tuples $(x, t_x)$
 where $x$ is input and $t_x$ is the desired output.
 
-The backpropagation algorithm first makes a forward pass to get to know what
-the current output $o_x$ would be for each $(x, t_x) \in T$.
 To evaluate how good the current \gls{MLP} is, an error function can be defined:
 
 \begin{align*}
-    E: \mdr^{n_1 \times n_2} \times \mdr^{n_2 \times n_3} \times \dots \times \mdr^{n_{m-1, m}} \rightarrow \mdr_{\geq 0}\\
-    E_T(W) = \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{k \in out} \left (t_{x}^{(k)} - o_{x}^{(k)} \right )^2
+    E: \mdr^{n_1 \times n_2} \times \mdr^{n_2 \times n_3} \times \dots \times \mdr^{n_{\layernumber-1, \layernumber}} \rightarrow \mdr_{\geq 0}\\
+    E_T(W) = \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(k)} - o_{x}^{(k)} \right )^2
 \end{align*}
-
-where $n_i$ is the numer of neurons in the $i$-th layer and $m$ is the number
-of layers and $out$ is the set of all output neurons.
 
 This function is isomorphic to 
 
-\[E: \mdr^{\sum_{i=2}^m n_{i-1} \cdot n_{i}} \rightarrow \mdr_{\geq 0}\]
+\[E: \mdr^{\sum_{i=2}^\layernumber n_{i-1} \cdot n_{i}} \rightarrow \mdr_{\geq 0}\]
 
 This error should be minimized. As the error is the sum of non-negative values,
 we will get a lower error by minimizing the error for a single training example.
@@ -98,7 +122,7 @@ So the algorithm is
                 \ForAll{$(x, t_x) \in T$}
                     \ForAll{node $i$}
                         \ForAll{nodes $j$ following $i$}
-                            \State $\displaystyle w_{ij} \gets w_{ij} - \eta \frac{\partial E_{\Set{x}}}{\partial w_{ij}} (W)$
+                            \State $\displaystyle w_{ijk} \gets w_{ijk} - \eta \frac{\partial E_{\Set{x}}}{\partial w_{ijk}} (W)$
                         \EndFor
                     \EndFor
                 \EndFor
@@ -109,24 +133,22 @@ So the algorithm is
 \label{alg:backpropagate}
 \end{algorithm}
 
-Computing the partial derivatives $\frac{\partial E_{\Set{x}}}{\partial w_{ij}}$
+Computing the partial derivatives $\frac{\partial E_{\Set{x}}}{\partial w_{ijk}}$
 is not a trivial task. To do that, we have to take a closer look at the
 error function:
 
-Let $n$ be the number of layers of the \gls{MLP}.
-
 \begin{align}
-    \frac{\partial E_{\Set{x}}}{\partial w_{ij}}
-    &= \frac{\partial}{\partial w_{ij}} \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{k \in out} \left (t_{x}^{(k)} - o_{x}^{(k)} \right )^2\\
-    &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{k \in out} \frac{\partial}{\partial w_{ij}} \left (t_{x}^{(k)} - o_{x}^{(k)} \right )^2\\
-    &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{k \in out} 2 \left (t_{x}^{(k)} - o_{x}^{(k)} \right ) \cdot \frac{\partial}{\partial w_{ij}} \left (t_{x}^{(k)} - o_{x}^{(k)} \right )\\
-    &= - \sum_{(x, t_x) \in T} \sum_{k \in out} \left (t_{x}^{(k)} - o_{x}^{(k)} \right ) \cdot \frac{\partial}{\partial w_{ij}} \left (\varphi_{n-1}(\Phi(x, n-1) \cdot W_{n-1,n})^{(k)} \right)
+    \frac{\partial E_{\Set{x}}}{\partial w_{ijk}}
+    &= \frac{\partial}{\partial w_{ijk}} \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
+    &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )^2\\
+    &= \frac{1}{2} \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} 2 \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (t_{x}^{(p)} - o_{x}^{(p)} \right )\\
+    &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \frac{\partial}{\partial w_{ijk}} \left (\varphi_{n-1}(\Phi(x, n-1) \cdot W_{n-1,n})^{(p)} \right)
 \end{align}
 
-At this point, it doesn't get simpler except if you know where $w_{ij}$ is.
-If $w_{ij}$ is for example a weight for an output node, you can apply the chain
+At this point, it doesn't get simpler except if you know where $w_{ijk}$ is.
+If $w_{ijk}$ is for example a weight for an output node, you can apply the chain
 rule\footnote{$(f(g))' = f'(g) \cdot g'$} once:
 
 \begin{align}
-    \frac{\partial E_{\Set{x}}}{\partial w_{ij}} &= - \sum_{(x, t_x) \in T} \sum_{k \in out} \left (t_{x}^{(k)} - o_{x}^{(k)} \right ) \cdot \left ( \frac{\partial}{\partial w_{ij}} \varphi_{n-1} \right )(\Phi(x, n-1) \cdot W_{n-1,n})^{(k)}\\
+    \frac{\partial E_{\Set{x}}}{\partial w_{ijk}} &= - \sum_{(x, t_x) \in T} \sum_{p = 1}^{|n_\layernumber|} \left (t_{x}^{(p)} - o_{x}^{(p)} \right ) \cdot \left ( \frac{\partial}{\partial w_{ijk}} \varphi_{n-1} \right )(\Phi(x, n-1) \cdot W_{n-1,n})^{(p)}\\
 \end{align}
