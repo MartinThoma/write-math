@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"get",
+				"get_error_dataset"
+			],
+			[
+				"input",
+				"input_neurons"
+			],
+			[
 				"for",
 				"forward_pass"
 			],
@@ -168,10 +176,6 @@
 				"steps_done"
 			],
 			[
-				"get",
-				"getElementById"
-			],
-			[
 				"is",
 				"is_in_codeblock"
 			],
@@ -311,7 +315,7 @@
 			"file": "feedforward.tex",
 			"settings":
 			{
-				"buffer_size": 6848,
+				"buffer_size": 10620,
 				"line_ending": "Unix"
 			}
 		}
@@ -484,11 +488,25 @@
 	},
 	"file_history":
 	[
+		"/var/www/write-math/bachelor-arbeit/artificial-neurons.tex",
+		"/var/www/write-math/website/classifiers/nn-python/pybrain-nn.py",
+		"/var/www/write-math/website/classifiers/nn-python/self-simple.py",
+		"/var/www/write-math/website/classifiers/nn-python/logistic_sgd.py",
+		"/var/www/write-math/bachelor-arbeit/activation-functions.tex",
+		"/var/www/write-math/website/classifiers/nn-python/perceptron.py",
+		"/var/www/nn-python/logistic_sgd.py",
+		"/var/www/nn-python/mlp.py",
+		"/var/www/nn-python/feed-forward.py",
+		"/var/www/nn-python/simple.py",
+		"/var/www/write-math/website/classifiers/nn-python/nn.py",
+		"/home/moose/Downloads/recipe-578148-1.py",
+		"/var/www/nn-python/newneural.py",
+		"/var/www/nn-python/nn.py",
+		"/var/www/write-math/bachelor-arbeit/feedforward.tex",
 		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/shortcuts.sty",
 		"/var/www/write-math/bachelor-arbeit/shortcuts.sty",
 		"/var/www/write-math/bachelor-arbeit/introduction.tex",
 		"/var/www/write-math/bachelor-arbeit/content.tex",
-		"/var/www/write-math/bachelor-arbeit/artificial-neurons.tex",
 		"/var/www/write-math/bachelor-arbeit/evaluation.tex",
 		"/var/www/write-math/bachelor-arbeit/thesisclass.cls",
 		"/var/www/write-math/bachelor-arbeit/preprocessing.tex",
@@ -499,13 +517,11 @@
 		"/home/moose/Downloads/bwinf/32.2/buschfeuer.tex",
 		"/home/moose/Downloads/bwinf/32.2/my_def.tex",
 		"/var/www/write-math/bachelor-arbeit/logos/Readme.md",
-		"/var/www/write-math/bachelor-arbeit/feedforward.tex",
 		"/var/www/write-math/bachelor-arbeit/titlepage.tex",
 		"/var/www/write-math/bachelor-arbeit/figures/feedforward.tex",
 		"/var/www/write-math/bachelor-arbeit/thesis.bib",
 		"/var/www/write-math/bachelor-arbeit/figures/artificial-neuron.tex",
 		"/var/www/write-math/bachelor-arbeit/glossary.tex",
-		"/var/www/write-math/bachelor-arbeit/activation-functions.tex",
 		"/home/moose/Downloads/0.bib",
 		"/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/GeoTopo.tex",
 		"/var/www/write-math/bachelor-arbeit/thesis.tex",
@@ -533,16 +549,13 @@
 		"/var/www/write-math/symbol-generator/manual/symbol.svg",
 		"/var/www/write-math/symbol-generator/manual/symbol.tex",
 		"/home/moose/Desktop/so.question.txt",
-		"/var/www/nn-python/mlp.py",
 		"/var/www/dtw-python/README.md",
 		"/var/www/dtw-python/selftest.py",
 		"/var/www/write-math/website/raw-data/17.svg",
 		"/var/www/svg-png-converter/convert.py",
 		"/home/moose/Downloads/bla.bib",
 		"/home/moose/Downloads/10.1007%2F11867661_81.bib",
-		"/var/www/nn-python/logistic_sgd.py",
 		"/home/moose/Desktop/pin.txt",
-		"/var/www/nn-python/nn.py",
 		"/home/moose/Downloads/MartinThoma.github.io/_drafts/2014-04-07-interact.md",
 		"/var/www/nn-python/test.py",
 		"/home/moose/Downloads/10.1007%2F978-3-540-85644-3_2.bib",
@@ -602,16 +615,7 @@
 		"/home/moose/Downloads/LaTeX-examples/presentations/Bachelor-Short/templates/beamerthemekit.sty",
 		"/home/moose/Downloads/LaTeX-examples/presentations/Bachelor-Short/README.md",
 		"/home/moose/Downloads/LaTeX-examples/presentations/Bachelor-Short/LaTeX/end.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/vollmacht-gesundheit/vollmacht-gesundheit.tex",
-		"/home/moose/Downloads/LaTeX-examples/presentations/Bachelor-Short/LaTeX/Makefile",
-		"/home/moose/Downloads/LaTeX-examples/presentations/Bachelor-Short/LaTeX/google-presentation.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/time-conversion/time-conversion.tex",
-		"/home/moose/Desktop/USA/2014-06-02/.htaccess",
-		"/etc/modprobe.d/iwlwifi.conf",
-		"/home/moose/Downloads/LaTeX-examples/documents/vollmacht-gesundheit/Makefile",
-		"/home/moose/Downloads/LaTeX-examples/documents/zwischenmiete-vertrag/zwischenmiete-vertrag.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/confirmation-zwischenmiete/confirmation-zwischenmiete.tex",
-		"/home/moose/Downloads/LaTeX-examples/documents/confirmation-zwischenmiete/Makefile"
+		"/home/moose/Downloads/LaTeX-examples/documents/vollmacht-gesundheit/vollmacht-gesundheit.tex"
 	],
 	"find":
 	{
@@ -627,9 +631,13 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"\\net_{\\layernumber",
+			"\\net_",
+			"matrix",
+			"combined",
 			"\\sum_{k = 1}^{|n_\\layernumber|}",
 			"be the number of layer",
 			"out",
@@ -753,11 +761,7 @@
 			"dtw(",
 			"dtw",
 			"dtw(",
-			"dtw",
-			"logging.",
-			"c10",
-			"-start",
-			"print"
+			"dtw"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -814,15 +818,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6848,
+						"buffer_size": 10620,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6105,
-								6105
+								3733,
+								3733
 							]
 						],
 						"settings":
@@ -830,18 +834,34 @@
 							"BracketHighlighterBusy": false,
 							"bh_regions":
 							[
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
@@ -850,37 +870,21 @@
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close"
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close"
 							],
 							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2843.0,
+						"translation.y": 1628.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -922,7 +926,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 340.0
+		"height": 222.0
 	},
 	"output.find_results":
 	{
