@@ -64,7 +64,8 @@
 						linkbordercolor={0 0.61 0.50},   
 						citebordercolor={0 0.61 0.50}]{hyperref}  %{0.57 0.74 0.57}
 \usepackage[nameinlink,noabbrev]{cleveref} % has to be after hyperref, ntheorem, amsthm
-\usepackage{glossaries}
+\usepackage[xindy,toc]{glossaries}
+\loadglsentries[main]{glossary}
 \makeglossaries
 \usepackage{shortcuts}
 \usepackage[fixlanguage]{babelbib}	% sets german style for literature entries

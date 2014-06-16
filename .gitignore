@@ -56,7 +56,7 @@ website/formulas/*.svg
 website/raw-data
 
 
-# Latex
+# LaTex
 bachelor-arbeit/*.aux
 bachelor-arbeit/*.log
 bachelor-arbeit/*.toc
@@ -67,6 +67,8 @@ bachelor-arbeit/*.glg
 bachelor-arbeit/*.glo
 bachelor-arbeit/*.ist
 bachelor-arbeit/*.gls
+bachelor-arbeit/*.xdy
 
 *config.py
 *.bak
+*.sublime-workspace
