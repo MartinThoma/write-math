@@ -67,3 +67,5 @@ bachelor-arbeit/*.glg
 bachelor-arbeit/*.glo
 bachelor-arbeit/*.ist
 bachelor-arbeit/*.gls
+
+*config.py
