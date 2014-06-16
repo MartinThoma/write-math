@@ -69,3 +69,4 @@ bachelor-arbeit/*.ist
 bachelor-arbeit/*.gls
 
 *config.py
+*.bak

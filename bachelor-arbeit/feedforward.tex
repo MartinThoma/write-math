@@ -228,6 +228,6 @@ Suppose $k = \layernumber - 2$ (last hidden layer). Then:
 \begin{align}
     \frac{\partial E_x}{\partial w_{ij}^{(\layernumber-2)}} &= \frac{\frac{1}{2} \sum_{p=1}^{n_\layernumber} \left ( t_x^{(p)} -\varphi_{\layernumber}(\net_{\layernumber-1})^{(p)} \right )^2}{\partial \net_{\layernumber-2}^{(j)}} \Phi(x, \layernumber-2)^{(i)}\\
     &= \frac{\frac{1}{2} \sum_{p=1}^{n_\layernumber} \left ( t_x^{(p)} -\varphi_{\layernumber}(\sum_{i=1}^{n_{\layernumber-1}} (
-        \varphi_{\layernumber-1} \big (\Phi(x, \layernumber-2) \cdot W_{\layernumber-2} \big)
+        \varphi_{\layernumber-1} \big (\varphi_{\layernumber-2}(\net_{\layernumber-2}^{(j)}) \big)
     )^{(i)} \cdot w_{ip}^{(\layernumber-1)})^{(p)} \right )^2}{\partial \net_{\layernumber-2}^{(j)}} \Phi(x, \layernumber-2)^{(i)}\\
 \end{align}
