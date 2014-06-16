@@ -6,11 +6,6 @@ from math import sqrt, exp
 
 CLASSIFIER_NAME = "dtw-python"
 
-import logging
-logging.basicConfig(filename='classificationpy.log',
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s: %(message)s')
-
 
 def space_evenly(pointlist, number=100, KIND='linear'):
     """Space the points evenly.
