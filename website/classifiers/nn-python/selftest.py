@@ -191,8 +191,9 @@ def crossvalidation(hidden_neurons, weightdecay, momentum):
 
         for testdata in cv[testset]:
             start = time.time()
-            x = get_features(testdata['data'])
-
+            x = get_features(testdata['data'], EPSILON, SPACE_EVENLY,
+                                    POINTS_PER_LINE, SPACE_EVENLY_KIND,
+                                    CENTER)
             # Classify
             results = fnn.activate(x)
             topIndices = (-results).argsort()
@@ -204,8 +205,6 @@ def crossvalidation(hidden_neurons, weightdecay, momentum):
                                                            trndata.outdim))
             print("Hidden neurons: %i" % HIDDEN_NEURONS)
             print("First sample (input, target, class):")
-            print(trndata['input'][0], trndata['target'][0],
-                  trndata['class'][0])
 
             end = time.time()
             execution_time.append(end - start)
