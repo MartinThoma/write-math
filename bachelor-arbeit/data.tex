@@ -4,25 +4,7 @@
 \begin{wrapfigure}{r}{7cm}
   \vspace{-35pt}
   \begin{center}
-    \newcommand*{\xMin}{0}%
-    \newcommand*{\xMax}{6}%
-    \newcommand*{\yMin}{0}%
-    \newcommand*{\yMax}{6}%
-    \begin{tikzpicture}[y=-1cm]
-        \foreach \i in {\xMin,...,\xMax} {
-            \draw [very thin,gray!25] (\i,\yMin) -- (\i,\yMax)  node [below] at (\i,\yMin) {};
-        }
-        \foreach \i in {\yMin,...,\yMax} {
-            \draw [very thin,gray!25] (\xMin,\i) -- (\xMax,\i) node [left] at (\xMin,\i) {};
-        }
-        \draw[->, very thick] (0,0) -- (1,0) node[above] {$x$};
-        \draw[->, very thick] (0,0) -- (0,1) node[left] {$y$};
-        \foreach \x in {\xMin,...,5} {
-            \foreach \y in {\yMin,...,5} {
-                \node at ({\x+0.5},{\y+0.5}) {$(\x, \y)$};
-            }
-        }
-    \end{tikzpicture}
+    \input{figures/canvas-plane.tex}
   \end{center}
   \vspace{-20pt}
   \caption{HTML5 canvas plane. Each step is one pixel. There cannot be non-integer

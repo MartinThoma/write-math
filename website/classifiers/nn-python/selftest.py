@@ -22,6 +22,8 @@ import datetime
 import sys
 from collections import defaultdict
 
+import os.path
+import cPickle as pickle
 
 logging.basicConfig(filename='selftest.log',
                     level=logging.INFO,
@@ -65,6 +67,53 @@ def get_features(raw_draw_data, EPSILON, SPACE_EVENLY, POINTS_PER_LINE,
     return features
 
 
+def print_parameters(symbol_counter, raw_data_counter, EPSILON, CENTER,
+                     FLATTEN, THRESHOLD, SPACE_EVENLY, POINTS_PER_LINE,
+                     SPACE_EVENLY_KIND, K_FOLD, symbols, t1sum, t10sum,
+                     MOMENTUM, WEIGHTDECAY, HIDDEN_NEURONS, execution_time,
+                     LEARNING_RATE, LEARNING_RATE_DECAY, EPOCHS):
+    print("\n" + "-"*80)
+    print(str(datetime.date.today()))
+    print("\n```")
+    print("### Dataset information ###")
+    print("The following %i symbols were evaluated:" % symbol_counter)
+    for symbol, counter in sorted(symbols.items()):
+        if symbol in ['A', '0', 'a']:
+            print("")
+        print("%s (%i)" % (symbol, counter), end=", ")
+        if symbol in ['Z', '9', 'z']:
+            print("")
+    print("")
+    print("raw datasets: %i" % raw_data_counter)
+    print("### Preprocessing Parameters ###")
+    print("Epsilon: %0.2f" % EPSILON)
+    print("Center: %r" % CENTER)
+    print("Squared quadratic: False")
+    print("Flatten: %r" % FLATTEN)
+    print("Threshold: %r" % THRESHOLD)
+    if SPACE_EVENLY:
+        print("Space evenly: %r (%i points, %s)" %
+              (SPACE_EVENLY, POINTS_PER_LINE, SPACE_EVENLY_KIND))
+    else:
+        print("Space evenly: %r" % SPACE_EVENLY)
+    print("### Neural Net Parameters ###")
+    print("Hidden neurons: %i" % HIDDEN_NEURONS)
+    print("Learning rate: %.5f" % LEARNING_RATE)
+    print("Learning rate: %.5f" % LEARNING_RATE_DECAY)
+    print("Momentum: %.5f" % MOMENTUM)
+    print("Weight decay: %.5f" % WEIGHTDECAY)
+    print("Epochs: %i" % EPOCHS)
+    print("### Performance ###")
+    print("* Top-1-Classification (%i-fold cross-validated): %0.5f" %
+          (K_FOLD, (t1sum/K_FOLD)))
+    print("* Top-10-Classification (%i-fold cross-validated): %0.5f" %
+          (K_FOLD, t10sum/K_FOLD))
+    if len(execution_time) > 0:
+        print("Average time: %.5f seconds" % (sum(execution_time) /
+                                              len(execution_time)))
+    print("```")
+
+
 def get_binned_data(EPSILON, SPACE_EVENLY, POINTS_PER_LINE, SPACE_EVENLY_KIND,
                     CENTER, K_FOLD=10, MIN_OCCURENCES=10):
     """
@@ -75,66 +124,69 @@ def get_binned_data(EPSILON, SPACE_EVENLY, POINTS_PER_LINE, SPACE_EVENLY_KIND,
     is an integer starting at 0.
     """
 
-    # Prepare 10-fold crossvalidation data set
-    cv = []
-    for i in range(K_FOLD):
-        cv.append([])
+    if os.path.isfile('databins.pickle'):
+        data = pickle.load(open('databins.pickle'))
+    else:
+        # Prepare 10-fold crossvalidation data set
+        cv = []
+        for i in range(K_FOLD):
+            cv.append([])
 
-    # Get datasets from database
-    sql = "SELECT id, formula_in_latex FROM `wm_formula`"
-    cursor.execute(sql)
-    datasets = cursor.fetchall()
-
-    symbol_counter = 0
-    raw_data_counter = 0
-    symbols = defaultdict(int)
-    index2symbol = []
-    symbol2index = {}
-
-    for dataset in datasets:
-        sql = ("SELECT id, data FROM `wm_raw_draw_data` "
-               "WHERE `accepted_formula_id` = %s" % str(dataset['id']))
+        # Get datasets from database
+        sql = "SELECT id, formula_in_latex FROM `wm_formula`"
         cursor.execute(sql)
-        raw_datasets = cursor.fetchall()
-        if len(raw_datasets) >= MIN_OCCURENCES:
-            index2symbol.append(dataset['id'])
-            symbol2index[dataset['id']] = len(index2symbol) - 1
-            symbol_counter += 1
-            symbols[dataset['formula_in_latex']] += 1
-            print("%s (%i)" % (dataset['formula_in_latex'], len(raw_datasets)))
-            i = 0
-            for raw_data in raw_datasets:
-                raw_data_counter += 1
-                # cv[i].append({'data': raw_data['data'],
-                #               'id': raw_data['id'],
-                #               'formula_id': dataset['id'],
-                #               'accepted_formula_id': dataset['id'],
-                #               'formula_in_latex': dataset['formula_in_latex']
-                #               })
-                x = get_features(raw_data['data'], EPSILON, SPACE_EVENLY,
-                                 POINTS_PER_LINE, SPACE_EVENLY_KIND,
-                                 CENTER)
-                y = symbol2index[dataset['id']]
-                cv[i].append((x, y))
-                i = (i + 1) % K_FOLD
-    return {'cv': cv,
-            'symbol_counter': symbol_counter,
-            'raw_data_counter': raw_data_counter,
-            'symbols': symbols}
+        datasets = cursor.fetchall()
+
+        symbol_counter = 0
+        raw_data_counter = 0
+        symbols = defaultdict(int)
+        index2symbol = []
+        symbol2index = {}
+
+        for dataset in datasets:
+            sql = ("SELECT id, data FROM `wm_raw_draw_data` "
+                   "WHERE `accepted_formula_id` = %s" % str(dataset['id']))
+            cursor.execute(sql)
+            raw_datasets = cursor.fetchall()
+            if len(raw_datasets) >= MIN_OCCURENCES:
+                index2symbol.append(dataset['id'])
+                symbol2index[dataset['id']] = len(index2symbol) - 1
+                symbol_counter += 1
+                print("%s (%i)" % (dataset['formula_in_latex'],
+                                   len(raw_datasets)))
+                i = 0
+                for raw_data in raw_datasets:
+                    raw_data_counter += 1
+                    symbols[dataset['formula_in_latex']] += 1
+                    # cv[i].append({'data': raw_data['data'],
+                    #               'id': raw_data['id'],
+                    #               'formula_id': dataset['id'],
+                    #               'accepted_formula_id': dataset['id'],
+                    #               'formula_in_latex': dataset['formula_in_latex']
+                    #               })
+                    x = get_features(raw_data['data'], EPSILON, SPACE_EVENLY,
+                                     POINTS_PER_LINE, SPACE_EVENLY_KIND,
+                                     CENTER)
+                    y = symbol2index[dataset['id']]
+                    cv[i].append((x, y))
+                    i = (i + 1) % K_FOLD
+        data = {'cv': cv,
+                'symbol_counter': symbol_counter,
+                'raw_data_counter': raw_data_counter,
+                'symbols': symbols}
+        pickle.dump(data, open("databins.pickle", "wb"))
+    return data
 
 
-def crossvalidation(hidden_neurons, weightdecay, momentum):
+def crossvalidation(HIDDEN_NEURONS, WEIGHTDECAY, MOMENTUM, POINTS_PER_LINE=20,
+                    MIN_OCCURENCES=10, K_FOLD=10, EPSILON=10,
+                    CENTER=False, THRESHOLD=20,
+                    SPACE_EVENLY_KIND='cubic', LEARNING_RATE=0.01,
+                    LEARNING_RATE_DECAY=1.0, EPOCHS=20):
     """ Start a 10-fold cross-validation. """
     # Parameters for self-testing
-    MIN_OCCURENCES = 10
-    K_FOLD = 10
-    EPSILON = 10
-    CENTER = False
     FLATTEN = False
-    THRESHOLD = 20
     SPACE_EVENLY = True
-    SPACE_EVENLY_KIND = 'cubic'
-    POINTS_PER_LINE = 20  # Does only make sense with SPACE_EVENLY=True
 
     tmp = get_binned_data(EPSILON, SPACE_EVENLY, POINTS_PER_LINE,
                           SPACE_EVENLY_KIND, CENTER, K_FOLD,
@@ -144,36 +196,23 @@ def crossvalidation(hidden_neurons, weightdecay, momentum):
     raw_data_counter = tmp['raw_data_counter']
     symbols = tmp['symbols']
 
-    ###
-    print("\n" + "-" * 80)
-    print(str(datetime.date.today()))
-    print("The following %i symbols were evaluated:" % symbol_counter)
-    symbolstring = ""
-    for el, counter in symbols.items():
-        symbolstring += ("%s (%i)" % (el, counter))
-    print("raw datasets: %i" % raw_data_counter)
-    print("Epsilon: %0.2f" % EPSILON)
-    print("Center: %r" % CENTER)
-    print("Squared quadratic: False")
-    print("Flatten: %r" % FLATTEN)
-    print("Threshold: %r" % THRESHOLD)
-    if SPACE_EVENLY:
-        print("Space evenly: %r (%i points, %s)" % (SPACE_EVENLY,
-                                                    POINTS_PER_LINE,
-                                                    SPACE_EVENLY_KIND))
-    else:
-        print("Space evenly: %r" % SPACE_EVENLY)
+    t1sum = 0
+    t10sum = 0
+
+    print_parameters(symbol_counter, raw_data_counter, EPSILON, CENTER,
+                     FLATTEN, THRESHOLD, SPACE_EVENLY, POINTS_PER_LINE,
+                     SPACE_EVENLY_KIND, K_FOLD, symbols, t1sum, t10sum,
+                     MOMENTUM, WEIGHTDECAY, HIDDEN_NEURONS, [],
+                     LEARNING_RATE, LEARNING_RATE_DECAY, EPOCHS)
 
     # Start getting validation results
     c_acc = []
     print("\n\n")
     execution_time = []
 
+    # Maximum of 4 lines and 2 coordinates (x and y) per line
     INPUT_FEATURES = 4*POINTS_PER_LINE*2 + 1
     CLASSES = symbol_counter
-    HIDDEN_NEURONS = hidden_neurons
-    WEIGHTDECAY = weightdecay
-    MOMENTUM = momentum
 
     for testset in range(K_FOLD):
         c_acc.append({'correct': 0,
@@ -208,10 +247,12 @@ def crossvalidation(hidden_neurons, weightdecay, momentum):
                            outclass=SoftmaxLayer)
 
         trainer = BackpropTrainer(fnn, dataset=trndata, momentum=MOMENTUM,
-                                  verbose=True, weightdecay=WEIGHTDECAY)
+                                  verbose=True, weightdecay=WEIGHTDECAY,
+                                  learningrate=LEARNING_RATE,
+                                  lrdecay=LEARNING_RATE_DECAY)
 
-        print("start traing")
-        for i in range(20):
+        print("start training")
+        for i in range(EPOCHS):
             trainer.trainEpochs(1)
             trnresult = percentError(trainer.testOnClassData(),
                                      trndata['class'])
@@ -259,37 +300,15 @@ def crossvalidation(hidden_neurons, weightdecay, momentum):
 
     print(c_acc)
 
-    t1sum = 0
-    t10sum = 0
-
     for testset in range(K_FOLD):
         t1sum += c_acc[testset]['accuracy']
         t10sum += c_acc[testset]['a10']
 
-    print("\n" + "-"*80)
-    print(str(datetime.date.today()))
-    print("The following %i symbols were evaluated:" % symbol_counter)
-    print(", ".join(symbols))
-    print("raw datasets: %i" % raw_data_counter)
-    print("Epsilon: %0.2f" % EPSILON)
-    print("Center: %r" % CENTER)
-    print("Squared quadratic: False")
-    print("Flatten: %r" % FLATTEN)
-    print("Threshold: %r" % THRESHOLD)
-    if SPACE_EVENLY:
-        print("Space evenly: %r (%i points, %s)" %
-              (SPACE_EVENLY, POINTS_PER_LINE, SPACE_EVENLY_KIND))
-    else:
-        print("Space evenly: %r" % SPACE_EVENLY)
-    print("* Top-1-Classification (%i-fold cross-validated): %0.5f" %
-          (K_FOLD, (t1sum/K_FOLD)))
-    print("* Top-10-Classification (%i-fold cross-validated): %0.5f" %
-          (K_FOLD, t10sum/K_FOLD))
-    print("Hidden neurons: %i" % HIDDEN_NEURONS)
-    print("Momentum: %.5f" % MOMENTUM)
-    print("weightdecay: %.5f" % WEIGHTDECAY)
-    print("Average time: %.5f seconds" % (sum(execution_time) /
-                                          len(execution_time)))
+    print_parameters(symbol_counter, raw_data_counter, EPSILON, CENTER,
+                     FLATTEN, THRESHOLD, SPACE_EVENLY, POINTS_PER_LINE,
+                     SPACE_EVENLY_KIND, K_FOLD, symbols, t1sum, t10sum,
+                     MOMENTUM, WEIGHTDECAY, HIDDEN_NEURONS, execution_time,
+                     LEARNING_RATE, LEARNING_RATE_DECAY, EPOCHS)
 
 if __name__ == '__main__':
     logging.info("Started selftest of classifier %s." % CLASSIFIER_NAME)
@@ -308,14 +327,34 @@ if __name__ == '__main__':
 
     # Add more options if you like
     parser.add_argument("-H", metavar="H", type=int, dest="hidden_neurons",
-                        default=5,
+                        default=200,
                         help="number of neurons in the hidden layer")
+    parser.add_argument("-P", metavar="POINTS", type=int,
+                        dest="points_per_line", default=20,
+                        help="number of points per stroke")
+    parser.add_argument("-e", metavar="EPOCHS", type=int,
+                        dest="epochs", default=20,
+                        help="number of epochs to learn")
     parser.add_argument("-d", metavar="W", type=float, dest="weightdecay",
                         default=0.01,
                         help="weightdecay")
     parser.add_argument("-m", metavar="M", type=float, dest="momentum",
                         default=0.1,
                         help="momentum")
+    parser.add_argument("-l", metavar="ETA", type=float, dest="learning_rate",
+                        default=0.01,
+                        help="learning rate")
+    parser.add_argument("-ld", metavar="ALPHA", type=float, dest="lrdecay",
+                        default=1,
+                        help="learning rate decay")
     args = parser.parse_args()
 
-    crossvalidation(args.hidden_neurons, args.weightdecay, args.momentum)
+    MIN_OCCURENCES = 10
+    K_FOLD = 10
+    EPSILON = 10
+    CENTER = False
+    THRESHOLD = 20
+    crossvalidation(args.hidden_neurons, args.weightdecay, args.momentum,
+                    args.points_per_line, MIN_OCCURENCES, K_FOLD, EPSILON,
+                    CENTER, THRESHOLD, 'cubic', args.learning_rate,
+                    args.lrdecay, args.epochs)
