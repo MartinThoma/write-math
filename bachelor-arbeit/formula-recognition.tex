@@ -18,6 +18,14 @@ natural language text are \textit{decorators}:
     \item \verb+[symbol]^{[arbitrary math]}+
 \end{itemize}
 
+A third problem that comes with formulas that consist of multiple symbols are
+semantics: For single symbols, it is not possible to distinguish \verb+\Sigma+
+from \verb+\sum+, so we don't expect an algorithm to be able to do so.
+However, if we have a complete formula we might have enough context and thus
+we want the recognition algorithm to be able to distinguish \verb+\Sigma+
+from \verb+\sum+ and other pairs of similar symbols like \verb+\Pi+ and
+\verb+\prod+ or \verb+\Omega+ and \verb+\Ohm+.
+
 \section{Segmentation}
 I assume that writers finish one handwritten symbol before they start the next
 symbol.
