@@ -70,6 +70,7 @@ bachelor-arbeit/*.gls
 bachelor-arbeit/*.xdy
 
 *config.py
+*config.php
 *.bak
 *.sublime-workspace
 *.pickle
