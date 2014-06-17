@@ -1,0 +1,23 @@
+%!TEX root = thesis.tex
+\chapter{Formula Recognition}\label{ch:FormulaRecognition}
+\section{Nesting Structures}
+One major issue of formula recognition are nesting structures:
+
+\begin{itemize}
+    \item \verb+\frac{[arbitrary math]}{[arbitrary math]}+
+    \item \verb+\begin{pmatrix}[arbitrary math; structure with & ]\end{pmatrix}+
+    \item \verb+\begin{align}[arbitrary math; structure with & ]\end{align}+
+    \item \verb+\stackrel{[arbitrary math]}{[arbitrary math]}+
+\end{itemize}
+
+Another point that is special about handwritten math recognition compared to
+natural language text are \textit{decorators}:
+
+\begin{itemize}
+    \item \verb+[symbol]_{[arbitrary math]}+
+    \item \verb+[symbol]^{[arbitrary math]}+
+\end{itemize}
+
+\section{Segmentation}
+I assume that writers finish one handwritten symbol before they start the next
+symbol.
