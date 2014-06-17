@@ -9,9 +9,29 @@ information of the handwriting. On-line handwriting recognition on the other
 hand can use the information how symbols were written. This thesis is about
 on-line handwriting recognition.
 
+\section{Steps in handwriting recognition}
+Most handwriting-recognizers perform the following steps in order to recognize
+characters, symbols or words:
+
+\begin{enumerate}
+    \item \textbf{Preprocessing}: Clean the data. This step is done to get rid
+          of information that was either generated due to errors in the hardware %TODO: is that the right way to say it?
+          or is not needed at all.
+    \item {Normalization}: Data that belongs to the same class should
+         look as simmilar as possible. This usually includes scaling.
+    \item \textbf{Segmentation}: The task of formula recognition can eventually
+          be reduced to the task of symbol recognition combined with symbol
+          placement. But before symbol recognition can be done the formula has
+          to be segmented.
+    \item \textbf{Feature computiation}: Features is high-level information derived
+          from the raw data after preprocessing. Some systems simply take the
+          result of the preprocessing step, but many compute new features. This
+          might have the advantage that less training data is needed as the
+          developer can use a priori knowledge to compute highly discriminative
+          features.
+\end{enumerate}
 
 \section{Mathematical notation}
-
 I will use the notation $v^{(i)}$ when I want to write about the $i$-th element
 of a vector $v$. Vectors will always be denoted by lowercase latin letters.
 
@@ -21,5 +41,3 @@ The number of training examples will be denoted with $m$, the input vector with
 $x$ and the output vector with $y$.
 
 A single training example thus is given by the tuple $(x, y)$.
-
-Parameters that are to be learned will be denoted with $\theta$.
