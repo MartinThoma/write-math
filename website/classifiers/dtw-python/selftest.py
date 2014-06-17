@@ -154,6 +154,8 @@ def crossvalidation():
 
     print("\n" + "-"*80)
     print(str(datetime.date.today()))
+    print("")
+    print("```")
     print("The following %i symbols were evaluated:" % symbol_counter)
     print(", ".join(symbols))
     print("raw datasets: %i" % raw_data_counter)
@@ -169,6 +171,7 @@ def crossvalidation():
     print("* Top-1-Classification (%i-fold cross-validated): %0.5f" % (K_FOLD, (t1sum/K_FOLD)))
     print("* Top-10-Classification (%i-fold cross-validated): %0.5f" % (K_FOLD, t10sum/K_FOLD))
     print("Average time: %.5f seconds" % (sum(execution_time)/len(execution_time)))
+    print("```")
 
 if __name__ == '__main__':
     logging.basicConfig(filename='selftest.log',

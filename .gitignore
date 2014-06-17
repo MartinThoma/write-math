@@ -72,3 +72,4 @@ bachelor-arbeit/*.xdy
 *config.py
 *.bak
 *.sublime-workspace
+*.pickle
