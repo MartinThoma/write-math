@@ -70,6 +70,14 @@
 \usepackage{shortcuts}
 \usepackage[fixlanguage]{babelbib}	% sets german style for literature entries
 \selectbiblanguage{ngerman}			% for \bibliographystyle{babalpha}
+\usepackage{multicol}
+% Packages for symbols
+\usepackage{marvosym}
+\usepackage{textcomp}
+\usepackage{dsfont}
+%\usepackage{tipa}
+\usepackage{esint}
+%\usepackage{wasysym}
 %% --- End of Packages ---
 
 
