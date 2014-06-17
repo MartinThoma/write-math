@@ -15,6 +15,7 @@
 {% endif %}
 <p><b>Description</b>: {{formula.description}}</p>
 <p><b>Total handdrawn symbols</b>: {{ total }}</p>
+<p><a href="../train/?formula_id={{ formula.id }}">Train this symbol</a></p>
 
  <ul class="gallery mw-gallery-traditional">
   {% for image in images %}

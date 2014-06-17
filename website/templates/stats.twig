@@ -1,0 +1,21 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<p>Currently, there are {{ more_than_10 }} symbols in the database that have
+   more than 10 labeled instances.</p>
+
+<table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>Formula in LaTeX</th>
+        <th>Instances in database</th>
+    </tr>
+  {% for s in symbol_training_data_count %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
+        <td>{{s.counter}}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
