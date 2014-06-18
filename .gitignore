@@ -57,23 +57,22 @@ website/raw-data
 
 
 # LaTex
-bachelor-arbeit/*.aux
-bachelor-arbeit/*.log
-bachelor-arbeit/*.toc
-bachelor-arbeit/*.out
-bachelor-arbeit/*.blg
-bachelor-arbeit/*.bbl
-bachelor-arbeit/*.glg
-bachelor-arbeit/*.glo
-bachelor-arbeit/*.ist
-bachelor-arbeit/*.gls
-bachelor-arbeit/*.xdy
+*.aux
+*.log
+*.toc
+*.out
+*.blg
+*.bbl
+*.glg
+*.glo
+*.ist
+*.gls
+*.xdy
 
 *config.py
 *config.php
 *.bak
 *.sublime-workspace
 *.pickle
-*.log
 
 website/classifiers/nn-python/experiments/

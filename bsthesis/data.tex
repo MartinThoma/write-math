@@ -21,8 +21,8 @@ and lifting. The origin is at the upper left corner and get bigger to the right
 ($x$-coordinate) and to the bottom ($y$-coordinate).
 
 The data is stored and shared in JSON format. Each handdrawing is stored as a
-list of lines, where each line consists of tuples $(x, y, t)$, where $x$ and
-$y$ are canvas coordinates and $t$ is a timestamp in seconds. This timestamp
+list of lines, where each line consists of tuples $(x(t), y(t), t)$, where $x$
+and $y$ are canvas coordinates and $t$ is a timestamp in seconds. This timestamp
 gives the time in milliseconds from 1970.
 
 The time resolution between points as well as the resolution of the image
@@ -30,15 +30,17 @@ depends on the device that was used. However, most symbols have time resolution
 of about $\SI{20}{\milli\second}$ and are within a bounding box of a
 $250 \text{px} \times 250 \text{px}$.
 
-\section{Preprocessing}
-\subsection{Scaling and shifting}
-In many experiments the datapoints were scaled to fit into a unit square while
-keeping their aspect ratio. Afterwards, the points were shifted to the
-$(0, 1) \times (0, 1)$ unit square. The algorithm is given in pseudocode on
+\section{Preprocessing}\label{sec:preprocessing}
+\subsection{Normalization: Scaling and shifting}
+In \cite{Kirsch} the datapoints were scaled to fit into a unit square while
+keeping their aspect ratio. Afterwards, the points were shifted to
+the $(0, 1) \times (0, 1)$ unit square. The algorithm is given in pseudocode on
 \cpageref{alg:scale-and-shift}. It was shown in \cite{Kirsch,Huang09} that
 this kind of preprocessing boosts classification accuracy significantly.
 
-\section{Features}
+Another idea in preprocessing is resampling \cite{Guyon1991,ICASSP-94}.
+
+\section{Features}\label{sec:features}
 A number of different features have been suggested so far for on-line handwriting
 recognition. They can be grouped into local features and global features.
 Local features apply to a given point on the drawing plane and sometimes even
@@ -47,14 +49,40 @@ line or even the complete image.
 
 \subsection{Local features}
 \begin{itemize}
-    \item Curvature\cite{Manke95}
-    \item Speed\cite{Huang09}
-    \item Binary pen pressure\cite{Kosmala98,Kosmala11}
+    \item Coordinates of the current point\cite{Guyon1991}
+    \item Speed\cite{Huang09,ICASSP-94}
+    \item Binary pen pressure\cite{Kosmala98,Kosmala11,ICASSP-94}
     \item Direction\cite{Manke95,Huang06}
+    \item Curvature\cite{Manke95,ICASSP-94,Guyon1991}
     \item Bitmap-environment\cite{Manke95}
+    \item Hat-Feature\cite{ICASSP-94,Manke00}
 \end{itemize}
 
 \cite{Kosmala98,Kosmala11} suggest that speed is a bad feature, because it \enquote{highly inconsistent}.
+
+The \textbf{direction} $\text{dir}$ at the point $i$ can be described by the vector 
+$(\cos \theta(i), \sin \theta(i))$ as described in \cite{Guyon1991}.
+
+\begin{align}
+    \cos \theta(i) &= \frac{\Delta x^{(i)}}{\Delta s^{(i)}}\\
+    \sin \theta(i) &= \frac{\Delta y^{(i)}}{\Delta s^{(i)}}
+\end{align}
+
+where
+
+\begin{align}
+    \Delta x (i) &= x^{(i+1)} - x^{(i-1)}\\
+    \Delta y (i) &= y^{(i+1)} - x^{(i-1)}\\
+    \Delta s (i) &= \sqrt{\Delta (x^{(i)})^2 + \Delta y (y^{(i)})^2}
+\end{align}
+
+The \textbf{curvature} $\phi$ of the point $i$ can be described by the
+angle of the two neighboring points:
+
+% TODO!
+% \begin{align}
+%     \text{cur}(i) &= \text{dir}(i-1)
+% \end{align}
 
 \subsection{Global features}
 \begin{itemize}

@@ -33,6 +33,7 @@
 \usepackage{vmargin}          % Adjust margins in a simple way
 \usepackage{fancyhdr}         % Define simple headings
 \usepackage{url}
+\def\UrlBreaks{\do\/\do-}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{enumitem}       % Better than \usepackage{enumerate}, because it allows to set references
 \usepackage{braket}         % needed for \Set

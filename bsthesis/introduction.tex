@@ -1,13 +1,17 @@
 %!TEX root = thesis.tex
 \chapter{Introduction}\label{ch:Introduction}
 
-Handwriting recognition is the task of finding a proper textual representation
+\Gls{HWR} is the task of finding a proper textual representation
 given a handwritten symbol or sequence of symbols.
 
-In off-line handwriting recognition, all algorithms have to work on pixel image
-information of the handwriting. On-line handwriting recognition on the other
+In off-line \gls{HWR}, all algorithms have to work on pixel image
+information of the handwriting. On-line \gls{HWR} on the other
 hand can use the information how symbols were written. This thesis is about
-on-line handwriting recognition.
+on-line \gls{HWR}.
+
+On-line \gls{HWR} can use techniques of off-line \gls{HWR}, but studies have
+showed that on-line information does significantly improve recognition rates
+and also simplify algorithms.\cite{Guyon1991}
 
 \section{Steps in handwriting recognition}
 Most handwriting-recognizers perform the following steps in order to recognize
@@ -16,19 +20,28 @@ characters, symbols or words:
 \begin{enumerate}
     \item \textbf{Preprocessing}: Clean the data. This step is done to get rid
           of information that was either generated due to errors in the hardware %TODO: is that the right way to say it?
-          or is not needed at all.
-    \item {Normalization}: Data that belongs to the same class should
-         look as simmilar as possible. This usually includes scaling.
+          or is not needed at all. The details are explained in
+          \cref{sec:preprocessing}.
     \item \textbf{Segmentation}: The task of formula recognition can eventually
           be reduced to the task of symbol recognition combined with symbol
           placement. But before symbol recognition can be done the formula has
-          to be segmented.
+          to be segmented. As this thesis % can "bachelors thesis" be abbreviated to thesis?
+          is only about single symbol recognition, this step will not be discussed.
     \item \textbf{Feature computiation}: Features is high-level information derived
           from the raw data after preprocessing. Some systems simply take the
           result of the preprocessing step, but many compute new features. This
           might have the advantage that less training data is needed as the
           developer can use a priori knowledge to compute highly discriminative
-          features.
+          features.\\
+          Various features will be explained in \cref{sec:features}.
+\end{enumerate}
+
+After those steps, it's only a supervised machine learning task that consists of
+two parts
+
+\begin{enumerate}
+    \item \textbf{Learning}: This is most of the time adjusting parameters.
+    \item \textbf{Evaluation} of new datasets.
 \end{enumerate}
 
 \section{Mathematical notation}
