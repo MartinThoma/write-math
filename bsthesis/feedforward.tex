@@ -242,3 +242,23 @@ Suppose $k = \layernumber - 2$ (last hidden layer). Then:
     \item \Gls{learning rate}
     \item \Gls{learning rate decay}
 \end{itemize}
+
+\input{activation-functions}
+
+\section{Out of Vocabulary}
+It might be desirable to have a possibility to reject drawings that were not
+recognized. Such a rejection could be realized in two ways:
+
+\begin{itemize}
+    \item A threshold for the answer,
+    \item a minimum delta between the highest rated answer and the second
+          highest rated answer or
+    \item explicitly training for \gls{OOV}.
+\end{itemize}
+
+\section{Time Delay Neural Networks}
+
+Time Delay Neural Networks were successfully applied to symbol recognition task
+in the past\cite{Guyon1991,Manke01}.
+
+TODO!
