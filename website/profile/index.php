@@ -52,6 +52,10 @@ if (isset($_POST['language'])) {
     $handedness = $_POST['handedness'];
 
     if (validate_display_name($_POST['display_name'])) {
+        # If there is already another person with that username,
+        # MySQL will throw an error. (unique row)
+        # does_user_exist cannot simply be applied, as the username might
+        # not have changed
         $sql = "UPDATE `wm_users` SET ".
                "`display_name` = :display_name ".
                "WHERE `id` = :uid;";

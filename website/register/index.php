@@ -23,8 +23,10 @@ function does_email_exist($email) {
     return !($row->id == 0);
 }
 
-function validate_display_name($name) {
-    return preg_match('/^[A-Za-z]{1}[A-Za-z0-9_ ]{1,}[A-Za-z0-9]{1}$/',$name);
+function generate_display_name() {
+    $prefix = "user_";
+    $i = rand();
+    return $prefix.$i;
 }
 
 function create_new_user($display_name, $email, $pw) {
@@ -51,25 +53,29 @@ function create_new_user($display_name, $email, $pw) {
     return array("id" => $pdo->lastInsertId(), "confirmation_code" => $code);
 }
 
-if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['password'])) {
-    $display_name = $_POST['display_name'];
+
+if (isset($_POST['accept_terms']) && $_POST['accept_terms'] == 'on') {
+    $accept_terms = true;
+} else {
+    $accept_terms = false;
+}
+
+/* Start registration */
+if (isset($_POST['email']) && isset($_POST['password'])) {
     $pw    = $_POST['password'];
     $email = $_POST['email'];
+    do {
+        $display_name = generate_display_name();
+    } while (does_user_exist($display_name));
+    $_SESSION['display_name'] = $display_name;
 
-    if (!validate_display_name($display_name)) {
-        $msg[] = array("class" => "alert-warning",
-               "text" => "Your username didn't validate. It has to have at ".
-                         "least 3 symbols, where the first and the last is ".
-                         "a character. You may only use A-Z, a-z, 0-9, _, ".
-                         "spaces and -.");
-    } elseif (does_user_exist($display_name)) {
-        $msg[] = array("class" => "alert-warning",
-                       "text" => "There is already a user with ".
-                                 "display name '".$display_name."'.");
-    } elseif (does_email_exist($email)) {
+    if (does_email_exist($email)) {
         $msg[] = array("class" => "alert-warning",
                        "text" => "There is already a user with ".
                                  "email '".$email."'.");
+    } elseif(!$accept_terms) {
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "You have to accept the terms.");
     } else {
         $return = create_new_user($display_name, $email, $pw);
         $user_id = $return["id"];
@@ -97,6 +103,7 @@ if (isset($_POST['display_name']) && isset($_POST['email']) && isset($_POST['pas
     }
 }
 
+/* confirm email */
 if (isset($_GET['email']) && isset($_GET['code'])) {
     $sql = "UPDATE `wm_users` ".
            "SET status = 'activated' ".
@@ -115,7 +122,10 @@ echo $twig->render('register.twig', array('heading' => 'Register',
                                           'logged_in' => is_logged_in(),
                                           'display_name' => $_SESSION['display_name'],
                                           'file'=> "register",
-                                          'msg' => $msg
+                                          'msg' => $msg,
+                                          'accepted_terms' => $accepted_terms,
+                                          'email' => $email,
+                                          'password_plain' => $_POST['password']
                                        )
                   );
 ?>

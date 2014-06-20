@@ -55,6 +55,11 @@
             <li {% if file == 'ranking' %}class="active"{% endif %}><a href="../ranking">Ranking</a></li>
             <li {% if file == 'about' %}class="active"{% endif %}  ><a href="../about">About</a></li>
           </ul>
+        {% else %}
+          <ul class="nav navbar-nav navbar-left">
+            <li {% if file == 'ranking' %}class="active"{% endif %}><a href="../ranking">Ranking</a></li>
+            <li {% if file == 'about' %}class="active"{% endif %}  ><a href="../about">About</a></li>
+          </ul>
         {% endif %}
         {% if logged_in %}
           <ul class="nav navbar-nav navbar-right">

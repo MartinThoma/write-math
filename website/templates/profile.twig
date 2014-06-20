@@ -20,6 +20,11 @@
                          name="display_name"
                          placeholder="John Smith"
                          value="{{ display_name }}" />
+                     <p class="help-block">Please note that this name will be
+                published. As it will be published and is free to use,
+                a revealed identity cannot be undone. You can change your
+                display name as often as you like, but
+                all usernames are public.</p>
                 </div>
               </div>
 
@@ -32,26 +37,13 @@
                          name="email"
                          placeholder="john.smith@yahoo.com"
                          value="{{ email }}" />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="password" class="col-sm-2 control-label">Password</label>
-                <div class="col-sm-10">
-                  <input type="password" class="form-control"
-                         id="password" name="password"
-                         pattern=".{6,60}" required
-                         title="6 characters minimum"/>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="passwordconf" class="col-sm-2 control-label">Confirmation</label>
-                <div class="col-sm-10">
-                  <input type="password"
-                         class="form-control"
-                         id="passwordconf"
-                         name="passwordconf" />
+                   <p class="help-block">This email address will be used to
+                   help you recover your password in case you forgot it.
+                   It will not be shared with anybody and only be stored
+                   on this websites server.<br/>
+                   You could use <a href="http://mailinator.com/">mailinator</a>,
+                   a disposable email address service if you're still worried
+                   about confidentiality of your email address.</p>
                 </div>
               </div>
 
@@ -72,6 +64,9 @@
                             {% endif %}
                         {% endfor %}
                     </select>
+                    <p class="help-block">Users from different countries might
+                expect different results for their input. This information
+                is used to find out if that is the case.</p>
                 </div>
               </div>
 
@@ -93,6 +88,10 @@
                           <option value="r">right</option>
                         {% endif %}
                     </select>
+                    <p class="help-block">Handedness might influence how users
+                write symbols. This information could be used to create
+                adapted writing models which might result in better classification
+                accuracy.</p>
                 </div>
               </div>
 
@@ -102,6 +101,34 @@
 </div>
 </div>
 
+<div class="container-fluid well span6">
+  <div class="row-fluid">
+      <form action="" method="post" role="form">
+        
+        <div class="form-group">
+          <label for="password" class="col-sm-2 control-label">Password</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control"
+                   id="password" name="password"
+                   pattern=".{6,60}" required
+                   title="6 characters minimum"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="passwordconf" class="col-sm-2 control-label">Confirmation</label>
+          <div class="col-sm-10">
+            <input type="password"
+                   class="form-control"
+                   id="passwordconf"
+                   name="passwordconf" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+  </div>
+</div>
 <p><a href="?logout">Logout</a></p>
 
 {% if userworkers|length > 0 %}
