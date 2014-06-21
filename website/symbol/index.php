@@ -8,7 +8,7 @@ if (isset($_GET['edit'])) {
     $edit_flag = true;
 }
 
-if (isset($_GET['delete']) && get_uid() == 10) {
+if (isset($_GET['delete']) && is_admin()) {
     $sql = "DELETE FROM `wm_formula` WHERE `id` = :id LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete'], PDO::PARAM_INT);
@@ -17,7 +17,7 @@ if (isset($_GET['delete']) && get_uid() == 10) {
            "text" => "Symbol was deleted.");
 }
 
-if (isset($_POST['id']) && get_uid() == 10) {
+if (isset($_POST['id']) && is_admin()) {
     $formula_id = $_POST['id'];
     $sql = "SELECT `wm_renderings`.`svg` ".
            "FROM `wm_formula` ".

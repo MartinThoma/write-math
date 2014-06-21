@@ -75,4 +75,4 @@ website/raw-data
 *.sublime-workspace
 *.pickle
 
-website/classifiers/nn-python/experiments/
+website/clients/nn-python/experiments/

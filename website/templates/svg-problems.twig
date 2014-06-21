@@ -1,0 +1,11 @@
+{% extends "base.twig" %}
+{% block content %}
+    <p>{{ problematic_formulas|length }} formulas are problematic.</p>
+    {% for formula in problematic_formulas %}
+        <li><a href="../symbol/?id={{ formula.formula_id }}">{{ formula.formula_id }}</a>: {{ formula.problem_type }} 
+        {% if is_admin %}
+            - <a href="?formula_id={{ formula.formula_id }}&is_ok" type="button" class="btn btn-success">Formula is ok</a>
+        {% endif %}
+        </li>
+    {% endfor %}
+{% endblock %}

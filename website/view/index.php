@@ -7,7 +7,7 @@ include 'functions.php';
 if (isset($_GET['delete'])) {
     $sql = "DELETE FROM `wm_raw_draw_data` ".
            "WHERE `wm_raw_draw_data`.`id` = :raw_id AND ".
-           "(user_id = :user_id OR :user_id = 10)";
+           "(user_id = :user_id OR :user_id = 10)";  # TODO: Change to admin-group check
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':raw_id', $_GET['delete'], PDO::PARAM_INT);
     $uid = get_uid();
@@ -16,7 +16,7 @@ if (isset($_GET['delete'])) {
     header("Location: ../gallery/");
 } elseif (isset($_GET['delete_answer'])) {
     $sql = "DELETE FROM `wm_raw_data2formula` ".
-           "WHERE `id` = :id AND (user_id = :user_id OR :user_id = 10)";
+           "WHERE `id` = :id AND (user_id = :user_id OR :user_id = 10)";  # TODO: Change to admin-group check
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete_answer'], PDO::PARAM_INT);
     $uid = get_uid();
@@ -57,7 +57,7 @@ if (isset($_GET['raw_data_id'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
                "SET `accepted_formula_id` = :accepted_id ".
                "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
-               "(`user_id` = :uid OR :uid = 10)";
+               "(`user_id` = :uid OR :uid = 10)";  # TODO: Change to admin-group check
         $stmt = $pdo->prepare($sql);
         $uid = get_uid();
         $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);

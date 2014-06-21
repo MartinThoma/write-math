@@ -3,7 +3,7 @@ require_once '../svg.php';
 include '../init.php';
 require_once '../classification.php';
 
-if (!is_logged_in() || get_uid() != 10) {
+if (!is_logged_in() || !is_admin()) {
     header("Location: ../login");
 }
 
@@ -21,6 +21,12 @@ function endsWith($haystack, $needle) {
 if (isset($_GET['cache-flush'])) {
     if ($_GET['cache-flush'] == 'raw') {
         $files = glob('../raw-data/*');
+        foreach($files as $file){
+            if(is_file($file) && endsWith($file, ".svg")) {
+                unlink($file);
+            }
+        }
+        $files = glob('../formulas/*');
         foreach($files as $file){
             if(is_file($file) && endsWith($file, ".svg")) {
                 unlink($file);
