@@ -4,6 +4,13 @@ include '../init.php';
 function login($email, $upass) {
     global $msg, $pdo;
 
+    // Was user logged in as an IP-User before?
+    $ip_user = false;
+    if (isset($_SESSION['account_type']) 
+        && $_SESSION['account_type'] == "IP-User") {
+        $ip_user = get_uid();
+    }
+
     $sql = "SELECT `id`, `status`, `password` ".
            "FROM `wm_users` WHERE `email` = :email";
     $stmt = $pdo->prepare($sql);
@@ -38,6 +45,13 @@ function login($email, $upass) {
         $_SESSION['email'] = $email;
         $_SESSION['password'] = $user->password;
         $_SESSION['is_logged_in'] = true;
+
+        if ($ip_user) {
+			// if an ip user logs in, his ip user account should
+			// get merged with his new user account
+            merge_accounts($ip_id, $user->id);
+        }
+
         header('Location: ../train');
     } else {
         $_SESSION['is_logged_in'] = false;

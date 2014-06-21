@@ -202,8 +202,8 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'challenges' => $challenges,
                                        'i' => ($i+1),
                                        'challenge_id' => $challenge_id,
-                                       'formula' => $formula,
-                                       'random_mode' => $random_mode
+                                       'random_mode' => $random_mode,
+                                       'useragentstring' => $_SERVER['HTTP_USER_AGENT']
                                        )
                   );
 

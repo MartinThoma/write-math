@@ -5,7 +5,22 @@
 {% endblock %}
 
 {% block content %}
+{% if account_type == 'IP-User' %}
+<div class="alert alert-warning">
+    Although you are not logged in, the following information gets stored:
+    <ul>
+        <li>Your handdrawn symbols</li>
+        <li>Votes, flagging actions, answers</li>
+        <li>All other interactions with this site</li>
+        <li>{{ useragentstring }}</li>
+    </ul>
 
+    By using this service, you agree with that.
+</div>
+<div class="alert alert-info">
+    By logging in, you help me to improve the classifier.
+</div>
+{% endif %}
 {% if challenge_id == "" and formula.id != "" %}
     <!-- Train a single formula, but not part of a challenge -->
     <form method="post" action="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" onsubmit="return addCanvas();" id="form">

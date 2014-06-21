@@ -17,5 +17,7 @@ $loader = new Twig_Loader_Filesystem('../templates');
 $twig = new Twig_Environment($loader, array(
     'cache' => '../cache',
 ));
-
+$twig->addGlobal('logged_in', is_logged_in());
+$twig->addGlobal('display_name', $_SESSION['display_name']);
+$twig->addGlobal('account_type', $_SESSION['account_type']);
 $msg = array();

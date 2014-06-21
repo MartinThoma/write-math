@@ -1,6 +1,7 @@
 {% extends "base.twig" %}
 
 {% block content %}
+<h2>General actions</h2>
 <ul>
     <li><a href="?cache-flush=templates">Flush cache templates</a></li>
     <li><a href="?cache-flush=raw">Flush cache raw</a></li>
@@ -30,4 +31,63 @@
     <p class="bg-danger"><a href="?many_lines">Show all drawings with at least 5 lines.</a></p>
 {% endif %}
 
+<h2>Merge Accounts</h2>
+<form role="form" method="get">
+  <div class="form-group">
+    <label for="accountA">Account A (gets deleted)</label>
+    <input type="text" class="form-control"
+           id="accountA" name="accountA" placeholder="91">
+  </div>
+  <div class="form-group">
+    <label for="accountB">Account B (remains)</label>
+    <input type="text" class="form-control"
+           id="accountB" name="accountB" placeholder="10">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% if accountA != '' %}
+    <table class="table table-striped">
+        <tr>
+            <th></th>
+            <th>Account A</th>
+            <th>Account B</th>
+        </tr>
+        <tr>
+            <td>ID</td>
+            <td>{{ accountA.id }}</td>
+            <td>{{ accountB.id }}</td>
+        </tr>
+        <tr>
+            <td>Account Type</td>
+            <td>{{ accountA.account_type }}</td>
+            <td>{{ accountB.account_type }}</td>
+        </tr>
+        <tr>
+            <td>Display Name</td>
+            <td>{{ accountA.display_name }}</td>
+            <td>{{ accountB.display_name }}</td>
+        </tr>
+    </table>
+    <p>Merge account A (gets deleted) to account B (remains).</p>
+    <p><a href="?accountA={{ accountA.id }}&accountB={{ accountB.id }}&confirm=true">Do it!</a> ATTENTION! You cannot undo this step!</p>
+{% endif %}
+
+{% if inactive_users|length > 0 %}
+<h2>Inactive Users</h2>
+<table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>Display name</th>
+    </tr>
+    {% for user in inactive_users %}
+        <tr>
+            <td>{{ loop.index }} 
+                <a href="?delete_inactive_user={{ user.id }}"><img src="../icons/cross.png" alt="delete" /></a>
+            </td>
+            <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
+        </tr>
+    {% endfor %}
+</table>
+{% endif %}
 {% endblock %}

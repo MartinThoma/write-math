@@ -5,6 +5,22 @@
 {% endblock %}
 
 {% block content %}
+    {% if account_type == 'IP-User' %}
+    <div class="alert alert-warning">
+        Although you are not logged in, the following information gets stored:
+        <ul>
+            <li>Your handdrawn symbols</li>
+            <li>Votes, flagging actions, answers</li>
+            <li>All other interactions with this site</li>
+            <li>{{ useragentstring }}</li>
+        </ul>
+
+        By using this service, you agree with that.
+    </div>
+    <div class="alert alert-info">
+        By logging in, you help me to improve the classifier.
+    </div>
+    {% endif %}
     <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>

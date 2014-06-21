@@ -61,7 +61,7 @@
             <li {% if file == 'about' %}class="active"{% endif %}  ><a href="../about">About</a></li>
           </ul>
         {% endif %}
-        {% if logged_in %}
+        {% if logged_in and account_type != 'IP-User' %}
           <ul class="nav navbar-nav navbar-right">
             <li {% if file == 'profile' %}class="active"{% endif %}><a href="../profile">{{ display_name }}</a></li>
           </ul>

@@ -2,7 +2,8 @@
 require_once '../svg.php';
 include '../init.php';
 
-if (!is_logged_in()) {
+// IP-Users should not be able to access this page
+if (!is_logged_in() || $_SESSION['account_type'] == 'IP-User') {
     header("Location: ../login");
 }
 

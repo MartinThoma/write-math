@@ -2,6 +2,7 @@
 {% import "pagination.twig" as pagination %}
 
 {% block content %}
+{% if user %}
 <div class="container-fluid well span6">
   <div class="row-fluid">
         <div class="span2" >
@@ -73,5 +74,8 @@
   {% endfor %}
  </ul>
 
-{{ pagination.pagination(currentPage, '&id=' ~ user_id, total, pages, 5) }}
+{{ pagination.pagination(currentPage, '&id=' ~ user.id, total, pages, 5) }}
+{% else %}
+<p>This user seems not to exist.</p>
+{% endif %}
 {% endblock %}

@@ -5,13 +5,14 @@
 			"follow_symlinks": true,
 			"path": ".",
             "folder_exclude_patterns": ["cache", "vendor", "css", "icons"],
-            "file_exclude_patterns": ["*.lock", "formulas/*.svg"]
+            "file_exclude_patterns": ["*.lock", "formulas/*.svg", "*.png", "*.ico"]
 		}
 	],
     "settings":
     {
         "tab_size": 4,
         "translate_tabs_to_spaces": true,
-        "use_tab_stops": true
+        "use_tab_stops": true,
+        "detect_indentation": false
     }
 }

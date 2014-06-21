@@ -175,7 +175,8 @@ echo $twig->render('classify.twig', array('heading' => 'Classify',
                                        'display_name' => $_SESSION['display_name'],
                                        'formula_ids' => $formula_ids,
                                        'raw_data_id' => $raw_data_id,
-                                       'msg' => $msg
+                                       'msg' => $msg,
+                                       'useragentstring' => $_SERVER['HTTP_USER_AGENT']
                                        )
                   );
 

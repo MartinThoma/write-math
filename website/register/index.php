@@ -1,57 +1,7 @@
 <?php
 include '../init.php';
+include '../user.func.php';
 
-function does_user_exist($display_name) {
-    global $pdo;
-
-    $sql = "SELECT `id` FROM `wm_users` WHERE `display_name` = :display_name";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
-    $stmt->execute();
-    $row = $stmt->fetchObject();
-    return !($row->id == 0);
-}
-
-function does_email_exist($email) {
-    global $pdo;
-
-    $sql = "SELECT `id` FROM `wm_users` WHERE `email` = :email";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->execute();
-    $row = $stmt->fetchObject();
-    return !($row->id == 0);
-}
-
-function generate_display_name() {
-    $prefix = "user_";
-    $i = rand();
-    return $prefix.$i;
-}
-
-function create_new_user($display_name, $email, $pw) {
-    global $pdo;
-
-    $sql = "INSERT INTO  `wm_users` (".
-           "`display_name` ,".
-           "`email` ,".
-           "`password`, ".
-           "`confirmation_code`, ".
-           "`status` ".
-           ") VALUES (".
-           ":display_name, :email, :password, ".
-           ":confirmation_code, 'deactivated');";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':display_name', $display_name, PDO::PARAM_STR);
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $hash = password_hash($pw, PASSWORD_BCRYPT, array("cost" => 10));
-    $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
-    $code = md5(rand());
-    $stmt->bindParam(':confirmation_code', $code, PDO::PARAM_STR);
-    $stmt->execute();
-
-    return array("id" => $pdo->lastInsertId(), "confirmation_code" => $code);
-}
 
 
 if (isset($_POST['accept_terms']) && $_POST['accept_terms'] == 'on') {
@@ -105,16 +55,13 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
 /* confirm email */
 if (isset($_GET['email']) && isset($_GET['code'])) {
-    $sql = "UPDATE `wm_users` ".
-           "SET status = 'activated' ".
-           "WHERE `email` = :email AND `confirmation_code` = :code";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':email', $_GET['email'], PDO::PARAM_STR);
-    $stmt->bindParam(':code', $_GET['code'], PDO::PARAM_STR);
-    $stmt->execute();
-    if ($stmt->rowCount() == 1) {
+    $return = activate_user($_GET['email'], $_GET['code']);
+    if ($return) {
         $msg[] = array("class" => "alert-success",
-                       "text" => "Congratulations. Your account was activated.");
+               "text" => "Congratulations. Your account was activated.");
+    } else {
+        $msg[] = array("class" => "alert-warning",
+               "text" => "This account could not be activated.");
     }
 }
 
