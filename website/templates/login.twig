@@ -1,7 +1,7 @@
 {% extends "base.twig" %}
 
 {% block content %}
-    {% if logged_in %}
+    {% if logged_in and account_type != 'IP-User' %}
         <div class="alert alert-info">You are already logged in as 
             '{{ display_name }}' with email '{{ email }}'.
         </div>

@@ -127,9 +127,9 @@ if (isset($_GET['raw_data_id'])) {
         $user_id = get_uid();
         $latex = trim($_POST['latex']);
         $raw_data_id = $_GET['raw_data_id'];
-        $mode = trim($_POST['mode']);
-        $packages = trim($_POST['packages']);
-        add_classification($user_id, $raw_data_id, $latex, $mode, $packages);
+        $mode = 'bothmodes';
+        //$packages = trim($_POST['packages']);
+        add_classification($user_id, $raw_data_id, $latex, $mode);
     }
 
     // Get all probable classifications

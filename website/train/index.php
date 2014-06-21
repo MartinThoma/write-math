@@ -6,6 +6,7 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+$heading_html = 'Train';
 $challenge_id = "";
 $i = "";
 $formula_id = "";
@@ -116,6 +117,7 @@ if (isset($_GET['rand'])) {
     $i = intval($_GET['i']);
     $challenge_id = intval($_GET['challenge_id']);
 
+    # TODO: Fix this shit
     while (true) {
         $sql = "SELECT `formula_id` FROM `wm_formula2challenge` ".
                "WHERE `challenge_id` = :challenge_id ".
@@ -177,7 +179,8 @@ if (isset($_GET['rand'])) {
     $formula_ids = $stmt->fetchAll();
 
     $sql = "SELECT `wm_challenges`.`id` , `challenge_name`, ".
-           "sum(case when `raw_data_id` is null then 1 else 0 end) as `missing` ".
+           "sum(case when `raw_data_id` is null then 1 else 0 end) as `missing`, ".
+           "sum(case when `raw_data_id` is null then 1 else 1 end) as `total`, ".
            "FROM `wm_challenges` ".
            "JOIN `wm_formula2challenge` ".
            "ON `challenge_id` = `wm_challenges`.`id` ".
@@ -192,7 +195,7 @@ if (isset($_GET['rand'])) {
     $challenges = $stmt->fetchAll();
 }
 
-echo $twig->render('train.twig', array('heading' => 'Train',
+echo $twig->render('train.twig', array('heading' => $heading_html,
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
                                        'file'=> "train",
@@ -202,6 +205,7 @@ echo $twig->render('train.twig', array('heading' => 'Train',
                                        'challenges' => $challenges,
                                        'i' => ($i+1),
                                        'challenge_id' => $challenge_id,
+                                       'formula' => $formula,
                                        'random_mode' => $random_mode,
                                        'useragentstring' => $_SERVER['HTTP_USER_AGENT']
                                        )

@@ -51,7 +51,7 @@
     <th>Operations</th>
     <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
   </tr>
-  {% elseif logged_in %}
+  {% elseif logged_in and account_type != 'IP-User' %}
   <tr>
     <th>Operations</th>
     <td><a href="?flag={{ raw_data_id }}" type="button" class="btn btn-danger">Flag</a></td>
@@ -149,8 +149,11 @@
        <div class="controls"> 
          <textarea name="latex" id="latex" class="form-control" rows="3"></textarea>
        </div>
+       <p class="help-block">Please add only the code you would add in the
+       document body. All packages / mathmode information will be added
+       automatically.</p>
      </div>
-      <div class="control-group">
+<!--       <div class="control-group">
        <label class="control-label" for="mode">Mode</label>
        <div class="controls"> 
          <select class="form-control" id="mode" name="mode">
@@ -185,7 +188,7 @@
          <input type="text" class="form-control" placeholder="amsmath" name="packages" id="packages" list="latex_packages"/>
        </div>
        <p class="help-block">Separate packages by spaces.</p>
-     </div>
+     </div> -->
      <button type="submit" class="btn btn-success">Submit</button>
    </form>
 {% endblock %}

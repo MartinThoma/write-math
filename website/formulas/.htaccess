@@ -1,4 +1,7 @@
 Options +Indexes
 IndexOptions +FancyIndexing
 # The following path has to be adjusted. It has to be an absolute path.
+# Testing:
 ErrorDocument 404 /write-math/website/formulas/cache-404.php
+# Online:
+# ErrorDocument 404 /write-math/formulas/cache-404.php

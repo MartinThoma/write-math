@@ -1,3 +1,3 @@
 <?php
-header("Location: about");
+header("Location: classify");
 ?>

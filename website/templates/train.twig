@@ -7,6 +7,7 @@
 {% block content %}
 {% if account_type == 'IP-User' %}
 <div class="alert alert-warning">
+    <h4>Disclaimer</h4>
     Although you are not logged in, the following information gets stored:
     <ul>
         <li>Your handdrawn symbols</li>
@@ -18,7 +19,7 @@
     By using this service, you agree with that.
 </div>
 <div class="alert alert-info">
-    By logging in, you help me to improve the classifier.
+    By <a href="../login">logging in</a>, you help me to improve the classifier.
 </div>
 {% endif %}
 {% if challenge_id == "" and formula.id != "" %}
@@ -77,7 +78,9 @@
           <div class="panel-heading">
             <h3 class="panel-title">Draw here
             <button type="submit" class="offset1 btn btn-success">Submit</button>
-            <a href="?challenge_id={{ challenge_id }}&i={{ i }}" class="btn btn-danger">Clear</a></h3>
+            <a href="?challenge_id={{ challenge_id }}&i={{ i }}" class="btn btn-danger">Clear</a>
+            <img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="50" style="width:50px;height:50px;float:right;">
+            </h3>
           </div>
           <div class="panel-body">
             <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>

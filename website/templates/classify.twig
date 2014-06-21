@@ -7,6 +7,7 @@
 {% block content %}
     {% if account_type == 'IP-User' %}
     <div class="alert alert-warning">
+        <h4>Disclaimer</h4>
         Although you are not logged in, the following information gets stored:
         <ul>
             <li>Your handdrawn symbols</li>
@@ -18,7 +19,7 @@
         By using this service, you agree with that.
     </div>
     <div class="alert alert-info">
-        By logging in, you help me to improve the classifier.
+        By <a href="../login">logging in</a>, you help me to improve the classifier.
     </div>
     {% endif %}
     <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
@@ -33,7 +34,7 @@
         var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
         var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
 
-        width *= 0.9;
+        width *= 0.8;
         height *= 0.8;
 
         if (width > 400) {
