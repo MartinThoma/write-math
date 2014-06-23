@@ -1,0 +1,5 @@
+D:\Dev - Running Programms\CSharp\Programme\LatexCounter\LatexMathSymbolCounter\LatexMathSymbolCounter\bin\Debug\lmsc.exe.config
+D:\Dev - Running Programms\CSharp\Programme\LatexCounter\LatexMathSymbolCounter\LatexMathSymbolCounter\bin\Debug\lmsc.exe
+D:\Dev - Running Programms\CSharp\Programme\LatexCounter\LatexMathSymbolCounter\LatexMathSymbolCounter\bin\Debug\lmsc.pdb
+D:\Dev - Running Programms\CSharp\Programme\LatexCounter\LatexMathSymbolCounter\LatexMathSymbolCounter\obj\Debug\lmsc.exe
+D:\Dev - Running Programms\CSharp\Programme\LatexCounter\LatexMathSymbolCounter\LatexMathSymbolCounter\obj\Debug\lmsc.pdb
