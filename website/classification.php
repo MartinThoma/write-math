@@ -41,6 +41,31 @@ function pointList($linelistP) {
     return $pointlist;
 }
 
+function get_bounding_box2($pointLinelist) {
+    $minx = $pointLinelist[0][0]["x"];
+    $maxx = $pointLinelist[0][0]["x"];
+    $miny = $pointLinelist[0][0]["y"];
+    $maxy = $pointLinelist[0][0]["y"];
+    foreach ($pointLinelist as $line) {
+        foreach ($line as $p) {
+            if ($p["x"] < $minx) {
+                $minx = $p["x"];
+            }
+            if ($p["x"] > $maxx) {
+                $maxx = $p["x"];
+            }
+            if ($p["y"] < $miny) {
+                $miny = $p["y"];
+            }
+            if ($p["y"] > $maxy) {
+                $maxy = $p["y"];
+            }
+        }
+    }
+    return array("minx" => $minx, "maxx" => $maxx,
+                 "miny" => $miny, "maxy" => $maxy);
+}
+
 function get_bounding_box($pointlist) {
     $minx = $pointlist[0]["x"];
     $maxx = $pointlist[0]["x"];

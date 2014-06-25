@@ -24,7 +24,7 @@ if (isset($_GET['delete'])) {
     $stmt->execute();
     $msg[] = array("class" => "alert-info",
                     "text" => "Your answer was deleted.");
-} elseif (isset($_GET['flag'])) {
+} elseif (isset($_GET['flag']) && $_SESSION['account_type'] != 'IP-User') {
     $sql = "INSERT INTO `wm_flags` (`user_id`, `raw_data_id`)".
            "VALUES (:uid,  :raw_data_id);";
     $stmt = $pdo->prepare($sql);
@@ -57,7 +57,7 @@ if (isset($_GET['raw_data_id'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
                "SET `accepted_formula_id` = :accepted_id ".
                "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
-               "(`user_id` = :uid OR :uid = 10)";  # TODO: Change to admin-group check
+               "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
         $stmt = $pdo->prepare($sql);
         $uid = get_uid();
         $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
@@ -76,6 +76,23 @@ if (isset($_GET['raw_data_id'])) {
                                      "a classification of a formula you ".
                                      "did not write. ".
                                      "Or multiple form submission.");
+        }
+    } elseif (isset($_GET['unaccept'])) {
+        $sql = "UPDATE `wm_raw_draw_data` ".
+               "SET `accepted_formula_id` = NULL ".
+               "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
+               "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+        $stmt = $pdo->prepare($sql);
+        $uid = get_uid();
+        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+        $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+        $stmt->execute();
+        if ($stmt->rowCount() != 1) {
+            $msg[] = array("class" => "alert-warning",
+                           "text" => "You could not unaccept that answer. ".
+                                     "This happens when you try to unaccept ".
+                                     "a classification of a formula you ".
+                                     "did not write. ");
         }
     } elseif (isset($_GET['vote'])) {
         // TODO: Check if user has right to vote

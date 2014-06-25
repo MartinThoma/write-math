@@ -1,0 +1,102 @@
+{% extends "base.twig" %}
+
+{% block header %}
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+
+ <script type='text/javascript'>
+     window.onload=function(){
+    var canvas = new fabric.Canvas('galleryImage');
+    var group = new fabric.Group();
+    canvas.add(group);
+
+    var path = new fabric.Path('{{ image.path }}');
+    path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+/*    path.scale(Math.min(canvas.height / path.height, 
+                                canvas.width  / path.width));*/
+    canvas.add(path);
+
+    {% if show_points %}
+    var group = new fabric.Group([], {});
+    var point_array = {{ points|raw }};
+    point_array.forEach(function(entry) {
+        circle = new fabric.Circle({
+            radius: 3, fill: 'green', left: entry['x'], top: entry['y']
+        });
+        group.addWithUpdate(circle);
+    });
+    canvas.add(group);
+    {% endif %}
+
+
+    canvas.renderAll();
+    path.center();
+    group.center();
+    /* Make sure that touch events do nothing */
+    canvas.deactivateAll();
+    canvas.selection = false;
+    canvas.forEachObject(function(o) {
+        o.selectable = false;
+    });
+}
+ </script>
+{% endblock %}
+
+{% block content %}
+    <table>
+        <tr>
+            <td><canvas id="galleryImage" width="400" height="400"></canvas></td>
+            <td>
+                
+<form role="form" method="get">
+  <div class="form-group">
+    <label for="raw_data_id">Raw data id</label>
+    <input type="number"
+           class="form-control"
+           id="raw_data_id" name="raw_data_id"
+           placeholder="31"
+           value="{{ image.id }}" />
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="show_points"
+             {% if show_points %}checked="checked"{% endif %}
+             /> Show points
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="scale_and_center"
+             {% if scale_and_center %}checked="checked"{% endif %}
+             /> Scale and center
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="douglas_peucker"
+             {% if douglas_peucker %}checked="checked"{% endif %}
+             /> Douglas Peucker <input type="text" name="epsilon" value="{{epsilon}}"/>
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="cubic_spline"
+             {% if cubic_spline %}checked="checked"{% endif %}
+             /> Cubic spline
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<a href="../view?raw_data_id={{ image.id }}">Raw data information</a>
+            </td>
+        </tr>
+    </table>
+    
+
+    <h2>Raw data</h2>
+    <pre>{{ image.data }}</pre>
+{% endblock %}

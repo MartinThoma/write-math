@@ -44,7 +44,11 @@
   </tr>
   <tr>
     <th>accepted_formula_id</th>
-    <td>{{ image_data.accepted_formula_id }}</td>
+    <td><a href="../symbol/?id={{ image_data.accepted_formula_id }}">{{ image_data.accepted_formula_id }}</a></td>
+  </tr>
+  <tr>
+    <th>Analyze</th>
+    <td><a href="../render/?raw_data_id={{ raw_data_id }}">Preprocessing</a></td>
   </tr>
   {% if image_data.user_id == uid or uid == 10 %}
   <tr>
@@ -85,7 +89,7 @@
           </td>
           <td>
             {% if answer.formula_id == image_data.accepted_formula_id %}
-              <img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" />
+              <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" /></a>
             {% else %}
           <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
 "src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
