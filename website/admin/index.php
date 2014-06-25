@@ -106,7 +106,8 @@ if (isset($_GET['accountA']) && isset($_GET['accountB'])
 
 $sql = "SELECT `wm_flags`.`id`, `user_id`, `raw_data_id`, `display_name` ".
        "FROM `wm_flags` ".
-       "JOIN `wm_users` ON `wm_users`.`id` = `user_id`";
+       "JOIN `wm_users` ON `wm_users`.`id` = `user_id` ".
+       "ORDER BY `display_name` ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $flags = $stmt->fetchAll();
@@ -116,7 +117,8 @@ $sql = "SELECT  `wm_users`.`id`, `email`, `display_name` FROM `wm_users` ".
        "LEFT JOIN `wm_raw_draw_data` ".
        "ON `wm_raw_draw_data`.`user_id` = `wm_users`.`id` ".
        "WHERE `account_type` = 'IP-User' ".
-       "AND `wm_raw_draw_data`.`user_id` IS NULL";
+       "AND `wm_raw_draw_data`.`user_id` IS NULL ".
+       "LIMIT ".intval(isset($_GET['page_users'])?isset($_GET['page_users']):0).", 50";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $inactive_users = $stmt->fetchAll();
