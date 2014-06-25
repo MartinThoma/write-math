@@ -1,30 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import logging
 FORMAT = "%(asctime)-15s %(message)s"
 logging.basicConfig(filename='example.log',
-                    level=logging.DEBUG,
+                    level=logging.INFO,
                     format=FORMAT)
 logging.debug("Test")
 import re
-import urllib2
 import MySQLdb
 import MySQLdb.cursors
 from dbconfig import mysql
 import os
-import glob
-import fnmatch
-
-
-def extract_wikipedia_article(article_name):
-    content  = urllib2.urlopen('http://de.wikipedia.org/w/api.php?format=json&action=query&titles=Laplace-Operator&prop=revisions&rvprop=content').read()
-    mathexpressions = extract_math_mode(content, is_wikipedia=True)
-    for expr in mathexpressions:
-        expr = expr.replace("\\\\", "\\")
-        symbols = extract_symbols(expr)
-        for symbol in symbols:
-            print(symbol+" in "+expr)
+from argparse import ArgumentParser
+import json
+import parse_folder
+import sys
 
 
 def get_known_symbols():
@@ -97,7 +89,9 @@ def replace_definitions(text, basepath):
         text = text.replace(findtext, replacetext)
 
     # \def
-    defcommand = re.compile(r"\\def(\\[A-Za-z][A-Za-z0-9]*)\{((?:[^\{]*?(?:\{(?:.*?)\}){0,3})+)\}")
+    curly = "(?:\{(?:.*?)\})"
+    defcommand = re.compile(r"\\def(\\[A-Za-z][A-Za-z0-9]*)\{((?:[^\{]*?"
+                            + curly + "{0,3})+)\}")
     for findtext, replacetext in defcommand.findall(text):
         text = text.replace(findtext, replacetext)
     # remove the command itself
@@ -148,12 +142,6 @@ def get_file_content(filename):
     return content
 
 
-def is_latex_root(filename):
-    with open(filename) as f:
-        content = f.read()
-    return "\\documentclass" in content
-
-
 if __name__ == "__main__":
     logging.info("Start establishing connection")
     connection = MySQLdb.connect(host=mysql['host'],
@@ -167,21 +155,20 @@ if __name__ == "__main__":
     logging.info("Start getting symbols")
     known_symbols = get_known_symbols()
     logging.info("Got symbols")
-    matches = []
-    for root, dirnames, filenames in os.walk('/home/moose/Downloads/LaTeX-examples/'):
-      for filename in fnmatch.filter(filenames, '*.tex'):
-          matches.append(os.path.join(root, filename))
-    for filename in matches:
-        if is_latex_root(filename):
-            print("yes"+filename)
-            # filename = "/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/Kapitel1.tex"
-            # filename = "/home/moose/Downloads/1406.5173v1_FILES/ms.tex"
-            # filename = "/home/moose/Downloads/LaTeX-examples/documents/GeoTopo/GeoTopo.tex"
-            known_symbols = extract_by_deleting(filename, known_symbols=known_symbols)
-    logging.info("#"*80)
-    logging.info("Results:")
-    for latex, counter in sorted(known_symbols.items(),
-                                 key=lambda x: x[1],
-                                 reverse=True):
-        if counter > 0:
-            logging.info("%s: %i" % (latex, counter))
+    parser = ArgumentParser()
+    filename = "/home/moose/Downloads/1406.5173v1_FILES/ms.tex"
+    parser.add_argument("-f", "--file", dest="filename",
+                        default=filename,
+                        help="get language stats for this file",
+                        metavar="FILE")
+    parser.add_argument("-o", "--output", dest="output",
+                        default=sys.stdout,
+                        help="get language stats for this file",
+                        metavar="FILE")
+    args = parser.parse_args()
+    known_symbols = extract_by_deleting(args.filename, known_symbols)
+    if args.output != sys.stdout:
+        with open(args.output, "w") as f:
+            print(json.dumps(known_symbols), file=f)
+    else:
+        print(json.dumps(known_symbols))
