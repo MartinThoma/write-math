@@ -81,23 +81,48 @@ if (isset($_GET['rand'])) {
     $random_mode = true;
     $sql = "SELECT `id`, `formula_name`, `description`, `mode`, `best_rendering` ".
            "FROM  `wm_formula` ".
-           "WHERE `id` NOT IN (".
-               "SELECT `formula_id` FROM wm_formula_svg_missing ".
-               "WHERE   user_id = :uid ".
-           ") AND `id` NOT IN ( ".
+           "WHERE `id` NOT IN ( ".
                "SELECT `formula_id` ".
                "FROM  `wm_raw_data2formula` ".
                "WHERE `user_id` = :uid".
            ") AND `id` NOT IN ( ".
+                "SELECT `wm_formula`.`id` ".
+                "FROM  `wm_raw_draw_data` ".
+                "JOIN  `wm_formula` ON  `wm_formula`.`id` =  `accepted_formula_id` ".
+                "GROUP BY `accepted_formula_id` ".
+                "HAVING COUNT(`wm_formula`.`id`) < 20 OR COUNT(`wm_formula`.`id` ) > 100 ".
+           ") AND `id` NOT IN ( ".
                "SELECT `formula_id` ".
                "FROM  `wm_user_unknown_formula` ".
                "WHERE `user_id` = :uid".
-           ") ORDER BY RAND( ) LIMIT 0, 1";
+            ") AND `formula_type` = 'single symbol' ".
+           "ORDER BY RAND( ) LIMIT 0, 1";
     $stmt = $pdo->prepare($sql);
     $user_id = get_uid();
     $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $formula = $stmt->fetchObject();
+    if (!$formula) {
+        $sql = "SELECT `id`, `formula_name`, `description`, `mode`, `best_rendering` ".
+               "FROM  `wm_formula` ".
+               "WHERE `id` NOT IN ( ".
+                "SELECT `wm_formula`.`id` ".
+                "FROM  `wm_raw_draw_data` ".
+                "JOIN  `wm_formula` ON  `wm_formula`.`id` =  `accepted_formula_id` ".
+                "GROUP BY `accepted_formula_id` ".
+                "HAVING COUNT(`wm_formula`.`id`) < 20 OR COUNT(`wm_formula`.`id` ) > 100 ".
+               ") AND `id` NOT IN ( ".
+                   "SELECT `formula_id` ".
+                   "FROM  `wm_user_unknown_formula` ".
+                   "WHERE `user_id` = :uid".
+               ") AND `formula_type` = 'single symbol' ".
+               "ORDER BY RAND( ) LIMIT 0, 1";
+        $stmt = $pdo->prepare($sql);
+        $user_id = get_uid();
+        $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $formula = $stmt->fetchObject();
+    }
 } elseif (isset($_GET['formula_id'])) {
     $formula_id = $_GET['formula_id'];
     $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, ".
@@ -105,7 +130,7 @@ if (isset($_GET['rand'])) {
            "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
            "FROM `wm_formula` ".
            "LEFT JOIN `wm_raw_data2formula` ".
-           "ON `formula_id` = `wm_formula`.`id` AND `user_id` = :uid ".
+           "ON `formula_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
            "WHERE `wm_formula`.`id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
@@ -170,7 +195,7 @@ if (isset($_GET['rand'])) {
            "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
            "FROM `wm_formula` ".
            "LEFT JOIN `wm_raw_data2formula` ".
-           "ON `formula_id` = `wm_formula`.`id` AND `user_id` = :uid ".
+           "ON `formula_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
            "GROUP BY formula_name ".
            "ORDER BY `wm_formula`.`id` ASC";
     $stmt = $pdo->prepare($sql);
@@ -180,7 +205,7 @@ if (isset($_GET['rand'])) {
 
     $sql = "SELECT `wm_challenges`.`id` , `challenge_name`, ".
            "sum(case when `raw_data_id` is null then 1 else 0 end) as `missing`, ".
-           "sum(case when `raw_data_id` is null then 1 else 1 end) as `total`, ".
+           "sum(case when `raw_data_id` is null then 1 else 1 end) as `total` ".
            "FROM `wm_challenges` ".
            "JOIN `wm_formula2challenge` ".
            "ON `challenge_id` = `wm_challenges`.`id` ".
@@ -189,6 +214,7 @@ if (isset($_GET['rand'])) {
            "AND `user_id` = :uid ".
            "GROUP BY `challenge_name` ".
            "ORDER BY `challenge_name` ASC";
+
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->execute();
