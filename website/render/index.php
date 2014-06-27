@@ -20,7 +20,7 @@ function scale_and_center($pointlist, $center = false) {
         $factorY = 1./$height;
     }
 
-    $factor = min($factorX, $factorY)*400;
+    $factor = min($factorX, $factorY)*390;
     $addx = 0;
     $addy = 0;
 
@@ -37,7 +37,8 @@ function scale_and_center($pointlist, $center = false) {
     foreach ($pointlist as $key1 => $line) {
         foreach ($line as $key2 => $p) {
             $pointlist[$key1][$key2] = array("x" => ($p["x"] - $minx)*$factor + $addx,
-                                     "y" => ($p["y"] - $miny)*$factor + $addy);
+                                     "y" => ($p["y"] - $miny)*$factor + $addy,
+                                     "time" => $p["time"]-$mint);
         }
     }
 
@@ -168,10 +169,10 @@ function get_spline($points) {
     for ($i=0; $i < $n; $i++) { 
         $spline[] = array("u" => $points[$i]["x"], 
                           "v" => $points[$i+1]["x"],
-                          "a" => float($x[4*$i+0]),
-                          "b" => float($x[4*$i+1]),
-                          "c" => float($x[4*$i+2]),
-                          "d" => float($x[4*$i+3]));
+                          "a" => $x[4*$i+0],
+                          "b" => $x[4*$i+1],
+                          "c" => $x[4*$i+2],
+                          "d" => $x[4*$i+3]);
     }
 
     return $spline;
@@ -180,7 +181,10 @@ function get_spline($points) {
 function evaluate_spline($spline, $x) {
     foreach ($spline as $t) {
         if ($t['u'] <= $x and $x <= $t['v']) {
-            return $t['a']*pow($x, 3) + $t['b']*pow($x, 2) + $t['c']*$x + $t['d'];
+            return $t['a']*pow($x, 3)
+                 + $t['b']*pow($x, 2)
+                 + $t['c']*$x
+                 + $t['d'];
         }
     }
 }
@@ -198,25 +202,34 @@ function calculate_spline_points($pointlist, $interpolationpoints) {
         $x = array();
         $y = array();
         foreach ($line as $p) {
-            $x[$p['t']] = $p['x'];
-            $y[$p['t']] = $p['y'];
+            $x[] = array("x" => $p['time'], "y" => $p['x']);
+            $y[] = array("x" => $p['time'], "y" => $p['y']);
         }
+
         $spline_x = get_spline($x);
         $spline_y = get_spline($y);
-        $minx = $spline_x[0]['u'];
-        $maxx = $spline_x[0]['v'];
-        $miny = $spline_y[0]['u'];
-        $maxy = $spline_y[0]['v'];
-        for ($i=0; $i < $interpolationpoints; $i++) { 
-            $new_x = evaluate_spline($spline_x, $minx + $i*($maxx - $minx)/$interpolationpoints);
-            $new_y = evaluate_spline($spline_y, $miny + $i*($maxy - $miny)/$interpolationpoints);
-            $new_line[] = array("x" => $new_x, "y" => $new_y);
+        $mint = $spline_x[0]['u'];
+        $maxt = end($spline_x)['v'];
+        for ($i=0; $i < $interpolationpoints; $i++) {
+            $t = $mint + $i*($maxt - $mint) /($interpolationpoints-1);
+            $new_x = evaluate_spline($spline_x, $t);
+            $new_y = evaluate_spline($spline_y, $t);
+            $new_line[] = array("x" => $new_x, "y" => $new_y, "time" => $t);
         }
         $new_points[] = $new_line;
     }
     return $new_points;
 }
 
+function count_points($pointlist) {
+    $counter = 0;
+    foreach ($pointlist as $line) {
+        foreach ($line as $p) {
+            $counter += 1;
+        }
+    }
+    return $counter;
+}
 
 if (isset($_GET['raw_data_id'])) {
     $sql = "SELECT `id`, `data` FROM `wm_raw_draw_data` WHERE `id` = :rid";
@@ -228,11 +241,22 @@ if (isset($_GET['raw_data_id'])) {
     $scale_and_center = isset($_GET["scale_and_center"]) && $_GET["scale_and_center"] == "on";
     $cubic_spline = isset($_GET["cubic_spline"]) && $_GET["cubic_spline"] == "on";
     $douglas_peucker = isset($_GET["douglas_peucker"]) && $_GET["douglas_peucker"] == "on";
+
     if (isset($_GET["epsilon"]) && $_GET["epsilon"] > 0) {
-         $epsilon = $_GET["epsilon"];
-     } else {
+        $epsilon = $_GET["epsilon"];
+    } else {
         $epsilon = 10;
-     }
+    }
+
+    if (isset($_GET["cubic_spline_points"]) && $_GET["cubic_spline_points"] >= 2) {
+        $cubic_spline_points = $_GET["cubic_spline_points"];
+    } else {
+        $cubic_spline_points = 20;
+    }
+
+    if ($cubic_spline_points > 100 && get_uid() != 10) {
+        $cubic_spline_points = 100;
+    }
 
     if ($scale_and_center) {
         $image["data"] = json_encode(scale_and_center(json_decode($image["data"], true), true));
@@ -246,8 +270,22 @@ if (isset($_GET['raw_data_id'])) {
     // Cubic spline interpolation
     if($cubic_spline) { #TODO: Fix bugs
         $pointlist = json_decode($image["data"], true);
-        $pointlist = calculate_spline_points($pointlist, $interpolationpoints);
-        $image["data"] = json_encode($pointlist);
+        if (count_points($pointlist) > 100) {
+            $msg[] = array("class" => "alert-warning",
+                       "text" => "This symbol has too many points (".count_points($pointlist).">100) to ".
+                                 "apply a cubic spline directly in the ".
+                                 "cubic spline directly online. ".
+                                 "You should apply the Douglas-Peucker ".
+                                 "algorithm in that case. ");
+        } else {
+            $pointlist = calculate_spline_points($pointlist, $cubic_spline_points);
+            $image["data"] = json_encode($pointlist);
+        }
+    }
+
+    // Make sure it's still within the border
+    if ($scale_and_center) {
+        $image["data"] = json_encode(scale_and_center(json_decode($image["data"], true), true));
     }
 
     // Calculate path for fabric.js
@@ -256,10 +294,22 @@ if (isset($_GET['raw_data_id'])) {
     // Draw points
     $points = array();
     if ($show_points) {
-        $data = json_decode($image["data"]);
-        foreach ($data as $line) {
-            foreach ($line as $point) {
-                $points[] = $point;
+        $pointlist = json_decode($image["data"], true);
+        if (count_points($pointlist) > 500) {
+            $msg[] = array("class" => "alert-warning",
+                       "text" => "This symbol has many points (".
+                                 count_points($pointlist)."> 500). ".
+                                 "Although they can easily be calculated, ".
+                                 "you should not display them. ".
+                                 "To keep your performance, this option ".
+                                 "was disabled automatically.");
+            $show_points = false;
+        } else {
+            $data = json_decode($image["data"]);
+            foreach ($data as $line) {
+                foreach ($line as $point) {
+                    $points[] = $point;
+                }
             }
         }
     }
@@ -279,6 +329,8 @@ echo $twig->render('render.twig', array('heading' => 'Render',
                                        'show_points' => $show_points,
                                        'scale_and_center' => $scale_and_center,
                                        'douglas_peucker' => $douglas_peucker,
-                                       'epsilon' => $epsilon
+                                       'epsilon' => $epsilon,
+                                       'cubic_spline' => $cubic_spline,
+                                       'cubic_spline_points' => $cubic_spline_points
                                        )
                   );

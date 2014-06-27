@@ -69,7 +69,8 @@
       <input type="checkbox"
              name="scale_and_center"
              {% if scale_and_center %}checked="checked"{% endif %}
-             /> Scale and center
+             /> Scale and shift
+        <p class="help-block">Shift points in space and time, but scale them only in space</p>
     </label>
   </div>
   <div class="checkbox">
@@ -78,6 +79,8 @@
              name="douglas_peucker"
              {% if douglas_peucker %}checked="checked"{% endif %}
              /> Douglas Peucker <input type="text" name="epsilon" value="{{epsilon}}"/>
+        <p class="help-block">Apply the Douglas-Peucker algorithm to get
+        rid of points that seem to be not much different from other points</p>
     </label>
   </div>
   <div class="checkbox">
@@ -85,7 +88,9 @@
       <input type="checkbox"
              name="cubic_spline"
              {% if cubic_spline %}checked="checked"{% endif %}
-             /> Cubic spline
+             /> Cubic spline <input type="number" name="cubic_spline_points" min="2" max="100"
+             step="1" value="{{cubic_spline_points}}"/>
+        <p class="help-block">Space points equidistant in time</p>
     </label>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
