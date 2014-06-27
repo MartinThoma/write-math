@@ -32,7 +32,9 @@
           <div class="panel-heading">
             <h3 class="panel-title">Draw here
             <button type="submit" class="btn btn-success">Submit</button>
-            <a href="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" class="btn btn-danger">Clear</a></h3>
+            <a href="?formula_id={{ formula.id }}{% if random_mode%}&rand{% endif %}" class="btn btn-danger">Clear</a>
+            <img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="50" style="width:50px;height:50px;float:right;">
+            </h3>
           </div>
           <div class="panel-body">
             <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
@@ -63,11 +65,13 @@
 
     <p><b>Description:</b> {{ formula.description }}</p>
     <p><b>Mode:</b> {{ formula.mode }}</p>
+    {% if not random_mode %}
     <div class="progress">
       <div class="progress-bar" role="progressbar" aria-valuenow="{{ formula.counter }}" aria-valuemin="0" aria-valuemax="50" style="width: {{ formula.counter / 50 * 100 }}%;">
         {{ formula.counter / 50 * 100 }}%
       </div>
     </div>
+    {% endif %}
 {% elseif challenge_id != "" %}
     <!-- Train a single formula as part of a challenge -->
     <form method="post" action="?challenge_id={{ challenge_id }}&i={{ i }}" onsubmit="return addCanvas();" id="form">

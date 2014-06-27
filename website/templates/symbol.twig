@@ -2,7 +2,14 @@
 {% import "pagination.twig" as pagination %}
 
 {% block content %}
-<img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg" width="150px" />
+
+{% if formula.best_rendering %}
+<img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg"
+    width="150px" style="width:150px;max-height:150px;" />
+{% else %}
+    <div style="width:150px;font-size: 250%;"><p>$${{ formula.formula_in_latex }}$$</p></div>
+{% endif %}
+
 <p><b>Name</b>: {{formula.formula_name|raw}} (<code>{{formula.formula_name}}</code>)</p>
 <p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
 <p><b>Mode</b>: {{ formula.mode }}</p>
@@ -137,4 +144,28 @@
 <a href="../symbol/?delete={{ formula.id }}">delete</a>
 {% endif %}
 {% endif %}
+
+<!-- MathJax -->
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+<!--
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [ ['$$', '$$']],
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    processEscapes: true,
+    scale: 200
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+// -->
+</script>
 {% endblock %}
