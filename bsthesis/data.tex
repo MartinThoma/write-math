@@ -38,16 +38,17 @@ the $(0, 1) \times (0, 1)$ unit square. The algorithm is given in pseudocode on
 \cpageref{alg:scale-and-shift}. It was shown in \cite{Kirsch,Huang09} that
 this kind of preprocessing boosts classification accuracy significantly.
 
-Another idea in preprocessing is resampling \cite{Guyon1991,ICASSP-94}.
+Another idea in preprocessing is resampling \cite{Guyon91,ICASSP-94}.
 
 \subsection{Noise reduction}
-Noise reduction methods include:
+The following list of noise reduction methods was created by \cite{Tappert90}
+and is still up-to-date.
 
 \begin{itemize}
     \item Wild-point detection and deleting or replacement of wild points with
-          the average of neighboring points\cite{Division1987},
+          the average of neighboring points\cite{Division87},
     \item Smoothing can be done in multiple ways. An approach that was used quite
-          often is by averaging a point with its neighbors\cite{Groner1966,Division1987,Arakaw1983}.
+          often is by averaging a point with its neighbors\cite{Groner66,Division87,Arakaw83}.
     \item Filtering is the process of removing points by some criteria. Those
           criteria include:
           \begin{itemize}
@@ -57,6 +58,10 @@ Noise reduction methods include:
               \item Enforcing a minimal change in direction\cite{Tappert90}.
           \end{itemize}
     \item Dehooking [TODO: Image of hook]
+    \item Dot reduction
+    \item Stroke connection
+    \item Deskewing
+    \item Baseline drift correction
 \end{itemize}
 
 Wild points are points that appear within a sequence of points of a stroke. They
@@ -72,11 +77,11 @@ line or even the complete image.
 
 \subsection{Local features}
 \begin{itemize}
-    \item Coordinates of the current point\cite{Guyon1991}
+    \item Coordinates of the current point\cite{Guyon91}
     \item Speed\cite{Huang09,ICASSP-94}
     \item Binary pen pressure\cite{Kosmala98,Kosmala11,ICASSP-94}
     \item Direction\cite{Manke95,Huang06}
-    \item Curvature\cite{Groner1966,Manke95,ICASSP-94,Guyon1991}
+    \item Curvature\cite{Groner66,Manke95,ICASSP-94,Guyon91}
     \item Bitmap-environment\cite{Manke95}
     \item Hat-Feature\cite{ICASSP-94,Manke00}
 \end{itemize}
@@ -84,7 +89,7 @@ line or even the complete image.
 \cite{Kosmala98,Kosmala11} suggest that speed is a bad feature, because it \enquote{highly inconsistent}.
 
 The \textbf{direction} $\text{dir}$ at the point $i$ can be described by the vector 
-$(\cos \theta(i), \sin \theta(i))$ as described in \cite{Guyon1991}.
+$(\cos \theta(i), \sin \theta(i))$ as described in \cite{Guyon91}.
 
 \begin{align}
     \cos \theta(i) &= \frac{\Delta x^{(i)}}{\Delta s^{(i)}}\\
