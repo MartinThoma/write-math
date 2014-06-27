@@ -4,7 +4,18 @@ require_once '../classification.php';
 include '../init.php';
 include 'functions.php';
 
-if (isset($_GET['delete'])) {
+if (isset($_POST['nr_of_lines'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `nr_of_symbols` = :nr ".
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
+           "AND (`user_id` = :user_id OR :user_id = 10);";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':nr', $_POST['nr_of_lines'], PDO::PARAM_INT);
+    $stmt->bindParam(':raw_id', $_POST['raw_id_lines'], PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['delete'])) {
     $sql = "DELETE FROM `wm_raw_draw_data` ".
            "WHERE `wm_raw_draw_data`.`id` = :raw_id AND ".
            "(user_id = :user_id OR :user_id = 10)";  # TODO: Change to admin-group check
@@ -130,7 +141,7 @@ if (isset($_GET['raw_data_id'])) {
 
     $raw_data_id = $_GET['raw_data_id'];
     $sql = "SELECT `user_id`, `display_name`, `data`, ".
-           "`creation_date`, `accepted_formula_id` ".
+           "`creation_date`, `accepted_formula_id`, `nr_of_symbols` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";

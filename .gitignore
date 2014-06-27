@@ -76,3 +76,4 @@ website/raw-data
 *.pickle
 
 website/clients/nn-python/experiments/
+*/private/*
