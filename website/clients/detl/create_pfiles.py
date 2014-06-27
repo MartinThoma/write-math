@@ -164,7 +164,6 @@ def create_pfile(POINTS_PER_LINE=20,
                  CENTER=False, THRESHOLD=20,
                  SPACE_EVENLY_KIND='cubic', LEARNING_RATE=0.01,
                  LEARNING_RATE_DECAY=1.0, EPOCHS=20):
-    """ Start a 10-fold cross-validation. """
     # Parameters for self-testing
     FLATTEN = False
     SPACE_EVENLY = True
