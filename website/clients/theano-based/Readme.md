@@ -1,5 +1,5 @@
-The following datasets were created with a non-public toolkit for 
-neural nets based.
+The following datasets were created with a KIT internal toolkit for
+neural nets.
 
 ## Dataset information
 ```
@@ -131,3 +131,145 @@ $ d test tstdata-0.pfile < trained_model.json
 [2014-06-27 05:35:47,954] >> Compiling theano model
 [2014-06-27 05:35:48,891] PFileDataset@tstdata-0.pfile,1: errors = 0.468750, cost = 2.322245
 ```
+
+### 161:400:1070 (Repeated training)
+
+```bash
+$ d show < model.json
+model: stack
+  properties: {}
+  [1] model: sigmoid
+    properties:
+      activation: sigmoid
+      n_hidden: 400
+      n_visible: 161
+    parameters:
+      W: (161, 400) min -0.414, max 0.414, avg 0.001, std 0.239
+      b: (400,) min 0.000, max 0.000, avg 0.000, std 0.000
+  [2] model: logreg
+    properties:
+      activation: softmax
+      n_hidden: 1070
+      n_visible: 400
+      output: prediction
+    parameters:
+      W: (400, 1070) min 0.000, max 0.000, avg 0.000, std 0.000
+      b: (1070,) min 0.000, max 0.000, avg 0.000, std 0.000
+$ d train traindata-1.pfile validdata-1.pfile < model.json > trained_model.json
+$ d train traindata-1.pfile validdata-1.pfile < trained_model.json > trained_model2.json
+$ d train --epoch 200 traindata-1.pfile validdata-1.pfile < trained_model2.json > trained_model3.json
+$ d train --epochs 10 --learning-rate 3 traindata-1.pfile validdata-1.pfile < trained_model3.json > trained_model4.json
+$ d train --epochs 10 --learning-rate 3 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model4.json > trained_model5.json
+$ d train --epochs 10 --learning-rate 3 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model5.json > trained_model6.json
+$ d train --epochs 100 --learning-rate 3 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model6.json > trained_model7.json
+$ d train --epochs 100 --learning-rate 30 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model7.json > trained_model8.json
+$ d train --epochs 100 --learning-rate 1 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model7.json > trained_model8.json
+$ d train --epochs 10 --learning-rate 0.1 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model8.json > trained_model9.json
+$ d train --epochs 100 --learning-rate 0.1 --momentum 0.1 traindata-1.pfile validdata-1.pfile < trained_model9.json > trained_model10.json
+$ d test testdata-1.pfile < trained_model10.json 
+[2014-06-27 12:34:47,808] >> Loading model
+[2014-06-27 12:34:47,885] >> Loading datasets
+[2014-06-27 12:34:48,282] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-1.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 12:34:48,307] >> Compiling theano model
+[2014-06-27 12:34:49,877] PFileDataset@testdata-1.pfile,1: errors = 0.260417, cost = 1.318792
+```
+
+### 161:322:322 MLP
+```bash
+$ d make mlp 161:322:322 > mlp3.json
+$ d train --epochs 300 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
+$ d test testdata-0.pfile < mlp3-1.json 
+[2014-06-27 13:29:23,732] >> Loading model
+[2014-06-27 13:29:23,765] >> Loading datasets
+[2014-06-27 13:29:24,299] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 13:29:24,319] >> Compiling theano model
+[2014-06-27 13:29:25,455] PFileDataset@testdata-0.pfile,1: errors = 0.326823, cost = 1.554708
+```
+
+### 161:483:322 MLP
+```bash
+$ d make mlp 161:483:322 > mlp3.json
+$ d train --epochs 300 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
+$ d test testdata-0.pfile < mlp3-1.json 
+[2014-06-27 13:29:23,732] >> Loading model
+[2014-06-27 13:29:23,765] >> Loading datasets
+[2014-06-27 13:29:24,299] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 13:29:24,319] >> Compiling theano model
+[2014-06-27 13:29:25,455] PFileDataset@testdata-0.pfile,1: errors = 0.326823, cost = 1.554708
+```
+
+### 161:80:322 MLP
+```bash
+$ d make mlp 161:483:322 > mlp3.json
+$ d train --epochs 300 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
+$ d test testdata-0.pfile < mlp3-1.json 
+[2014-06-27 13:29:23,732] >> Loading model
+[2014-06-27 13:29:23,765] >> Loading datasets
+[2014-06-27 13:29:24,299] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 13:29:24,319] >> Compiling theano model
+[2014-06-27 13:29:25,455] PFileDataset@testdata-0.pfile,1: errors = 0.326823, cost = 1.554708
+$ d test testdata-0.pfile < mlp3-1.json
+[2014-06-27 14:53:08,371] >> Loading model
+[2014-06-27 14:53:08,387] >> Loading datasets
+[2014-06-27 14:53:08,716] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 14:53:08,743] >> Compiling theano model
+[2014-06-27 14:53:09,784] PFileDataset@testdata-0.pfile,1: errors = 0.386719, cost = 1.645437
+```
+### 161:161:322 MLP
+
+```bash
+$ d make mlp 161:161:322 > mlp3.json
+$ d train --epochs 300 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
+$ d test testdata-0.pfile < mlp3-1.json
+[2014-06-27 16:06:29,598] >> Loading model
+[2014-06-27 16:06:29,620] >> Loading datasets
+[2014-06-27 16:06:30,818] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 16:06:30,858] >> Compiling theano model
+[2014-06-27 16:06:32,023] PFileDataset@testdata-0.pfile,1: errors = 0.330729, cost = 1.674410
+```
+
+train more:
+
+```bash
+$ d train --epochs 600 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
+$ d test testdata-0.pfile < mlp3-1.json
+[2014-06-27 16:24:16,323] >> Loading model
+[2014-06-27 16:24:16,345] >> Loading datasets
+[2014-06-27 16:24:16,709] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata-0.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-06-27 16:24:16,735] >> Compiling theano model
+[2014-06-27 16:24:17,821] PFileDataset@testdata-0.pfile,1: errors = 0.330729, cost = 1.674410
+```
+
+### 161:161:200 MLP
+
+```bash
+$ d make mlp 161:161:200 > mlp3.json
+$ d train --epochs 300 --learning-rate 10 --momentum 0.1 traindata-0.pfile validdata-0.pfile < mlp3.json > mlp3-1.json
