@@ -1,5 +1,5 @@
-The following datasets were created with DETL, a non-public toolkit for 
-neural nets based on Theano and written by Jonas Gehring.
+The following datasets were created with a non-public toolkit for 
+neural nets based.
 
 ## Dataset information
 ```
@@ -24,7 +24,7 @@ Space evenly: True (20 points, cubic)
 
 ## 3-layer MLP
 ```bash
-detl show < model.json
+d show < model.json
 model: stack
   properties: {}
   [1] model: sigmoid
@@ -50,7 +50,7 @@ model: stack
 Train
 
 ```bash
-$ time detl train --epochs 200 -v trndata-0.pfile < model.json > trained_model.json
+$ time d train --epochs 200 -v trndata-0.pfile < model.json > trained_model.json
 [2014-06-26 21:03:24,537] >> Loading model
 [2014-06-26 21:03:24,618] >> Loading datasets
 [2014-06-26 21:03:24,952] >> Supervised training started with arguments:
@@ -91,13 +91,13 @@ $ time detl train --epochs 200 -v trndata-0.pfile < model.json > trained_model.j
 [...]
 [2014-06-26 21:54:01,867] >  epoch 200/5800, training cost 3.739707
 [2014-06-26 21:54:01,929] >> Training finished in 0:50:35.283719
-detl train --epochs 200 -v trndata-0.pfile < model.json > trained_model.json  2994,28s user 7,47s system 98% cpu 50:38,29 total
+$ d train --epochs 200 -v trndata-0.pfile < model.json > trained_model.json  2994,28s user 7,47s system 98% cpu 50:38,29 total
 ```
 
 Test
 
 ```bash
-detl test tstdata-0.pfile < trained_model.json 
+$ d test tstdata-0.pfile < trained_model.json 
 [2014-06-26 22:01:42,698] >> Loading model
 [2014-06-26 22:01:42,775] >> Loading datasets
 [2014-06-26 22:01:43,094] >> Testing started with arguments:
@@ -114,13 +114,13 @@ detl test tstdata-0.pfile < trained_model.json
 ```bash
 [2014-06-26 23:04:25,833] >  epoch 2000/58000, training cost 2.172440
 [2014-06-26 23:04:25,841] >> Training finished in 0:19:10.198515
-detl train --epochs 2000 -v trndata-0.pfile < mlp2.json > trained_model.json  1150,12s user 0,77s system 99% cpu 19:12,11 total
+$ d train --epochs 2000 -v trndata-0.pfile < mlp2.json > trained_model.json  1150,12s user 0,77s system 99% cpu 19:12,11 total
 ```
 
 Test
 
 ```bash
-$ detl test tstdata-0.pfile < trained_model.json
+$ d test tstdata-0.pfile < trained_model.json
 [2014-06-27 05:35:47,574] >> Loading model
 [2014-06-27 05:35:47,593] >> Loading datasets
 [2014-06-27 05:35:47,931] >> Testing started with arguments:
