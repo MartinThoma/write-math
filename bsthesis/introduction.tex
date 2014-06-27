@@ -11,7 +11,7 @@ on-line \gls{HWR}.
 
 On-line \gls{HWR} can use techniques of off-line \gls{HWR}, but studies have
 showed that on-line information does significantly improve recognition rates
-and also simplify algorithms.\cite{Guyon1991}
+and also simplify algorithms.\cite{Guyon1991,Becker72}
 
 \section{Steps in handwriting recognition}
 Most handwriting-recognizers perform the following steps in order to recognize
@@ -56,3 +56,14 @@ $x$ and the output vector with $y$.
 A single training example thus is given by the tuple $(x, y)$.
 
 Weights will be denoted with $W$, hyperparameters with $\theta$.
+
+0-indexed vectors are used.
+
+\section{Limitations of Symbol Recognition}
+The recognition capabilities of single symbols are quite limited. There are
+many symbols such as \enquote{$\cdot$} and \enquote{.} or \enquote{0}, \enquote{O}
+and \enquote{o} that can only be destinguished with context and the availability
+of a baseline. As I chose to set up the design of write-math.com without a
+baseline and the associated %TODO: is associated correct? "damit verbunden"
+restrictions for the user, it is impossible to destingush these characters.
+The best that can be done is applying the a priori probabilty.
