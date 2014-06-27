@@ -194,21 +194,28 @@ def create_pfile(POINTS_PER_LINE=20,
                       'w10': 0})
         # Prepare datasets the algorithm may use
         datasets = []
+        validset_nr = (testset + 1) % 10
         for key, data_bin in enumerate(cv):
-            if key != testset:
+            if key != testset and key != validset_nr:
                 datasets += data_bin
 
         print("Start training dataset generation")
         trndata = []
         for x, y in datasets:
             trndata.append((x, y))
-        make_pfile("trndata-%i" % testset, INPUT_FEATURES, trndata)
+        make_pfile("traindata-%i" % testset, INPUT_FEATURES, trndata)
         print("end training dataset generation")
         print("testdata")
         tstdata = []
         for x, y in cv[testset]:
             tstdata.append((x, y))
-        make_pfile("tstdata-%i" % testset, INPUT_FEATURES, tstdata)
+        make_pfile("testdata-%i" % testset, INPUT_FEATURES, tstdata)
+        print("end testdata")
+        print("validdata")
+        validdata = []
+        for x, y in cv[validset_nr]:
+            validdata.append((x, y))
+        make_pfile("validdata-%i" % testset, INPUT_FEATURES, validdata)
         print("end testdata")
 
     print_parameters(symbol_counter, raw_data_counter, EPSILON, CENTER,
@@ -235,7 +242,7 @@ if __name__ == '__main__':
                         help="number of points per stroke")
     args = parser.parse_args()
 
-    MIN_OCCURENCES = 10
+    MIN_OCCURENCES = 20
     K_FOLD = 10
     EPSILON = 10
     CENTER = False
