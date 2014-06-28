@@ -22,7 +22,7 @@
         By <a href="../login">logging in</a>, you help me to improve the classifier.
     </div>
     {% endif %}
-    <form method="post" action="index.php" onsubmit="return addCanvas();" id="form">
+    <form method="post" action="index.php" onsubmit="$('button').prop('disabled', true);return addCanvas();" id="form">
     <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
     <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
     <button type="submit" class="btn btn-success">Submit</button>
