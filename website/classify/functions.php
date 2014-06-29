@@ -104,13 +104,9 @@ function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
     }
 }
 
-function classify() {
+function classify($raw_data_id, $drawnJSON) {
     global $msg, $pdo;
 
-    $raw_data_id = insert_userdrawing(get_uid(), $_POST['drawnJSON']);
-    if ($raw_data_id == false) {
-        return;
-    }
     # Get a list of all workers
     $sql = "SELECT `id`, `worker_name`, `url` ".
            "FROM `wm_workers` ".
@@ -126,9 +122,7 @@ function classify() {
         // contact worker
         //set POST variables
         $url = $request_url;
-        $fields = array(
-                    'classify' => urlencode($_POST['drawnJSON'])
-                );
+        $fields = array('classify' => urlencode($drawnJSON));
 
         //url-ify the data for the POST
         foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }

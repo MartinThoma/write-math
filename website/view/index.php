@@ -3,6 +3,19 @@ require_once '../svg.php';
 require_once '../classification.php';
 include '../init.php';
 include 'functions.php';
+include '../classify/functions.php';
+
+if (isset($_GET['request_new_rendering'])) {
+    $raw_data_id = intval($_GET['request_new_rendering']);
+
+    // Get raw data
+    $sql = "SELECT `data` FROM `wm_raw_draw_data` WHERE `id` = :rid LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':rid', $raw_data_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $draw = $stmt->fetchObject()->data;
+    classify($raw_data_id, $draw);
+}
 
 if (isset($_POST['nr_of_lines'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".

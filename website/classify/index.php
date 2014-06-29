@@ -39,7 +39,10 @@ if (!function_exists('json_last_error_msg')) {
 $formula_ids = array();
 
 if (isset($_POST['drawnJSON'])) {
-    classify();
+    $raw_data_id = insert_userdrawing(get_uid(), $_POST['drawnJSON']);
+    if (!($raw_data_id == false)) {
+        classify($raw_data_id, $_POST['drawnJSON']);
+    }
 }
 
 echo $twig->render('classify.twig', array('heading' => 'Classify',
