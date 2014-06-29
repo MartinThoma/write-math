@@ -32,6 +32,10 @@
     <td>{{ lines_nr }}</td>
   </tr>
   <tr>
+    <th>points</th>
+    <td>{{ points_nr }}</td>
+  </tr>
+  <tr>
     <th>control points</th>
     <td>{{ control_points }}</td>
   </tr>
@@ -158,7 +162,7 @@
               {% if answer.package != '' %}
               <p>Package: {{answer.package}}</p>
               {% endif %}
-              <p><a href="../profile?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
+              <p><a href="../user/?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
           </td>
           <td>
             {% if answer.formula_id == image_data.accepted_formula_id %}
