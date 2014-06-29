@@ -79,7 +79,7 @@ function gauss($A, $x) {
 
         # Make all rows below this one 0 in current column
         for ($k=$i+1; $k < $n; $k++) { 
-            $c = -$A[$k][$i]/$A[$i][$i];
+            $c = -$A[$k][$i]/$A[$i][$i];  # TODO: This can be 0!
             for ($j=$i; $j < $n+1; $j++) { 
                 if ($i==$j) {
                     $A[$k][$j] = 0;
@@ -93,7 +93,7 @@ function gauss($A, $x) {
     # Solve equation Ax=b for an upper triangular matrix $A
     $x = array_fill(0, $n, 0);
     for ($i=$n-1; $i > -1; $i--) { 
-        $x[$i] = $A[$i][$n]/$A[$i][$i];
+        $x[$i] = $A[$i][$n]/$A[$i][$i];  # TODO: This can be 0!
         for ($k=$i-1; $k > -1; $k--) { 
             $A[$k][$n] -= $A[$k][$i] * $x[$i];
         }

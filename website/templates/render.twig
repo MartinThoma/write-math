@@ -5,14 +5,12 @@
 
  <script type='text/javascript'>
      window.onload=function(){
-    var canvas = new fabric.Canvas('galleryImage');
+    var canvas = new fabric.StaticCanvas('galleryImage');
     var group = new fabric.Group();
     canvas.add(group);
 
     var path = new fabric.Path('{{ image.path }}');
     path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
-/*    path.scale(Math.min(canvas.height / path.height, 
-                                canvas.width  / path.width));*/
     canvas.add(path);
 
     {% if show_points %}
@@ -42,12 +40,19 @@
 {% endblock %}
 
 {% block content %}
-    <table>
-        <tr>
-            <td><canvas id="galleryImage" width="400" height="400"></canvas></td>
-            <td>
-                
-<form role="form" method="get">
+<div class="row-fluid clearfix">
+    <div class="span6 pull-left panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Modified image</h3>
+        </div>
+        <div class="panel-body"><canvas id="galleryImage" width="400" height="400"></canvas></div>
+    </div>
+    <div class="span6 pull-right panel panel-default" style="width:400px;">
+        <div class="panel-heading" style="padding-left:50px;">
+            <h3 class="panel-title">Preprocessing options</h3>
+        </div>
+        <div class="panel-body" style="margin-left:50px;">
+<form role="form" method="get" onsubmit="$('button').prop('disabled', true);">
   <div class="form-group">
     <label for="raw_data_id">Raw data id</label>
     <input type="number"
@@ -95,13 +100,12 @@
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+        </div>
+    </div>
+</div>
 
-<a href="../view?raw_data_id={{ image.id }}">Raw data information</a>
-            </td>
-        </tr>
-    </table>
-    
 
     <h2>Raw data</h2>
     <pre>{{ image.data }}</pre>
+    <p>See <a href="../view?raw_data_id={{ image.id }}">raw data information</a></p>
 {% endblock %}
