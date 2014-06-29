@@ -162,7 +162,8 @@
     <td>{{ worker.description }}</td>
     <td>{% if worker.latest_heartbeat is null %}
           <a href="?request_heartbeat={{ worker.id }}">Request</a>
-        {% else %}{{ worker.latest_heartbeat }}{% endif%}</td>
+        {% else %}<a href="?request_heartbeat={{ worker.id }}">{{ worker.latest_heartbeat }}</a>{% endif%}</td>
+    <td>&nbsp;</td>
   </tr>
   {% endfor %}
 </table>
