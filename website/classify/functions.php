@@ -140,6 +140,7 @@ function classify($raw_data_id, $drawnJSON) {
         $fields = array('classify' => urlencode($drawnJSON));
 
         //url-ify the data for the POST
+        $fields_string = "";
         foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
         rtrim($fields_string, '&');
 
@@ -160,8 +161,8 @@ function classify($raw_data_id, $drawnJSON) {
                "text" => "Worker '".$worker['worker_name']."' returned '".
                          json_last_error_msg()."'<br/>".
                          "Request URL: <a href=\"$request_url\">Link</a><br/>".
-                         "Answer: ".htmlentities(substr($answer, 0, 20))).
-                         "...";
+                         "Answer: ".htmlentities(substr($answer, 0, 20)).
+                         "...");
              # TODO: The user should not see this. This should be logged, though.
         } else {
             insert_worker_answers($worker['id'], $raw_data_id, $answer_json);
