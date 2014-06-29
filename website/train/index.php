@@ -12,6 +12,8 @@ $i = "";
 $formula_id = "";
 $random_mode = false;
 $formula_ids = array();
+$formula = null;
+$challenges = null;
 
 if (isset($_POST['formula_id'])) {
     insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);

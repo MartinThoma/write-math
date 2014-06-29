@@ -15,7 +15,7 @@ import logging
 import MySQLdb
 import MySQLdb.cursors
 from classification import pointLineList, douglas_peucker, space_evenly, \
-    scale_and_center
+    scale_and_shift
 from dbconfig import mysql
 import time
 import datetime
@@ -48,7 +48,7 @@ def get_features(raw_draw_data, EPSILON, SPACE_EVENLY, POINTS_PER_LINE,
             Anew.append(space_evenly(line, POINTS_PER_LINE, SPACE_EVENLY_KIND))
         A = Anew
 
-    A = scale_and_center(A, CENTER)
+    A = scale_and_shift(A, CENTER)
 
     features = [len(A)]
     for line in range(4):

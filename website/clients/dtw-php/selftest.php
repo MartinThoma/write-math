@@ -84,8 +84,8 @@ for ($testset=0; $testset < K_FOLD; $testset++) {
         } else {
             $result_path = pointLineList($raw_draw_data);
         }
-        $A = scale_and_center(list_of_pointlists2pointlist($result_path),
-                              CENTER);
+        $A = scale_and_shift(list_of_pointlists2pointlist($result_path),
+                             CENTER);
 
         // Prepare datasets the algorithm may use
         $datasets = array();

@@ -12,11 +12,11 @@ if (isset($_GET['heartbeat'])) {
 
     // Classification
     if ($epsilon > 0) {
-        $result_path = apply_douglas_peucker(pointLineList($raw_draw_data), $epsilon);
+        $result_path = apply_linewise_douglas_peucker(pointLineList($raw_draw_data), $epsilon);
     } else {
         $result_path = pointLineList($raw_draw_data);
     }
-    $A = scale_and_center(list_of_pointlists2pointlist($result_path));
+    $A = scale_and_shift(list_of_pointlists2pointlist($result_path));
 
     // Get the first 4000 known formulas
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data`, `accepted_formula_id`, ".

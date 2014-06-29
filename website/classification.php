@@ -1,5 +1,65 @@
 <?php
 
+require_once('preprocessing.php');
+
+function d($p1, $p2) {
+    $dx = $p1["x"] - $p2["x"];
+    $dy = $p1["y"] - $p2["y"];
+    return $dx*$dx + $dy*$dy;
+}
+
+function apply_greedy_matching_dtw_linewise($A, $B) {
+    $A = scale_and_shift(pointLineList($A));
+    $B = scale_and_shift(pointLineList($B));
+    if (count($A) != count($B)) {
+        # If they have a different count of lines, they are different
+        return 1.8e200;
+    } else {
+        $dist = 0;
+        for ($i=0; $i < count($A); $i++) { 
+            $dist += greedyMatchingDTW($A[$i], $B[$i]);
+        }
+        return $dist;
+    }
+}
+
+function greedyMatchingDTW($A, $B) {
+    $a = array_shift($A);
+    $b = array_shift($B);
+    $d = d($a, $b);
+    $as = array_shift($A);
+    $bs = array_shift($B);
+    while (count($A) > 0 && count($B)) {
+        $l = d($as, $b);
+        $m = d($as, $bs);
+        $r = d($a, $bs);
+        $mu = min($l, $m, $r);
+        $d = $d + $mu;
+        if ($l == $mu) {
+            $a = $as;
+            $as = array_shift($A);
+        } elseif ($r == $mu) {
+            $b = $bs;
+            $bs = array_shift($B);
+        } else {
+            $a = $as;
+            $b = $bs;
+            $as = array_shift($A);
+            $bs = array_shift($B);
+        }
+    }
+    if (count($A) == 0) {
+        foreach ($B as $p) {
+            $d = $d + d($as, $p);
+        }
+    } elseif (count($B) == 0) {
+        foreach ($A as $p) {
+            $d = $d + d($bs, $p);
+        }
+    }
+    return $d;
+}
+
 function pointLineList($linelistP) {
     global $msg;
 
@@ -41,74 +101,12 @@ function pointList($linelistP) {
     return $pointlist;
 }
 
-function get_bounding_box2($pointLinelist) {
-    $minx = $pointLinelist[0][0]["x"];
-    $maxx = $pointLinelist[0][0]["x"];
-    $miny = $pointLinelist[0][0]["y"];
-    $maxy = $pointLinelist[0][0]["y"];
-    $mint = $pointLinelist[0][0]["time"];
-    $maxt = $pointLinelist[0][0]["time"];
-    foreach ($pointLinelist as $line) {
-        foreach ($line as $p) {
-            if ($p["x"] < $minx) {
-                $minx = $p["x"];
-            }
-            if ($p["x"] > $maxx) {
-                $maxx = $p["x"];
-            }
-            if ($p["y"] < $miny) {
-                $miny = $p["y"];
-            }
-            if ($p["y"] > $maxy) {
-                $maxy = $p["y"];
-            }
-            if ($p["time"] < $mint) {
-                $mint = $p["time"];
-            }
-            if ($p["time"] > $maxt) {
-                $maxt = $p["time"];
-            }
-        }
-    }
-    return array("minx" => $minx, "maxx" => $maxx,
-                 "miny" => $miny, "maxy" => $maxy,
-                 "mint" => $mint, "maxt" => $maxt);
-}
-
-function get_bounding_box($pointlist) {
-    $minx = $pointlist[0]["x"];
-    $maxx = $pointlist[0]["x"];
-    $miny = $pointlist[0]["y"];
-    $maxy = $pointlist[0]["y"];
-    foreach ($pointlist as $p) {
-        if ($p["x"] < $minx) {
-            $minx = $p["x"];
-        }
-        if ($p["x"] > $maxx) {
-            $maxx = $p["x"];
-        }
-        if ($p["y"] < $miny) {
-            $miny = $p["y"];
-        }
-        if ($p["y"] > $maxy) {
-            $maxy = $p["y"];
-        }
-    }
-    return array("minx" => $minx, "maxx" => $maxx,
-                 "miny" => $miny, "maxy" => $maxy);
-}
-
 function list_of_pointlists2pointlist($data) {
     $result = array();
     foreach ($data as $line) {
         $result = array_merge($result, $line);
     }
     return $result;
-}
-
-function get_dimensions($pointlist) {
-    extract(get_bounding_box($pointlist));
-    return array("width" => $maxx - $minx, "height" => $maxy - $miny);
 }
 
 function get_time_resolution($pointlist, $lines_nr) {

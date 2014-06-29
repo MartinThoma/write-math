@@ -21,7 +21,7 @@ def classifyD(raw_data_id, raw_draw_data, epsilon):
                                             epsilon)
     else:
         result_path = pointLineList(raw_draw_data)
-    A = scale_and_center(list_of_pointlists2pointlist(result_path))
+    A = scale_and_shift(list_of_pointlists2pointlist(result_path))
 
     # Get the first 4000 known formulas
     sql = ("SELECT `wm_raw_draw_data`.`id`, `data`, `accepted_formula_id`, "

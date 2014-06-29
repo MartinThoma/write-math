@@ -1,46 +1,6 @@
 <?php
-function scale_and_center($pointlist, $center=false) {
-    global $msg;
 
-    extract(get_bounding_box2($pointlist));
-
-    $width = $maxx - $minx;
-    $height = $maxy - $miny;
-
-    $factorX = 1;
-    $factorY = 1;
-    if ($width != 0) {
-        $factorX = 1./$width;
-    }
-
-    if ($height != 0) {
-        $factorY = 1./$height;
-    }
-
-    $factor = min($factorX, $factorY)*390;
-    $addx = 0;
-    $addy = 0;
-
-    if ($center) {
-        $add = (1 - (max($factorX, $factorY) / $factor)) / 2;
-    
-        if ($factor == $factorX) {
-            $addy = $add;
-        } else {
-            $addx = $add;
-        }
-    }
-
-    foreach ($pointlist as $key1 => $line) {
-        foreach ($line as $key2 => $p) {
-            $pointlist[$key1][$key2] = array("x" => ($p["x"] - $minx)*$factor + $addx,
-                                     "y" => ($p["y"] - $miny)*$factor + $addy,
-                                     "time" => $p["time"]-$mint);
-        }
-    }
-
-    return $pointlist;
-}
+require_once '../preprocessing.php';
 
 /**
  * Gaussian elimination

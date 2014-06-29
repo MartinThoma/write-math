@@ -66,7 +66,7 @@ def get_bounding_box(pointlist):
     return {"minx": minx, "maxx": maxx, "miny": miny, "maxy": maxy}
 
 
-def get_scale_and_center_parameters(pointlist, center=False):
+def get_scale_and_shift_parameters(pointlist, center=False):
     """ Take a list of points and calculate the factors for scaling and moving
         it so that it's in the unit square. Keept the aspect ratio.
         Optionally center the points inside of the unit square.
@@ -100,18 +100,18 @@ def get_scale_and_center_parameters(pointlist, center=False):
             "minx": a['minx'], "miny": a['miny']}
 
 
-def scale_and_center(pointlist, center=False):
+def scale_and_shift(pointlist, center=False):
     """ Take a list of points and scale and move it so that it's in the unit
         square. Keep the aspect ratio. Optionally center the points inside of
         the unit square.
 
-        >>> scale_and_center([{'x': 0, 'y': 0}, {'x': 10, 'y': 10}])
+        >>> scale_and_shift([{'x': 0, 'y': 0}, {'x': 10, 'y': 10}])
         [{'y': 0.0, 'x': 0.0}, {'y': 1.0, 'x': 1.0}]
     """
 
     flat_pointlist = list_of_pointlists2pointlist(pointlist)
 
-    tmp = get_scale_and_center_parameters(flat_pointlist, center)
+    tmp = get_scale_and_shift_parameters(flat_pointlist, center)
     factor, addx, addy = tmp['factor'], tmp['addx'], tmp['addy']
     minx, miny = tmp['minx'], tmp['miny']
 
@@ -355,7 +355,7 @@ def classify(datasets, A, EPSILON=0, THRESHOLD=100, FLATTEN=True,
                 Bnew.append(space_evenly(line, POINTS))
             B = Bnew
 
-        B = scale_and_center(B)
+        B = scale_and_shift(B)
 
         if FLATTEN:
             B = list_of_pointlists2pointlist(B)

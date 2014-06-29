@@ -1,44 +1,6 @@
 <?php
 
-function scale_and_center($pointlist, $center = false) {
-    global $msg;
-
-    extract(get_bounding_box($pointlist));
-
-    $width = $maxx - $minx;
-    $height = $maxy - $miny;
-
-    $factorX = 1;
-    $factorY = 1;
-    if ($width != 0) {
-        $factorX = 1./$width;
-    }
-
-    if ($height != 0) {
-        $factorY = 1./$height;
-    }
-
-    $factor = min($factorX, $factorY);
-    $addx = 0;
-    $addy = 0;
-
-    if ($center) {
-        $add = (1 - (max($factorX, $factorY) / $factor)) / 2;
-    
-        if ($factor == $factorX) {
-            $addy = $add;
-        } else {
-            $addx = $add;
-        }
-    }
-
-    foreach ($pointlist as $key => $p) {
-        $pointlist[$key] = array("x" => ($p["x"] - $minx)*$factor + $addx,
-                                 "y" => ($p["y"] - $miny)*$factor + $addy);
-    }
-
-    return $pointlist;
-}
+require_once('../../preprocessing.php');
 
 /**
  * Calculate the squared eucliden distance of two points.
@@ -103,89 +65,6 @@ function greedyMatchingDTW($A, $B) {
     return $d;
 }
 
-/**
- * Calculate the distance from $p3 to the line defined by $p1 and $p2.
- * @param array $p1 associative array with "x" and "y" (start of line)
- * @param array $p2 associative array with "x" and "y" (end of line)
- * @param array $p3 associative array with "x" and "y" (point)
- */
-function LotrechterAbstand($p1, $p2, $p3) {
-    $x3 = $p3['x'];
-    $y3 = $p3['y'];
-
-    $px = $p2['x']-$p1['x'];
-    $py = $p2['y']-$p1['y'];
-
-    $something = $px*$px + $py*$py;
-    if ($something == 0) {
-        // TODO: really?
-        return 0;
-    }
-
-    $u =  (($x3 - $p1['x']) * $px + ($y3 - $p1['y']) * $py) / $something;
-
-    if ($u > 1) {
-        $u = 1;
-    } elseif ($u < 0) {
-        $u = 0;
-    }
-
-    $x = $p1['x'] + $u * $px;
-    $y = $p1['y'] + $u * $py;
-
-    $dx = $x - $x3;
-    $dy = $y - $y3;
-
-    # Note: If the actual distance does not matter,
-    # if you only want to compare what this function
-    # returns to other results of this function, you
-    # can just return the squared distance instead
-    # (i.e. remove the sqrt) to gain a little performance
-
-    $dist = sqrt($dx*$dx + $dy*$dy);
-    return $dist;
-}
-
-function DouglasPeucker($PointList, $epsilon) {
-    // Finde den Punkt mit dem größten Abstand
-    $dmax = 0;
-    $index = 0;
-    for ($i = 1; $i < count($PointList); $i++) {
-            $d = LotrechterAbstand($PointList[0], end($PointList), $PointList[$i]);
-            if ($d > $dmax) {
-                $index = $i;
-                $dmax = $d;
-            }
-    }
- 
-    // Wenn die maximale Entfernung größer als Epsilon ist, dann rekursiv vereinfachen
-    if ($dmax >= $epsilon){
-            // Recursive call
-            $recResults1 = DouglasPeucker(array_slice($PointList, 0, $index), $epsilon);
-            $recResults2 = DouglasPeucker(array_slice($PointList, $index, -1), $epsilon);
-     
-            // Ergebnisliste aufbauen
-            $ResultList = array_merge(array_slice($recResults1, 0, -1), $recResults2);
-    } else{
-            $ResultList = array($PointList[0], end($PointList));
-    }
- 
-    // Ergebnis zurückgeben
-    return $ResultList;
-}
-
-/**
- * Apply the Douglas-Peucker algorithm to each line of $pointlist seperately.
- * @param  array $pointlist see pointList()
- * @return pointlist
- */
-function apply_douglas_peucker($pointlist, $epsilon) {
-    for ($i=0; $i < count($pointlist); $i++) {
-        $pointlist[$i] = DouglasPeucker($pointlist[$i], $epsilon);
-    }
-    return $pointlist;
-}
-
 function get_path($data, $epsilon=0) {
     $path = "";
     $data = pointLineList($data);
@@ -195,7 +74,7 @@ function get_path($data, $epsilon=0) {
         return false;
     }
     if ($epsilon > 0) {
-        $data = apply_douglas_peucker($data, $epsilon);
+        $data = apply_linewise_douglas_peucker($data, $epsilon);
     }
 
     foreach ($data as $line) {
@@ -219,7 +98,7 @@ function pointLineList($linelistP) {
     foreach ($linelist as $line) {
         $l = array();
         foreach ($line as $p) {
-            $l[] = array("x"=>$p->x, "y"=>$p->y);
+            $l[] = array("x"=>$p->x, "y"=>$p->y, "time"=>$p->time);
         }
         $pointlist[] = $l;
     }
@@ -253,10 +132,16 @@ function pointList($linelistP) {
 }
 
 function get_bounding_box($pointlist) {
-    $minx = $pointlist[0]["x"];
-    $maxx = $pointlist[0]["x"];
-    $miny = $pointlist[0]["y"];
-    $maxy = $pointlist[0]["y"];
+    if (!isset($pointlist[0])) {
+        echo "index 0 does not exist!";
+        var_dump($pointlist);
+    } else {
+        $minx = $pointlist[0]["x"];
+        $maxx = $pointlist[0]["x"];
+        $miny = $pointlist[0]["y"];
+        $maxy = $pointlist[0]["y"];
+    }
+
     foreach ($pointlist as $p) {
         if ($p["x"] < $minx) {
             $minx = $p["x"];
@@ -281,11 +166,6 @@ function list_of_pointlists2pointlist($data) {
         $result = array_merge($result, $line);
     }
     return $result;
-}
-
-function get_dimensions($pointlist) {
-    extract(get_bounding_box($pointlist));
-    return array("width" => $maxx - $minx, "height" => $maxy - $miny);
 }
 
 function get_probability_from_distance($results) {
@@ -333,11 +213,11 @@ function classify($datasets, $A, $epsilon = 0) {
     foreach ($datasets as $key => $dataset) {
         $B = $dataset['data'];
         if ($epsilon > 0) {
-            $B = apply_douglas_peucker(pointLineList($B), $epsilon);
+            $B = apply_linewise_douglas_peucker(pointLineList($B), $epsilon);
         } else {
             $B = pointLineList($B);
         }
-        $B = scale_and_center(list_of_pointlists2pointlist($B));
+        $B = scale_and_shift(list_of_pointlists2pointlist($B));
         $results[] = array("dtw" => greedyMatchingDTW($A, $B),
                            "latex" => $dataset['accepted_formula_id'],
                            "id" => $dataset['id'],

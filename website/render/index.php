@@ -10,7 +10,7 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->execute();
     $image = $stmt->fetch(PDO::FETCH_ASSOC);
     $show_points = isset($_GET["show_points"]) && $_GET["show_points"] == "on";
-    $scale_and_center = isset($_GET["scale_and_center"]) && $_GET["scale_and_center"] == "on";
+    $scale_and_shift = isset($_GET["scale_and_shift"]) && $_GET["scale_and_shift"] == "on";
     $cubic_spline = isset($_GET["cubic_spline"]) && $_GET["cubic_spline"] == "on";
     $douglas_peucker = isset($_GET["douglas_peucker"]) && $_GET["douglas_peucker"] == "on";
 
@@ -30,12 +30,15 @@ if (isset($_GET['raw_data_id'])) {
         $cubic_spline_points = 100;
     }
 
-    if ($scale_and_center) {
-        $image["data"] = json_encode(scale_and_center(json_decode($image["data"], true), true));
+    if ($scale_and_shift) {
+        $image["data"] = json_encode(scale_and_shift(json_decode($image["data"], true),
+                                                     true,
+                                                     390)
+                                    );
     }
 
     if ($douglas_peucker) {
-        $pointlist = apply_douglas_peucker(json_decode($image["data"], true), $epsilon);
+        $pointlist = apply_linewise_douglas_peucker(json_decode($image["data"], true), $epsilon);
         $image["data"] = json_encode($pointlist);
     }
 
@@ -56,8 +59,11 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     // Make sure it's still within the border
-    if ($scale_and_center) {
-        $image["data"] = json_encode(scale_and_center(json_decode($image["data"], true), true));
+    if ($scale_and_shift) {
+        $image["data"] = json_encode(scale_and_shift(json_decode($image["data"], true),
+                                                     true,
+                                                     390)
+                                    );
     }
 
     // Calculate path for fabric.js
@@ -99,7 +105,7 @@ echo $twig->render('render.twig', array('heading' => 'Render',
                                        'image' => $image,
                                        'points' => json_encode($points),
                                        'show_points' => $show_points,
-                                       'scale_and_center' => $scale_and_center,
+                                       'scale_and_shift' => $scale_and_shift,
                                        'douglas_peucker' => $douglas_peucker,
                                        'epsilon' => $epsilon,
                                        'cubic_spline' => $cubic_spline,

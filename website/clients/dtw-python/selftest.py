@@ -94,7 +94,7 @@ def crossvalidation():
                     Anew.append(space_evenly(line, POINTS, SPACE_EVENLY_KIND))
                 A = Anew
 
-            A = scale_and_center(A, CENTER)
+            A = scale_and_shift(A, CENTER)
 
             if FLATTEN:
                 A = list_of_pointlists2pointlist(A)
