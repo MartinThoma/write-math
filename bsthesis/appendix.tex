@@ -11,9 +11,54 @@
 {\addchap{Appendix}}	% english style
 {\addchap{Anhang}}	% german style
 
-
 \section{Algorithms}\label{appendix:algorithms}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
+  \begin{algorithmic}
+        \Function{dot\_reduction}{$pointlist$, $\theta \in \mathbb{R}_{\geq 0}$}
+            \State $new\_pointlist \gets []$
+            \State $current\_line \gets 0$
+            \ForAll{$line$ in $pointlist$}
+                \State $new\_line \gets line$
+                \State $max\_distance = \Call{get\_max\_distance}{line}$
+
+                \If{$max\_distance < \theta$}
+                    \State $new\_line \gets [\Call{get\_average\_point}{line}]$
+                \EndIf
+                \State $new\_pointlist.\Call{append}{new\_line}$
+            \EndFor
+            \Return $new\_pointlist$
+        \EndFunction
+  \end{algorithmic}
+  \caption{Dot reduction}
+  \label{alg:dot-reduction}
+\end{algorithm}
+
+
+\begin{algorithm}[ht]
+  \begin{algorithmic}
+        \Function{weighted\_average\_smoothing}{$pointlist$, $\theta = [\frac{1}{6}, \frac{4}{6}, \frac{1}{6}]$}
+            \State $\theta \gets \frac{1}{\Call{sum}{\theta}} \cdot \theta$ \Comment{Normalize parameters to a sum of 1}
+            \State $new\_pointlist \gets []$
+            \State $current\_line \gets 0$
+            \ForAll{$line$ in $pointlist$}
+                \State $new\_pointlist.\Call{append}{[line[0]]}$
+                \If{$\Call{length}{line} > 1$}
+                    \For{$i \gets 1; i < \Call{length}{line}-1; i \gets i + 1$}
+                        \State $p \gets \theta_0 \cdot line[i-1] + \theta_1 \cdot line[i] + \theta_2 \cdot line[i+1]$
+                        \State $new\_pointlist[current\_line].\Call{append}{p}$
+                    \EndFor
+                    \State $new\_pointlist[current\_line].\Call{append}{line[-1]}$
+                \EndIf
+                \State $current\_line \gets current\_line + 1$
+            \EndFor
+            \Return $new\_pointlist$
+        \EndFunction
+  \end{algorithmic}
+  \caption{Weighted average smoothing}
+  \label{alg:weighted-average-smoothing}
+\end{algorithm}
+
+\begin{algorithm}[ht]
   \begin{algorithmic}
     \State $a \gets \text{next from}~A$
     \State $b \gets \text{next from}~B$
@@ -52,7 +97,7 @@
   \label{alg:greedy-matching}
 \end{algorithm}
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
     \begin{algorithmic}
         \Function{scale\_and\_shift}{$pointlist$}
             \State $min_x, min_y = pointlist[0]['x'], pointlist[0]['y']$
@@ -101,13 +146,13 @@
 \caption{Scale and shift a list of lines to the $(0,1) \times (0, 1)$ unit square}
 \label{alg:scale-and-shift}
 \end{algorithm}
-
-\section{Figures}\label{appendix:figures}
-\setcounter{figure}{0}
-% TODO
-\begin{figure} [ht]
-    \centering
-    ein Bild
-    \caption{A figure}
-    \label{fig:BPMNBeispiela}
-\end{figure}
+% \clearpage
+% \section{Figures}\label{appendix:figures}
+% \setcounter{figure}{0}
+% % TODO
+% \begin{figure} [ht]
+%     \centering
+%     ein Bild
+%     \caption{A figure}
+%     \label{fig:BPMNBeispiela}
+% \end{figure}

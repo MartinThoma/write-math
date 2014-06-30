@@ -6,12 +6,13 @@ given a handwritten symbol or sequence of symbols.
 
 In off-line \gls{HWR}, all algorithms have to work on pixel image
 information of the handwriting. On-line \gls{HWR} on the other
-hand can use the information how symbols were written. This thesis is about
-on-line \gls{HWR}.
+hand can use the information how symbols were written. So the pen trajectory
+is given in on-line \gls{HWR}.
+This thesis is about on-line \gls{HWR}.
 
 On-line \gls{HWR} can use techniques of off-line \gls{HWR}, but studies have
 showed that on-line information does significantly improve recognition rates
-and also simplify algorithms.\cite{Guyon91,Becker72}
+and also simplify algorithms\cite{Guyon91,Becker72}.
 
 \section{Steps in handwriting recognition}
 Most handwriting-recognizers perform the following steps in order to recognize
@@ -36,12 +37,12 @@ characters, symbols or words:
           Various features will be explained in \cref{sec:features}.
 \end{enumerate}
 
-After those steps, it's only a supervised machine learning task that consists of
+After those steps, it's a supervised machine learning task that consists of
 two parts
 
 \begin{enumerate}
     \item \textbf{Learning}: This is most of the time adjusting parameters.
-    \item \textbf{Evaluation} of new datasets.
+    \item \textbf{Evaluation} of new instances.
 \end{enumerate}
 
 \section{Mathematical notation}
@@ -73,3 +74,6 @@ Preprocessing-operations that cannot be done with a single symbol are
 \begin{itemize}
     \item Baseline correction
 \end{itemize}
+
+Another limitation is that there is no context that can be used for calculating
+the hypothesis.

@@ -26,42 +26,60 @@ and $y$ are canvas coordinates and $t$ is a timestamp in seconds. This timestamp
 gives the time in milliseconds from 1970.
 
 The time resolution between points as well as the resolution of the image
-depends on the device that was used. However, most symbols have time resolution
-of about $\SI{20}{\milli\second}$ and are within a bounding box of a
-$250 \text{px} \times 250 \text{px}$.
+depends on the device that was used. However, most symbols have a time
+resolution of about $\SI{20}{\milli\second}$ and are within a bounding box of a
+$250 \text{px} \times 250 \text{px}$ square.
 
 \section{Preprocessing}\label{sec:preprocessing}
-\subsection{Normalization: Scaling and shifting}
+\subsection{Normalization: Scaling, shifting and resampling}
 In \cite{Kirsch} the datapoints were scaled to fit into a unit square while
 keeping their aspect ratio. Afterwards, the points were shifted to
 the $(0, 1) \times (0, 1)$ unit square. The algorithm is given in pseudocode on
 \cpageref{alg:scale-and-shift}. It was shown in \cite{Kirsch,Huang09} that
 this kind of preprocessing boosts classification accuracy significantly.
 
-Another idea in preprocessing is resampling \cite{Guyon91,ICASSP-94}.
+Another method to normalize data is resampling, sometimes also called
+stroke length normalization.
+\cite{Guyon91} resampled characters and digits to 81 points each, where different
+lines were also connected by \enquote{pen-up} segments. They resampled to get
+points regulary spaced in arc length, not in time. \cite{ICASSP-94} also
+resampled data to get points regulary spaced in arc length, but they encoded
+speed as an extra feature.
 
 \subsection{Noise reduction}
 The following list of noise reduction methods was created by \cite{Tappert90}
-and is still up-to-date.
-
+and is still up-to-date.\nopagebreak
 \begin{itemize}
-    \item Wild-point detection and deleting or replacement of wild points with
-          the average of neighboring points\cite{Division87},
-    \item Smoothing can be done in multiple ways. An approach that was used quite
-          often is by averaging a point with its neighbors\cite{Groner66,Division87,Arakaw83}.
-    \item Filtering is the process of removing points by some criteria. Those
-          criteria include:
+    \item \textbf{Smoothing} can be done in multiple ways. An approach that was
+          used quite often is applying a weighted average
+          \cite{Groner66,Division87,Arakaw83}. \cref{alg:weighted-average-smoothing}
+          describes in pseudocode how to implement weighted average smoothing.
+    \item \textbf{Wild-point detection} and deletion or replacement of 
+          wild points with the average of neighboring points\cite{Division87},
+    \item \textbf{Filtering} is the process of removing points by some criteria.
+          Those criteria include:
           \begin{itemize}
-              \item Duplicate points
+              \item Duplicate points,
               \item Enforcing a minimal distance between consecutive 
                     points\cite{Tappert90}.
               \item Enforcing a minimal change in direction\cite{Tappert90}.
           \end{itemize}
-    \item Dehooking [TODO: Image of hook]
-    \item Dot reduction
-    \item Stroke connection
-    \item Deskewing
-    \item Baseline drift correction
+          An idea that seemingly nobody has tried before is applying the
+          Douglas-Peucker algorithm for filtering dots.
+    \item \textbf{Dehooking} [TODO: Image of hook]
+    \item \textbf{Dot reduction} reduces dots to single points. Sometimes
+          multiple points get recorded although the user wanted to make only
+          a single point, e.g. for one of the following symbols:
+          $\cdot$, ., $\dots$, $\vdots$, $\ddots$, i, ä, ö, ü.
+          This can be detected by calculating
+          the maximum distance $d$ two points in a stroke have. If $d$ is
+          smaller than a threshold $\theta$, then it is a single point.
+          In that case all points of the line get reduced to a single dot.
+          This dot could be the center of mass of all points in the stroke.
+    \item \textbf{Stroke connection} might be used if the distance between
+          pen-up and pen-down is below a threshold.
+    \item \textbf{Deskewing} corrects character slant.
+    \item \textbf{Baseline drift correction} moves words to be on a baseline.
 \end{itemize}
 
 Wild points are points that appear within a sequence of points of a stroke. They
