@@ -156,23 +156,28 @@ function calculate_spline_points($pointlist, $interpolationpoints) {
     $new_points = array();
     foreach ($pointlist as $key => $line) {
         $new_line = array();
-        $x = array();
-        $y = array();
-        foreach ($line as $p) {
-            $x[] = array("x" => $p['time'], "y" => $p['x']);
-            $y[] = array("x" => $p['time'], "y" => $p['y']);
+        if (count($line) > 1) {
+            $x = array();
+            $y = array();
+            foreach ($line as $p) {
+                $x[] = array("x" => $p['time'], "y" => $p['x']);
+                $y[] = array("x" => $p['time'], "y" => $p['y']);
+            }
+
+            $spline_x = get_spline($x);
+            $spline_y = get_spline($y);
+            $mint = $spline_x[0]['u'];
+            $maxt = end($spline_x)['v'];
+            for ($i=0; $i < $interpolationpoints; $i++) {
+                $t = $mint + $i*($maxt - $mint) /($interpolationpoints-1);
+                $new_x = evaluate_spline($spline_x, $t);
+                $new_y = evaluate_spline($spline_y, $t);
+                $new_line[] = array("x" => $new_x, "y" => $new_y, "time" => $t);
+            }
+        } else {
+            $new_line = $line;
         }
 
-        $spline_x = get_spline($x);
-        $spline_y = get_spline($y);
-        $mint = $spline_x[0]['u'];
-        $maxt = end($spline_x)['v'];
-        for ($i=0; $i < $interpolationpoints; $i++) {
-            $t = $mint + $i*($maxt - $mint) /($interpolationpoints-1);
-            $new_x = evaluate_spline($spline_x, $t);
-            $new_y = evaluate_spline($spline_y, $t);
-            $new_line[] = array("x" => $new_x, "y" => $new_y, "time" => $t);
-        }
         $new_points[] = $new_line;
     }
     return $new_points;

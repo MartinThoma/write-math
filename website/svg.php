@@ -2,6 +2,19 @@
 require_once '../preprocessing.php';
 require_once '../classification.php';
 
+function get_dots($data) {
+    $dots = array();
+    $pointList = pointLineList($data);
+    foreach ($pointList as $line) {
+        if (count($line) == 1) {
+            $dots[] = array('x'=> $line[0]["x"],
+                            'y'=> $line[0]["y"],
+                            'time'=> $line[0]["time"]);
+        }
+    }
+    return $dots;
+}
+
 function create_raw_data_svg($raw_data_id, $data) {
     # Move drawing so that the smallest x-value is 0 and the smallest y value
     # is 0.
@@ -58,11 +71,13 @@ function get_path($data, $epsilon=0) {
     }
 
     foreach ($data as $line) {
-        foreach ($line as $i => $point) {
-            if ($i == 0) {
-                $path .= " M ".$point['x']." ".$point['y'];
-            } else {
-                $path .= " L ".$point['x']." ".$point['y'];
+        if (count($line) > 1) {
+            foreach ($line as $i => $point) {
+                if ($i == 0) {
+                    $path .= " M ".$point['x']." ".$point['y'];
+                } else {
+                    $path .= " L ".$point['x']." ".$point['y'];
+                }
             }
         }
     }

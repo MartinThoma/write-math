@@ -1,5 +1,119 @@
 <?php
 
+function minimum_time_delay_filter($pointlist, $theta) {
+    $new_pointlist = array();
+    $t_last = -1000;
+    foreach ($pointlist as $current_line=>$line) {
+        $new_line = array();
+        foreach ($line as $p) {
+            if ($p['time']-$t_last > $theta) {
+                $new_line[] = $p;
+                $t_last = $p['time'];
+            }
+        }
+        $new_pointlist[$current_line] = $new_line;
+    }
+    return $new_pointlist;
+}
+
+
+/**
+ * Calculate the average point.
+ * @param  array $L List of points
+ * @return array    a single point
+ */
+function get_average_point($L) {
+    $x = 0;
+    $y = 0;
+    $t = 0;
+    foreach ($L as $p) {
+        $x += $p['x'];
+        $y += $p['y'];
+        $t += $p['time'];
+    }
+    $x = $x / count($L);
+    $y = $y / count($L);
+    $t = $t / count($L);
+    return array('x'=> $x, 'y' => $y, 'time' => $t);
+}
+
+
+function squared_dist($p1, $p2) {
+    return pow($p1['x'] - $p2['x'], 2) + pow($p1['y'] - $p2['y'], 2);
+}
+
+
+/**
+ * Find the maximum distance between two points in a list of points
+ * @param  array $L list of points
+ * @return float    maximum distance bewtween two points
+ */
+function get_max_distance($L) {
+    if (count($L) <= 1) {
+        return -1;
+    } else {
+        $max_dist = squared_dist($L[0], $L[1]);
+        for ($i=0; $i < count($L)-1; $i++) { 
+            for ($j=$i+1; $j < count($L); $j++) { 
+                $max_dist = max(squared_dist($L[$i], $L[$j]), $max_dist);
+            }
+        }
+        return sqrt($max_dist);
+    }
+}
+
+
+/**
+ * Reduce lines where the maximum distance between points is below a threshold
+ * to a single dot.
+ * @param  array $pointlist A list of lines. Lines themselfs are lists of
+ *                          associative arrays.
+ * @param  float $threshold What euclidean distance has a line to have?
+ * @return array            the modified pointlist
+ */
+function dot_reduction($pointlist, $threshold) {
+    $new_pointlist = array();
+    foreach ($pointlist as $current_line => $line) {
+        $new_line = $line;
+        $max_distance = get_max_distance($line);
+        if ($max_distance < $threshold) {
+            $new_line = array(get_average_point($line));
+        }
+        $new_pointlist[] = $new_line;
+    }
+    return $new_pointlist;
+}
+
+function weighted_average_smoothing($pointlist, $theta) {
+    $new_theta = array();
+    for ($i=0; $i < count($theta); $i++) { 
+        $new_theta[] = $theta[$i] / array_sum($theta);
+    }
+    $theta = $new_theta;
+
+    $new_pointlist = array();
+    foreach ($pointlist as $current_line => $line) {
+        $new_pointlist[] = array($line[0]);
+        if (count($line) > 1) {
+            for ($i=1; $i < count($line)-1; $i++) {
+                $p = array('x' => 0, 'y' => 0, 'time' => 0);
+                $p['x'] =   $theta[0]*$line[$i-1]['x']
+                          + $theta[1]*$line[$i]['x']
+                          + $theta[2]*$line[$i+1]['x'];
+                $p['y'] =   $theta[0]*$line[$i-1]['y']
+                          + $theta[1]*$line[$i]['y']
+                          + $theta[2]*$line[$i+1]['y'];
+                $p['time'] =   $theta[0]*$line[$i-1]['time']
+                             + $theta[1]*$line[$i]['time']
+                             + $theta[2]*$line[$i+1]['time'];
+                $new_pointlist[$current_line][] = $p;
+            }
+            $new_pointlist[$current_line][] = end($line);
+        }
+    }
+    return $new_pointlist;
+}
+
 /**
  * Scale a list of points so that they fit into a unit square and shift the
  * points into [0, 1] x [0, 1].

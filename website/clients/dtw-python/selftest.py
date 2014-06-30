@@ -11,6 +11,38 @@ import datetime
 import sys
 
 
+def print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
+                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
+                                K_FOLD, t1sum=-1, t10sum=-1,
+                                execution_time=[]):
+    print("\n" + "-"*80)
+    print(str(datetime.date.today()))
+    print("")
+    print("```")
+    print("The following %i symbols were evaluated:" % symbol_counter)
+    print(", ".join(symbols))
+    print("raw datasets: %i" % raw_data_counter)
+    print("Epsilon: %0.2f" % EPSILON)
+    print("Center: %r" % CENTER)
+    print("Squared quadratic: False")
+    print("Flatten: %r" % FLATTEN)
+    print("Threshold: %r" % THRESHOLD)
+    if SPACE_EVENLY:
+        print("Space evenly: %r (%i points, %s)" % (SPACE_EVENLY, POINTS,
+                                                    SPACE_EVENLY_KIND))
+    else:
+        print("Space evenly: %r" % SPACE_EVENLY)
+    print("* Top-1-Classification (%i-fold cross-validated): %0.5f" %
+          (K_FOLD, (t1sum/K_FOLD)))
+    print("* Top-10-Classification (%i-fold cross-validated): %0.5f" %
+          (K_FOLD, t10sum/K_FOLD))
+    if len(execution_time) > 0:
+        print("Average time: %.5f seconds" %
+              (sum(execution_time)/len(execution_time)))
+    print("```")
+
+
 def crossvalidation():
     # Parameters for self-testing
     MIN_OCCURENCES = 10
@@ -41,7 +73,8 @@ def crossvalidation():
         raw_datasets = cursor.fetchall()
         if len(raw_datasets) >= MIN_OCCURENCES:
             symbol_counter += 1
-            symbols.append(dataset['formula_in_latex'])
+            symbols.append("%s (%i)" % (dataset['formula_in_latex'],
+                                        len(raw_datasets)))
             print("%s (%i)" % (dataset['formula_in_latex'], len(raw_datasets)))
             i = 0
             for raw_data in raw_datasets:
@@ -54,22 +87,10 @@ def crossvalidation():
                               })
                 i = (i + 1) % K_FOLD
 
-    ###
-    print("\n" + "-"*80)
-    print(str(datetime.date.today()))
-    print("The following %i symbols were evaluated:" % symbol_counter)
-    print(", ".join(symbols))
-    print("raw datasets: %i" % raw_data_counter)
-    print("Epsilon: %0.2f" % EPSILON)
-    print("Center: %r" % CENTER)
-    print("Squared quadratic: False")
-    print("Flatten: %r" % FLATTEN)
-    print("Threshold: %r" % THRESHOLD)
-    if SPACE_EVENLY:
-        print("Space evenly: %r (%i points, %s)" % (SPACE_EVENLY, POINTS, SPACE_EVENLY_KIND))
-    else:
-        print("Space evenly: %r" % SPACE_EVENLY)
-    ###
+    print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
+                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
+                                K_FOLD)
 
     # Start getting validation results
     classification_accuracy = []
@@ -122,8 +143,8 @@ def crossvalidation():
                 classification_accuracy[testset]['correct'] += 1
             else:
                 classification_accuracy[testset]['wrong'] += 1
-                logging.warning(("Got raw_data_id %i wrong. "
-                                 "It is %i, but I thought it would be %i.") %
+                logging.warning(("Raw-data-ID: %i; "
+                                 "Formula-ID: %i; Hypothesis: %i") %
                                 (testdata['id'],
                                  testdata['formula_id'],
                                  answer_id))
@@ -152,26 +173,10 @@ def crossvalidation():
         t1sum += classification_accuracy[testset]['accuracy']
         t10sum += classification_accuracy[testset]['a10']
 
-    print("\n" + "-"*80)
-    print(str(datetime.date.today()))
-    print("")
-    print("```")
-    print("The following %i symbols were evaluated:" % symbol_counter)
-    print(", ".join(symbols))
-    print("raw datasets: %i" % raw_data_counter)
-    print("Epsilon: %0.2f" % EPSILON)
-    print("Center: %r" % CENTER)
-    print("Squared quadratic: False")
-    print("Flatten: %r" % FLATTEN)
-    print("Threshold: %r" % THRESHOLD)
-    if SPACE_EVENLY:
-        print("Space evenly: %r (%i points, %s)" % (SPACE_EVENLY, POINTS, SPACE_EVENLY_KIND))
-    else:
-        print("Space evenly: %r" % SPACE_EVENLY)
-    print("* Top-1-Classification (%i-fold cross-validated): %0.5f" % (K_FOLD, (t1sum/K_FOLD)))
-    print("* Top-10-Classification (%i-fold cross-validated): %0.5f" % (K_FOLD, t10sum/K_FOLD))
-    print("Average time: %.5f seconds" % (sum(execution_time)/len(execution_time)))
-    print("```")
+    print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
+                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
+                                K_FOLD, t1sum, t10sum, execution_time)
 
 if __name__ == '__main__':
     logging.basicConfig(filename='selftest.log',

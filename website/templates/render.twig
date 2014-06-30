@@ -9,9 +9,19 @@
     var group = new fabric.Group();
     canvas.add(group);
 
-    var path = new fabric.Path('{{ image.path }}');
-    path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
-    canvas.add(path);
+    {% if path != "" %}
+        var path = new fabric.Path('{{ image.path }}');
+        path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+        canvas.add(path);
+    {% endif %}
+
+    {% for dot in dots %}
+        var dot = new fabric.Circle({radius: 5,
+                                     fill: 'red',
+                                     left: {{ dot.x }},
+                                     top: {{ dot.y }}});
+        canvas.add(dot);
+    {% endfor %}
 
     {% if show_points %}
     var group = new fabric.Group([], {});
@@ -27,8 +37,12 @@
 
 
     canvas.renderAll();
-    path.center();
+    {% if path != "" %}
+        path.center();
+    {% endif %}
+    {% if show_points %}
     group.center();
+    {% endif %}
     /* Make sure that touch events do nothing */
     canvas.deactivateAll();
     canvas.selection = false;
@@ -75,8 +89,49 @@
              name="scale_and_shift"
              {% if scale_and_shift %}checked="checked"{% endif %}
              /> Scale and shift
-        <p class="help-block">Shift points in space and time, but scale them only in space</p>
+        <p class="help-block">Shift points in space and time, but scale them only in space.</p>
     </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="minimum_time_delay_filter"
+             {% if minimum_time_delay_filter %}checked="checked"{% endif %}
+             /> Minimum Time Delay Filter <input type="text" name="minimum_time_delay_filter_constant" value="{{minimum_time_delay_filter_constant}}"/>
+        <p class="help-block">Sometimes hardware makes points when the user does not
+        want to make points. A characteristic of those points is sometimes a very
+        high speed. You can modify the minimum time delta two points should have.</p>
+    </label>
+  </div>
+  <div class="form-group">
+    <label for="smooth1">Smoothing factor (point before)</label>
+    <input type="number"
+           step="any"
+           min="0"
+           class="form-control"
+           id="smooth1" name="smooth1"
+           placeholder="0.166"
+           value="{{ smooth1 }}" />
+  </div>
+  <div class="form-group">
+    <label for="smooth2">Smoothing factor (current point)</label>
+    <input type="number"
+           step="any"
+           min="0"
+           class="form-control"
+           id="smooth2" name="smooth2"
+           placeholder="0.668"
+           value="{{ smooth2 }}" />
+  </div>
+<div class="form-group">
+    <label for="smooth3">Smoothing factor (point after)</label>
+    <input type="number"
+           step="any"
+           min="0"
+           class="form-control"
+           id="smooth3" name="smooth3"
+           placeholder="0.166"
+           value="{{ smooth3 }}" />
   </div>
   <div class="checkbox">
     <label>
@@ -91,11 +146,36 @@
   <div class="checkbox">
     <label>
       <input type="checkbox"
+             name="dot_reduction"
+             {% if dot_reduction %}checked="checked"{% endif %}
+             /> Dot reduction <input 
+                 type="number"
+                 step="any"
+                 min="0"
+                 name="dot_reduction_threshold" 
+                 value="{{ dot_reduction_threshold }}"/>
+        <p class="help-block">Sometimes dots have mutliple points due to an
+        error in the device. This filter replaces lines where the maximum
+        distance of points in that line is lower than a threshold</p>
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
              name="cubic_spline"
              {% if cubic_spline %}checked="checked"{% endif %}
              /> Cubic spline <input type="number" name="cubic_spline_points" min="2" max="100"
              step="1" value="{{cubic_spline_points}}"/>
         <p class="help-block">Space points equidistant in time</p>
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="show_raw"
+             {% if show_raw %}checked="checked"{% endif %}
+             /> Show raw data
+        <p class="help-block">This might be much.</p>
     </label>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
@@ -104,8 +184,10 @@
     </div>
 </div>
 
-
+{% if show_raw %}
     <h2>Raw data</h2>
     <pre>{{ image.data }}</pre>
-    <p>See <a href="../view?raw_data_id={{ image.id }}">raw data information</a></p>
+{% endif %}
+
+<p>See <a href="../view?raw_data_id={{ image.id }}">raw data information</a></p>
 {% endblock %}
