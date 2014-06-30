@@ -45,15 +45,15 @@
   </tr>
   <tr>
     <th>Min. Time Delta</th>
-    <td>{{ '%02.2f'|format(time_resolution.min_time_resolution) }} ms</td>
+    <td>{% if time_resolution.min_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.min_time_resolution) }} ms{% endif %}</td>
   </tr>
   <tr>
     <th>Avg. Time Delta</th>
-    <td>{{ '%02.2f'|format(time_resolution.average_time_resolution) }} ms</td>
+    <td>{% if time_resolution.average_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.average_time_resolution) }} ms{% endif %}</td>
   </tr>
   <tr>
     <th>Max. Time Delta</th>
-    <td>{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms</td>
+    <td>{% if time_resolution.max_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms{% endif %}</td>
   </tr>
 <!--   <tr>
     <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>

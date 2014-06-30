@@ -278,7 +278,13 @@ def pointLineList(linelistP):
     [[{u'y': 411, u'x': 606, u'time': 33}, {u'y': 411, u'x': 605, u'time': 35}, {u'y': 412, u'x': 605, u'time': 39}]]
     """
     global logging
-    linelist = json.loads(linelistP)
+    try:
+        linelist = json.loads(linelistP)
+    except Exception, e:
+        logging.debug("pointLineList: linelistP")
+        logging.debug(linelistP)
+        raise e
+    
 
     if len(linelist) == 0:
         logging.waring("Pointlist was empty. Search for '" +
@@ -359,7 +365,6 @@ def classify(datasets, A, EPSILON=0, THRESHOLD=100, FLATTEN=True,
 
         if FLATTEN:
             B = list_of_pointlists2pointlist(B)
-
         results.append({"dtw": dtw(A, B),
                         "latex": dataset['accepted_formula_id'],
                         "id": dataset['id'],

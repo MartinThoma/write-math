@@ -163,6 +163,11 @@ function list_of_pointlists2pointlist($data) {
 }
 
 function get_time_resolution($pointlist, $lines_nr) {
+    if(count($pointlist) < 2) {
+        return array("min_time_resolution" => -1,
+                     "max_time_resolution" => -1,
+                     "average_time_resolution" => -1);
+    }
     $min_time_resolution = $pointlist[1]["time"]-$pointlist[0]["time"];
     $max_time_resolution = $min_time_resolution;
 
