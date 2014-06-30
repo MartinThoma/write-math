@@ -66,6 +66,7 @@ function get_bounding_box($pointlist) {
     $maxy = $pointlist[0][0]["y"];
     $mint = $pointlist[0][0]["time"];
     $maxt = $pointlist[0][0]["time"];
+
     foreach ($pointlist as $line) {
         foreach ($line as $p) {
             if ($p["x"] < $minx) {

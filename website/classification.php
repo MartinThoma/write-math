@@ -2,6 +2,61 @@
 
 require_once('preprocessing.php');
 
+/**
+ * Classify $A with data from $datasets and smoothing of $epsilon.
+ * @param  array $datasets array(
+ *                             array('data' => ..., 
+ *                                   'accepted_formula_id' => ...,
+ *                                   'id' => ...,
+ *                                   'formula_in_latex' => ...,
+ *                                  )
+ *                         )
+ * @param  array $A        List of points
+ * @return array           List of possible classifications, ordered DESC by
+ *                              likelines
+ */
+function classify_with_greedy_matching($datasets, $A, $epsilon = 0) {
+    $results = array();
+
+    foreach ($datasets as $key => $dataset) {
+        $B = $dataset['data'];
+        if ($epsilon > 0) {
+            $B = apply_linewise_douglas_peucker(pointLineList($B), $epsilon);
+        } else {
+            $B = pointLineList($B);
+        }
+        $B = scale_and_shift($B);
+        $results[] = array("dtw" => apply_greedy_matching_dtw_linewise($A, $B),
+                           "latex" => $dataset['accepted_formula_id'],
+                           "id" => $dataset['id'],
+                           "latex" => $dataset['formula_in_latex'],
+                           "formula_id" => $dataset['formula_id']);
+    }
+
+    $dtw = array();
+    foreach ($results as $key => $row) {
+        $dtw[$key] = $row['dtw'];
+    }
+    array_multisort($dtw, SORT_ASC, $results);
+    $results = array_filter($results, "maximum_dtw");
+
+    // get only best match for each single symbol
+    $results2 = array();
+    foreach ($results as $key => $row) {
+        if (array_key_exists($row['formula_id'], $results2)) {
+            $results2[$row['formula_id']] = min($results2[$row['formula_id']], $row['dtw']);
+        } else {
+            $results2[$row['formula_id']] = $row['dtw'];
+        }
+    }
+
+    $results = $results2;
+    $results = array_slice($results, 0, 10, true);
+
+    $results = get_probability_from_distance($results);
+    return $results;
+}
+
 function d($p1, $p2) {
     $dx = $p1["x"] - $p2["x"];
     $dy = $p1["y"] - $p2["y"];
@@ -9,8 +64,6 @@ function d($p1, $p2) {
 }
 
 function apply_greedy_matching_dtw_linewise($A, $B) {
-    $A = scale_and_shift(pointLineList($A));
-    $B = scale_and_shift(pointLineList($B));
     if (count($A) != count($B)) {
         # If they have a different count of lines, they are different
         return 1.8e200;
@@ -146,4 +199,38 @@ function get_time_resolution($pointlist, $lines_nr) {
                  "max_time_resolution" => $max_time_resolution,
                  "average_time_resolution" => $avg_time_resolution);
 }
+
+function maximum_dtw($var, $threshold=20) {
+    if ($threshold == 0) {
+        return true;
+    } else {
+        return ($var['dtw'] < $threshold);
+    }
+}
+
+function get_probability_from_distance($results) {
+    if (count($results) == 0) {
+        return array();
+    }
+    // check if one distance is 0 and meanwhile build sum of distances.
+    $sum = 0.0;
+    $modified = array();
+    foreach ($results as $formula_id => $dtw) {
+        if ($dtw == 0) {
+            return array(array($formula_id => 1));
+        } else {
+            $modified[$formula_id] = exp(-$dtw);
+            $sum += $modified[$formula_id];
+        }
+    }
+
+    $results = $modified;
+
+    $probabilities = array();
+    foreach ($results as $formula_id => $p) {
+        $probabilities[] = array($formula_id => $p / $sum);
+    }
+    return $probabilities;
+}
+
 ?>

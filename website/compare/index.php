@@ -30,7 +30,9 @@ if (!isset($_GET['A']) || !isset($_GET['B'])) {
     $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
     $A = $data[0]['data'];
     $B = $data[1]['data'];
-    $dtw_distance = apply_greedy_matching_dtw_linewise($A, $B);
+    $As = scale_and_shift(pointLineList($A));
+    $Bs = scale_and_shift(pointLineList($B));
+    $dtw_distance = apply_greedy_matching_dtw_linewise($As, $Bs);
 
     $pathA = get_path($A, $epsilon);
     $pathB = get_path($B, $epsilon);

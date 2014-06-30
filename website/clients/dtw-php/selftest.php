@@ -1,7 +1,7 @@
 <?php
 set_time_limit (6*60*60);
 require_once 'init.php';
-require_once 'classification.php';
+require_once '../../classification.php';
 
 // Parameters for self-testing
 define("MIN_OCCURENCES", 10);
@@ -79,13 +79,12 @@ for ($testset=0; $testset < K_FOLD; $testset++) {
         $start = microtime (true);
         $raw_draw_data = $testdata['data'];
         if (EPSILON > 0) {
-            $result_path = apply_douglas_peucker(pointLineList($raw_draw_data),
-                                                 EPSILON);
+            $result_path = apply_linewise_douglas_peucker(pointLineList($raw_draw_data),
+                                                          EPSILON);
         } else {
             $result_path = pointLineList($raw_draw_data);
         }
-        $A = scale_and_shift(list_of_pointlists2pointlist($result_path),
-                             CENTER);
+        $A = scale_and_shift($result_path, CENTER);
 
         // Prepare datasets the algorithm may use
         $datasets = array();
@@ -97,7 +96,7 @@ for ($testset=0; $testset < K_FOLD; $testset++) {
             }
         }
 
-        $results = classify($datasets, $A, EPSILON);
+        $results = classify_with_greedy_matching($datasets, $A, EPSILON);
         $end = microtime (true);
         $execution_time[] = $end - $start;
 

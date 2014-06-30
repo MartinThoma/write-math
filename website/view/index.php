@@ -6,6 +6,9 @@ require_once 'functions.php';
 require_once '../classify/functions.php';
 require_once '../feature_extraction.php';
 
+$answers = null;
+$image_data = null;
+
 if (isset($_GET['request_new_classification'])) {
     $raw_data_id = intval($_GET['request_new_classification']);
 
@@ -159,6 +162,7 @@ if (isset($_GET['raw_data_id'])) {
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
+
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
@@ -206,6 +210,7 @@ if ($epsilon > 0) {
 } else {
     $result_path = pointLineList($image_data->data);
 }
+
 $bounding_box = get_dimensions($result_path);
 $time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $lines_nr);
 
