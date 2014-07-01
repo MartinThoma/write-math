@@ -31,11 +31,11 @@ resolution of about $\SI{20}{\milli\second}$ and are within a bounding box of a
 $250 \text{px} \times 250 \text{px}$ square.
 
 \section{Preprocessing}\label{sec:preprocessing}
-Preprocessing is a data manipulation step done to improve the quality and
+Preprocessing in symbol recognition is done to improve the quality and
 expressive power of data. It should make follow-up tasks like segmentation and
 feature extraction easier, more effective or faster. It does so by removing
 or fixing errors in the input data, reducing duplicate information and
-removing unnecessary information.
+removing irrelevant information.
 
 \subsection{Normalization: Scaling, shifting and resampling}
 In \cite{Kirsch} the datapoints were scaled to fit into a unit square while
@@ -62,17 +62,18 @@ and is still up-to-date.
           $\cdot$, ., $\dots$, $\vdots$, $\ddots$, i, ä, ö, ü.
           This can be detected by calculating
           the maximum distance $d$ two points in a stroke have. If $d$ is
-          smaller than a threshold $\theta$, then it is a single point.
+          smaller than a threshold, then it is a single point.
           In that case all points of the line get reduced to a single dot.
           This dot could be the center of mass of all points in the stroke.
     \item \textbf{Dehooking} is the removal of hooks which the author did not
           want to write. Hooks appear sometimes at the end of strokes.
           Examples can be seen in \cref{fig:hooks}. An algorithm in pseudocode
-          can be found on \cpageref{alg:dehooking}.
+          can be found on \cpageref{alg:dehooking}. A more sophisticated method
+          was applied in \cite{Huang09}.
     \item \textbf{Filtering} is the process of removing points by some criteria.
           Those criteria include:
           \begin{itemize}
-              \item Duplicate points,
+              \item Duplicate points as applied in \cite{Huang09,Guerfali93},
               \item Enforcing a minimal distance between consecutive 
                     points\cite{Tappert90}.
               \item Maximum velocity / acceleration\cite{Division87}
@@ -87,8 +88,18 @@ and is still up-to-date.
           \cite{Groner66,Division87,Arakaw83}. \Cref{alg:weighted-average-smoothing}
           describes in pseudocode how weighted average smoothing can be implemented.
     \item \textbf{Stroke connection} might be used if the distance between
-          pen-up and pen-down is below a threshold.
-    \item \textbf{Deskewing} corrects character slant.
+          pen-up and pen-down is below a threshold. \cite{Guerfali93} describes
+          that such maliciously disconnected components can get detected by
+          observing angular continuity and the shortness of distance between
+          two strokes.
+    \item \textbf{Deskewing} corrects character slant. Although this technique
+          was applied by some authors \cite{Bozinovic1989,Guerfali93,IWFHR94},
+          it seems not ot be
+          applicable to the domain of mathematical handwriting, because on the
+          one hand symbols might occur in variations with slant, like
+          $\rightarrow$ and $\nearrow$. On the other hand it is questionable
+          if slant is as consistent with symbols as it is with cursive
+          handwriting.
     \item \textbf{Baseline drift correction} moves words to be on a baseline.
 \end{itemize}
 
@@ -105,10 +116,6 @@ and is still up-to-date.
     \caption{Examples for hooks}
     \label{fig:hooks}
 \end{figure}
-
-Wild points are points that appear within a sequence of points of a stroke. They
-that were not caused by the pen, but by a hardware error. They are characterized
-by a very high velocity and sharp angles.
 
 \section{Features}\label{sec:features}
 A number of different features have been suggested so far for on-line handwriting
@@ -162,4 +169,14 @@ angle of the two neighboring points:
     \item Number of strokes\cite{Huang09}
     \item Pseudo-Zernike Features (TODO: Really global? What is it?)\cite{Khotanzad}
     \item Shadow Code Features\cite{Khotanzad}
+    \item \textbf{Position sequences}
+    \begin{itemize}
+        \item \textit{Pentip sequence}: \cite{Kirsch} used the raw pentip
+              sequence combined with \gls{DTW} to recognize mathematical symbols.
+        \item \textit{Zone sequences}: Some authors \cite{Brown1964,Hanaki80}
+          recognize symbols by
+          dividing the box in which the character is written into zones. By examining the position of the pen-tip a sequence of zones can be generated for a written
+          symbol.
+        \item \textit{Direction sequences}:
+    \end{itemize}
 \end{itemize}
