@@ -1,5 +1,5 @@
 %!TEX root = thesis.tex
-\chapter{Data, Preprocessing and Features}\label{ch:preprocessing}
+\chapter{Data, Preprocessing and Feature extraction}\label{ch:preprocessing}
 
 \begin{wrapfigure}{r}{7cm}
   \vspace{-35pt}
@@ -31,6 +31,12 @@ resolution of about $\SI{20}{\milli\second}$ and are within a bounding box of a
 $250 \text{px} \times 250 \text{px}$ square.
 
 \section{Preprocessing}\label{sec:preprocessing}
+Preprocessing is a data manipulation step done to improve the quality and
+expressive power of data. It should make follow-up tasks like segmentation and
+feature extraction easier, more effective or faster. It does so by removing
+or fixing errors in the input data, reducing duplicate information and
+removing unnecessary information.
+
 \subsection{Normalization: Scaling, shifting and resampling}
 In \cite{Kirsch} the datapoints were scaled to fit into a unit square while
 keeping their aspect ratio. Afterwards, the points were shifted to
@@ -47,26 +53,26 @@ resampled data to get points regulary spaced in arc length, but they encoded
 speed as an extra feature.
 
 \subsection{Noise reduction}
-The following list of noise reduction methods was created by \cite{Tappert90}
-and is still up-to-date.\nopagebreak
+The following list of noise reduction techniques was created by \cite{Tappert90}
+and is still up-to-date.
 \begin{itemize}
-    \item \textbf{Smoothing} can be done in multiple ways. An approach that was
-          used quite often is applying a weighted average
-          \cite{Groner66,Division87,Arakaw83}. \cref{alg:weighted-average-smoothing}
-          describes in pseudocode how to implement weighted average smoothing.
-    \item \textbf{Wild-point detection} and deletion or replacement of 
-          wild points with the average of neighboring points\cite{Division87},
     \item \textbf{Filtering} is the process of removing points by some criteria.
           Those criteria include:
           \begin{itemize}
               \item Duplicate points,
               \item Enforcing a minimal distance between consecutive 
                     points\cite{Tappert90}.
+              \item Maximum velocity / acceleration\cite{Division87}
               \item Enforcing a minimal change in direction\cite{Tappert90}.
           \end{itemize}
           An idea that seemingly nobody has tried before is applying the
           Douglas-Peucker algorithm for filtering dots.
-    \item \textbf{Dehooking} [TODO: Image of hook]
+
+          A special reason for the application of filtering methods are occasional spurious points which are also called \textit{wild points}.
+    \item \textbf{Smoothing} can be done in multiple ways. An approach that was
+          used quite often is applying a weighted average
+          \cite{Groner66,Division87,Arakaw83}. \Cref{alg:weighted-average-smoothing}
+          describes in pseudocode how weighted average smoothing can be implemented.
     \item \textbf{Dot reduction} reduces dots to single points. Sometimes
           multiple points get recorded although the user wanted to make only
           a single point, e.g. for one of the following symbols:
@@ -79,8 +85,25 @@ and is still up-to-date.\nopagebreak
     \item \textbf{Stroke connection} might be used if the distance between
           pen-up and pen-down is below a threshold.
     \item \textbf{Deskewing} corrects character slant.
+    \item \textbf{Dehooking} is the removal of hooks which the author did not
+          want to write. Hooks appear sometimes at the end of strokes.
+          Examples can be seen in \cref{fig:hooks}.
     \item \textbf{Baseline drift correction} moves words to be on a baseline.
 \end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Hook at the end of $\hbar$]{
+        \includegraphics[height=0.3\linewidth, keepaspectratio]{figures/8350.pdf}
+        \label{fig:hook-hbar}
+    }%
+    \subfloat[Hook in the letter R]{
+        \includegraphics[height=0.3\linewidth, keepaspectratio]{figures/11387.pdf}
+        \label{fig:hook-R}
+    }%
+    \caption{Examples for hooks}
+    \label{fig:hooks}
+\end{figure}
 
 Wild points are points that appear within a sequence of points of a stroke. They
 that were not caused by the pen, but by a hardware error. They are characterized
