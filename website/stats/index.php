@@ -5,6 +5,7 @@ $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
        "COUNT(  `wm_formula`.`id` ) AS counter ".
        "FROM  `wm_raw_draw_data` ".
        "JOIN  `wm_formula` ON  `wm_formula`.`id` =  `accepted_formula_id` ".
+       "WHERE `formula_type` = 'single symbol' ".
        "GROUP BY  `accepted_formula_id` ".
        "ORDER BY counter DESC";
 $stmt = $pdo->prepare($sql);

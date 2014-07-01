@@ -198,6 +198,7 @@ if (isset($_GET['rand'])) {
            "FROM `wm_formula` ".
            "LEFT JOIN `wm_raw_data2formula` ".
            "ON `formula_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
+           "WHERE `formula_type` = 'single symbol' ".
            "GROUP BY formula_name ".
            "ORDER BY `wm_formula`.`id` ASC";
     $stmt = $pdo->prepare($sql);

@@ -71,7 +71,7 @@ function get_path($data, $epsilon=0) {
     }
 
     foreach ($data as $line) {
-        if (count($line) > 1) {
+        //if (count($line) > 1) {
             foreach ($line as $i => $point) {
                 if ($i == 0) {
                     $path .= " M ".$point['x']." ".$point['y'];
@@ -79,7 +79,7 @@ function get_path($data, $epsilon=0) {
                     $path .= " L ".$point['x']." ".$point['y'];
                 }
             }
-        }
+        //}
     }
 
     return $path;

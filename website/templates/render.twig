@@ -9,19 +9,9 @@
     var group = new fabric.Group();
     canvas.add(group);
 
-    {% if path != "" %}
-        var path = new fabric.Path('{{ image.path }}');
-        path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
-        canvas.add(path);
-    {% endif %}
-
-    {% for dot in dots %}
-        var dot = new fabric.Circle({radius: 5,
-                                     fill: 'red',
-                                     left: {{ dot.x }},
-                                     top: {{ dot.y }}});
-        canvas.add(dot);
-    {% endfor %}
+    var path = new fabric.Path('{{ image.path }}');
+    path.set({fill: 'transparent', stroke: 'red', strokeWidth: 3});
+    canvas.add(path);
 
     {% if show_points %}
     var group = new fabric.Group([], {});
@@ -37,12 +27,8 @@
 
 
     canvas.renderAll();
-    {% if path != "" %}
-        path.center();
-    {% endif %}
-    {% if show_points %}
+    path.center();
     group.center();
-    {% endif %}
     /* Make sure that touch events do nothing */
     canvas.deactivateAll();
     canvas.selection = false;
