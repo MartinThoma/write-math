@@ -56,6 +56,19 @@ speed as an extra feature.
 The following list of noise reduction techniques was created by \cite{Tappert90}
 and is still up-to-date.
 \begin{itemize}
+    \item \textbf{Dot reduction} reduces dots to single points. Sometimes
+          multiple points get recorded although the user wanted to make only
+          a single point, e.g. for one of the following symbols:
+          $\cdot$, ., $\dots$, $\vdots$, $\ddots$, i, ä, ö, ü.
+          This can be detected by calculating
+          the maximum distance $d$ two points in a stroke have. If $d$ is
+          smaller than a threshold $\theta$, then it is a single point.
+          In that case all points of the line get reduced to a single dot.
+          This dot could be the center of mass of all points in the stroke.
+    \item \textbf{Dehooking} is the removal of hooks which the author did not
+          want to write. Hooks appear sometimes at the end of strokes.
+          Examples can be seen in \cref{fig:hooks}. An algorithm in pseudocode
+          can be found on \cpageref{alg:dehooking}.
     \item \textbf{Filtering} is the process of removing points by some criteria.
           Those criteria include:
           \begin{itemize}
@@ -73,21 +86,9 @@ and is still up-to-date.
           used quite often is applying a weighted average
           \cite{Groner66,Division87,Arakaw83}. \Cref{alg:weighted-average-smoothing}
           describes in pseudocode how weighted average smoothing can be implemented.
-    \item \textbf{Dot reduction} reduces dots to single points. Sometimes
-          multiple points get recorded although the user wanted to make only
-          a single point, e.g. for one of the following symbols:
-          $\cdot$, ., $\dots$, $\vdots$, $\ddots$, i, ä, ö, ü.
-          This can be detected by calculating
-          the maximum distance $d$ two points in a stroke have. If $d$ is
-          smaller than a threshold $\theta$, then it is a single point.
-          In that case all points of the line get reduced to a single dot.
-          This dot could be the center of mass of all points in the stroke.
     \item \textbf{Stroke connection} might be used if the distance between
           pen-up and pen-down is below a threshold.
     \item \textbf{Deskewing} corrects character slant.
-    \item \textbf{Dehooking} is the removal of hooks which the author did not
-          want to write. Hooks appear sometimes at the end of strokes.
-          Examples can be seen in \cref{fig:hooks}.
     \item \textbf{Baseline drift correction} moves words to be on a baseline.
 \end{itemize}
 
