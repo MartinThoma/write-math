@@ -14,10 +14,18 @@ if (isset($_GET['raw_data_id'])) {
     $cubic_spline = isset($_GET["cubic_spline"]) && $_GET["cubic_spline"] == "on";
     $douglas_peucker = isset($_GET["douglas_peucker"]) && $_GET["douglas_peucker"] == "on";
     $dot_reduction = isset($_GET["dot_reduction"]) && $_GET["dot_reduction"] == "on";
+    $dehooking = isset($_GET["dehooking"]) && $_GET["dehooking"] == "on";
     $minimum_time_delay_filter = isset($_GET["minimum_time_delay_filter"]) && $_GET["minimum_time_delay_filter"] == "on";
     $dot_reduction_threshold = isset($_GET['dot_reduction_threshold']) ? $_GET['dot_reduction_threshold'] : 0.2;
+    $dehooking_threshold = isset($_GET['dehooking_threshold']) ? $_GET['dehooking_threshold'] : 20;
     $minimum_time_delay_filter_constant = isset($_GET['minimum_time_delay_filter_constant']) ? $_GET['minimum_time_delay_filter_constant'] : 10;
     $show_raw = isset($_GET["show_raw"]) && $_GET["show_raw"] == "on";
+    $smoothing_applications = isset($_GET['smoothing_applications']) ? $_GET['smoothing_applications'] : 1;
+    if ($smoothing_applications > 30) {
+        $smoothing_applications = 30;
+    } elseif ($smoothing_applications < 0) {
+        $smoothing_applications = 0;
+    }
     $smooth1 = isset($_GET['smooth1']) ? $_GET['smooth1'] : 0;
     $smooth2 = isset($_GET['smooth2']) ? $_GET['smooth2'] : 1;
     $smooth3 = isset($_GET['smooth3']) ? $_GET['smooth3'] : 0;
@@ -46,7 +54,21 @@ if (isset($_GET['raw_data_id'])) {
                                     );
     }
 
-    // Wildpoint speed filter
+    // Dot reduction
+    if ($dot_reduction) {
+        $pointlist = dot_reduction(json_decode($image["data"], true),
+                                   $dot_reduction_threshold);
+        $image["data"] = json_encode($pointlist);
+    }
+
+    // Dehooking
+    if ($dehooking) {
+        $pointlist = dehook_symbol(json_decode($image["data"], true),
+                                   $dehooking_threshold);
+        $image["data"] = json_encode($pointlist);
+    }
+
+    // Minimum time delay filter
     if ($minimum_time_delay_filter) {
         $pointlist = minimum_time_delay_filter(json_decode($image["data"], true),
                                                $minimum_time_delay_filter_constant);
@@ -54,20 +76,16 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     // apply weighted moving average
-    $pointlist = weighted_average_smoothing(json_decode($image["data"], true),
-                                            $theta);
-    $image["data"] = json_encode($pointlist);
+    for ($i=0; $i < $smoothing_applications; $i++) { 
+        $pointlist = weighted_average_smoothing(json_decode($image["data"], true),
+                                                $theta);
+        $image["data"] = json_encode($pointlist);
+    }
+
 
     // Douglas Peucker
     if ($douglas_peucker) {
         $pointlist = apply_linewise_douglas_peucker(json_decode($image["data"], true), $epsilon);
-        $image["data"] = json_encode($pointlist);
-    }
-
-    // Dot reduction
-    if ($dot_reduction) {
-        $pointlist = dot_reduction(json_decode($image["data"], true),
-                                   $dot_reduction_threshold);
         $image["data"] = json_encode($pointlist);
     }
 
@@ -148,6 +166,9 @@ echo $twig->render('render.twig', array('heading' => 'Render',
                                        'dot_reduction' => $dot_reduction,
                                        'dot_reduction_threshold' => $dot_reduction_threshold,
                                        'minimum_time_delay_filter' => $minimum_time_delay_filter,
-                                       'minimum_time_delay_filter_constant' => $minimum_time_delay_filter_constant
+                                       'minimum_time_delay_filter_constant' => $minimum_time_delay_filter_constant,
+                                       'dehooking' => $dehooking,
+                                       'dehooking_threshold' => $dehooking_threshold,
+                                       'smoothing_applications' => $smoothing_applications
                                        )
                   );

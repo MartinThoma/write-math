@@ -1,5 +1,93 @@
 <?php
 
+/**
+ * Remove hooks from end of line of all lines in symbol
+ * @param  array $pointlist A list of lines. Lines themselfs are lists of
+ *                          associative arrays.
+ * @param  float $theta     Maximum angle that might occur at end of line
+ * @return array            modified pointlist
+ */
+function dehook_symbol($pointlist, $theta) {
+    $new_pointlist = array();
+    foreach ($pointlist as $current_line => $line) {
+        $new_line = dehook_line($line, $theta);
+        $new_pointlist[] = $new_line;
+    }
+    return $new_pointlist;
+}
+
+
+/**
+ * Remove hooks at end of line. They can be detected by an change of direction
+ * that is greater than theta.
+ * @param  array $line  List of points
+ * @param  float $theta Maximum angle that might occur at end of line
+ * @return array        modified line
+ */
+function dehook_line($line, $theta) {
+    $new_line = array();
+    if (count($line) < 3) {
+        $new_line = $line;
+    } else {
+        # Get everything but the last point
+        $new_line = array_slice($line, 0, count($line)-1);
+        # leave only the last 3 points
+        $line = array_slice($line, count($line)-3);
+
+        # Calculate angle
+        $x1 = null;
+        $y1 = null;
+        $x2 = null;
+        $y2 = null;
+        $x3 = null;
+        $y3 = null;
+        foreach ($line as $p) {
+            if (is_null($x1)) {
+                $x1 = $p['x'];
+                $y1 = $p['y'];
+            } elseif (is_null($x2)) {
+                $x2 = $p['x'];
+                $y2 = $p['y'];
+            } elseif (is_null($x3)) {
+                $x3 = $p['x'];
+                $y3 = $p['y'];
+            } else {
+                $x1 = $x2;
+                $x2 = $x3;
+                $x3 = $p['x'];
+                $y1 = $y2;
+                $y2 = $y3;
+                $y3 = $p['y'];
+            }
+
+            if (!is_null($x3)) {
+                $v1 = array('x' => $x2 - $x1, 'y' => $y2 - $y1);
+                $v2 = array('x' => $x3 - $x2, 'y' => $y3 - $y2);
+
+                // calculate angle with dot product
+                $angle = rad2deg(acos(($v1['x']*$v2['x']+$v1['y']*$v2['y'])/
+                         (sqrt(pow($v1['x'], 2) + pow($v1['y'], 2))
+                          * sqrt(pow($v2['x'], 2) + pow($v2['y'], 2)))));
+                if ($angle < $theta) {
+                    $new_line[] = $p;
+                } else {
+                    # This was a hook! Remove that point and test again!
+                    $new_line = dehook_line($new_line, $theta);
+                }
+            }
+        }
+    }
+    return $new_line;
+}
+
+/**
+ * Filter all points out that don't have a minimum time delay theta between
+ * them.
+ * @param  array $pointlist A list of lines. Lines themselfs are lists of
+ *                          associative arrays.
+ * @param  float $theta     Minimum time delay
+ * @return filtered pointlist
+ */
 function minimum_time_delay_filter($pointlist, $theta) {
     $new_pointlist = array();
     $t_last = -1000;

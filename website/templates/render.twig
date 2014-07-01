@@ -81,6 +81,34 @@
   <div class="checkbox">
     <label>
       <input type="checkbox"
+             name="dot_reduction"
+             {% if dot_reduction %}checked="checked"{% endif %}
+             /> Dot reduction <input 
+                 type="number"
+                 step="any"
+                 min="0"
+                 name="dot_reduction_threshold" 
+                 value="{{ dot_reduction_threshold }}"/>
+        <p class="help-block">Sometimes dots have mutliple points due to an
+        error in the device. This filter replaces lines where the maximum
+        distance of points in that line is lower than a threshold.</p>
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
+             name="dehooking"
+             {% if dehooking %}checked="checked"{% endif %}
+             /> Dehooking <input type="text" name="dehooking_threshold" value="{{dehooking_threshold}}"/>
+        <p class="help-block">Sometimes users get points at the end of lines
+        which they did not want to make. Those points have a significant change of
+        direction. This method removes points at the end that would lead to
+        a change of direction above a threshold.</p>
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"
              name="minimum_time_delay_filter"
              {% if minimum_time_delay_filter %}checked="checked"{% endif %}
              /> Minimum Time Delay Filter <input type="text" name="minimum_time_delay_filter_constant" value="{{minimum_time_delay_filter_constant}}"/>
@@ -88,6 +116,17 @@
         want to make points. A characteristic of those points is sometimes a very
         high speed. You can modify the minimum time delta two points should have.</p>
     </label>
+  </div>
+  <div class="form-group">
+    <label for="smoothing_applications">Apply smoothing that often</label>
+    <input type="number"
+           step="1"
+           min="0"
+           max="30"
+           class="form-control"
+           id="smoothing_applications" name="smoothing_applications"
+           placeholder="1"
+           value="{{ smoothing_applications }}" />
   </div>
   <div class="form-group">
     <label for="smooth1">Smoothing factor (point before)</label>
@@ -126,23 +165,7 @@
              {% if douglas_peucker %}checked="checked"{% endif %}
              /> Douglas Peucker <input type="text" name="epsilon" value="{{epsilon}}"/>
         <p class="help-block">Apply the Douglas-Peucker algorithm to get
-        rid of points that seem to be not much different from other points</p>
-    </label>
-  </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox"
-             name="dot_reduction"
-             {% if dot_reduction %}checked="checked"{% endif %}
-             /> Dot reduction <input 
-                 type="number"
-                 step="any"
-                 min="0"
-                 name="dot_reduction_threshold" 
-                 value="{{ dot_reduction_threshold }}"/>
-        <p class="help-block">Sometimes dots have mutliple points due to an
-        error in the device. This filter replaces lines where the maximum
-        distance of points in that line is lower than a threshold</p>
+        rid of points that seem to be not much different from other points.</p>
     </label>
   </div>
   <div class="checkbox">
@@ -152,7 +175,7 @@
              {% if cubic_spline %}checked="checked"{% endif %}
              /> Cubic spline <input type="number" name="cubic_spline_points" min="2" max="100"
              step="1" value="{{cubic_spline_points}}"/>
-        <p class="help-block">Space points equidistant in time</p>
+        <p class="help-block">Space points equidistant in time.</p>
     </label>
   </div>
   <div class="checkbox">
