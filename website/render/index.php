@@ -145,7 +145,7 @@ if (isset($_GET['raw_data_id'])) {
     exit (0);
 }
 
-echo $twig->render('render.twig', array('heading' => 'Render',
+echo $twig->render('render.twig', array('heading' => 'Interactive Preprocessing Experiments',
                                        'file'=> "render",
                                        'logged_in' => is_logged_in(),
                                        'display_name' => $_SESSION['display_name'],
