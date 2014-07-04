@@ -7,7 +7,7 @@ def main():
     MIN_OCCURENCES = 10
     K_FOLD = 10
 
-    datasets = pickle.load(open("handwriting_datasets.pickle"))
+    datasets, formula_id2latex = pickle.load(open("handwriting_datasets.pickle"))
 
     # Prepare crossvalidation data set
     cv = [[], [], [], [], [], [], [], [], [], []]
@@ -27,7 +27,7 @@ def main():
                 cv[i].append(raw_data)
                 i = (i + 1) % K_FOLD
 
-    pickle.dump(cv, open("cv_datasets.pickle", "wb"))
+    pickle.dump((cv, formula_id2latex), open("cv_datasets.pickle", "wb"))
 
 
 if __name__ == '__main__':

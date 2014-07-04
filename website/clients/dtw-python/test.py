@@ -8,9 +8,19 @@ from download_dataset import main as download_dataset
 import cPickle as pickle
 import logging
 import time
-logging.basicConfig(filename='classificationpy.log',
+from argparse import ArgumentParser
+logging.basicConfig(filename='test.log',
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s: %(message)s')
+
+
+def pp_results(results, data, formula_id2latex):
+    s = "Raw-Data-ID: %i; Reality: %s\n" % (data['id'],
+                                          formula_id2latex[data['formula_id']])
+    for result in results:
+        s += "\t%0.3f for\t%s\n" % (result['p'],
+                              formula_id2latex[result['formula_id']])
+    return s
 
 
 def main(K_FOLD=10, get_new_dataset=False):
@@ -19,7 +29,7 @@ def main(K_FOLD=10, get_new_dataset=False):
         make_crossvalidation_dataset()
 
     logging.info("Load data")
-    cv = pickle.load(open('cv_datasets.pickle'))
+    cv, formula_id2latex = pickle.load(open('cv_datasets.pickle'))
 
     # apply preprocessing
     logging.info("Apply Preprocessing")
@@ -66,12 +76,20 @@ def main(K_FOLD=10, get_new_dataset=False):
                     ca[testset]['c10'] += 1
                 else:
                     ca[testset]['w10'] += 1
-                    logging.info("Raw-Data-ID: %i; HYP: %s; Reality: %i" %
-                                 (data['id'], str(results), data['formula_id'])
-                                 )
+                    logging.info(pp_results(results, data, formula_id2latex))
 
             if i % 100 == 0:
                 logging.info(ca)
 
 if __name__ == '__main__':
-    main()
+    parser = ArgumentParser()
+
+    # Add more options if you like
+    parser.add_argument("-k", "--kfold", dest="kfold", type=int, default=10,
+                        help="K Fold cross validation")
+    parser.add_argument("-r", "--refresh", dest="refresh_dataset",
+                        action="store_true", default=False,
+                        help="refresh dataset")
+
+    args = parser.parse_args()
+    main(args.kfold, args.refresh_dataset)

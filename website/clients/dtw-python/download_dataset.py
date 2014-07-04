@@ -21,8 +21,10 @@ def main():
     datasets = cursor.fetchall()
 
     handwriting_datasets = []
+    formula_id2latex = {}
 
     for dataset in datasets:
+        formula_id2latex[dataset['id']] = dataset['formula_in_latex']
         sql = ("SELECT id, data FROM `wm_raw_draw_data` "
                "WHERE `accepted_formula_id` = %s" % str(dataset['id']))
         cursor.execute(sql)
@@ -39,7 +41,7 @@ def main():
                 print("Raw data id: %s" % raw_data['id'])
                 print(e)
 
-    pickle.dump(handwriting_datasets,
+    pickle.dump((handwriting_datasets, formula_id2latex),
                 open("handwriting_datasets.pickle", "wb"))
 
 if __name__ == '__main__':
