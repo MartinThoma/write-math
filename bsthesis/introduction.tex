@@ -77,3 +77,30 @@ Preprocessing-operations that cannot be done with a single symbol are
 
 Another limitation is that there is no context that can be used for calculating
 the hypothesis.
+
+\section{What is a symbol?}
+A symbol is an atomic semantic entity. Examples for symbols are: $\alpha, \propto, \cdot, x, \int, \sigma, \dots$
+
+In contrast, the \LaTeX{} command \verb+\ll+ which compiles to $\ll$ are two
+symbols as well as \verb+\iint+ and \verb+\iiint+ which compile to $\iint$ and
+$\iiint$ are two and three symbols. 
+
+I suggest to ignore those commands in a symbol recognizer. Instead, a formula
+recognizer that recognizes \verb+\int\int+ should apply a post recognition method
+that transforms $\int\int$ to $\iint$. Some of those are transformations are
+listed in \cref{table:postprocessing-formula-recognizer}.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{ll|ll}
+        \toprule
+        \multicolumn{2}{c|}{Search}           & \multicolumn{2}{c}{Replace} \\
+        \LaTeX{}            & Rendered       & \LaTeX{}      & Rendered \\\midrule
+        \verb+\int\int+     & $\int\int$     & \verb+\iint+  & $\iint$ \\
+        \verb+\int\int\int+ & $\int\int\int$ & \verb+\iiint+ & $\iiint$ \\
+        \verb+<<+           & $<<$           & \verb+\ll+    & $\ll$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Multiple symbols in one \LaTeX{} command}
+    \label{table:postprocessing-formula-recognizer}
+\end{table}

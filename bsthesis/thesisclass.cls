@@ -38,6 +38,10 @@
 \usepackage{enumitem}       % Better than \usepackage{enumerate}, because it allows to set references
 \usepackage{braket}         % needed for \Set
 \usepackage{csquotes}       % \enquote{}
+\usepackage{array}
+\usepackage{booktabs}       % \toprule
+\setlength{\heavyrulewidth}{1.5pt}
+\setlength{\abovetopsep}{4pt}
 
 \usepackage{algorithm,algpseudocode}
 \algtext*{EndIf}        % Remove "end if" text
