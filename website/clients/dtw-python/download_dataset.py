@@ -41,7 +41,9 @@ def main():
                 print("Raw data id: %s" % raw_data['id'])
                 print(e)
 
-    pickle.dump((handwriting_datasets, formula_id2latex),
+    pickle.dump({'handwriting_datasets': handwriting_datasets,
+                 'formula_id2latex': formula_id2latex,
+                 },
                 open("handwriting_datasets.pickle", "wb"))
 
 if __name__ == '__main__':
