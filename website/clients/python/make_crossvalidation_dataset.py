@@ -1,12 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import cPickle as pickle
 
 
-def main():
-    MIN_OCCURENCES = 10
-    K_FOLD = 10
-
+def main(MIN_OCCURENCES=10, K_FOLD=10):
     loaded = pickle.load(open("handwriting_datasets.pickle"))
     datasets = loaded['handwriting_datasets']
 
@@ -43,4 +41,19 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+
+    # Add more options if you like
+    parser.add_argument("-m", "--min-occurences", dest="MIN_OCCURENCES",
+                        type=int, default=10,
+                        help="How many training instances should exist at" +
+                             "minimum for a symbol to be considered?")
+    parser.add_argument("-k", "--kfold", dest="K_FOLD",
+                        type=int, default=10,
+                        help="How many equal sized bins should be created?")
+
+    args = parser.parse_args()
+
+    main(args.MIN_OCCURENCES, args.K_FOLD)

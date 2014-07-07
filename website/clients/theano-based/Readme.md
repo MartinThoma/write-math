@@ -303,47 +303,178 @@ $ d test testdata-0.pfile < mlp3.json
 [2014-06-27 16:57:24,806] PFileDataset@testdata-0.pfile,1: errors = 0.962240, cost = 5.298317
 ```
 
-### Douglas-Peucker-Features ()
+### Douglas-Peucker-Features
 #### Data
+```
+! (68), + (80), - (92), / (78), 
+0 (124), 1 (94), 2 (94), 3 (104), 4 (117), 5 (79), 6 (89), 7 (81), 8 (93), 9 (80) 
+< (91), > (73), 
+A (311), B (121), C (121), D (99), E (112), F (112), G (109), H (101), I (89), J (101), K (94), L (91), M (113), N (92), O (78), P (74), Q (74), R (82), S (52), T (62), U (57), V (45), W (58), X (48), Y (50), Z (68) 
+[ (94), \$ (49), \% (38), \& (40), \Delta (116), \EURcr (35), \EURtm (43), \Finv (49), \Gamma (123), \Lambda (56), \Leftarrow (35), \Longleftrightarrow (40), \Omega (121), \Phi (48), \Pi (55), \Psi (50), \Rightarrow (63), \Sigma (102), \Theta (53), \Upomega (36), \Upsilon (41), \Xi (43), \_ (81), \alpha (138), \approx (45), \barwedge (71), \beta (119), \bigcap (88), \bigcup (69), \boxdot (53), \cap (79), \cdot (94), \celsius (48), \chi (50), \circ (71), \cong (58), \cup (80), \dashv (79), \delta (70), \dots (71), \dotsc (41), \dot{\cup} (67), \ell (42), \emptyset (79), \epsilon (60), \equiv (72), \eta (49), \exists (113), \fint (57), \forall (41), \gamma (100), \geq (55), \gg (57), \hbar (75), \iddots (38), \in (101), \infty (47), \int (68), \iota (47), \kappa (53), \lambda (85), \leadsto (74), \leftarrow (76), \leq (57), \lessdot (48), \libra (35), \ll (45), \lll (35), \mathbb{H} (73), \mathbb{N} (50), \mathbb{Q} (57), \mathbb{R} (48), \mathbb{Z} (66), \mu (123), \nabla (51), \neq (74), \ni (76), \nu (48), \ohm (70), \oiint (67), \oint (94), \omega (52), \parallel (79), \partial (74), \permil (35), \perp (76), \phi (63), \pi (127), \pm (85), \prec (40), \propto (77), \psi (51), \rceil (104), \rfloor (50), \rho (48), \rightarrow (106), \setminus (69), \sharp (56), \sigma (64), \sim (76), \sqint (75), \sqrt{} (88), \square (78), \subset (95), \subseteq (56), \succ (42), \succeq (41), \sum (62), \supset (90), \supseteq (60), \tau (68), \textasciitilde (47), \textbackslash (75), \textlira (37), \textlptr (79), \textrangle (50), \theta (54), \times (97), \triangleq (42), \updelta (50), \uplus (41), \upsilon (46), \varepsilon (119), \varkappa (45), \varphi (119), \varrho (45), \vdash (73), \vdots (73), \vee (73), \wedge (79), \xi (128), \zeta (65), \{ (70), \| (72), \} (85), ] (101), 
+a (63), b (47), c (56), d (45), e (50), f (61), g (49), h (47), i (54), j (49), k (50), l (44), m (48), n (54), o (47), p (46), q (64), r (41), s (50), t (61), u (53), v (41), w (43), x (58), y (48), z (50) 
+| (75), 
+```
+Classes (Nr of symbols): 205
 
 #### Preprocessing
-
-#### Features
+```
+* <function scale_and_shift at 0x27a55f0> with []
+* <function douglas_peucker at 0x27a56e0> with {'EPSILON': 0.2}
+```
+#### Features (161)
+* Number of lines
+* Points of symbol (maximum of 20 per line, maximum of 4 lines)
+  Empty slots get filled with -1
 
 #### Learning
 
 ```bash
 $ d make mlp 161:256:282 > mlp.json
 $ d test testdata.pfile < mlp.json 
-    [2014-07-05 15:14:29,192] >> Loading model
-    [2014-07-05 15:14:29,220] >> Loading datasets
-    [2014-07-05 15:14:30,406] >> Testing started with arguments:
+    [2014-07-05 18:29:31,229] >> Loading model
+    [2014-07-05 18:29:31,255] >> Loading datasets
+    [2014-07-05 18:29:31,635] >> Testing started with arguments:
     {'batch_size': 256,
      'datasets': [PFileDataset@testdata.pfile,1],
      'verbosity': 0,
      'warn': False}
-    [2014-07-05 15:14:30,428] >> Compiling theano model
-    [2014-07-05 15:14:32,016] PFileDataset@testdata.pfile,1: errors = 0.979167, cost = 5.641907
+    [2014-07-05 18:29:31,658] >> Compiling theano model
+    [2014-07-05 18:29:32,922] PFileDataset@testdata.pfile,1: errors = 0.975000, cost = 5.641907
 $ d train --epochs 300 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1.json
-$ d test testdata.pfile < mlp-1.json
-    [2014-07-05 15:15:01,907] >> Loading model
-    [2014-07-05 15:15:01,942] >> Loading datasets
-    [2014-07-05 15:15:02,278] >> Testing started with arguments:
+$ d test testdata.pfile < mlp-1.json  
+    [2014-07-05 18:53:58,557] >> Loading model
+    [2014-07-05 18:53:58,585] >> Loading datasets
+    [2014-07-05 18:53:58,915] >> Testing started with arguments:
     {'batch_size': 256,
      'datasets': [PFileDataset@testdata.pfile,1],
      'verbosity': 0,
      'warn': False}
-    [2014-07-05 15:15:02,302] >> Compiling theano model
-    [2014-07-05 15:15:03,519] PFileDataset@testdata.pfile,1: errors = 0.294922, cost = 1.24381
+    [2014-07-05 18:53:58,935] >> Compiling theano model
+    [2014-07-05 18:54:00,142] PFileDataset@testdata.pfile,1: errors = 0.306250, cost = 1.197945
 $ d train --epochs 300 --learning-rate 0.5 --momentum 0.1 traindata.pfile validdata.pfile < mlp-1.json > mlp-2.json
-$ d test testdata.pfile < mlp-2.json 
-    [2014-07-05 15:15:45,468] >> Loading model
-    [2014-07-05 15:15:45,495] >> Loading datasets
-    [2014-07-05 15:15:45,815] >> Testing started with arguments:
+$ d test testdata.pfile < mlp-2.json
+    [2014-07-05 19:17:45,131] >> Loading model
+    [2014-07-05 19:17:45,161] >> Loading datasets
+    [2014-07-05 19:17:45,479] >> Testing started with arguments:
     {'batch_size': 256,
      'datasets': [PFileDataset@testdata.pfile,1],
      'verbosity': 0,
      'warn': False}
-    [2014-07-05 15:15:45,839] >> Compiling theano model
-    [2014-07-05 15:15:47,052] PFileDataset@testdata.pfile,1: errors = 0.277344, cost = 1.166061
+    [2014-07-05 19:17:45,499] >> Compiling theano model
+    [2014-07-05 19:17:46,721] PFileDataset@testdata.pfile,1: errors = 0.278125, cost = 1.082631
+```
+--------------------------------------------------------------------------------
+#### Features (161)
+* Number of lines
+* Points of symbol (maximum of 20 per line, maximum of 4 lines)
+  Empty slots get filled with 0
+
+#### Learning
+
+```bash
+$ d make mlp 161:256:282 > mlp.json
+$ d test testdata.pfile < mlp.json 
+    [2014-07-05 19:20:42,249] >> Loading model
+    [2014-07-05 19:20:42,277] >> Loading datasets
+    [2014-07-05 19:20:42,598] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 19:20:42,619] >> Compiling theano model
+    [2014-07-05 19:20:43,735] PFileDataset@testdata.pfile,1: errors = 0.975000, cost = 5.641907
+$ d train --epochs 300 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1.json
+$ d test testdata.pfile < mlp-1.json 
+    [2014-07-05 20:16:35,013] >> Loading model
+    [2014-07-05 20:16:35,040] >> Loading datasets
+    [2014-07-05 20:16:35,372] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 20:16:35,395] >> Compiling theano model
+    [2014-07-05 20:16:36,513] PFileDataset@testdata.pfile,1: errors = 0.270313, cost = 1.082142
+$ d train --epochs 300 --learning-rate 0.5 --momentum 0.1 traindata.pfile validdata.pfile < mlp-1.json > mlp-2.json
+$ d test testdata.pfile < mlp-2.json
+    [2014-07-05 20:52:30,896] >> Loading model
+    [2014-07-05 20:52:30,923] >> Loading datasets
+    [2014-07-05 20:52:31,248] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 20:52:31,272] >> Compiling theano model
+    [2014-07-05 20:52:32,394] PFileDataset@testdata.pfile,1: errors = 0.258594, cost = 1.034283
+$ d train --epochs 300 --learning-rate 2 --momentum 0.1 traindata.pfile validdata.pfile < mlp-2.json > mlp-3.json
+$ d test testdata.pfile < mlp-3.json 
+[2014-07-05 21:41:54,139] >> Loading model
+[2014-07-05 21:41:54,166] >> Loading datasets
+[2014-07-05 21:41:54,498] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-07-05 21:41:54,521] >> Compiling theano model
+[2014-07-05 21:41:55,652] PFileDataset@testdata.pfile,1: errors = 0.249219, cost = 1.073648
+$ d train --epochs 300 --learning-rate 2 --momentum 0.1 traindata.pfile validdata.pfile < mlp-3.json > mlp-4.json
+$ d test testdata.pfile < mlp-4.json 
+    [2014-07-05 21:42:26,781] >> Loading model
+    [2014-07-05 21:42:26,808] >> Loading datasets
+    [2014-07-05 21:42:27,129] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 21:42:27,151] >> Compiling theano model
+    [2014-07-05 21:42:28,278] PFileDataset@testdata.pfile,1: errors = 0.249219, cost = 1.074607
+```
+
+--------------------------------------------------------------------------------
+#### Preprocessing
+```
+* <function scale_and_shift at 0x28d86e0> with []
+* <function douglas_peucker at 0x28d87d0> with {'EPSILON': 0.2}
+* <function space_evenly at 0x28d8758> with {'KIND': 'cubic', 'number': 100}
+```
+#### Features (161)
+* Number of lines
+* Points of symbol (maximum of 20 per line, maximum of 4 lines)
+  Empty slots get filled with 0
+
+#### Learning
+
+```bash
+$ d make mlp 161:256:282 > mlp.json
+$ d test testdata.pfile < mlp.json 
+    [2014-07-05 21:46:01,041] >> Loading model
+    [2014-07-05 21:46:01,068] >> Loading datasets
+    [2014-07-05 21:46:01,401] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 21:46:01,423] >> Compiling theano model
+    [2014-07-05 21:46:02,538] PFileDataset@testdata.pfile,1: errors = 0.975000, cost = 5.641907
+$ d train --epochs 300 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1.json
+$ d test testdata.pfile < mlp-1.json  
+    [2014-07-05 22:06:51,937] >> Loading model
+    [2014-07-05 22:06:51,964] >> Loading datasets
+    [2014-07-05 22:06:52,292] >> Testing started with arguments:
+    {'batch_size': 256,
+     'datasets': [PFileDataset@testdata.pfile,1],
+     'verbosity': 0,
+     'warn': False}
+    [2014-07-05 22:06:52,315] >> Compiling theano model
+    [2014-07-05 22:06:53,444] PFileDataset@testdata.pfile,1: errors = 0.350781, cost = 1.436929
+$ d train --epochs 300 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp-1.json > mlp-2.json
+$ test testdata.pfile < mlp-2.json 
+[2014-07-05 22:59:26,798] >> Loading model
+[2014-07-05 22:59:26,825] >> Loading datasets
+[2014-07-05 22:59:28,029] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-07-05 22:59:28,080] >> Compiling theano model
+[2014-07-05 22:59:29,699] PFileDataset@testdata.pfile,1: errors = 0.338281, cost = 1.410109
 ```
