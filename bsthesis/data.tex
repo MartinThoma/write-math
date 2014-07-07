@@ -38,18 +38,27 @@ or fixing errors in the input data, reducing duplicate information and
 removing irrelevant information.
 
 \subsection{Normalization: Scaling, shifting and resampling}
-In \cite{Kirsch} the datapoints were scaled to fit into a unit square while
+\textit{Size normalization} is done by many handwriting recognition systems, but
+the way in which size normalization is done varies.\\
+Single symbol recognizers such as the one presented in \cite{Kirsch} scale the
+datapoints to fit into a unit square while
 keeping their aspect ratio. Afterwards, the points were shifted to
-the $(0, 1) \times (0, 1)$ unit square. The algorithm is given in pseudocode on
+the $[0, 1] \times [0, 1]$ unit square. The algorithm is given in pseudocode on
 \cpageref{alg:scale-and-shift}. It was shown in \cite{Kirsch,Huang09} that
-this kind of preprocessing boosts classification accuracy significantly.
+this kind of preprocessing boosts classification accuracy significantly.\\
+\cite{Guyon91} shifts the symbol to $[-1, 1] \times [-1, 1]$.
 
-Another method to normalize data is resampling, sometimes also called
+Multiple symbol recognizers such as NPen++ as presented in \cite{Manke01}
+scale words in respect to a previously calculated baseline and a corpus line.
+
+Another method to normalize data is \textit{resampling}, sometimes also called
 stroke length normalization.
 \cite{Guyon91} resampled characters and digits to 81 points each, where different
 lines were also connected by \enquote{pen-up} segments. They resampled to get
-points regulary spaced in arc length, not in time. \cite{ICASSP-94} also
-resampled data to get points regulary spaced in arc length, but they encoded
+points regulary spaced in arc length, not in time. \cite{Manke01} also resampled
+the points to be equidistant in space, but they used a distance of $\frac{\text{corpus height}}{13}$.
+They found an improvement of $5\%$ with this preprocessing step.
+\cite{ICASSP-94} also resampled data to get points regulary spaced in arc length, but they encoded
 speed as an extra feature.
 
 \subsection{Noise reduction}
@@ -79,8 +88,6 @@ and is still up-to-date.
               \item Maximum velocity / acceleration\cite{Division87}
               \item Enforcing a minimal change in direction\cite{Tappert90}.
           \end{itemize}
-          An idea that seemingly nobody has tried before is applying the
-          Douglas-Peucker algorithm for filtering dots.
 
           A special reason for the application of filtering methods are occasional spurious points which are also called \textit{wild points}.
     \item \textbf{Smoothing} can be done in multiple ways. An approach that was
@@ -102,6 +109,9 @@ and is still up-to-date.
           handwriting.
     \item \textbf{Baseline drift correction} moves words to be on a baseline.
 \end{itemize}
+
+An idea for filtering that seemingly nobody has tried before is applying the
+Douglas-Peucker algorithm.
 
 \begin{figure}[ht]
     \centering
@@ -126,59 +136,65 @@ line or even the complete image.
 
 \subsection{Local features}
 \begin{itemize}
-    \item Coordinates of the current point\cite{Guyon91}
-    \item Speed\cite{Huang09,ICASSP-94}
-    \item Binary pen pressure\cite{Kosmala98,Kosmala11,ICASSP-94}
-    \item Direction\cite{Manke95,Huang06}
-    \item Curvature\cite{Groner66,Manke95,ICASSP-94,Guyon91}
-    \item Bitmap-environment\cite{Manke95}
-    \item Hat-Feature\cite{ICASSP-94,Manke00}
-\end{itemize}
-
-\cite{Kosmala98,Kosmala11} suggest that speed is a bad feature, because it \enquote{highly inconsistent}.
-
-The \textbf{direction} $\text{dir}$ at the point $i$ can be described by the vector 
-$(\cos \theta(i), \sin \theta(i))$ as described in \cite{Guyon91}.
-
+    \item \textbf{Coordinates} of the current point are used by \cite{Guyon91}.
+    \item \textbf{Speed} has been used by \cite{ICASSP-94}, but
+          \cite{Kosmala98,Kosmala11} suggest that speed is a bad feature,
+          because they think that speed is \enquote{highly inconsistent}.
+    \item \textbf{Binary pen pressure} has been used by \cite{Kosmala98,Kosmala11,ICASSP-94,Manke94,Guyon91}.
+    \item \textbf{Direction} has been used by \cite{Manke95,Huang06}.
+The \textbf{direction} at the point $i$ can be described by the vector 
+$(\cos \theta(i), \sin \theta(i))$ as described in \cite{Guyon91}:
 \begin{align}
     \cos \theta(i) &= \frac{\Delta x^{(i)}}{\Delta s^{(i)}}\\
     \sin \theta(i) &= \frac{\Delta y^{(i)}}{\Delta s^{(i)}}
 \end{align}
-
 where
-
 \begin{align}
     \Delta x (i) &= x^{(i+1)} - x^{(i-1)}\\
     \Delta y (i) &= y^{(i+1)} - x^{(i-1)}\\
-    \Delta s (i) &= \sqrt{\Delta (x^{(i)})^2 + \Delta y (y^{(i)})^2}
+    \Delta s (i) &= \sqrt{(\Delta x(i))^2 + (\Delta y (i))^2}
 \end{align}
+    \item \textbf{Curvature} has been used by \cite{Groner66,Manke95,ICASSP-94,Guyon91}.
+          It is calculated in \cite{Guyon91} by the angle of two neighboring
+          lines like this:
+          \begin{align}
+              \varphi(i)      &= \theta(i+1) - \theta(i-1)\\
+              \cos \varphi(i) &=\cos \theta (i-1) \cdot \cos \theta (i+1)\\
+                              &+\sin \theta (i-1) \cdot \sin \theta (i+1)\\
+              \cos \varphi(i) &=\cos \theta (i-1) \cdot \cos \theta (i+1)\\
+                              &-\sin \theta (i-1) \cdot \sin \theta (i+1)
+          \end{align}
+    \item \textbf{Bitmap-environment} has been used by \cite{Manke94}make. This
+          feature is a $3 \times 3$ pixel environment around the current point.
+          It allows the recognizer to determine points that cross or touch
+          strokes. 
+    \item \textbf{Hat-Feature} has been used by \cite{ICASSP-94,Manke00}.
+\end{itemize}
 
-The \textbf{curvature} $\phi$ of the point $i$ can be described by the
-angle of the two neighboring points:
-
-% TODO!
-% \begin{align}
-%     \text{cur}(i) &= \text{dir}(i-1)
-% \end{align}
 
 \subsection{Global features}
 \begin{itemize}
-    \item Re-curvature\cite{Huang06} (TODO: Explain (all))
-    \item Center point\cite{Huang06}
-    \item Stroke length\cite{Huang06}
-    \item Number of strokes\cite{Huang09}
-    \item Pseudo-Zernike Features (TODO: Really global? What is it?)\cite{Khotanzad}
-    \item Shadow Code Features\cite{Khotanzad}
-    \item \textbf{Position sequences}
+    \item \textbf{Re-curvature} is defined in \cite{Huang06,Huang09} as the
+          ratio between the height of a stroke and the distance between its
+          start and end points.
+    \item \textbf{Center point} was used in \cite{Huang06}.
+    \item \textbf{Stroke length} was used in \cite{Huang06}. It can be
+          calculated by using a linear interpolation.
+    \item \textbf{Number of strokes} was used in \cite{Huang09}.
+    \item \textbf{Sequence features}
     \begin{itemize}
         \item \textit{Pentip sequence}: \cite{Kirsch} used the raw pentip
               sequence combined with \gls{DTW} to recognize mathematical symbols.
               Other authors like \cite{Koschinski95} used pentip sequences, too,
               but made use of \glspl{HMM} or \glspl{ANN} to recognize symbols
-        \item \textit{Zone sequences}: Some authors \cite{Brown1964,Hanaki80}
-          recognize symbols by
-          dividing the box in which the character is written into zones. By examining the position of the pen-tip a sequence of zones can be generated for a written
-          symbol.
-        \item \textit{Direction sequences}:
+        \item \textit{Zone sequences} are used by \cite{Brown1964,Hanaki80}. The
+          idea is to recognize symbols by dividing the box in which the
+          character is written into zones. By examining the position of the
+          pen-tip a sequence of zones can be generated for a written symbol.
+        \item \textit{Direction sequences} were used in \cite{Impedovo1976,Powers1973}.
     \end{itemize}
 \end{itemize}
+
+There are other global features used for off-line handwriting recognition which
+I will not examine. Examples are Pseudo-Zernike moments and Shadow Code features
+which were used in \cite{Khotanzad}.
