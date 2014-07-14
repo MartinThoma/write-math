@@ -168,6 +168,14 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->execute();
     $image_data = $stmt->fetchObject();
 
+    // Get best rendering of this
+    $sql = "SELECT `best_rendering` FROM `wm_formula` WHERE `id` = :fid;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':fid', $image_data->accepted_formula_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $image_data_best_rendering = $stmt->fetchObject();
+    $image_data->accepted_formula_id_best_rendering = $image_data_best_rendering->best_rendering;
+
     // Add a new classification
     if (isset($_POST['latex'])) {
         $user_id = get_uid();
