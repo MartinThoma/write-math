@@ -27,7 +27,7 @@
 \usepackage[T1]{fontenc}    % this is needed for correct output of umlauts in pdf
 
 \usepackage{ae}               % Almost european, virtual T1-Font
-\usepackage[pdftex]{graphicx}
+\usepackage[pdftex,final]{graphicx}
 \usepackage{wrapfig}
 \usepackage{rotating}
 \usepackage{vmargin}          % Adjust margins in a simple way

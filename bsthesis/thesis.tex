@@ -1,4 +1,9 @@
-\documentclass{thesisclass}
+\documentclass[draft]{thesisclass}
+\usepackage{ifdraft, blindtext}
+\ifdraft{%
+    \usepackage{todonotes}}{ % draft with TODOs
+    \usepackage[disable]{todonotes} % final without TODOs
+}
 % Based on thesisclass.cls of Timo Rohrberg, 2009
 % ----------------------------------------------------------------
 % Thesis - Main document
@@ -38,12 +43,6 @@
 %% ---------------------------------
 % Remove this section for final version!
 \setlength{\marginparwidth}{20mm}
-
-\newcommand{\margtodo}
-{\marginpar{\textbf{\textcolor{red}{ToDo}}}{}}
-
-\newcommand{\todo}[1]
-{{\textbf{\textcolor{red}{(\margtodo{}#1)}}}{}}
 
 
 %% --------------------------------
