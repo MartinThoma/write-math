@@ -105,7 +105,8 @@ if (isset($_POST['language'])) {
     if ($handedness == 'NULL') {
         $sql = "UPDATE `wm_users` SET `handedness` =  NULL WHERE `id` = :uid;";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
+        $uid = get_uid();
+        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
         $stmt->execute();
     } else {
         $sql = "UPDATE `wm_users` SET `handedness` =  :hand WHERE `id` = :uid;";
