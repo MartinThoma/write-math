@@ -97,8 +97,9 @@ def main(folder):
             except Exception, e:
                 print("Skip - duplicate content?")
                 os.rename(rawdatafile_full, "skipped/"+rawdatafile)
-        if i % 500 == 0:
+        if i % 200 == 0:
             print(i)
+        if i % 50000 == 0:
             exit()
 
     summe = 0
