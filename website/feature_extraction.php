@@ -11,9 +11,7 @@ function get_point_count($data) {
         return -1;
     }
     foreach ($data as $line) {
-        if (get_max_distance($line) < 100) {
-            $sum += 1;
-        }
+        $sum += count($line);
     }
     return $sum;
 }
