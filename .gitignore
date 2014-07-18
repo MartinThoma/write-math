@@ -79,3 +79,4 @@ website/clients/nn-python/experiments/
 private/
 *.pfile
 *.json
+too-big/

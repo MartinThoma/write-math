@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 24. Mai 2014 um 21:43
+-- Erstellungszeit: 17. Jul 2014 um 19:03
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 
@@ -19,21 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `20080912003-1`
 --
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_formula2challenge`
---
-
-CREATE TABLE IF NOT EXISTS `wm_formula2challenge` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `challenge_id` int(11) NOT NULL,
-  `formula_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `formula_id` (`formula_id`,`challenge_id`),
-  KEY `challenge_id` (`challenge_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=134 ;
 
 --
 -- Daten für Tabelle `wm_formula2challenge`
@@ -170,17 +155,6 @@ INSERT INTO `wm_formula2challenge` (`id`, `challenge_id`, `formula_id`) VALUES
 (124, 9, 513),
 (126, 9, 582),
 (117, 9, 951);
-
---
--- Constraints der exportierten Tabellen
---
-
---
--- Constraints der Tabelle `wm_formula2challenge`
---
-ALTER TABLE `wm_formula2challenge`
-  ADD CONSTRAINT `wm_formula2challenge_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `wm_formula2challenge_ibfk_2` FOREIGN KEY (`challenge_id`) REFERENCES `wm_challenges` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

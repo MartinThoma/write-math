@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 24. Mai 2014 um 21:44
+-- Erstellungszeit: 17. Jul 2014 um 19:03
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 
@@ -19,22 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `20080912003-1`
 --
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_similarity`
---
-
-CREATE TABLE IF NOT EXISTS `wm_similarity` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `base_symbol` int(11) NOT NULL,
-  `similar_symbol` int(11) NOT NULL,
-  `comment_choice` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `base_symbol` (`base_symbol`),
-  KEY `simmilar_symbol` (`similar_symbol`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=23 ;
 
 --
 -- Daten für Tabelle `wm_similarity`
@@ -60,18 +44,9 @@ INSERT INTO `wm_similarity` (`id`, `base_symbol`, `similar_symbol`, `comment_cho
 (19, 87, 310, 'text[greekletter] is useless'),
 (20, 169, 872, 'up[greekletter]'),
 (21, 171, 876, 'up[greekletter]'),
-(22, 168, 869, 'up[greekletter]');
-
---
--- Constraints der exportierten Tabellen
---
-
---
--- Constraints der Tabelle `wm_similarity`
---
-ALTER TABLE `wm_similarity`
-  ADD CONSTRAINT `wm_similarity_ibfk_2` FOREIGN KEY (`similar_symbol`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `wm_similarity_ibfk_1` FOREIGN KEY (`base_symbol`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+(22, 168, 869, 'up[greekletter]'),
+(23, 111, 533, 'Letter ''V'' and logical or'),
+(24, 111, 52, 'Capital and small letter v');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

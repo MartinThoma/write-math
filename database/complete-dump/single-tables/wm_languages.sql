@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 24. Mai 2014 um 21:43
+-- Erstellungszeit: 17. Jul 2014 um 20:12
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 
@@ -19,19 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `20080912003-1`
 --
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `wm_languages`
---
-
-CREATE TABLE IF NOT EXISTS `wm_languages` (
-  `language_code` char(2) COLLATE utf8_bin NOT NULL,
-  `english_language_name` varchar(255) COLLATE utf8_bin NOT NULL,
-  `native_language_name` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`language_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Daten für Tabelle `wm_languages`
