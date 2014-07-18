@@ -112,11 +112,12 @@ if (isset($_GET['id'])) {
 
     // Get all raw data of this user
     $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $page_size = 7*4;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `accepted_formula_id` = :fid ".
            "ORDER BY `creation_date` DESC ".
-           "LIMIT ".(($currentPage-1)*14).", 14";
+           "LIMIT ".(($currentPage-1)*$page_size).", ".$page_size;
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $_GET['id'], PDO::PARAM_STR);
     $stmt->execute();
@@ -136,7 +137,7 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'edit_flag' => $edit_flag,
                                        'images' => $images,
                                        'total' => $total,
-                                       'pages' => floor(($total)/14),
+                                       'pages' => floor(($total)/$page_size),
                                        'currentPage' => $currentPage
                                        )
                   );
