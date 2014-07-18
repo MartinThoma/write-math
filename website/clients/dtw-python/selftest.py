@@ -144,10 +144,11 @@ def crossvalidation():
             else:
                 classification_accuracy[testset]['wrong'] += 1
                 logging.warning(("Raw-data-ID: %i; "
-                                 "Formula-ID: %i; Hypothesis: %i") %
+                                 "Formula-ID: %i; Hypothesis: %i, Percentage: %0.3f") %
                                 (testdata['id'],
                                  testdata['formula_id'],
-                                 answer_id))
+                                 answer_id,
+                                 results[0]['p'])) # TODO: that might be wrong
 
             if testdata['formula_id'] in [r['formula_id'] for r in results]:
                 classification_accuracy[testset]['c10'] += 1

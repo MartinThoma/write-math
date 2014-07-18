@@ -80,3 +80,6 @@ private/
 *.pfile
 *.json
 too-big/
+detexify-import/done/
+detexify-import/skipped/
+detexify-import/splitted/
