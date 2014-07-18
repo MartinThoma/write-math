@@ -9,7 +9,7 @@ if (!is_logged_in()) {
 if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(`id`) as counter FROM `wm_raw_draw_data` ".
-           "WHERE `accepted_formula_id` IS NULL ";
+           "WHERE `accepted_formula_id` IS NULL AND is_image=0;";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $row = $stmt->fetchObject();
@@ -19,7 +19,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
-           "WHERE `accepted_formula_id` IS NULL ".
+           "WHERE `accepted_formula_id` IS NULL AND is_image=0 ".
            "ORDER BY `creation_date` DESC ".
            "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);

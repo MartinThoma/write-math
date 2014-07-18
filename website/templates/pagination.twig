@@ -4,7 +4,7 @@
           <li><a href="?page=1{{ append_information }}">1</a></li>
       {% endif %}
       {% if currentPage > 1 %}
-          <li><a href="?page={{ currentPage-1 }}{{ append_information }}">&laquo;</a></li>
+          <li><a href="?page={{ currentPage-1 }}{{ append_information }}" accesskey="a">&laquo;</a></li>
       {% else %}
           <li class="disabled"><a href="#">&laquo;</a></li>
       {% endif %}
@@ -24,7 +24,7 @@
       {% endfor %}
 
       {% if currentPage < total %}
-          <li><a href="?page={{ currentPage+1 }}{{ append_information }}">&raquo;</a></li>
+          <li><a href="?page={{ currentPage+1 }}{{ append_information }}" accesskey="s">&raquo;</a></li>
       {% else %}
           <li class="disabled"><a href="#">&raquo;</a></li>
       {% endif %}
