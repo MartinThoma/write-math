@@ -68,10 +68,19 @@
     <td><a href="../user/?id={{ image_data.user_id }}">{{ image_data.display_name }}</a></td>
   </tr>
   <tr>
-    <th>accepted_formula_id</th>
-    <td><a href="../symbol/?id={{ image_data.accepted_formula_id }}">{{ image_data.accepted_formula_id }} <img 
+    <th>Accepted formula</th>
+    <td>
+    {% if image_data.accepted_formula_id is null %}
+    None so far
+    {% else %}
+    <a href="../symbol/?id={{ image_data.accepted_formula_id }}"><img 
               src="../formulas/{{ image_data.accepted_formula_id }}-{{ image_data.accepted_formula_id_best_rendering }}.svg"
-                 width="150" style="width:50px;max-height:50px;" /></a></td>
+                 width="150" style="width:50px;max-height:50px;" /> ({{ image_data.accepted_formula_id }})</a>
+        {% if image_data.user_id == uid or uid == 10 %}
+            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="u">unaccept</a>
+        {% endif %}
+    {% endif %}
+    </td>
   </tr>
   <tr>
     <th>Analyze</th>
@@ -79,8 +88,72 @@
   </tr>
   {% if image_data.user_id == uid or uid == 10 %}
   <tr>
-    <th>Operations</th>
+    <th rowspan="6">Operations</th>
     <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.accepted_formula_id == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&trash={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Drawing is trash</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&trash={{ raw_data_id }}" type="button" class="btn btn-warning">Drawing is trash</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.missing_line == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&missing_line={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">One line is missing, but the end dot is visible</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&missing_line={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="m">One line is missing, but the end dot is visible</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.has_hook == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&has_hook={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Has hook</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&has_hook={{ raw_data_id }}" type="button" class="btn btn-warning">Has hook</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.has_too_long_line == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&has_too_long_line={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Has much too long line</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&has_too_long_line={{ raw_data_id }}" type="button" class="btn btn-warning">Has much too long line</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.is_image == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">This is an image, not a formula</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning">This is an image, not a formula</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>Number of <abbr title="Points that appeared by hardware mistakes and which are not connected to any line">wild points</abbr></td>
+    <td>
+        <form class="form-inline" role="form" method="post">
+            <input type="hidden"
+                   id="raw_data_id"
+                   name="raw_data_id"
+                   value="{{ raw_data_id }}" />
+            <input type="number"
+                   step="1"
+                   min="0"
+                   id="wild_point_count"
+                   name="wild_point_count"
+                   value="{{ image_data.wild_point_count }}"
+                   accesskey="w" />
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    </td>
   </tr>
   {% elseif logged_in and account_type != 'IP-User' %}
   <tr>

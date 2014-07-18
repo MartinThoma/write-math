@@ -32,6 +32,17 @@ if (isset($_POST['nr_of_lines'])) {
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_POST['wild_point_count'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `wild_point_count` = :wild_point_count ".
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
+           "AND (`user_id` = :user_id OR :user_id = 10);";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':wild_point_count', $_POST['wild_point_count'], PDO::PARAM_INT);
+    $stmt->bindParam(':raw_id', $_POST['raw_data_id'], PDO::PARAM_INT);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+    $stmt->execute();
 } elseif (isset($_GET['delete'])) {
     $sql = "DELETE FROM `wm_raw_draw_data` ".
            "WHERE `wm_raw_draw_data`.`id` = :raw_id AND ".
@@ -42,6 +53,56 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
     header("Location: ../gallery/");
+} elseif (isset($_GET['trash'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `accepted_formula_id` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['trash'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['missing_line'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `missing_line` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['missing_line'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['has_hook'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `has_hook` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['has_too_long_line'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `has_too_long_line` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['is_image'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `is_image` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['is_image'], PDO::PARAM_INT);
+    $stmt->execute();
 } elseif (isset($_GET['delete_answer'])) {
     $sql = "DELETE FROM `wm_raw_data2formula` ".
            "WHERE `id` = :id AND (user_id = :user_id OR :user_id = 10)";  # TODO: Change to admin-group check
@@ -158,7 +219,9 @@ if (isset($_GET['raw_data_id'])) {
 
     $raw_data_id = $_GET['raw_data_id'];
     $sql = "SELECT `user_id`, `display_name`, `data`, ".
-           "`creation_date`, `accepted_formula_id`, `nr_of_symbols` ".
+           "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
+           "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
+           "`has_too_long_line` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
