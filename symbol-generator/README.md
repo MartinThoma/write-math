@@ -1,0 +1,1 @@
+This folder is used to generate SVG images of LaTeX fonts.

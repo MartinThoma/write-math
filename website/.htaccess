@@ -1,6 +1,0 @@
-AddType text/cache-manifest .appcache
-
-RewriteEngine On
-RewriteBase /
-RewriteCond %{REQUEST_URI} !^/write-math/maintenance\.html$
-RewriteRule ^(.*)$ http://martin-thoma.de/write-math/maintenance.html [R=307,L]
