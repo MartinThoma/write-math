@@ -1,0 +1,1 @@
+Scripts in this folder are used to find errors in the dataset.
