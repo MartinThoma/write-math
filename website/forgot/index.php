@@ -67,9 +67,9 @@ if (isset($_GET['email']) && !isset($_GET['code'])) {
                    "is: '".$new_password."' (without the apostrophes)\n\n".
                    "Best regards,\n".
                    "Martin Thoma";
-       $headers = 'From: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
-                  'Reply-To: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
-                  'X-Mailer: PHP/' . phpversion();
+        $headers = 'From: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
+                   'Reply-To: Martin Thoma <info@martin-thoma.de>' . PHP_EOL .
+                   'X-Mailer: PHP/' . phpversion();
         mail($_GET['email'], "[Write-Math] New password", $message,
              $headers);
         $msg[] = array("class" => "alert-success",
@@ -77,6 +77,7 @@ if (isset($_GET['email']) && !isset($_GET['code'])) {
                                  "An Email with your new password was sent ".
                                  "to you. You can change that in your profile.");
         $password_changed = true;
+        print_r($message);
     } else {
         $msg[] = array("class" => "alert-danger",
                        "text" => "Your password could not be resetted. ".
@@ -87,7 +88,6 @@ if (isset($_GET['email']) && !isset($_GET['code'])) {
 
 echo $twig->render('forgot.twig', array('heading' => 'Reset password',
                                         'logged_in' => is_logged_in(),
-                                        'display_name' => $_SESSION['display_name'],
                                         'file'=> "forgot",
                                         'msg' => $msg,
                                         'password_changed' => $password_changed

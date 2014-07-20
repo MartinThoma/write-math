@@ -478,3 +478,40 @@ $ test testdata.pfile < mlp-2.json
 [2014-07-05 22:59:28,080] >> Compiling theano model
 [2014-07-05 22:59:29,699] PFileDataset@testdata.pfile,1: errors = 0.338281, cost = 1.410109
 ```
+
+### More Data
+#### Data
+```
+!` (683), - (102), / (512), 
+0 (124), 1 (104), 2 (108), 3 (104), 4 (117), 8 (107), < (102), 
+A (314), B (121), C (126), D (104), E (113), F (112), G (109), H (101), J (102), K (102), L (101), M (113), N (102), [ (740), \# (751), \$ (292), \% (619), \& (867), \AA (517), \AE (116), \Ankh (157), \Bat (539), \Bowtie (186), \CircledA (105), \Delta (655), \Downarrow (112), \EUR (278), \EURdig (121), \EURtm (109), \Faxmachine (103), \Frowny (171), \Gamma (452), \Heart (418), \Im (113), \Lambda (304), \Leftarrow (106), \Leftrightarrow (790), \Letter (154), \Lightning (158), \Longleftrightarrow (180), \Longrightarrow (173), \MVAt (858), \Mobilefone (192), \Mundus (262), \O (161), \Omega (571), \Phi (417), \Pi (570), \Psi (314), \Re (142), \Rightarrow (1141), \S (233), \Sigma (1288), \Smiley (871), \Telefon (147), \Theta (306), \Updelta (108), \Upomega (140), \Upphi (119), \Uppi (138), \Uppsi (126), \Upsigma (232), \Upsilon (128), \Uptheta (105), \Vdash (104), \Xi (286), \Yinyang (240), \aa (156), \ae (185), \aleph (545), \alpha (1706), \amalg (143), \angle (162), \approx (1361), \ast (367), \astrosun (236), \backsim (111), \backslash (172), \barwedge (118), \because (162), \beta (791), \bigcap (276), \bigcirc (157), \bigcup (347), \bigodot (141), \bigoplus (389), \bigotimes (194), \bigstar (374), \bigvee (111), \bigwedge (193), \blacksmiley (160), \blacksquare (374), \bot (469), \bowtie (151), \boxdot (117), \boxtimes (134), \bullet (222), \cap (731), \cdot (472), \celsius (221), \checked (185), \checkmark (592), \chi (617), \circ (638), \circlearrowleft (134), \circledcirc (104), \clubsuit (186), \cong (957), \coprod (123), \copyright (170), \cup (630), \curvearrowright (120), \dag (164), \dagger (108), \dashv (172), \ddots (267), \degree (449), \delta (821), \diameter (141), \diamond (150), \div (233), \doteq (117), \dots (127), \dotsb (284), \dotsc (155), \downarrow (130), \ell (595), \emptyset (648), \epsilon (373), \equiv (1652), \eta (437), \exists (945), \female (129), \fint (212), \forall (1392), \frownie (232), \fullmoon (107), \gamma (770), \geq (585), \geqslant (209), \gg (463), \gtrsim (406), \hbar (345), \heartsuit (631), \hookrightarrow (443), \iddots (171), \idotsint (103), \iiiint (133), \iiint (164), \iint (227), \in (1472), \infty (1869), \int (2340), \iota (119), \kappa (176), \lambda (732), \langle (505), \lceil (238), \leadsto (428), \leftarrow (157), \leftrightarrow (359), \leq (724), \leqslant (262), \lesssim (492), \lfloor (302), \lightning (359), \ll (637), \llbracket (516), \longmapsto (148), \longrightarrow (175), \lozenge (106), \ltimes (148), \male (218), \mapsto (608), \mars (162), \mathbb{1} (620), \mathcal{A} (234), \mathcal{B} (113), \mathcal{C} (128), \mathcal{D} (143), \mathcal{E} (201), \mathcal{F} (262), \mathcal{H} (174), \mathcal{L} (498), \mathcal{M} (133), \mathcal{N} (219), \mathcal{O} (561), \mathcal{P} (219), \mathcal{R} (109), \mathcal{S} (117), \mathcal{T} (138), \mathcal{Z} (110), \mathds{1} (211), \mathds{C} (287), \mathds{E} (159), \mathds{N} (681), \mathds{P} (142), \mathds{Q} (152), \mathds{R} (1564), \mathds{Z} (668), \mathfrak{A} (115), \mathfrak{S} (157), \mathscr{A} (119), \mathscr{C} (137), \mathscr{D} (106), \mathscr{H} (130), \mathscr{L} (534), \mathscr{S} (145), \mid (245), \models (314), \mu (779), \nabla (791), \nearrow (137), \neg (542), \neq (993), \nexists (209), \ni (359), \nmid (246), \not\equiv (258), \notin (847), \nrightarrow (129), \nsubseteq (193), \nu (262), \o (201), \ocircle (110), \odot (340), \ohm (233), \oiint (253), \oint (827), \omega (413), \oplus (861), \otimes (691), \parallel (261), \partial (1563), \permil (133), \perp (725), \phi (470), \phone (105), \pi (1096), \pm (1012), \pounds (113), \prec (324), \preccurlyeq (129), \preceq (200), \prod (749), \propto (958), \psi (390), \rangle (101), \rceil (160), \rfloor (140), \rho (470), \rightarrow (791), \rightharpoonup (146), \rightleftharpoons (142), \rightsquigarrow (146), \rrbracket (121), \rtimes (190), \searrow (105), \setminus (356), \sharp (181), \shortrightarrow (181), \sigma (754), \sim (1278), \simeq (586), \skull (284), \smiley (802), \spadesuit (151), \sqcap (105), \sqcup (176), \sqrt{} (636), \sqsubseteq (196), \square (1334), \ss (155), \star (176), \subset (561), \subseteq (1061), \subsetneq (155), \succ (249), \succeq (155), \sum (2228), \sun (131), \supset (307), \supseteq (296), \tau (354), \textasciicircum (221), \textasciitilde (284), \textasteriskcentered (175), \textbackslash (201), \textbeta (121), \textbraceleft (293), \textbullet (110), \textchi (144), \textcopyright (164), \textdagger (107), \textdegree (234), \textdollaroldstyle (187), \textepsilon (203), \textesh (309), \textestimated (137), \textgreater (367), \textinterrobang (140), \textlambda (196), \textlangle (100), \textlbrackdbl (145), \textless (372), \textlptr (133), \textmusicalnote (154), \textomega (136), \textonehalf (161), \textordfeminine (148), \textpm (270), \textquestiondown (148), \textquotedblleft (152), \textregistered (267), \textrightarrow (133), \textsca (191), \textscripta (117), \textsection (346), \textsterling (101), \textsurd (195), \texttheta (117), \texttildelow (144), \texttimes (255), \texttrademark (130), \texttwosuperior (174), \textvisiblespace (148), \therefore (504), \theta (438), \thicksim (105), \times (1000), \top (233), \triangle (195), \triangledown (132), \trianglelefteq (129), \triangleq (403), \twoheadrightarrow (268), \upalpha (311), \uparrow (152), \upbeta (134), \upchi (126), \updelta (186), \upgamma (136), \upharpoonright (101), \uplambda (220), \uplus (142), \upmu (252), \upphi (150), \uppi (392), \upsigma (105), \uptau (183), \uptheta (121), \upvarepsilon (150), \upvarphi (328), \upvarsigma (105), \upxi (272), \vDash (336), \varepsilon (521), \varkappa (113), \varnothing (300), \varoiint (126), \varphi (1020), \varpi (107), \varrho (152), \vartheta (177), \vdash (717), \vdots (302), \vee (577), \wedge (948), \with (156), \wp (219), \xi (1783), \zeta (581), \{ (789), \| (314), \} (245), ] (234), | (418), 
+```
+Classes (nr of symbols): 387
+#### Preprocessing
+```
+* <function scale_and_shift at 0x371fed8> with []
+* <function douglas_peucker at 0x3720050> with {'EPSILON': 0.2}
+* <function space_evenly at 0x371ff50> with {'KIND': 'cubic', 'number': 100}
+```
+#### Features (161)
+* Number of lines
+* Points of symbol (maximum of 20 per line, maximum of 4 lines)
+  Empty slots get filled with -1
+
+#### Learning
+
+```bash
+$ d make mlp 161:256:282 > mlp.json
+$ d test testdata.pfile < mlp.json
+$ d test testdata.pfile < mlp3-1.json 
+[2014-07-19 00:11:53,425] >> Loading model
+[2014-07-19 00:11:53,456] >> Loading datasets
+[2014-07-19 00:11:53,820] >> Testing started with arguments:
+{'batch_size': 256,
+ 'datasets': [PFileDataset@testdata.pfile,1],
+ 'verbosity': 0,
+ 'warn': False}
+[2014-07-19 00:11:53,845] >> Compiling theano model
+[2014-07-19 00:11:56,915] PFileDataset@testdata.pfile,1: errors = 0.605395, cost = 3.049634
+
+```

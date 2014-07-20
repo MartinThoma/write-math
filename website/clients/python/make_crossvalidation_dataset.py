@@ -4,7 +4,7 @@
 import cPickle as pickle
 
 
-def main(MIN_OCCURENCES=10, K_FOLD=10):
+def main(MIN_OCCURENCES=100, K_FOLD=10):
     loaded = pickle.load(open("handwriting_datasets.pickle"))
     datasets = loaded['handwriting_datasets']
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # Add more options if you like
     parser.add_argument("-m", "--min-occurences", dest="MIN_OCCURENCES",
-                        type=int, default=10,
+                        type=int, default=100,
                         help="How many training instances should exist at" +
                              "minimum for a symbol to be considered?")
     parser.add_argument("-k", "--kfold", dest="K_FOLD",

@@ -7,12 +7,28 @@
         <th>#</th>
         <th>Formula in LaTeX</th>
         <th>Instances in database</th>
+        {% if user_id == 10 %}
+        <th>is important<th>
+        {% endif %}
     </tr>
   {% for s in symbol_training_data_count %}
     <tr>
-        <td>{{ loop.index }}</td>
-        <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
-        <td>{{s.counter}}</td>
+        {% if s.is_important %}
+            <td style="background-color:green;">{{ loop.index }}</td>
+            <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
+            <td style="background-color:green;">{{s.counter}}</td>
+        {% else %}
+            <td>{{ loop.index }}</td>
+            <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
+            <td>{{s.counter}}</td>
+        {% endif %}
+    {% if user_id == 10 %}
+        {% if s.is_important %}
+            <td><a href="?is_not_important={{ s.id }}">is not important</a></td>
+        {% else %}
+            <td><a href="?is_important={{ s.id }}">is important</a></td>
+        {% endif %}
+    {% endif %}
     </tr>
   {% endfor %}
 </table>

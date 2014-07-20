@@ -76,6 +76,7 @@ class HandwrittenData(object):
                 xs.append(p['x'])
                 ys.append(p['y'])
             plt.plot(xs, ys, '-o')
+        plt.gca().invert_yaxis()
         plt.show()
 
 if __name__ == '__main__':

@@ -89,7 +89,13 @@
   {% if image_data.user_id == uid or uid == 10 %}
   <tr>
     <th rowspan="6">Operations</th>
-    <td><a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a></td>
+    <td>
+        <a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a>
+        {% if uid == 10 %}
+        <a href="?raw_data_id={{ raw_data_id }}&rerender={{ raw_data_id }}" type="button" class="btn btn-danger">rerender</a>
+        <a href="?raw_data_id={{ raw_data_id }}&fix={{ raw_data_id }}" type="button" class="btn btn-danger">fix it</a>
+        {% endif %}
+    </td>
   </tr>
   <tr>
     <td>

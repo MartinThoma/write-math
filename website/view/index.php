@@ -53,6 +53,50 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
     header("Location: ../gallery/");
+} elseif (isset($_GET['fix'])) {
+    $raw_data_id = intval($_GET['fix']);
+    if (get_uid() == 10) {
+        # Get raw data
+        $sql = "SELECT `data` ".
+               "FROM `wm_raw_draw_data` ".
+               "WHERE `id` = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $raw_data_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $image_data = $stmt->fetchObject();
+        $raw_data = $image_data->data;
+
+        # Does this dataset need to be fixed?
+        if (!endsWith($raw_data, ']]')) {
+            $i = -1;
+            while (substr($raw_data, $i, 1) != '}' && $i > -strlen($raw_data)) {
+                $i -= 1;
+            }
+            $fixed = substr($raw_data, 0, strlen($raw_data)+$i+1)."]]";
+            # Put it in the database
+            $sql = "UPDATE `20080912003-1`.`wm_raw_draw_data` ".
+                   "SET `data` = :data ".
+                   "WHERE `wm_raw_draw_data`.`id` = :rid LIMIT 1; ";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':data', $fixed, PDO::PARAM_STR);
+            $stmt->bindParam(':rid', $raw_data_id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            # Remove old rendering
+            unlink("../raw-data/$raw_data_id.svg");
+
+            # Redirect
+            header("Location: ../view/?raw_data_id=$raw_data_id");
+        } else {
+            $msg[] = array("class" => "alert-info",
+                            "text" => "No need to fix anything.");
+        }
+    }
+} elseif (isset($_GET['rerender'])) {
+    $raw_data_id = intval($_GET['rerender']);
+    if (get_uid() == 10) {
+        unlink("../raw-data/$raw_data_id.svg");
+    }
 } elseif (isset($_GET['trash'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `accepted_formula_id` = 1 ".

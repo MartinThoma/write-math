@@ -65,4 +65,8 @@ function sanitize_packages($packages) {
     return $packages;
 }
 
+function endsWith($haystack, $needle) {
+    return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+}
+
 ?>

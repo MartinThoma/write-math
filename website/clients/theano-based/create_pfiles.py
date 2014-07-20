@@ -120,17 +120,17 @@ def create_pfile():
     print("## done")
 
     make_pfile("testdata", INPUT_FEATURES, prepared)
-
+    print("Testdata was written")
     prepared = prepare_dataset(validation_set,
                                formula_id2index,
                                preprocessing_queue)
     make_pfile("validdata", INPUT_FEATURES, prepared)
-
+    print("validdata was written")
     prepared = prepare_dataset(training_set,
                                formula_id2index,
                                preprocessing_queue)
     make_pfile("traindata", INPUT_FEATURES, prepared)
-
+    print("traindata was written")
 if __name__ == '__main__':
     logging.info("Started creation of pfiles.")
     create_pfile()
