@@ -11,6 +11,7 @@ from dbconfig import mysql_local, mysql_online
 sys.path.append("/var/www/write-math/website/clients/dtw-python")
 from classification import dtw
 import preprocessing
+import webbrowser
 
 
 def update_data(a, unaccept=False):
@@ -226,6 +227,7 @@ def main(raw_data_start_id):
                            ]
 
     for formula_id in formulaid2latex.keys():
+        alread_shown_in_browser = False
         if formula_id == 1:
             # This formula id is for trash. No need to look at it.
             continue
@@ -242,7 +244,7 @@ def main(raw_data_start_id):
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
         print("Raw datasets: %i" % len(raw_datasets))
-        if len(raw_datasets) < 500:
+        if len(raw_datasets) < 100:
             continue
         As = []
         for i, data in enumerate(raw_datasets):
@@ -266,6 +268,9 @@ def main(raw_data_start_id):
                 if data['administrator_edit'] is not None:
                     As.append(B.get_pointlist())
                 else:
+                    if not alread_shown_in_browser:
+                        alread_shown_in_browser = True
+                        webbrowser.open("http://www.martin-thoma.de/write-math/view/?raw_data_id=%i" % data['id'], 2) 
                     B.show()
                     if B.ok:
                         As.append(B.get_pointlist())
