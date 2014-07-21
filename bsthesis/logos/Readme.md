@@ -1,1 +1,0 @@
-Please note that those logos are NOT licensed under MIT license.
