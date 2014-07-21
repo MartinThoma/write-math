@@ -16,7 +16,7 @@ def scale_and_shift(handwritten_data, center=False):
         unit square. Keep the aspect ratio. Optionally center the points
         inside of the unit square.
     """
-    assert type(handwritten_data) is HandwrittenData.HandwrittenData, \
+    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(handwritten_data)
 
