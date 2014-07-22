@@ -1,13 +1,19 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from __future__ import print_function
 import MySQLdb
 from dbconfig import mysql_online
 import MySQLdb.cursors
 import time
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 
-def main(mysql):
+def main(mysql, start):
+    """
+    Download wm_raw_draw_data and store it in text files with 2000 inserts
+    each. Those files are stored in the same folder as this script is in.
+    """
     pagesize = 2000
     print("Connect to database")
     connection = MySQLdb.connect(host=mysql['host'],
@@ -29,7 +35,7 @@ def main(mysql):
     # Speed up insertion
     f.write("LOCK TABLES wm_raw_draw_data WRITE;")
 
-    for i in range(0, count, pagesize):
+    for i in range(start, count, pagesize):
         start_time = time.time()
         sql = "SELECT * FROM  `wm_raw_draw_data` LIMIT %i, %i" % (i, pagesize)
         cursor.execute(sql)
@@ -40,8 +46,8 @@ def main(mysql):
             values = [data[key] for key in keys]
             values = ",".join(map(lambda n: "'%s'" % str(n), values))
             # IGNORE makes it possible to easily restart insertion
-            sql = "INSERT IGNORE INTO `wm_raw_draw_data` (%s) VALUES (%s);\n" % \
-                  (keys_str, values)
+            sql = ("INSERT IGNORE INTO `wm_raw_draw_data` "
+                   "(%s) VALUES (%s);\n" % (keys_str, values))
             f.write(sql)
             datacounter += 1
             if datacounter % 10000 == 0:
@@ -55,4 +61,9 @@ def main(mysql):
     f.write("UNLOCK TABLES;")
     f.close()
 if __name__ == '__main__':
-    main(mysql_online)
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-s", "--start", type=int,
+                        default=0, dest="start",
+                        help="how many IDs should be skipped?")
+    args = parser.parse_args()
+    main(mysql_online, args.start)

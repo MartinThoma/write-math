@@ -79,7 +79,7 @@ website/clients/nn-python/experiments/
 private/
 *.pfile
 *.json
-too-big/
+wm_raw_draw_data_*.sql
 detexify-import/done/
 detexify-import/skipped/
 detexify-import/splitted/
