@@ -1,4 +1,8 @@
 --
+-- Constraints der exportierten Tabellen
+--
+
+--
 -- Constraints der Tabelle `wm_dtw_worker_data`
 --
 ALTER TABLE `wm_dtw_worker_data`
@@ -15,8 +19,8 @@ ALTER TABLE `wm_flags`
 -- Constraints der Tabelle `wm_formula`
 --
 ALTER TABLE `wm_formula`
-  ADD CONSTRAINT `wm_formula_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `wm_formula_ibfk_1` FOREIGN KEY (`best_rendering`) REFERENCES `wm_renderings` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+  ADD CONSTRAINT `wm_formula_ibfk_1` FOREIGN KEY (`best_rendering`) REFERENCES `wm_renderings` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  ADD CONSTRAINT `wm_formula_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `wm_formula2challenge`

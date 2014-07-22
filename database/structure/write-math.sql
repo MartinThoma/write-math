@@ -3,23 +3,16 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 17. Jul 2014 um 16:59
+-- Erstellungszeit: 22. Jul 2014 um 02:26
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 --
 -- Datenbank: `20080912003-1`
 --
-
 
 -- --------------------------------------------------------
 
@@ -84,10 +77,11 @@ CREATE TABLE IF NOT EXISTS `wm_formula` (
   `preamble` text COLLATE utf8_bin NOT NULL,
   `best_rendering` int(11) DEFAULT NULL,
   `formula_type` enum('single symbol','formula','drawing','nesting symbol') COLLATE utf8_bin DEFAULT NULL,
+  `is_important` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `best_rendering` (`best_rendering`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1476 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1513 ;
 
 -- --------------------------------------------------------
 
@@ -196,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_data2formula` (
   KEY `raw_data_id` (`raw_data_id`,`formula_id`,`user_id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=19507 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=19718 ;
 
 -- --------------------------------------------------------
 
@@ -211,18 +205,21 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   `nr_of_symbols` int(11) NOT NULL DEFAULT '1',
   `md5data` char(32) COLLATE utf8_bin NOT NULL DEFAULT '',
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `user_agent` char(255) COLLATE utf8_bin NOT NULL,
+  `user_agent` varchar(255) COLLATE utf8_bin NOT NULL,
   `accepted_formula_id` int(11) DEFAULT NULL,
   `wild_point_count` smallint(6) NOT NULL DEFAULT '0',
   `missing_line` tinyint(1) NOT NULL DEFAULT '0',
   `has_hook` tinyint(1) NOT NULL DEFAULT '0',
   `has_too_long_line` tinyint(1) NOT NULL DEFAULT '0',
+  `has_interrupted_line` tinyint(1) NOT NULL DEFAULT '0',
   `is_image` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is an image, not a formula',
+  `other_problem` tinyint(1) NOT NULL DEFAULT '0',
+  `administrator_edit` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id_2` (`user_id`,`md5data`),
   KEY `user_id` (`user_id`),
   KEY `accepted_formula_id` (`accepted_formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=190731 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=292243 ;
 
 -- --------------------------------------------------------
 
@@ -240,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `wm_renderings` (
   PRIMARY KEY (`id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1170 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1188 ;
 
 -- --------------------------------------------------------
 
@@ -267,7 +264,7 @@ CREATE TABLE IF NOT EXISTS `wm_similarity` (
 CREATE TABLE IF NOT EXISTS `wm_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `display_name` varchar(20) COLLATE utf8_bin NOT NULL,
-  `email` varchar(255) COLLATE utf8_bin,
+  `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `password` char(60) COLLATE utf8_bin NOT NULL,
   `account_type` enum('IP-User','Regular User','Admin') COLLATE utf8_bin NOT NULL DEFAULT 'Regular User',
   `confirmation_code` char(32) COLLATE utf8_bin NOT NULL,
@@ -278,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=17705 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=19945 ;
 
 -- --------------------------------------------------------
 
@@ -311,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `wm_votes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uservote` (`user_id`,`raw_data2formula_id`),
   KEY `raw_data2formula_id` (`raw_data2formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=4493 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=5296 ;
 
 -- --------------------------------------------------------
 
@@ -352,12 +349,5 @@ CREATE TABLE IF NOT EXISTS `wm_worker_answers` (
   KEY `formula_id` (`formula_id`),
   KEY `raw_data_id` (`raw_data_id`),
   KEY `worker_id` (`worker_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=7671 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=7741 ;
 
---
--- Constraints der exportierten Tabellen
---
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
