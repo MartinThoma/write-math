@@ -1,0 +1,77 @@
+{% extends "base.twig" %}
+{% import "pagination.twig" as pagination %}
+
+{% block content %}
+<form role="form" method="get">
+  <div class="form-group">
+    <label for="wild_point_count">wild_point_count</label>
+    <input type="number"
+           class="form-control"
+           id="wild_point_count" name="wild_point_count"
+           min="0"
+           step="1"
+           value="{{ restrictions['min_wild_points'] }}" />
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="missing_line" value="1"
+             {% if restrictions['missing_line'] %}checked="checked"{% endif %}
+      /> missing_line
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="has_hook" value="1"
+             {% if restrictions['has_hook'] %}checked="checked"{% endif %}
+      /> has_hook
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="has_too_long_line" value="1"
+             {% if restrictions['has_too_long_line'] %}checked="checked"{% endif %}
+      /> has_too_long_line
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="has_interrupted_line" value="1"
+             {% if restrictions['has_interrupted_line'] %}checked="checked"{% endif %}
+      /> has_interrupted_line
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="other_problem" value="1"
+             {% if restrictions['other_problem'] %}checked="checked"{% endif %}
+      /> other_problem
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="is_image" value="1"
+             {% if restrictions['is_image'] %}checked="checked"{% endif %}
+      /> is_image
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+   <ul class="gallery mw-gallery-traditional">
+    {% for image in userimages %}
+     <li class="gallerybox" style="width: 155px">
+       <div style="width: 155px">
+         <div class="thumb" style="width: 150px;">
+           <div style="margin:21px auto;">
+             <a href="../view?raw_data_id={{ image.id }}"><img src="../raw-data/{{ image.id }}.svg" style="width:140px;height:140px;"/></a>
+           </div>
+         </div>
+         <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>
+       </div>
+     </li>
+    {% endfor %}
+   </ul>
+
+{{ pagination.pagination(currentPage, pagination_url, total, pages, 5) }}
+
+{% endblock %}
