@@ -36,12 +36,23 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $symbol_training_data_count = $stmt->fetchAll();
 
+$sum = 0;
+$important_count = 0;
+foreach ($symbol_training_data_count as $s) {
+    $sum += $s['counter'];
+    if ($s['is_important']) {
+        $important_count += 1;
+    }
+}
+
 echo $twig->render('stats.twig', array('heading' => 'Stats',
                                        'file'=> "stats",
                                        'logged_in' => is_logged_in(),
                                        'user_id' => get_uid(),
                                        'display_name' => $_SESSION['display_name'],
                                        'msg' => $msg,
-                                       'symbol_training_data_count' => $symbol_training_data_count
+                                       'symbol_training_data_count' => $symbol_training_data_count,
+                                       'sum' => $sum,
+                                       'important_count' => $important_count
                                        )
                   );

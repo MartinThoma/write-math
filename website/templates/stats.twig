@@ -31,5 +31,14 @@
     {% endif %}
     </tr>
   {% endfor %}
+    <tr>
+       <td>&sum;</td>
+       <td>&nbsp;</td>
+       <td>{{ sum }}</td>
+       <td>{{ important_count }}</td>
+        {% if user_id == 10 %}
+            <td>&nbsp;</td>
+        {% endif %}
+    </tr>
 </table>
 {% endblock %}
