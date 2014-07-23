@@ -29,8 +29,8 @@ class HandwrittenData(object):
             raise inst
 
         if len(pointlist) == 0:
-            logging.waring("Pointlist was empty. Search for '" +
-                           self.raw_data_json + "' in `wm_raw_draw_data`.")
+            logging.warning("Pointlist was empty. Search for '" +
+                            self.raw_data_json + "' in `wm_raw_draw_data`.")
         return pointlist
 
     def set_pointlist(self, pointlist):
