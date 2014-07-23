@@ -69,12 +69,13 @@ if (isset($_POST['nr_of_lines'])) {
         # Does this dataset need to be fixed?
         if (!endsWith($raw_data, ']]')) {
             $i = -1;
+            # Take everything from the back until the first '}' appears
             while (substr($raw_data, $i, 1) != '}' && $i > -strlen($raw_data)) {
                 $i -= 1;
             }
             $fixed = substr($raw_data, 0, strlen($raw_data)+$i+1)."]]";
             # Put it in the database
-            $sql = "UPDATE `20080912003-1`.`wm_raw_draw_data` ".
+            $sql = "UPDATE `wm_raw_draw_data` ".
                    "SET `data` = :data ".
                    "WHERE `wm_raw_draw_data`.`id` = :rid LIMIT 1; ";
             $stmt = $pdo->prepare($sql);
