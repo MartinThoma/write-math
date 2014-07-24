@@ -172,3 +172,38 @@ def douglas_peucker(handwritten_data, EPSILON=10):
     for i in range(0, len(pointlist)):
         pointlist[i] = DouglasPeucker(pointlist[i], EPSILON)
     handwritten_data.set_pointlist(pointlist)
+
+
+def connect_lines(handwritten_data):
+    """Detect if lines were probably accidentially disconnected. If that is the
+       case, connect them.
+    """
+    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+        "handwritten data is not of type HandwrittenData, but of %r" % \
+        type(handwritten_data)
+
+    def euclidean_distance(p1, p2):
+        return sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
+
+    pointlist = handwritten_data.get_pointlist()
+
+    # Connecting lines makes only sense when there are multiple lines
+    if len(pointlist) > 1:
+        lines = []
+        last_appended = False
+        i = 0
+        while i < len(pointlist)-1:
+            last_point = pointlist[i][-1]
+            first_point = pointlist[i+1][0]
+            if euclidean_distance(last_point, first_point) < 0.05:
+                lines.append(pointlist[i]+pointlist[i+1])
+                pointlist[i+1] = lines[-1]
+                if i == len(pointlist)-2:
+                    last_appended = True
+                i += 1
+            else:
+                lines.append(pointlist[i])
+            i += 1
+        if not last_appended:
+            lines.append(pointlist[-1])
+        handwritten_data.set_pointlist(lines)
