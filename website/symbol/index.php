@@ -101,11 +101,16 @@ if (isset($_GET['id'])) {
     $stmt->execute();
     $formula = $stmt->fetchObject();
 
+    $tab = isset($_GET['tab']) ? $_GET['tab'] : "trainingset";
+    $is_testset = $tab == "testset";
+
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(`id`) as counter FROM `wm_raw_draw_data` ".
-           "WHERE `accepted_formula_id` = :fid ";
+           "WHERE `accepted_formula_id` = :fid ".
+           "AND is_in_testset=:is_in_testset ";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $_GET['id'], PDO::PARAM_STR);
+    $stmt->bindParam(':is_in_testset', $is_testset);
     $stmt->execute();
     $row = $stmt->fetchObject();
     $total = $row->counter;
@@ -116,15 +121,17 @@ if (isset($_GET['id'])) {
     $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `accepted_formula_id` = :fid ".
+           "AND is_in_testset=:is_in_testset ".
            "ORDER BY `creation_date` DESC ".
            "LIMIT ".(($currentPage-1)*$page_size).", ".$page_size;
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $_GET['id'], PDO::PARAM_STR);
+    $stmt->bindParam(':is_in_testset', $is_testset);
     $stmt->execute();
     $images = $stmt->fetchAll();
 } else {
-        $msg[] = array("class" => "alert-warning",
-               "text" => "Please set an ID (e.g. <a href=\"../symbol/?id=31\">like this</a>)");
+    $msg[] = array("class" => "alert-warning",
+                   "text" => "Please set an ID (e.g. <a href=\"../symbol/?id=31\">like this</a>)");
 }
 
 echo $twig->render('symbol.twig', array('heading' => 'Symbol',
@@ -138,7 +145,8 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'images' => $images,
                                        'total' => $total,
                                        'pages' => floor(($total)/$page_size),
-                                       'currentPage' => $currentPage
+                                       'currentPage' => $currentPage,
+                                       'tab' => $tab
                                        )
                   );
 

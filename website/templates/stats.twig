@@ -4,6 +4,7 @@
 
 <table class="table table-striped">
     <tr>
+        <td></td>
         <th>#</th>
         <th>Formula in LaTeX</th>
         <th>Instances in database</th>
@@ -13,6 +14,8 @@
     </tr>
   {% for s in symbol_training_data_count %}
     <tr>
+            <th><img  src="../formulas/{{ s.id }}-{{ s.best_rendering }}.svg"
+                 width="30" style="width:30px;max-height:30px;" /></th>
         {% if s.is_important %}
             <td style="background-color:green;">{{ loop.index }}</td>
             <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
@@ -32,10 +35,11 @@
     </tr>
   {% endfor %}
     <tr>
+       <td>&nbsp;</td>
        <td>&sum;</td>
        <td>&nbsp;</td>
        <td>{{ sum }}</td>
-       <td>{{ important_count }}</td>
+       <td>{{ important_count }} ({{ important_count_raw }} raw)</td>
         {% if user_id == 10 %}
             <td>&nbsp;</td>
         {% endif %}

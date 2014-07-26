@@ -88,7 +88,7 @@
   </tr>
   {% if image_data.user_id == uid or uid == 10 %}
   <tr>
-    <th rowspan="6">Operations</th>
+    <th rowspan="7">Operations</th>
     <td>
         <a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a>
         {% if uid == 10 %}
@@ -139,6 +139,15 @@
         <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">This is an image, not a formula</a>
     {% else %}
         <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning">This is an image, not a formula</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.is_in_testset == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&remove_from_testset={{ raw_data_id }}" type="button" class="btn btn-primary" disabled="true">Remove from testset</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&add_to_testset={{ raw_data_id }}" type="button" class="btn btn-primary">Add to testset</a>
     {% endif %}
     </td>
   </tr>

@@ -24,6 +24,11 @@
 <p><b>Total handdrawn symbols</b>: {{ total }}</p>
 <p><a href="../train/?formula_id={{ formula.id }}">Train this symbol</a></p>
 
+<ul class="nav nav-tabs">
+  <li {% if tab == 'trainingset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}">Trainingset</a></li>
+  <li {% if tab == 'testset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}&tab=testset">Testset</a></li>
+</ul>
+
  <ul class="gallery mw-gallery-traditional">
   {% for image in images %}
    <li class="gallerybox" style="width: 155px">
@@ -42,7 +47,7 @@
   {% endfor %}
  </ul>
 
-{{ pagination.pagination(currentPage, '&id=' ~ formula.id, total, pages, 5) }}
+{{ pagination.pagination(currentPage, '&id=' ~ formula.id ~ '&tab=' ~ tab, total, pages, 5) }}
 
 <hr/>
 

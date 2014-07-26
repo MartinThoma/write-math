@@ -25,10 +25,10 @@ if (isset($_GET['is_not_important'])) {
 
 
 $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
-       "`is_important`, ".
-       "COUNT(  `wm_formula`.`id` ) AS counter ".
-       "FROM  `wm_raw_draw_data` ".
-       "JOIN  `wm_formula` ON  `wm_formula`.`id` =  `accepted_formula_id` ".
+       "`is_important`, `best_rendering`, ".
+       "COUNT(`wm_formula`.`id`) AS `counter` ".
+       "FROM `wm_raw_draw_data` ".
+       "JOIN `wm_formula` ON `wm_formula`.`id` = `accepted_formula_id` ".
        "WHERE `formula_type` = 'single symbol' ".
        "GROUP BY  `accepted_formula_id` ".
        "ORDER BY counter DESC";
@@ -38,10 +38,16 @@ $symbol_training_data_count = $stmt->fetchAll();
 
 $sum = 0;
 $important_count = 0;
+$important_count_raw = 0;
+$tmp = array();
 foreach ($symbol_training_data_count as $s) {
     $sum += $s['counter'];
     if ($s['is_important']) {
         $important_count += 1;
+        $important_count_raw += $s['counter'];
+        if ($s['formula_in_latex'] != "") {
+            $tmp[] = $s['formula_in_latex'];
+        }
     }
 }
 
@@ -53,6 +59,7 @@ echo $twig->render('stats.twig', array('heading' => 'Stats',
                                        'msg' => $msg,
                                        'symbol_training_data_count' => $symbol_training_data_count,
                                        'sum' => $sum,
-                                       'important_count' => $important_count
+                                       'important_count' => $important_count,
+                                       'important_count_raw' => $important_count_raw
                                        )
                   );

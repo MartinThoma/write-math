@@ -9,6 +9,22 @@ require_once '../feature_extraction.php';
 $answers = null;
 $image_data = null;
 
+if (isset($_GET['add_to_testset']) && is_admin()) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `is_in_testset` =  '1' ".
+           "WHERE `wm_raw_draw_data`.`id` = :rid;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':rid', $_GET['add_to_testset'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['remove_from_testset']) && is_admin()) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `is_in_testset` =  '0' ".
+           "WHERE `wm_raw_draw_data`.`id` = :rid;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':rid', $_GET['remove_from_testset'], PDO::PARAM_INT);
+    $stmt->execute();
+}
+
 if (isset($_GET['request_new_classification'])) {
     $raw_data_id = intval($_GET['request_new_classification']);
 
@@ -266,7 +282,7 @@ if (isset($_GET['raw_data_id'])) {
     $sql = "SELECT `user_id`, `display_name`, `data`, ".
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
-           "`has_too_long_line` ".
+           "`has_too_long_line`, `is_in_testset` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
