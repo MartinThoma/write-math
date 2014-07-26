@@ -90,13 +90,13 @@ def create_pfile():
     for i in range(2, len(cv)):
         training_set += cv[i]
 
-
     preprocessing_queue = [(preprocessing.scale_and_shift, []),
+                           (preprocessing.connect_lines, []),
                            (preprocessing.douglas_peucker,
                             {'EPSILON': 0.2}),
-                            (preprocessing.space_evenly,
-                             {'number': 100,
-                              'KIND': 'cubic'})
+                           (preprocessing.space_evenly,
+                            {'number': 100,
+                             'KIND': 'cubic'})
                            ]
 
     print("Classes (nr of symbols): %i" % len(formula_id2index))

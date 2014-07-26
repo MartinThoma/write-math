@@ -7,6 +7,10 @@ from scipy.interpolate import interp1d
 from math import sqrt
 
 
+def _euclidean_distance(p1, p2):
+    return sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
+
+
 def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
@@ -182,9 +186,6 @@ def connect_lines(handwritten_data):
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(handwritten_data)
 
-    def euclidean_distance(p1, p2):
-        return sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
-
     pointlist = handwritten_data.get_pointlist()
 
     # Connecting lines makes only sense when there are multiple lines
@@ -195,7 +196,7 @@ def connect_lines(handwritten_data):
         while i < len(pointlist)-1:
             last_point = pointlist[i][-1]
             first_point = pointlist[i+1][0]
-            if euclidean_distance(last_point, first_point) < 0.05:
+            if _euclidean_distance(last_point, first_point) < 0.05:
                 lines.append(pointlist[i]+pointlist[i+1])
                 pointlist[i+1] = lines[-1]
                 if i == len(pointlist)-2:
@@ -207,3 +208,56 @@ def connect_lines(handwritten_data):
         if not last_appended:
             lines.append(pointlist[-1])
         handwritten_data.set_pointlist(lines)
+
+
+def dot_reduction(handwritten_data, threshold):
+    """Reduce lines where the maximum distance between points is below a
+       threshold to a single dot.
+    """
+
+    def get_max_distance(L):
+        """Find the maximum distance between two points in a list of points
+        @param  list L list of points
+        @return float  maximum distance bewtween two points
+        """
+        if len(L) <= 1:
+            return -1
+        else:
+            max_dist = _euclidean_distance(L[0], L[1])
+            for i in range(len(L)-1):
+                for j in range(i+1, len(L)):
+                    max_dist = max(_euclidean_distance(L[i], L[j]), max_dist)
+            return max_dist
+
+    def get_average_point(L):
+        """Calculate the average point.
+        @param  list L List of points
+        @return dict   a single point
+        """
+        x, y, t = 0, 0, 0
+        for point in L:
+            x += point['x']
+            y += point['y']
+            t += point['time']
+        x = float(x) / len(L)
+        y = float(y) / len(L)
+        t = float(t) / len(L)
+        return {'x': x, 'y': y, 'time': t}
+
+    new_pointlist = []
+    pointlist = handwritten_data.get_pointlist()
+    for line in pointlist:
+        new_line = line
+        if len(line) > 1 and get_max_distance(line) < threshold:
+            new_line = [get_average_point(line)]
+        new_pointlist.append(new_line)
+
+    handwritten_data.set_pointlist(new_pointlist)
+
+
+def remove_wild_points(handwritten_data):
+    """Find wild points and remove them."""
+    # Bounding box criterion:
+    # If the distance from point to all others strokes bounding boxes is
+    # more than 1/5 of the whole size, it is a wild point
+    pass
