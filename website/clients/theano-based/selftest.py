@@ -16,7 +16,7 @@ import MySQLdb
 import MySQLdb.cursors
 from classification import pointLineList, douglas_peucker, space_evenly, \
     scale_and_shift
-from dbconfig import mysql
+import yaml
 import time
 import datetime
 import sys
@@ -313,10 +313,15 @@ def crossvalidation(HIDDEN_NEURONS, WEIGHTDECAY, MOMENTUM, POINTS_PER_LINE=20,
 if __name__ == '__main__':
     logging.info("Started selftest of classifier %s." % CLASSIFIER_NAME)
     logging.info("start establishing connection")
-    connection = MySQLdb.connect(host=mysql['host'],
-                                 user=mysql['user'],
-                                 passwd=mysql['passwd'],
-                                 db=mysql['db'],
+
+    yamlconfigfile = "/var/www/write-math/website/clients/python/db.config.yml"
+    with open(yamlconfigfile, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+
+    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
+                                 user=cfg['mysql_online']['user'],
+                                 passwd=cfg['mysql_online']['passwd'],
+                                 db=cfg['mysql_online']['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
     logging.info("end establishing connection")

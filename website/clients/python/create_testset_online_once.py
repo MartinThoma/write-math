@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-import cPickle as pickle
 import MySQLdb
 import MySQLdb.cursors
-from dbconfig import mysql
 from HandwrittenData import HandwrittenData
 import random
 import math
+import yaml
 
 """
 Add `is_in_testset` to raw_datasets in MySQL database, so that at least 10%
@@ -15,10 +14,10 @@ of the data online has the flag `is_in_testset`.
 
 
 def main():
-    connection = MySQLdb.connect(host=mysql['host'],
-                                 user=mysql['user'],
-                                 passwd=mysql['passwd'],
-                                 db=mysql['db'],
+    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
+                                 user=cfg['mysql_online']['user'],
+                                 passwd=cfg['mysql_online']['passwd'],
+                                 db=cfg['mysql_online']['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
 
@@ -54,7 +53,7 @@ def main():
             add_new = random.sample(raw_candidate_ids, remaining)
             if len(add_new) < 20:
                 for el in add_new:
-                    print("http://www.martin-thoma.de/write-math/view/?raw_data_id=%i" % el)
+                    print("http://write-math.com/view/?raw_data_id=%i" % el)
             for rid in add_new:
                 sql = ("UPDATE `wm_raw_draw_data` SET `is_in_testset`=1 "
                        "WHERE `id` = %i LIMIT 1") % rid
@@ -63,4 +62,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with open("db.config.yml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+
+    main(cfg)

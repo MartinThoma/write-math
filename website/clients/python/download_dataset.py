@@ -3,15 +3,15 @@
 import cPickle as pickle
 import MySQLdb
 import MySQLdb.cursors
-from dbconfig import mysql
+import yaml
 from HandwrittenData import HandwrittenData
 
 
-def main():
-    connection = MySQLdb.connect(host=mysql['host'],
-                                 user=mysql['user'],
-                                 passwd=mysql['passwd'],
-                                 db=mysql['db'],
+def main(cfg):
+    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
+                                 user=cfg['mysql_online']['user'],
+                                 passwd=cfg['mysql_online']['passwd'],
+                                 db=cfg['mysql_online']['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
 
@@ -49,4 +49,6 @@ def main():
                 open("handwriting_datasets.pickle", "wb"))
 
 if __name__ == '__main__':
-    main()
+    with open("db.config.yml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+    main(cfg)
