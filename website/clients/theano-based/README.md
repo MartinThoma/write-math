@@ -887,7 +887,7 @@ $ d test testdata.pfile < mlp-1.json
 ### Newbob training
 
 ```bash
-time detl train --newbob --epochs 100 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1-batch256.json
+time d train --newbob --epochs 100 --learning-rate 1 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1-batch256.json
 [2014-07-24 11:32:46,726] >> Loading model
 [2014-07-24 11:32:46,761] >> Loading datasets
 [2014-07-24 11:32:48,168] >> Supervised training started with arguments:
@@ -948,13 +948,13 @@ time detl train --newbob --epochs 100 --learning-rate 1 --momentum 0.1 traindata
 [2014-07-24 11:56:55,499] >  epoch 18/11304, learning rate set to 0.031250
 [2014-07-24 11:58:15,209] >  epoch 19/11932, validation error 0.551078
 [2014-07-24 11:58:15,228] >> Training finished in 0:25:21.028607
-detl train --newbob --epochs 100 --learning-rate 1 --momentum 0.1   < mlp.jso  1519,12s user 4,71s system 99% cpu 25:29,29 total
+d train --newbob --epochs 100 --learning-rate 1 --momentum 0.1   < mlp.jso  1519,12s user 4,71s system 99% cpu 25:29,29 total
 ```
 
 ### Increased learning rate
 
 ```bash
-time detl train --epochs 100 --learning-rate 2 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1-learning-rate-2.json
+time d train --epochs 100 --learning-rate 2 --momentum 0.1 traindata.pfile validdata.pfile < mlp.json > mlp-1-learning-rate-2.json
 [2014-07-24 13:09:17,279] >> Loading model
 [2014-07-24 13:09:17,314] >> Loading datasets
 [2014-07-24 13:09:23,680] >> Supervised training started with arguments:
@@ -1091,5 +1091,5 @@ time detl train --epochs 100 --learning-rate 2 --momentum 0.1 traindata.pfile va
 [2014-07-24 15:24:01,944] >  epoch 99/62172, validation error 0.493473
 [2014-07-24 15:25:21,498] >  epoch 100/62800, validation error 0.489122
 [2014-07-24 15:25:21,515] >> Training finished in 2:15:51.789313
-detl train --epochs 100 --learning-rate 2 --momentum 0.1 traindata.pfile  <    8077,91s user 10,56s system 99% cpu 2:16:09,19 total
+d train --epochs 100 --learning-rate 2 --momentum 0.1 traindata.pfile  <    8077,91s user 10,56s system 99% cpu 2:16:09,19 total
 ```
