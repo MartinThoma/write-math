@@ -57,10 +57,6 @@ def prepare_dataset(dataset, formula_id2index, preprocessing_queue):
         fill_empty_with = 0
         for line_nr in range(4):
             if line_nr < len(pointlist):
-                # if len(pointlist[line_nr]) >= 20:
-                #     print("More than 20 points in this list! (%i)" %
-                #           len(pointlist[line_nr]))
-                #     print("Raw-Data-ID: %r" % data['id'])
                 for point_nr in range(20):
                     if point_nr < len(pointlist[line_nr]):
                         x.append(pointlist[line_nr][point_nr]['x'])
@@ -78,17 +74,45 @@ def prepare_dataset(dataset, formula_id2index, preprocessing_queue):
     return prepared
 
 
-def create_pfile():
-    path_to_data = '../python/cv_datasets.pickle'
-    tmp = pickle.load(open(path_to_data))
-    cv = tmp['cv']
-    formula_id2index = tmp['formula_id2index']
+def get_sets(path_to_data):
+    loaded = pickle.load(open(path_to_data))
+    datasets = loaded['handwriting_datasets']
 
-    test_set = cv[0]
-    validation_set = cv[1]
     training_set = []
-    for i in range(2, len(cv)):
-        training_set += cv[i]
+    validation_set = []
+    test_set = []
+
+    dataset_by_formula_id = {}
+    index2formula_id = []
+    formula_id2index = {}
+    symbols = {}
+
+    for dataset in datasets:
+        if dataset['formula_id'] in dataset_by_formula_id:
+            dataset_by_formula_id[dataset['formula_id']].append(dataset)
+        else:
+            dataset_by_formula_id[dataset['formula_id']] = [dataset]
+
+    for formula_id, dataset in dataset_by_formula_id.items():
+        formula_id2index[formula_id] = len(index2formula_id)
+        index2formula_id.append(formula_id)
+        symbols[loaded['formula_id2latex'][formula_id]] = len(dataset)
+        i = 0
+        for raw_data in dataset:
+            if raw_data['is_in_testset']:
+                test_set.append(raw_data)
+            else:
+                if i % 10 == 0:
+                    validation_set.append(raw_data)
+                else:
+                    training_set.append(raw_data)
+                i = (i + 1) % 10
+    return training_set, validation_set, test_set, formula_id2index
+
+
+def create_pfile():
+    training_set, validation_set, test_set, formula_id2index = \
+        get_sets("../python/handwriting_datasets.pickle")
 
     preprocessing_queue = [(preprocessing.scale_and_shift, []),
                            (preprocessing.connect_lines, []),
@@ -106,7 +130,6 @@ def create_pfile():
     for algorithm, options in preprocessing_queue:
         print("* %r with %r" % (algorithm, options))
     print("```")
-
 
     prepared = prepare_dataset(test_set,
                                formula_id2index,
