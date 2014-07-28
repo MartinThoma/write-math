@@ -16,7 +16,8 @@ def main():
     cursor = connection.cursor()
 
     # Download all datasets
-    sql = "SELECT id, formula_in_latex FROM `wm_formula`"
+    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
+           "WHERE `is_important` = 1 ORDER BY `id` ASC")
     cursor.execute(sql)
     datasets = cursor.fetchall()
 
@@ -25,7 +26,7 @@ def main():
 
     for dataset in datasets:
         formula_id2latex[dataset['id']] = dataset['formula_in_latex']
-        sql = ("SELECT id, data FROM `wm_raw_draw_data` "
+        sql = ("SELECT `id`, `data`, `is_in_testset` FROM `wm_raw_draw_data` "
                "WHERE `accepted_formula_id` = %s" % str(dataset['id']))
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
@@ -35,7 +36,8 @@ def main():
                 handwriting_datasets.append({'handwriting': HandwrittenData(raw_data['data']),
                                              'id': raw_data['id'],
                                              'formula_id': dataset['id'],
-                                             'formula_in_latex': dataset['formula_in_latex']
+                                             'formula_in_latex': dataset['formula_in_latex'],
+                                             'is_in_testset': raw_data['is_in_testset']
                                              })
             except Exception as e:
                 print("Raw data id: %s" % raw_data['id'])
