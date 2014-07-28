@@ -70,6 +70,8 @@ website/raw-data
 *.xdy
 
 *config.py
+*config.yaml
+*config.yml
 *config.php
 *.bak
 *.sublime-workspace
