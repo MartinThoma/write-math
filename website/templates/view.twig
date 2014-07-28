@@ -145,7 +145,7 @@
   <tr>
     <td>
     {% if image_data.is_in_testset == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&remove_from_testset={{ raw_data_id }}" type="button" class="btn btn-primary" disabled="true">Remove from testset</a>
+        <a href="?raw_data_id={{ raw_data_id }}&remove_from_testset={{ raw_data_id }}" type="button" class="btn btn-primary">Remove from testset</a>
     {% else %}
         <a href="?raw_data_id={{ raw_data_id }}&add_to_testset={{ raw_data_id }}" type="button" class="btn btn-primary">Add to testset</a>
     {% endif %}

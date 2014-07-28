@@ -229,7 +229,8 @@ if (isset($_GET['raw_data_id'])) {
         }
     } elseif (isset($_GET['unaccept'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
-               "SET `accepted_formula_id` = NULL ".
+               "SET `accepted_formula_id` = NULL, ".
+               "is_in_testset = 0 ".
                "WHERE `wm_raw_draw_data`.`id` = :raw_data_id AND ".
                "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
         $stmt = $pdo->prepare($sql);
