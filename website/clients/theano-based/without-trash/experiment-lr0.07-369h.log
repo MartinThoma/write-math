@@ -1,0 +1,138 @@
+time d train --epochs 100 --learning-rate 0.07 --momentum 0.1 traindata.pfile validdata.pfile < mlp-369-100epochs.json > mlp-369-200epochs.json
+[2014-07-28 20:51:48,765] >> Loading model
+[2014-07-28 20:51:48,806] >> Loading datasets
+[2014-07-28 20:51:55,583] >> Supervised training started with arguments:
+{'adadelta': False,
+ 'adadelta_epsilon': '1e-6',
+ 'adadelta_rho': '0.95',
+ 'adagrad': False,
+ 'adagrad_decay': False,
+ 'batch_size': 256,
+ 'datasets': (DatasetContainer [PFileDataset@traindata.pfile,1],
+              DatasetContainer [PFileDataset@validdata.pfile,1],
+              DatasetContainer []),
+ 'epochs': 100,
+ 'fix_layers': [],
+ 'graph': False,
+ 'hooks': [],
+ 'l1_reg': '0.0',
+ 'l2_reg': '0.0',
+ 'layer_args': [],
+ 'learning_rate': '0.07',
+ 'minibatches': -1,
+ 'momentum': '0.1',
+ 'newbob': False,
+ 'newbob_decay': 0.5,
+ 'newbob_threshold': [0.005, 0.001],
+ 'patience': -1,
+ 'patience_improve_threshold': 0.995,
+ 'patience_increase': 1.5,
+ 'pre_validate': False,
+ 'print_errors': False,
+ 'validation_interval': -1,
+ 'verbosity': 0,
+ 'warn': False}
+[2014-07-28 20:51:55,583] >> Compiling theano graph
+[2014-07-28 20:52:02,260] >> Training started
+[2014-07-28 20:53:21,237] >  epoch 1/531, validation error 0.557203
+[2014-07-28 20:54:54,377] >  epoch 2/1062, validation error 0.554290
+[2014-07-28 20:56:27,429] >  epoch 3/1593, validation error 0.553761
+[2014-07-28 20:58:00,719] >  epoch 4/2124, validation error 0.552635
+[2014-07-28 20:59:27,759] >  epoch 5/2655, validation error 0.551245
+[2014-07-28 21:01:01,254] >  epoch 6/3186, validation error 0.550649
+[2014-07-28 21:02:27,981] >  epoch 7/3717, validation error 0.549590
+[2014-07-28 21:04:03,861] >  epoch 8/4248, validation error 0.548663
+[2014-07-28 21:05:30,224] >  epoch 9/4779, validation error 0.547603
+[2014-07-28 21:07:03,544] >  epoch 10/5310, validation error 0.546279
+[2014-07-28 21:08:31,068] >  epoch 11/5841, validation error 0.545352
+[2014-07-28 21:10:03,989] >  epoch 12/6372, validation error 0.544690
+[2014-07-28 21:11:30,387] >  epoch 13/6903, validation error 0.543631
+[2014-07-28 21:13:02,803] >  epoch 14/7434, validation error 0.542903
+[2014-07-28 21:14:36,230] >  epoch 15/7965, validation error 0.542505
+[2014-07-28 21:16:09,961] >  epoch 16/8496, validation error 0.542174
+[2014-07-28 21:17:45,397] >  epoch 17/9027, validation error 0.541049
+[2014-07-28 21:19:19,621] >  epoch 18/9558, validation error 0.540320
+[2014-07-28 21:20:59,233] >  epoch 19/10089, validation error 0.540254
+[2014-07-28 21:22:34,870] >  epoch 20/10620, validation error 0.538996
+[2014-07-28 21:24:08,423] >  epoch 21/11151, validation error 0.537937
+[2014-07-28 21:25:41,522] >  epoch 22/11682, validation error 0.537341
+[2014-07-28 21:27:14,853] >  epoch 23/12213, validation error 0.536547
+[2014-07-28 21:28:47,653] >  epoch 24/12744, validation error 0.535620
+[2014-07-28 21:30:20,179] >  epoch 25/13275, validation error 0.534958
+[2014-07-28 21:31:52,929] >  epoch 26/13806, validation error 0.533898
+[2014-07-28 21:33:29,298] >  epoch 27/14337, validation error 0.532508
+[2014-07-28 21:35:01,741] >  epoch 28/14868, validation error 0.531581
+[2014-07-28 21:36:31,941] >  epoch 29/15399, validation error 0.531250
+[2014-07-28 21:38:01,748] >  epoch 30/15930, validation error 0.530257
+[2014-07-28 21:39:31,481] >  epoch 31/16461, validation error 0.529462
+[2014-07-28 21:41:01,280] >  epoch 32/16992, validation error 0.528800
+[2014-07-28 21:42:31,065] >  epoch 33/17523, validation error 0.528072
+[2014-07-28 21:44:02,345] >  epoch 34/18054, validation error 0.527211
+[2014-07-28 21:45:34,757] >  epoch 35/18585, validation error 0.526020
+[2014-07-28 21:47:07,956] >  epoch 36/19116, validation error 0.525490
+[2014-07-28 21:48:44,538] >  epoch 37/19647, validation error 0.524695
+[2014-07-28 21:50:17,368] >  epoch 38/20178, validation error 0.524497
+[2014-07-28 21:51:49,716] >  epoch 39/20709, validation error 0.523570
+[2014-07-28 21:53:22,667] >  epoch 40/21240, validation error 0.522974
+[2014-07-28 21:54:56,757] >  epoch 41/21771, validation error 0.522246
+[2014-07-28 21:56:30,403] >  epoch 42/22302, validation error 0.521782
+[2014-07-28 21:58:03,773] >  epoch 43/22833, validation error 0.521054
+[2014-07-28 21:59:36,819] >  epoch 44/23364, validation error 0.520524
+[2014-07-28 22:01:09,695] >  epoch 45/23895, validation error 0.519928
+[2014-07-28 22:02:46,620] >  epoch 46/24426, validation error 0.519465
+[2014-07-28 22:04:20,664] >  epoch 47/24957, validation error 0.519068
+[2014-07-28 22:05:54,241] >  epoch 48/25488, validation error 0.518273
+[2014-07-28 22:07:27,549] >  epoch 49/26019, validation error 0.517677
+[2014-07-28 22:09:00,252] >  epoch 50/26550, validation error 0.516949
+[2014-07-28 22:10:33,713] >  epoch 51/27081, validation error 0.516353
+[2014-07-28 22:12:06,303] >  epoch 52/27612, validation error 0.515757
+[2014-07-28 22:13:38,783] >  epoch 53/28143, validation error 0.515162
+[2014-07-28 22:15:11,283] >  epoch 54/28674, validation error 0.514831
+[2014-07-28 22:16:43,822] >  epoch 55/29205, validation error 0.513970
+[2014-07-28 22:18:19,839] >  epoch 56/29736, validation error 0.513374
+[2014-07-28 22:19:52,725] >  epoch 57/30267, validation error 0.513175
+[2014-07-28 22:21:25,262] >  epoch 58/30798, validation error 0.512844
+[2014-07-28 22:22:58,476] >  epoch 59/31329, validation error 0.512182
+[2014-07-28 22:24:32,010] >  epoch 60/31860, validation error 0.511785
+[2014-07-28 22:26:04,061] >  epoch 61/32391, validation error 0.511653
+[2014-07-28 22:27:43,310] >  epoch 62/32922, validation error 0.511189
+[2014-07-28 22:29:15,755] >  epoch 63/33453, validation error 0.510858
+[2014-07-28 22:30:48,299] >  epoch 64/33984, validation error 0.510395
+[2014-07-28 22:32:21,058] >  epoch 65/34515, validation error 0.510196
+[2014-07-28 22:33:57,883] >  epoch 66/35046, validation error 0.509534
+[2014-07-28 22:35:31,055] >  epoch 67/35577, validation error 0.508872
+[2014-07-28 22:37:04,752] >  epoch 68/36108, validation error 0.508210
+[2014-07-28 22:38:38,061] >  epoch 69/36639, validation error 0.507548
+[2014-07-28 22:40:11,083] >  epoch 70/37170, validation error 0.506886
+[2014-07-28 22:41:43,759] >  epoch 71/37701, validation error 0.506488
+[2014-07-28 22:43:17,357] >  epoch 72/38232, validation error 0.506356
+[2014-07-28 22:44:50,238] >  epoch 73/38763, validation error 0.506555
+[2014-07-28 22:46:24,241] >  epoch 74/39294, validation error 0.505892
+[2014-07-28 22:48:01,189] >  epoch 75/39825, validation error 0.505297
+[2014-07-28 22:49:34,275] >  epoch 76/40356, validation error 0.504899
+[2014-07-28 22:51:07,039] >  epoch 77/40887, validation error 0.504635
+[2014-07-28 22:52:39,964] >  epoch 78/41418, validation error 0.504171
+[2014-07-28 22:54:12,993] >  epoch 79/41949, validation error 0.503509
+[2014-07-28 22:55:46,085] >  epoch 80/42480, validation error 0.503310
+[2014-07-28 22:57:18,638] >  epoch 81/43011, validation error 0.502450
+[2014-07-28 22:58:51,807] >  epoch 82/43542, validation error 0.502251
+[2014-07-28 23:00:24,580] >  epoch 83/44073, validation error 0.501589
+[2014-07-28 23:01:57,216] >  epoch 84/44604, validation error 0.501258
+[2014-07-28 23:03:34,044] >  epoch 85/45135, validation error 0.500927
+[2014-07-28 23:05:06,571] >  epoch 86/45666, validation error 0.501126
+[2014-07-28 23:06:39,001] >  epoch 87/46197, validation error 0.500993
+[2014-07-28 23:08:11,728] >  epoch 88/46728, validation error 0.500993
+[2014-07-28 23:09:45,280] >  epoch 89/47259, validation error 0.500530
+[2014-07-28 23:11:18,992] >  epoch 90/47790, validation error 0.500199
+[2014-07-28 23:12:52,345] >  epoch 91/48321, validation error 0.500265
+[2014-07-28 23:14:25,984] >  epoch 92/48852, validation error 0.499934
+[2014-07-28 23:15:58,601] >  epoch 93/49383, validation error 0.499470
+[2014-07-28 23:17:31,483] >  epoch 94/49914, validation error 0.498941
+[2014-07-28 23:19:08,748] >  epoch 95/50445, validation error 0.498874
+[2014-07-28 23:20:42,069] >  epoch 96/50976, validation error 0.498742
+[2014-07-28 23:22:15,404] >  epoch 97/51507, validation error 0.498279
+[2014-07-28 23:23:54,731] >  epoch 98/52038, validation error 0.497948
+[2014-07-28 23:25:32,050] >  epoch 99/52569, validation error 0.497683
+[2014-07-28 23:27:09,701] >  epoch 100/53100, validation error 0.497352
+[2014-07-28 23:27:09,728] >> Training finished in 2:35:07.467291
+d train --epochs 100 --learning-rate 0.07 --momentum 0.1 traindata.pfile    9140,53s user 7,73s system 98% cpu 2:35:23,67 total

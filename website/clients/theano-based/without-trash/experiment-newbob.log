@@ -1,0 +1,66 @@
+time d train --epochs 100 --learning-rate 0.1 --newbob --momentum 0.1 traindata.pfile validdata.pfile < mlp-100h.json > mlp-0.06lr-100h-100epochs.json
+[2014-07-29 14:44:10,827] >> Loading model
+[2014-07-29 14:44:10,851] >> Loading datasets
+[2014-07-29 14:44:12,565] >> Supervised training started with arguments:
+{'adadelta': False,
+ 'adadelta_epsilon': '1e-6',
+ 'adadelta_rho': '0.95',
+ 'adagrad': False,
+ 'adagrad_decay': False,
+ 'batch_size': 256,
+ 'datasets': (DatasetContainer [PFileDataset@traindata.pfile,1],
+              DatasetContainer [PFileDataset@validdata.pfile,1],
+              DatasetContainer []),
+ 'epochs': 100,
+ 'fix_layers': [],
+ 'graph': False,
+ 'hooks': [],
+ 'l1_reg': '0.0',
+ 'l2_reg': '0.0',
+ 'layer_args': [],
+ 'learning_rate': '0.1',
+ 'minibatches': -1,
+ 'momentum': '0.1',
+ 'newbob': True,
+ 'newbob_decay': 0.5,
+ 'newbob_threshold': [0.005, 0.001],
+ 'patience': -1,
+ 'patience_improve_threshold': 0.995,
+ 'patience_increase': 1.5,
+ 'pre_validate': False,
+ 'print_errors': False,
+ 'validation_interval': -1,
+ 'verbosity': 0,
+ 'warn': False}
+[2014-07-29 14:44:12,565] >> Compiling theano graph
+[2014-07-29 14:44:15,533] >> Training started
+[2014-07-29 14:44:40,063] >  epoch 1/531, validation error 0.976496
+[2014-07-29 14:45:03,932] >  epoch 2/1062, validation error 0.967624
+[2014-07-29 14:45:27,684] >  epoch 3/1593, validation error 0.954251
+[2014-07-29 14:45:51,984] >  epoch 4/2124, validation error 0.937103
+[2014-07-29 14:46:16,730] >  epoch 5/2655, validation error 0.926311
+[2014-07-29 14:46:42,021] >  epoch 6/3186, validation error 0.914195
+[2014-07-29 14:47:07,169] >  epoch 7/3717, validation error 0.887513
+[2014-07-29 14:47:32,372] >  epoch 8/4248, validation error 0.863414
+[2014-07-29 14:47:57,601] >  epoch 9/4779, validation error 0.844942
+[2014-07-29 14:48:23,192] >  epoch 10/5310, validation error 0.829979
+[2014-07-29 14:48:47,964] >  epoch 11/5841, validation error 0.815082
+[2014-07-29 14:49:11,921] >  epoch 12/6372, validation error 0.805350
+[2014-07-29 14:49:36,091] >  epoch 13/6903, validation error 0.798663
+[2014-07-29 14:50:00,904] >  epoch 14/7434, validation error 0.794425
+[2014-07-29 14:50:00,911] >  epoch 14/7434, learning rate set to 0.050000
+[2014-07-29 14:50:25,636] >  epoch 15/7965, validation error 0.769002
+[2014-07-29 14:50:25,644] >  epoch 15/7965, learning rate set to 0.025000
+[2014-07-29 14:50:50,899] >  epoch 16/8496, validation error 0.750794
+[2014-07-29 14:50:50,907] >  epoch 16/8496, learning rate set to 0.012500
+[2014-07-29 14:51:15,850] >  epoch 17/9027, validation error 0.736758
+[2014-07-29 14:51:15,857] >  epoch 17/9027, learning rate set to 0.006250
+[2014-07-29 14:51:39,989] >  epoch 18/9558, validation error 0.725371
+[2014-07-29 14:51:39,996] >  epoch 18/9558, learning rate set to 0.003125
+[2014-07-29 14:52:04,103] >  epoch 19/10089, validation error 0.721663
+[2014-07-29 14:52:04,110] >  epoch 19/10089, learning rate set to 0.001563
+[2014-07-29 14:52:28,250] >  epoch 20/10620, validation error 0.719213
+[2014-07-29 14:52:28,257] >  epoch 20/10620, learning rate set to 0.000781
+[2014-07-29 14:52:52,671] >  epoch 21/11151, validation error 0.718882
+[2014-07-29 14:52:52,678] >> Training finished in 0:08:37.144921
+d train --epochs 100 --learning-rate 0.1 --newbob --momentum 0.1   <  >   510,83s user 2,06s system 98% cpu 8:42,49 total
