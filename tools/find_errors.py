@@ -1,24 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Find raw_datasets which are not accepted by the administrator and look
+   different than other known datasets with the same accepted_formula_id.
+"""
 import sys
+import logging
+logging.basicConfig(level=logging.INFO,
+                    stream=sys.stdout,
+                    format='%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
 sys.path.append("/var/www/write-math/website/clients/python")
 from HandwrittenData import HandwrittenData
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
-from dbconfig import mysql_local, mysql_online
+
 sys.path.append("/var/www/write-math/website/clients/dtw-python")
 from classification import dtw
+
 import preprocessing
 import webbrowser
+import yaml
 
 
-def update_data(a, unaccept=False):
-    connection_local = MySQLdb.connect(host=mysql_local['host'],
-                                       user=mysql_local['user'],
-                                       passwd=mysql_local['passwd'],
-                                       db=mysql_local['db'],
+def update_data(cfg, a, unaccept=False):
+    connection_local = MySQLdb.connect(host=cfg['mysql_local']['host'],
+                                       user=cfg['mysql_local']['user'],
+                                       passwd=cfg['mysql_local']['passwd'],
+                                       db=cfg['mysql_local']['db'],
                                        cursorclass=MySQLdb.cursors.DictCursor)
     cursor_local = connection_local.cursor()
     if unaccept:
@@ -81,10 +92,10 @@ def update_data(a, unaccept=False):
     connection_local.commit()
     cursor_local.close()
     connection_local.close()
-    connection_online = MySQLdb.connect(host=mysql_online['host'],
-                                        user=mysql_online['user'],
-                                        passwd=mysql_online['passwd'],
-                                        db=mysql_online['db'],
+    connection_online = MySQLdb.connect(host=cfg['mysql_online']['host'],
+                                        user=cfg['mysql_online']['user'],
+                                        passwd=cfg['mysql_online']['passwd'],
+                                        db=cfg['mysql_online']['db'],
                                         cursorclass=MySQLdb.cursors.DictCursor)
     cursor_online = connection_online.cursor()
     cursor_online.execute(sql)
@@ -179,7 +190,7 @@ class HandwrittenDataM(HandwrittenData):
 
         def unaccept_function(a):
             self.unaccept = True
-            print("unaccept raw_data_id %i" % self.raw_data_id)
+            logger.info("unaccept raw_data_id %i" % self.raw_data_id)
             plt.close()
         unacceptpos = plt.axes([0.81, 0.05, 0.1, 0.075])
         unaccept_button = Button(unacceptpos, 'unaccept')
@@ -187,7 +198,7 @@ class HandwrittenDataM(HandwrittenData):
 
         def is_trash_function(a):
             a.istrash = True
-            print("trash raw_data_id %i" % self.raw_data_id)
+            logger.info("trash raw_data_id %i" % self.raw_data_id)
             plt.close()
         is_trash_pos = plt.axes([0.7, 0.2, 0.1, 0.075])
         is_trash_button = Button(is_trash_pos, 'is_trash')
@@ -201,16 +212,17 @@ class HandwrittenDataM(HandwrittenData):
         plt.show()
 
 
-def main(raw_data_start_id):
-    connection = MySQLdb.connect(host=mysql_local['host'],
-                                 user=mysql_local['user'],
-                                 passwd=mysql_local['passwd'],
-                                 db=mysql_local['db'],
+def main(cfg, raw_data_start_id):
+    connection = MySQLdb.connect(host=cfg['mysql_local']['host'],
+                                 user=cfg['mysql_local']['user'],
+                                 passwd=cfg['mysql_local']['passwd'],
+                                 db=cfg['mysql_local']['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
 
     # Get formulas
-    print("Get formulas")
+    logger.info("Get formulas")
+    print("get formulas")
     sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula`")
     cursor.execute(sql)
     formulas = cursor.fetchall()
@@ -235,8 +247,8 @@ def main(raw_data_start_id):
             # This formula id is for trash. No need to look at it.
             continue
         # Get data
-        print("Get data for formula_id %i (%s)" % (formula_id,
-                                                   formulaid2latex[formula_id])
+        logger.info("Get data for formula_id %i (%s)" % (formula_id,
+                                                         formulaid2latex[formula_id])
               )
         sql = ("SELECT `id`, `data`, `accepted_formula_id`, "
                "`wild_point_count`, `missing_line`, `has_hook`, "
@@ -248,7 +260,7 @@ def main(raw_data_start_id):
                "`creation_date` ASC;") % formula_id
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
-        print("Raw datasets: %i" % len(raw_datasets))
+        logger.info("Raw datasets: %i" % len(raw_datasets))
         checked_raw_data_instances += len(raw_datasets)
         checked_formulas += 1
         if len(raw_datasets) < 100:
@@ -283,13 +295,13 @@ def main(raw_data_start_id):
                     B.show()
                     if B.ok:
                         As.append(B.get_pointlist())
-                        update_data(B)
+                        update_data(cfg, B)
                     else:
-                        update_data(B, True)
-        print("[Status] Checked formulas: %i of %i" % (checked_formulas,
+                        update_data(cfg, B, True)
+        logger.info("[Status] Checked formulas: %i of %i" % (checked_formulas,
                                                        len(formulaid2latex)))
-        print("[Status] Checked raw_data_instances: %i" % checked_raw_data_instances)
-    print("done")
+        logger.info("[Status] Checked raw_data_instances: %i" % checked_raw_data_instances)
+    logger.info("done")
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -301,4 +313,6 @@ if __name__ == '__main__':
                         help="at which raw_data_id should it start?",
                         metavar="RAW_DATA_ID")
     args = parser.parse_args()
-    main(args.i)
+    with open("/var/www/write-math/website/clients/python/db.config.yml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+    main(cfg, args.i)
