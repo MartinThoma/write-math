@@ -19,6 +19,11 @@ this:
 import HandwrittenData
 import preprocessing
 import json
+import urllib
+import os
+import Image
+import tempfile
+import shutil
 
 
 class Stroke_Count(object):
@@ -87,15 +92,86 @@ class Constant_Point_Coordinates(object):
                         x.append(self.fill_empty_with)
                         x.append(self.fill_empty_with)
         else:
-            # TODO
-            preprocessing.space_evenly(handwritten_data,
-                                       number=self.points_per_line)
+            # Space evenly should be called before!
             for point in handwritten_data.get_pointlist()[0]:
                 x.append(point['x'])
                 x.append(point['y'])
-                try:
-                    x.append(point['pen_down'])
-                except:
-                    with open("nopendown.txt", "a") as f:
-                        f.write("%i\n" % handwritten_data.raw_data_id)
+                x.append(point['pen_down'])
+        return x
+
+
+class First_N_Points(object):
+    def __init__(self, n=81):
+        self.n = n
+
+    def __repr__(self):
+        return ("First_N_Points\n"
+                " - n: %i\n") % \
+               (self.n)
+
+    def __str__(self):
+        return ("first n points\n"
+                " - n: %i\n") % \
+               (self.n)
+
+    def get_dimension(self):
+        return 2*self.n
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        x = []
+        pointlist = handwritten_data.get_pointlist()
+        left = self.n
+        for line in pointlist:
+            for point in line:
+                if left == 0:
+                    break
+                else:
+                    left -= 1
+                    x.append(point['x'])
+                    x.append(point['y'])
+        return x
+
+
+class Bitmap(object):
+    def __init__(self, n=28):
+        self.n = n  # Size of the bitmap (n x n)
+
+    def __repr__(self):
+        return ("Bitmap (n=%i)\n") % (self.n)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def get_dimension(self):
+        return self.n**2
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        x = []
+        url = "http://localhost/write-math/website/raw-data/"
+        raw_data_id = handwritten_data.raw_data_id
+        foldername = "/tmp/write-math/"
+        f = urllib.urlopen("{url}{id}.svg".format(url=url, id=raw_data_id))
+        with open("%s%i.svg" % (foldername, raw_data_id), "wb") as imgFile:
+            imgFile.write(f.read())
+
+        command = ("convert -size 28x28 {folder}{id}.svg  -resize {n}x{n} "
+                   "-gravity center -extent {n}x{n} "
+                   "-monochrome {folder}{id}.png").format(id=raw_data_id,
+                                                          n=self.n,
+                                                          url=url,
+                                                          folder=foldername)
+        os.system(command)
+        im = Image.open("%s%i.png" % (foldername, raw_data_id))
+        pix = im.load()
+        # pixel_image = [[0 for i in range(28)] for j in range(28)]
+        for i in range(28):
+            for j in range(28):
+                # pixel_image[i][j] = pix[i, j]
+                x.append(pix[i, j])
         return x
