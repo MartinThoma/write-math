@@ -41,3 +41,13 @@ The most important part - the `wm_raw_draw_data` table - is too big to put it
 under version control.
 
 This data can be downloaded via [www.dropbox.com](https://www.dropbox.com/sh/rov7qyxi1c00dmi/AADLbZitMVLTQVY1D89tif8pa)
+
+## Importing
+
+* Download this repository
+* Download all `wm_raw_draw_data` files and put them into
+  `database/complete-dump/single-tables` (should be at least 24)
+* adjust the `/var/www/write-math/website/clients/python/db.config.yml`
+* create a `write-math` MySQL database
+* `./clean_database.py`: About 5 seconds
+* `./import_database.py`: 5-6 hours

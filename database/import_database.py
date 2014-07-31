@@ -4,7 +4,7 @@
 from __future__ import print_function
 import MySQLdb
 import MySQLdb.cursors
-from dbconfig import mysql_local
+import yaml
 import subprocess
 from contextlib import closing
 import gzip
@@ -35,6 +35,7 @@ def main(mysql, folder):
         with open(folder + 'structure/write-math.sql') as f:
             schema_sql_queries = f.read()
         cursor.execute(schema_sql_queries)
+    print("schema import done")
 
     prefix = folder + "complete-dump/single-tables/"
 
@@ -95,4 +96,7 @@ if __name__ == '__main__':
                         help="folder with all mysql tables", metavar="FILE")
 
     args = parser.parse_args()
-    main(mysql_local, args.folder)
+    yamlfile = "/var/www/write-math/website/clients/python/db.config.yml"
+    with open(yamlfile, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+    main(cfg['mysql_local'], args.folder)

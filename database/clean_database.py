@@ -3,8 +3,8 @@
 from __future__ import print_function
 import MySQLdb
 import MySQLdb.cursors
-from dbconfig import mysql_local
 import sys
+import yaml
 
 
 def query_yes_no(question, default="yes"):
@@ -56,11 +56,15 @@ def clean(mysql):
            "`wm_languages`, `wm_papers`, `wm_raw_data2formula`, "
            "`wm_raw_draw_data`, `wm_renderings`, `wm_similarity`, "
            "`wm_users`, `wm_user_unknown_formula`, `wm_votes`, "
+           "`wm_models`,"
            "`wm_workers`, `wm_worker_answers`;SET foreign_key_checks = 1;")
     a = cursor.execute(sql)
     print(a)
 
 if __name__ == '__main__':
+    yamlfile = "/var/www/write-math/website/clients/python/db.config.yml"
+    with open(yamlfile, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
     if query_yes_no("Do you want to remove all content from the database? "
                     "This step cannot be undone!", "no"):
-        clean(mysql_local)
+        clean(cfg['mysql_local'])
