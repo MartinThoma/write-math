@@ -21,3 +21,23 @@ Import Table 'wm_raw_data2formula.sql'... done in 1.11 s
 Import Table 'wm_raw_draw_data_1.sql'... done in 782.53 s
 
 ```
+
+## License
+
+The database is licensed under the [ODbL](odbl-10.txt). This license is also
+used by [OpenStreetMap](http://wiki.openstreetmap.org/wiki/Open_Database_License).
+A human-readable form of the license can be found at http://opendatacommons.org/licenses/odbl/summary/. 
+
+Feel free to contact [me](info@martin-thoma.de) if you have questions.
+
+## Credits
+
+The major part of the data is from [detexify-data](https://github.com/kirel/detexify-data).
+It was included into the dataset by the user "Detexify".
+
+## raw draw data
+
+The most important part - the `wm_raw_draw_data` table - is too big to put it
+under version control.
+
+This data can be downloaded via [www.dropbox.com](https://www.dropbox.com/sh/rov7qyxi1c00dmi/AADLbZitMVLTQVY1D89tif8pa)
