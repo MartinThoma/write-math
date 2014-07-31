@@ -13,7 +13,7 @@ of the data online has the flag `is_in_testset`.
 """
 
 
-def main():
+def main(cfg):
     connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
                                  user=cfg['mysql_online']['user'],
                                  passwd=cfg['mysql_online']['passwd'],
