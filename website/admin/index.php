@@ -53,6 +53,25 @@ if (isset($_GET['delete_inactive_user'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $_GET['delete_inactive_user'], PDO::PARAM_STR);
     $stmt->execute();
+} elseif (isset($_GET['delete_all_inactive_users'])) {
+    $sql = "SELECT  `wm_users`.`id` FROM `wm_users` ".
+           "LEFT JOIN `wm_raw_draw_data` ".
+           "ON `wm_raw_draw_data`.`user_id` = `wm_users`.`id` ".
+           "WHERE `account_type` = 'IP-User' ".
+           "AND `wm_raw_draw_data`.`user_id` IS NULL ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $inactive_users = $stmt->fetchAll();
+    $i = 0;
+    foreach ($inactive_users as $key => $value) {
+        $sql = "DELETE FROM `wm_users` WHERE `id` = :id LIMIT 1;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $value['id'], PDO::PARAM_INT);
+        $stmt->execute();
+        $i += 1;
+    }
+    $msg[] = array("class" => "alert-success",
+                   "text" => "Your have deleted all inactive users ($i).");
 }
 
 if (isset($_GET['many_lines'])) {
