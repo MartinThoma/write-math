@@ -12,7 +12,9 @@ import yaml
 from HandwrittenData import HandwrittenData
 
 
-def main(cfg):
+def main():
+    with open("db.config.yml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
     connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
                                  user=cfg['mysql_online']['user'],
                                  passwd=cfg['mysql_online']['passwd'],
@@ -61,6 +63,4 @@ def main(cfg):
                 open("handwriting_datasets.pickle", "wb"))
 
 if __name__ == '__main__':
-    with open("db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
-    main(cfg)
+    main()
