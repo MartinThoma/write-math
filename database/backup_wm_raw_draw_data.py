@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""This script can be used for creating a backup of wm_raw_draw_data."""
+
 from __future__ import print_function
 import MySQLdb
 from dbconfig import mysql_online
