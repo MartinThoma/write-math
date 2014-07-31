@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 17. Jul 2014 um 19:03
+-- Erstellungszeit: 31. Jul 2014 um 17:43
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 

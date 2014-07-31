@@ -44,6 +44,12 @@ ALTER TABLE `wm_formula_svg_missing`
   ADD CONSTRAINT `wm_formula_svg_missing_ibfk_2` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints der Tabelle `wm_models`
+--
+ALTER TABLE `wm_models`
+  ADD CONSTRAINT `parent_model_id` FOREIGN KEY (`parent`) REFERENCES `wm_models` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints der Tabelle `wm_raw_data2formula`
 --
 ALTER TABLE `wm_raw_data2formula`
