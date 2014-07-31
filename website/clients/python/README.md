@@ -1,4 +1,5 @@
-1. Download latest data from server with `download_dataset.py`
+1. Download latest data from server with `download_dataset.py`.
+   Takes about 175,68s.
 2. Create crossvalidation dataset with `make_crossvalidation_dataset.py` (see also: `HandwrittenData.py`). Takes about 131,02s.
 3. Apply preprocessing (see `preprocessing.py`).
 4. Apply learning algorithm.
