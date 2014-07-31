@@ -4,13 +4,15 @@
 import logging
 import json
 import matplotlib.pyplot as plt
+import preprocessing
 
 
 class HandwrittenData(object):
     """Represents a handwritten symbol."""
-    def __init__(self, raw_data_json, formula_id=None):
+    def __init__(self, raw_data_json, formula_id=None, raw_data_id=None):
         self.raw_data_json = raw_data_json
         self.formula_id = formula_id
+        self.raw_data_id = raw_data_id
         assert type(json.loads(self.raw_data_json)) is list, \
             "raw_data_json is not JSON: %r" % self.raw_data_json
         assert len(self.get_pointlist()) >= 1, \
@@ -61,6 +63,18 @@ class HandwrittenData(object):
                 "mint": mint, "maxt": maxt}
 
     def preprocessing(self, algorithms):
+        """Apply preprocessing algorithms.
+
+        >>> a = HandwrittenData(...)
+        >>> preprocessing_queue = [(preprocessing.scale_and_shift, []), \
+                                   (preprocessing.connect_lines, []), \
+                                   (preprocessing.douglas_peucker, \
+                                    {'EPSILON': 0.2}), \
+                                   (preprocessing.space_evenly, \
+                                    {'number': 100, \
+                                     'KIND': 'cubic'})]
+        >>> a.preprocessing(preprocessing_queue)
+        """
         assert type(algorithms) is list
         for algorithm, parameters in algorithms:
             if type(parameters) is dict:
@@ -70,14 +84,55 @@ class HandwrittenData(object):
             else:
                 raise Exception
 
+    def feature_extraction(self, algorithms):
+        """Get a list of features.
+
+        Every algorithm has to return the features as a list."""
+        assert type(algorithms) is list
+        features = []
+        for algorithm in algorithms:
+            features += algorithm(self)
+        return features
+
     def show(self):
-        for line in self.get_pointlist():
+        pointlist = self.get_pointlist()
+        if 'pen_down' in pointlist[0][0]:
+            if len(pointlist) > 1:
+                print("Lenght of pointlist was %i." % len(pointlist))
+                print("That was unexpected")
+                print(pointlist)
+                exit()
+            new_pointlist = []
+            last = None
+            stroke = []
+            for point in pointlist[0]:
+                if last is None:
+                    last = point['pen_down']
+                if point['pen_down'] != last:
+                    new_pointlist.append(stroke)
+                    last = point['pen_down']
+                    stroke = []
+                else:
+                    stroke.append(point)
+            new_pointlist.append(stroke)
+            pointlist = new_pointlist
+
+        fig, ax = plt.subplots()
+        ax.set_title('Raw data id: %s, Formula_id: %s' % (str(self.raw_data_id),
+                                                          str(self.formula_id)
+                                                          ))
+
+        for line in pointlist:
             xs, ys = [], []
             for p in line:
                 xs.append(p['x'])
                 ys.append(p['y'])
-            plt.plot(xs, ys, '-o')
+            if "pen_down" in line[0] and line[0]["pen_down"] is False:
+                plt.plot(xs, ys, '-x')
+            else:
+                plt.plot(xs, ys, '-o')
         plt.gca().invert_yaxis()
+        ax.set_aspect('equal')
         plt.show()
 
     def __eq__(self, other):
@@ -88,6 +143,12 @@ class HandwrittenData(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __repr__(self):
+        return "HandwrittenData(raw_data_id=%s)" % str(self.raw_data_id)
+
+    def __str__(self):
+        return self.__repr__()
 
 if __name__ == '__main__':
     a = HandwrittenData('[[{"x":305,"y":260,"time":35},'
