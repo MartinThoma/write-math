@@ -44,7 +44,10 @@ def main(mysql, folder):
     tables += filter(lambda n: n.endswith('.gz'), files)
     tables = natsort.natsorted(tables)
 
-    for table in tables:
+    big = filter(lambda n: n.startswith('wm_raw_draw_data'), tables)
+    small = filter(lambda n: not n.startswith('wm_raw_draw_data'), tables)
+
+    for table in small+big:
         start_time = time.time()
         print("Import Table '%s'" % table, end="")
         proc = subprocess.Popen(["mysql",
