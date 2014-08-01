@@ -15,10 +15,11 @@ from HandwrittenData import HandwrittenData
 def main():
     with open("db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
-    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
-                                 user=cfg['mysql_online']['user'],
-                                 passwd=cfg['mysql_online']['passwd'],
-                                 db=cfg['mysql_online']['db'],
+    mysql = cfg['mysql_online']
+    connection = MySQLdb.connect(host=mysql['host'],
+                                 user=mysql['user'],
+                                 passwd=mysql['passwd'],
+                                 db=mysql['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
 
@@ -44,7 +45,7 @@ def main():
             try:
                 handwriting = HandwrittenData(raw_data['data'],
                                               formula['id'],
-                                              raw_data['id']),
+                                              raw_data['id'])
                 handwriting_datasets.append({'handwriting': handwriting,
                                              'id': raw_data['id'],
                                              'formula_id': formula['id'],
