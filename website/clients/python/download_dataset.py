@@ -13,7 +13,8 @@ from HandwrittenData import HandwrittenData
 
 
 def main():
-    with open("db.config.yml", 'r') as ymlfile:
+    path = "/var/www/write-math/website/clients/python/"
+    with open("%sdb.config.yml" % path, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     mysql = cfg['mysql_online']
     connection = MySQLdb.connect(host=mysql['host'],
@@ -26,6 +27,7 @@ def main():
     # Get all formulas that should get examined
     sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
            "WHERE `is_important` = 1 "  # only use the important symbol subset
+           "AND id != 1 "  # exclude trash class
            "ORDER BY `id` ASC")
     cursor.execute(sql)
     formulas = cursor.fetchall()
