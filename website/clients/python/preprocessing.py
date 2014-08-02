@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Preprocessing algorithms.
+
+Each algorithm works on the HandwrittenData class. They have to be applied like
+this:
+
+>>> a = HandwrittenData(...)
+>>> preprocessing_queue = [(preprocessing.scale_and_shift, []), \
+                           (preprocessing.connect_lines, []), \
+                           (preprocessing.douglas_peucker, \
+                            {'EPSILON': 0.2}), \
+                           (preprocessing.space_evenly, {'number': 100})]
+>>> a.preprocessing(preprocessing_queue)
+"""
+
 import HandwrittenData
 import numpy
 from scipy.interpolate import interp1d
@@ -13,6 +28,23 @@ def _euclidean_distance(p1, p2):
 
 def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
+
+
+def get_algorithm(algorithm_name):
+    if algorithm_name == 'scale_and_shift':
+        return scale_and_shift
+    elif algorithm_name == 'space_evenly':
+        return space_evenly
+    elif algorithm_name == 'douglas_peucker':
+        return douglas_peucker
+    elif algorithm_name == 'connect_lines':
+        return connect_lines
+    elif algorithm_name == 'dot_reduction':
+        return dot_reduction
+    elif algorithm_name == 'remove_wild_points':
+        return remove_wild_points
+    else:
+        return None
 
 
 def scale_and_shift(handwritten_data, center=False):
@@ -65,38 +97,115 @@ def scale_and_shift(handwritten_data, center=False):
             pointlist[linenr][key] = {"x": (p["x"] - minx) * factor + addx,
                                       "y": (p["y"] - miny) * factor + addy,
                                       "time": p["time"] - mint}
+            if "pen_down" in p:
+                pointlist[linenr][key]["pen_down"] = p["pen_down"]
     handwritten_data.set_pointlist(pointlist)
 
 
-def space_evenly(handwritten_data, number=100, KIND='linear'):
+def space_evenly(handwritten_data, number=100, kind='cubic'):
     """Space the points evenly. """
 
+    # Make sure that the lists are sorted
     pointlist = handwritten_data.get_pointlist()
+    for i in range(len(pointlist)):
+        pointlist[i] = sorted(pointlist[i], key=lambda p: p['time'])
+    pointlist = sorted(pointlist, key=lambda line: line[0]['time'])
+
+    for i in range(len(pointlist)-1):
+        # TODO: Remove this and check data before adding it to the database
+        if not (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]):
+            with open("fix-time.txt", "a") as f:
+                if hasattr(handwritten_data, 'raw_data_id'):
+                    f.write(str(handwritten_data.raw_data_id) + "i:" + str(i) +
+                            ":" + str(pointlist[i][-1]["time"]) + ":" +
+                            str(pointlist[i+1][0]["time"]) + "\n")
+                else:
+                    f.write(str(handwritten_data.raw_data_id) + "i:" + str(i) +
+                            ":" + str(pointlist[i][-1]["time"]) + ":" +
+                            str(pointlist[i+1][0]["time"]) + "\n")
+            return
+
+        # The last point of the previous line should be lower than the first
+        # point of the next line
+        assert (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]), \
+            ("Something is wrong with the time. The last point of line %i "
+             "has a time of %0.2f, but the first point of line %i has a "
+             "time of %0.2f. See raw_data_id %s") % \
+            (i,
+             pointlist[i][-1]["time"],
+             i+1,
+             pointlist[i+1][0]["time"],
+             str(handwritten_data.raw_data_id))
+
+    # calculate "pen_down" strokes
+    times = []
+    for i, line in enumerate(pointlist):
+        line_info = {"start": line[0]['time'],
+                     "end": line[-1]['time'],
+                     "pen_down": True}
+        # set up variables for interpolation
+        x, y, t = [], [], []
+        for point in line:
+            if point['time'] not in t:
+                x.append(point['x'])
+                y.append(point['y'])
+                t.append(point['time'])
+        x, y = numpy.array(x), numpy.array(y)
+        if len(t) == 1:
+            # constant interpolation
+            fx, fy = lambda x: float(x), lambda y: float(y)
+        elif len(t) == 2:
+            # linear interpolation
+            fx, fy = interp1d(t, x, 'linear'), interp1d(t, y, 'linear')
+        elif len(t) == 3:
+            # quadratic interpolation
+            fx, fy = interp1d(t, x, 'quadratic'), interp1d(t, y, 'quadratic')
+        else:
+            fx, fy = interp1d(t, x, kind), interp1d(t, y, kind)
+        line_info['fx'] = fx
+        line_info['fy'] = fy
+        times.append(line_info)
+
+    # Model "pen_up" strokes
+    for i in range(len(pointlist) - 1):
+        line_info = {"start": pointlist[i][-1],
+                     "end": pointlist[i+1][0],
+                     "pen_down": False}
+        x, y, t = [], [], []
+        for point in [pointlist[i][-1], pointlist[i+1][0]]:
+            if point['time'] not in t:
+                x.append(point['x'])
+                y.append(point['y'])
+                t.append(point['time'])
+            else:
+                # TODO: That should not happen
+                pass
+        if len(x) == 1:
+            # constant interpolation
+            fx, fy = lambda x: float(x), lambda y: float(y)
+        else:
+            # linear interpolation
+            x, y = numpy.array(x), numpy.array(y)
+            fx, fy = interp1d(t, x, kind='linear'), interp1d(t, y, kind='linear')
+        line_info['fx'] = fx
+        line_info['fy'] = fy
+        times.append(line_info)
+
     new_pointlist = []
 
-    for line in pointlist:
-        new_line = []
-        if len(line) < 4:
-            new_line = line
-        else:
-            line = sorted(line, key=lambda p: p['time'])
+    tnew = numpy.linspace(pointlist[0][0]['time'],
+                          pointlist[-1][-1]['time'],
+                          number)
 
-            x, y, t = [], [], []
-
-            for point in line:
-                if point['time'] not in t:
-                    x.append(point['x'])
-                    y.append(point['y'])
-                    t.append(point['time'])
-
-            x, y = numpy.array(x), numpy.array(y)
-            fx, fy = interp1d(t, x, kind=KIND), interp1d(t, y, kind=KIND)
-            tnew = numpy.linspace(t[0], t[-1], number)
-
-            for x, y in zip(fx(tnew), fy(tnew)):
-                new_line.append({'x': x, 'y': y})
-        new_pointlist.append(new_line)
-    handwritten_data.set_pointlist(new_pointlist)
+    for time in tnew:
+        for line_intervall in times:
+            if line_intervall["start"] <= time <= line_intervall["end"]:
+                x = float(line_intervall['fx'](time))
+                y = float(line_intervall['fy'](time))
+                time = float(time)
+                new_pointlist.append({'x': x, 'y': y, 'time': time,
+                                      'pen_down': line_intervall['pen_down']})
+    handwritten_data.set_pointlist([new_pointlist])
 
 
 def douglas_peucker(handwritten_data, EPSILON=10):
@@ -178,7 +287,7 @@ def douglas_peucker(handwritten_data, EPSILON=10):
     handwritten_data.set_pointlist(pointlist)
 
 
-def connect_lines(handwritten_data):
+def connect_lines(handwritten_data, minimum_distance=0.05):
     """Detect if lines were probably accidentially disconnected. If that is the
        case, connect them.
     """
@@ -196,7 +305,7 @@ def connect_lines(handwritten_data):
         while i < len(pointlist)-1:
             last_point = pointlist[i][-1]
             first_point = pointlist[i+1][0]
-            if _euclidean_distance(last_point, first_point) < 0.05:
+            if _euclidean_distance(last_point, first_point) < minimum_distance:
                 lines.append(pointlist[i]+pointlist[i+1])
                 pointlist[i+1] = lines[-1]
                 if i == len(pointlist)-2:
