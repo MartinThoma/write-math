@@ -1,0 +1,67 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% if model_detailed is not null %}
+        <table>
+            <tr>
+                <td>ID</td>
+                <td>{{ model_detailed.id }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    {% endif %}
+
+    <table class="table">
+        <tr>
+            <th>&nbsp;</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Topology</th>
+            <th>Parent</th>
+            <th>Testresult</th>
+            <th>&nbsp;</th>
+        </tr>
+        {% for model in models %}
+            <tr>
+                <td><a href="?create_new_based_on={{ model.id }}">+</a></td>
+                <td>{{ model.id }}</td>
+                <td>{{ model.name }}</td>
+                <td>{{ model.topology }}</td>
+                <td>{{ model.parent }}</td>
+                <td>{{ model.testresult }}</td>
+                <td><a href="?details={{ model.id }}">Details</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
