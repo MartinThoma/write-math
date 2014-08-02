@@ -25,6 +25,17 @@ import Image
 import tempfile
 import shutil
 
+def get_class(name):
+    if name == "Stroke_Count":
+        return Stroke_Count
+    elif name == "Constant_Point_Coordinates":
+        return Constant_Point_Coordinates
+    elif name == "First_N_Points":
+        return First_N_Points
+    elif name == "Bitmap":
+        return Bitmap
+    else:
+        return None
 
 class Stroke_Count(object):
     def __repr__(self):
@@ -75,10 +86,10 @@ class Constant_Point_Coordinates(object):
             type(handwritten_data)
         x = []
         pointlist = handwritten_data.get_pointlist()
-        if len(pointlist[0]) < 5:
-            return x  # TODO: Improve!
         if self.lines > 0:
             for line_nr in range(self.lines):
+                # make sure that the current symbol actually has that many
+                # lines
                 if line_nr < len(pointlist):
                     for point_nr in range(self.points_per_line):
                         if point_nr < len(pointlist[line_nr]):
