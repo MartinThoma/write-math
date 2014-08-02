@@ -17,7 +17,7 @@ CLASSIFIER_NAME = "dtw-python"
 
 
 def print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
-                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                EPSILON, CENTER, THRESHOLD,
                                 SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
                                 K_FOLD, t1sum=-1, t10sum=-1,
                                 execution_time=[]):
@@ -31,7 +31,6 @@ def print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
     print("Epsilon: %0.2f" % EPSILON)
     print("Center: %r" % CENTER)
     print("Squared quadratic: False")
-    print("Flatten: %r" % FLATTEN)
     print("Threshold: %r" % THRESHOLD)
     if SPACE_EVENLY:
         print("Space evenly: %r (%i points, %s)" % (SPACE_EVENLY, POINTS,
@@ -54,10 +53,9 @@ def crossvalidation():
     K_FOLD = 10
     EPSILON = 10
     CENTER = False
-    FLATTEN = False
     THRESHOLD = 20
     SPACE_EVENLY = True
-    SPACE_EVENLY_KIND = 'cubic'
+    SPACE_EVENLY_KIND = 'linear'
     POINTS = 100  # Does only make sense with SPACE_EVENLY=True
 
     # Prepare crossvalidation data set
@@ -65,7 +63,7 @@ def crossvalidation():
 
     sql = ("SELECT id, formula_in_latex FROM `wm_formula` "
            "WHERE is_important = 1 ")
-           #"AND id < 35")  # TODO: Remove this line as soon as possible
+           "AND id < 35")  # TODO: Remove this line as soon as possible
     cursor.execute(sql)
     datasets = cursor.fetchall()
 
@@ -108,7 +106,7 @@ def crossvalidation():
                 i = (i + 1) % K_FOLD
 
     print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
-                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                EPSILON, CENTER, THRESHOLD,
                                 SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
                                 K_FOLD)
 
@@ -148,19 +146,20 @@ def crossvalidation():
                 logging.debug("Raw_data_id = %i as testdata got no results" %
                               testdata['id'])
             else:
-                answer_id = results[0]['formula_id']
+                answer_id = results[0]['formula_id']['formula_id']
 
             if answer_id == testdata['handwriting'].formula_id:
                 classification_accuracy[testset]['correct'] += 1
+                classification_accuracy[testset]['c10'] += 1
             else:
                 classification_accuracy[testset]['wrong'] += 1
                 logging.warning(("Raw-data-ID: %i; "
                                  "Formula-ID: %i; Hypothesis: %i, Percentage: %0.3f") %
                                 (testdata['handwriting'].raw_data_id,
                                  testdata['handwriting'].formula_id,
-                                 answer_id['formula_id'],
+                                 answer_id,
                                  results[0]['p'])) # TODO: that might be wrong
-            if testdata['handwriting'].formula_id in [r['formula_id'] for r in results]:
+            if testdata['handwriting'].formula_id in [r['formula_id']['formula_id'] for r in results]:
                 classification_accuracy[testset]['c10'] += 1
             else:
                 classification_accuracy[testset]['w10'] += 1
@@ -191,7 +190,7 @@ def crossvalidation():
         t10sum += classification_accuracy[testset]['a10']
 
     print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
-                                EPSILON, CENTER, FLATTEN, THRESHOLD,
+                                EPSILON, CENTER, THRESHOLD,
                                 SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
                                 K_FOLD, t1sum, t10sum, execution_time)
 

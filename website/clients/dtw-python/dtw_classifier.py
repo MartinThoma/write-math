@@ -61,7 +61,7 @@ class dtw_classifier(object):
             """ Get a list of results with dtw and formula id and return a
                 dict mapping formula-ids to probabilities.
             """
-            distances = [result['dtw'] for result in results]
+            distances = [-result['dtw'] for result in results]
             softmax_results = distance_metric.softmax(distances)
             probabilities = []
             for formula_id, p in zip(results, softmax_results):

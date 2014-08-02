@@ -11,7 +11,7 @@ import cPickle as pickle
 import logging
 import time
 from argparse import ArgumentParser
-logging.basicConfig(filename='test.log',
+logging.basicConfig(stream=sys.stdout,  # filename='test.log',
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s: %(message)s')
 
@@ -74,13 +74,13 @@ def main(K_FOLD=10, get_new_dataset=False):
             ca[testset]['time'] += end - start
 
             if len(results) > 0:
-                if results[0]['formula_id'] == data['formula_id']:
+                if results[0]['formula_id']['formula_id'] == data['formula_id']:
                     ca[testset]['correct'] += 1
                     ca[testset]['c10'] += 1
                 else:
                     ca[testset]['wrong'] += 1
 
-                    if data['formula_id'] in [r['formula_id']
+                    if data['formula_id'] in [r['formula_id']['formula_id']
                                               for r in results]:
                         ca[testset]['c10'] += 1
                     else:
@@ -97,6 +97,7 @@ def main(K_FOLD=10, get_new_dataset=False):
 
             if i % 100 == 0:
                 logging.info(ca)
+    return ca
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -109,4 +110,5 @@ if __name__ == '__main__':
                         help="refresh dataset")
 
     args = parser.parse_args()
-    main(args.kfold, args.refresh_dataset)
+    ca = main(args.kfold, args.refresh_dataset)
+    print(ca)
