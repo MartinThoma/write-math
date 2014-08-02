@@ -13,11 +13,11 @@ of the data online has the flag `is_in_testset`.
 """
 
 
-def main(cfg):
-    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
-                                 user=cfg['mysql_online']['user'],
-                                 passwd=cfg['mysql_online']['passwd'],
-                                 db=cfg['mysql_online']['db'],
+def main(mysql):
+    connection = MySQLdb.connect(host=mysql['host'],
+                                 user=mysql['user'],
+                                 passwd=mysql['passwd'],
+                                 db=mysql['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
 
@@ -65,4 +65,5 @@ if __name__ == '__main__':
     with open("db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
-    main(cfg)
+    main(cfg['mysql_online'])
+    main(cfg['mysql_local'])
