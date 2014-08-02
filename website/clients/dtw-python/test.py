@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append("/var/www/write-math/website/clients/python")
 import preprocessing
 from dtw_classifier import dtw_classifier
 from make_crossvalidation_dataset import main as make_crossvalidation_dataset
@@ -15,17 +17,21 @@ logging.basicConfig(filename='test.log',
 
 
 def pp_results(results, data, formula_id2latex):
-    s = "Raw-Data-ID: %i; Reality: %s\n" % (data['id'],
-                                            formula_id2latex[data['formula_id']])
+    """Pretty-Print the results of the cross-validation."""
+    s = "Raw-Data-ID: %i; Reality: %s\n" % \
+        (data['id'], formula_id2latex[data['formula_id']])
     for result in results:
-        s += "\t%0.3f for\t%s\n" % (result['p'],
-                                    formula_id2latex[result['formula_id']])
+        s += "\t%0.3f for\t%s\n" % \
+             (result['p'],
+              formula_id2latex[result['formula_id']['formula_id']])
     return s
 
 
 def main(K_FOLD=10, get_new_dataset=False):
     if get_new_dataset:
+        print("Download dataset ...")
         download_dataset()
+        print("make_crossvalidation_dataset ...")
         make_crossvalidation_dataset()
 
     logging.info("Load data")
@@ -37,12 +43,10 @@ def main(K_FOLD=10, get_new_dataset=False):
     logging.info("Apply Preprocessing")
     for i in range(K_FOLD):
         for data in cv[i]:
-            data['handwriting'].preprocessing([(preprocessing.scale_and_shift, []),
-                                               (preprocessing.douglas_peucker,
-                                                {'EPSILON': 0.2}),
-                                               (preprocessing.space_evenly,
-                                                {'number': 100,
-                                                 'KIND': 'cubic'})])
+            data['handwriting'].preprocessing(
+                [(preprocessing.scale_and_shift, []),
+                 (preprocessing.douglas_peucker, {'EPSILON': 0.2}),
+                 (preprocessing.space_evenly, {'number': 100})])
 
     # start testing
     logging.info("Start testing")
@@ -76,7 +80,8 @@ def main(K_FOLD=10, get_new_dataset=False):
                 else:
                     ca[testset]['wrong'] += 1
 
-                    if data['formula_id'] in [r['formula_id'] for r in results]:
+                    if data['formula_id'] in [r['formula_id']
+                                              for r in results]:
                         ca[testset]['c10'] += 1
                     else:
                         ca[testset]['w10'] += 1

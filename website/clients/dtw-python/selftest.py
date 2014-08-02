@@ -4,11 +4,16 @@ from __future__ import print_function
 import logging
 import MySQLdb
 import MySQLdb.cursors
-from classification import *
-from dbconfig import mysql
 import time
 import datetime
 import sys
+import yaml
+sys.path.append("/var/www/write-math/website/clients/python")
+from HandwrittenData import HandwrittenData  # Needed because of pickle
+import preprocessing
+import dtw_classifier
+
+CLASSIFIER_NAME = "dtw-python"
 
 
 def print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
@@ -58,13 +63,26 @@ def crossvalidation():
     # Prepare crossvalidation data set
     cv = [[], [], [], [], [], [], [], [], [], []]
 
-    sql = "SELECT id, formula_in_latex FROM `wm_formula`"
+    sql = ("SELECT id, formula_in_latex FROM `wm_formula` "
+           "WHERE is_important = 1 ")
+           #"AND id < 35")  # TODO: Remove this line as soon as possible
     cursor.execute(sql)
     datasets = cursor.fetchall()
 
     symbol_counter = 0
     raw_data_counter = 0
     symbols = []
+
+    # Define which preprocessing methods will get applied
+    preprocessing_queue = []
+    if EPSILON > 0:
+        preprocessing_queue.append((preprocessing.douglas_peucker,
+                                   {'EPSILON': EPSILON}))
+    if SPACE_EVENLY:
+        preprocessing_queue.append((preprocessing.space_evenly,
+                                   {'number': 100,
+                                    'kind': SPACE_EVENLY_KIND}))
+    preprocessing_queue.append((preprocessing.scale_and_shift, []))
 
     for dataset in datasets:
         sql = ("SELECT id, data FROM `wm_raw_draw_data` "
@@ -75,14 +93,16 @@ def crossvalidation():
             symbol_counter += 1
             symbols.append("%s (%i)" % (dataset['formula_in_latex'],
                                         len(raw_datasets)))
-            print("%s (%i)" % (dataset['formula_in_latex'], len(raw_datasets)))
+            print("Get %s (datasets: %i) from server ..." %
+                  (dataset['formula_in_latex'], len(raw_datasets)))
             i = 0
             for raw_data in raw_datasets:
                 raw_data_counter += 1
-                cv[i].append({'data': raw_data['data'],
-                              'id': raw_data['id'],
-                              'formula_id': dataset['id'],
-                              'accepted_formula_id': dataset['id'],
+                tmp = HandwrittenData(raw_data['data'],
+                                      dataset['id'],
+                                      raw_data['id'])
+                tmp.preprocessing(preprocessing_queue)
+                cv[i].append({'handwriting': tmp,
                               'formula_in_latex': dataset['formula_in_latex']
                               })
                 i = (i + 1) % K_FOLD
@@ -95,6 +115,7 @@ def crossvalidation():
     # Start getting validation results
     classification_accuracy = []
     print("\n\n")
+    print("Start validation ...")
     execution_time = []
 
     for testset in range(K_FOLD):
@@ -102,31 +123,21 @@ def crossvalidation():
                                         'wrong': 0,
                                         'c10': 0,
                                         'w10': 0})
+
+        # Prepare datasets the algorithm may use
+        trainingset = []
+        for key, value in enumerate(cv):
+            if key != testset:
+                trainingset += value
+
+        # Learn
+        classifier = dtw_classifier.dtw_classifier()
+        classifier.learn(trainingset)
+
         for testdata in cv[testset]:
             start = time.time()
-            raw_draw_data = testdata['data']
-            A = pointLineList(raw_draw_data)
-            if EPSILON > 0:
-                A = douglas_peucker(A, EPSILON)
-
-            if SPACE_EVENLY:
-                Anew = []
-                for line in A:
-                    Anew.append(space_evenly(line, POINTS, SPACE_EVENLY_KIND))
-                A = Anew
-
-            A = scale_and_shift(A, CENTER)
-
-            if FLATTEN:
-                A = list_of_pointlists2pointlist(A)
-
-            # Prepare datasets the algorithm may use
-            datasets = []
-            for key, value in enumerate(cv):
-                if key != testset:
-                    datasets += value
-            results = classify(datasets, A, EPSILON, THRESHOLD, FLATTEN,
-                               SPACE_EVENLY, POINTS)
+            A = testdata['handwriting']
+            results = classifier.classify(A)
             end = time.time()
             execution_time.append(end - start)
 
@@ -139,18 +150,17 @@ def crossvalidation():
             else:
                 answer_id = results[0]['formula_id']
 
-            if answer_id == testdata['formula_id']:
+            if answer_id == testdata['handwriting'].formula_id:
                 classification_accuracy[testset]['correct'] += 1
             else:
                 classification_accuracy[testset]['wrong'] += 1
                 logging.warning(("Raw-data-ID: %i; "
                                  "Formula-ID: %i; Hypothesis: %i, Percentage: %0.3f") %
-                                (testdata['id'],
-                                 testdata['formula_id'],
-                                 answer_id,
+                                (testdata['handwriting'].raw_data_id,
+                                 testdata['handwriting'].formula_id,
+                                 answer_id['formula_id'],
                                  results[0]['p'])) # TODO: that might be wrong
-
-            if testdata['formula_id'] in [r['formula_id'] for r in results]:
+            if testdata['handwriting'].formula_id in [r['formula_id'] for r in results]:
                 classification_accuracy[testset]['c10'] += 1
             else:
                 classification_accuracy[testset]['w10'] += 1
@@ -158,8 +168,14 @@ def crossvalidation():
             print('|', end="")
             sys.stdout.flush()
 
-        classification_accuracy[testset]['accuracy'] = (float(classification_accuracy[testset]['correct']) / (classification_accuracy[testset]['correct'] + classification_accuracy[testset]['wrong']))
-        classification_accuracy[testset]['a10'] = float(classification_accuracy[testset]['c10']) / (classification_accuracy[testset]['c10'] + classification_accuracy[testset]['w10'])
+        classification_accuracy[testset]['accuracy'] = \
+            (float(classification_accuracy[testset]['correct']) /
+             (classification_accuracy[testset]['correct']
+              + classification_accuracy[testset]['wrong']))
+        classification_accuracy[testset]['a10'] = \
+            (float(classification_accuracy[testset]['c10']) /
+             (classification_accuracy[testset]['c10']
+              + classification_accuracy[testset]['w10']))
         print(classification_accuracy[testset])
         print("\n")
         print("Average time:")
@@ -184,12 +200,16 @@ if __name__ == '__main__':
                         level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s: %(message)s')
 
+    yamlconfigfile = "/var/www/write-math/website/clients/python/db.config.yml"
+    with open(yamlconfigfile, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+
     logging.info("Started selftest of classifier %s." % CLASSIFIER_NAME)
     logging.info("start establishing connection")
-    connection = MySQLdb.connect(host=mysql['host'],
-                                 user=mysql['user'],
-                                 passwd=mysql['passwd'],
-                                 db=mysql['db'],
+    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
+                                 user=cfg['mysql_online']['user'],
+                                 passwd=cfg['mysql_online']['passwd'],
+                                 db=cfg['mysql_online']['db'],
                                  cursorclass=MySQLdb.cursors.DictCursor)
     cursor = connection.cursor()
     logging.info("end establishing connection")

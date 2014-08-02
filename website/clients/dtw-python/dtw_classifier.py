@@ -17,10 +17,12 @@ class dtw_classifier(object):
         """
         assert type(trainingdata) is list
         for data in trainingdata:
-            assert 'id' in data
             assert 'formula_in_latex' in data
-            assert 'formula_id' in data
             assert 'handwriting' in data
+            assert isinstance(data['handwriting'],
+                              HandwrittenData.HandwrittenData), \
+                ("handwritten data is not of type HandwrittenData, "
+                 "but of %r") % type(data['handwriting'])
             self.datasets.append(data)
 
     def classify(self, A):
@@ -45,11 +47,11 @@ class dtw_classifier(object):
         # get only best match for each single symbol
         results2 = {}
         for row in results:
-            if row['formula_id'] in results2:
-                results2[row['formula_id']] = min(results2[row['formula_id']],
+            if row['handwriting'].formula_id in results2:
+                results2[row['handwriting'].formula_id] = min(results2[row['handwriting'].formula_id],
                                                   row['dtw'])
             else:
-                results2[row['formula_id']] = row['dtw']
+                results2[row['handwriting'].formula_id] = row['dtw']
 
         results = [{'formula_id': key, 'dtw': el}
                    for key, el in results2.items()]
