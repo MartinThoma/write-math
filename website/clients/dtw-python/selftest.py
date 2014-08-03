@@ -139,7 +139,7 @@ def crossvalidation(path_to_data):
                               testdata['handwriting'].raw_data_id)
                 # Set it to trash class in this case
                 answer_id = 1
-                results = [{'formula_id': {'formula_id': 1, 'p': 1}}]
+                results = [{'formula_id': {'formula_id': 1, 'p': 1}, 'p': 1}]
             else:
                 answer_id = results[0]['formula_id']['formula_id']
 
