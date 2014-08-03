@@ -55,7 +55,7 @@ def make_pfile(dataset_name, folder, features, data, time_prefix):
               (input_filename, features, output_filename)
     logging.info(command)
     os.system(command)
-    # os.remove(input_filename)
+    os.remove(input_filename)
 
 
 def prepare_dataset(dataset,
