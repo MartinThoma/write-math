@@ -2,16 +2,19 @@
 
 from __future__ import print_function
 import logging
-import MySQLdb
-import MySQLdb.cursors
+import sys
+import os
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
 import time
 import datetime
-import sys
 import yaml
 sys.path.append("/var/www/write-math/website/clients/python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing
 import dtw_classifier
+import cPickle as pickle
 
 CLASSIFIER_NAME = "dtw-python"
 
@@ -47,9 +50,8 @@ def print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
     print("```")
 
 
-def crossvalidation():
+def crossvalidation(path_to_data):
     # Parameters for self-testing
-    MIN_OCCURENCES = 10
     K_FOLD = 10
     EPSILON = 10
     CENTER = False
@@ -61,49 +63,38 @@ def crossvalidation():
     # Prepare crossvalidation data set
     cv = [[], [], [], [], [], [], [], [], [], []]
 
-    sql = ("SELECT id, formula_in_latex FROM `wm_formula` "
-           "WHERE is_important = 1 ")
-           "AND id < 35")  # TODO: Remove this line as soon as possible
-    cursor.execute(sql)
-    datasets = cursor.fetchall()
-
     symbol_counter = 0
     raw_data_counter = 0
     symbols = []
 
-    # Define which preprocessing methods will get applied
-    preprocessing_queue = []
-    if EPSILON > 0:
-        preprocessing_queue.append((preprocessing.douglas_peucker,
-                                   {'EPSILON': EPSILON}))
-    if SPACE_EVENLY:
-        preprocessing_queue.append((preprocessing.space_evenly,
-                                   {'number': 100,
-                                    'kind': SPACE_EVENLY_KIND}))
-    preprocessing_queue.append((preprocessing.scale_and_shift, []))
-
-    for dataset in datasets:
-        sql = ("SELECT id, data FROM `wm_raw_draw_data` "
-               "WHERE `accepted_formula_id` = %s" % str(dataset['id']))
-        cursor.execute(sql)
-        raw_datasets = cursor.fetchall()
-        if len(raw_datasets) >= MIN_OCCURENCES:
-            symbol_counter += 1
-            symbols.append("%s (%i)" % (dataset['formula_in_latex'],
-                                        len(raw_datasets)))
-            print("Get %s (datasets: %i) from server ..." %
-                  (dataset['formula_in_latex'], len(raw_datasets)))
-            i = 0
-            for raw_data in raw_datasets:
-                raw_data_counter += 1
-                tmp = HandwrittenData(raw_data['data'],
-                                      dataset['id'],
-                                      raw_data['id'])
-                tmp.preprocessing(preprocessing_queue)
-                cv[i].append({'handwriting': tmp,
-                              'formula_in_latex': dataset['formula_in_latex']
-                              })
-                i = (i + 1) % K_FOLD
+    # Load from pickled file
+    logging.info("Start loading data...")
+    loaded = pickle.load(open(path_to_data))
+    raw_datasets = loaded['handwriting_datasets']
+    formula_id2raw_counter = {}
+    logging.info("Start creating crossvalidation sets...")
+    start_time = time.time()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            # Show how much work was done / how much work is remaining
+            percentage_done = float(i)/len(raw_datasets)
+            current_running_time = time.time() - start_time
+            remaining_seconds = current_running_time / percentage_done
+            tmp = datetime.timedelta(seconds=remaining_seconds)
+            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
+                             (percentage_done*100, str(tmp)))
+            sys.stdout.flush()
+        # Do the work
+        fid = raw_dataset['handwriting'].formula_id
+        to_append = {'handwriting': raw_dataset['handwriting'],
+                     'formula_in_latex': raw_dataset['formula_in_latex']}
+        if fid not in formula_id2raw_counter:
+            cv[0].append(to_append)
+            formula_id2raw_counter[fid] = 1
+        else:
+            cv[formula_id2raw_counter[fid]].append(to_append)
+            formula_id2raw_counter[fid] = ((formula_id2raw_counter[fid] + 1) %
+                                           K_FOLD)
 
     print_experiment_parameters(symbols, symbol_counter, raw_data_counter,
                                 EPSILON, CENTER, THRESHOLD,
@@ -113,7 +104,7 @@ def crossvalidation():
     # Start getting validation results
     classification_accuracy = []
     print("\n\n")
-    print("Start validation ...")
+    logging.info("Start validation ...")
     execution_time = []
 
     for testset in range(K_FOLD):
@@ -132,7 +123,8 @@ def crossvalidation():
         classifier = dtw_classifier.dtw_classifier()
         classifier.learn(trainingset)
 
-        for testdata in cv[testset]:
+        start_time = time.time()
+        for i, testdata in enumerate(cv[testset]):
             start = time.time()
             A = testdata['handwriting']
             results = classifier.classify(A)
@@ -144,7 +136,10 @@ def crossvalidation():
                 # That should not happen. Threshold of maximum_dtw might be too
                 # high.
                 logging.debug("Raw_data_id = %i as testdata got no results" %
-                              testdata['id'])
+                              testdata['handwriting'].raw_data_id)
+                # Set it to trash class in this case
+                answer_id = 1
+                results = [{'formula_id': {'formula_id': 1, 'p': 1}}]
             else:
                 answer_id = results[0]['formula_id']['formula_id']
 
@@ -154,18 +149,26 @@ def crossvalidation():
             else:
                 classification_accuracy[testset]['wrong'] += 1
                 logging.warning(("Raw-data-ID: %i; "
-                                 "Formula-ID: %i; Hypothesis: %i, Percentage: %0.3f") %
+                                 "Formula-ID: %i; Hypothesis: %i, "
+                                 "Percentage: %0.3f") %
                                 (testdata['handwriting'].raw_data_id,
                                  testdata['handwriting'].formula_id,
                                  answer_id,
                                  results[0]['p'])) # TODO: that might be wrong
-            if testdata['handwriting'].formula_id in [r['formula_id']['formula_id'] for r in results]:
+            if testdata['handwriting'].formula_id in \
+               [r['formula_id']['formula_id'] for r in results]:
                 classification_accuracy[testset]['c10'] += 1
             else:
                 classification_accuracy[testset]['w10'] += 1
-
-            print('|', end="")
-            sys.stdout.flush()
+            if i > 0 and i % 100 == 0:
+                # Show how much work was done / how much work is remaining
+                percentage_done = float(i)/len(cv[testset])
+                current_running_time = time.time() - start_time
+                remaining_seconds = current_running_time / percentage_done
+                tmp = datetime.timedelta(seconds=remaining_seconds)
+                sys.stdout.write("\r%0.2f%% (%s remaining)   " %
+                                 (percentage_done*100, str(tmp)))
+                sys.stdout.flush()
 
         classification_accuracy[testset]['accuracy'] = \
             (float(classification_accuracy[testset]['correct']) /
@@ -177,10 +180,10 @@ def crossvalidation():
               + classification_accuracy[testset]['w10']))
         print(classification_accuracy[testset])
         print("\n")
-        print("Average time:")
-        print(sum(execution_time)/len(execution_time))
+        logging.info("Average time:")
+        logging.info(sum(execution_time)/len(execution_time))
 
-    print(classification_accuracy)
+    logging.info(classification_accuracy)
 
     t1sum = 0
     t10sum = 0
@@ -194,22 +197,27 @@ def crossvalidation():
                                 SPACE_EVENLY, SPACE_EVENLY_KIND, POINTS,
                                 K_FOLD, t1sum, t10sum, execution_time)
 
+
+def is_valid_file(parser, arg):
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
+
 if __name__ == '__main__':
-    logging.basicConfig(filename='selftest.log',
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s: %(message)s')
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--handwriting_datasets", dest="handwriting_datasets",
+                        help="where are the pickled handwriting_datasets?",
+                        metavar="FILE",
+                        type=lambda x: is_valid_file(parser, x),
+                        default=("/var/www/write-math/archive/"
+                                 "handwriting_datasets-2014-08-01.pickle"))
+    args = parser.parse_args()
 
     yamlconfigfile = "/var/www/write-math/website/clients/python/db.config.yml"
     with open(yamlconfigfile, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
-
     logging.info("Started selftest of classifier %s." % CLASSIFIER_NAME)
-    logging.info("start establishing connection")
-    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
-                                 user=cfg['mysql_online']['user'],
-                                 passwd=cfg['mysql_online']['passwd'],
-                                 db=cfg['mysql_online']['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
-    cursor = connection.cursor()
-    logging.info("end establishing connection")
-    crossvalidation()
+    crossvalidation(args.handwriting_datasets)
