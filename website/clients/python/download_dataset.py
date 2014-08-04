@@ -4,15 +4,25 @@ Download raw data from online server and store it as
 handwriting_datasets.pickle.
 """
 
-
+import logging
+import sys
+import os
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
 import cPickle as pickle
 import MySQLdb
 import MySQLdb.cursors
 import yaml
 from HandwrittenData import HandwrittenData
+import time
 
 
-def main():
+def main(destination):
+    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
+    filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
+    destination_path = os.path.join(destination, filename)
+    logging.info("Data will be written to '%s'" % destination_path)
     path = "/var/www/write-math/website/clients/python/"
     with open("%sdb.config.yml" % path, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
@@ -42,12 +52,14 @@ def main():
                "WHERE `accepted_formula_id` = %s" % str(formula['id']))
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
-        print("%s (%i)" % (formula['formula_in_latex'], len(raw_datasets)))
+        logging.info("%s (%i)" % (formula['formula_in_latex'],
+                                  len(raw_datasets)))
         for raw_data in raw_datasets:
             try:
                 handwriting = HandwrittenData(raw_data['data'],
                                               formula['id'],
-                                              raw_data['id'])
+                                              raw_data['id'],
+                                              formula['formula_in_latex'])
                 handwriting_datasets.append({'handwriting': handwriting,
                                              'id': raw_data['id'],
                                              'formula_id': formula['id'],
@@ -57,13 +69,28 @@ def main():
                                              raw_data['is_in_testset']
                                              })
             except Exception as e:
-                print("Raw data id: %s" % raw_data['id'])
-                print(e)
-
+                logging.info("Raw data id: %s" % raw_data['id'])
+                logging.info(e)
     pickle.dump({'handwriting_datasets': handwriting_datasets,
                  'formula_id2latex': formula_id2latex,
                  },
-                open("handwriting_datasets.pickle", "wb"))
+                open(destination_path, "wb"))
+
+
+def is_valid_file(parser, arg):
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
 
 if __name__ == '__main__':
-    main()
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("-d", "--destination", dest="destination",
+                        default="/var/www/write-math/archive",
+                        help="where do write the handwriting_dataset.pickle",
+                        type=lambda x: is_valid_file(parser, x),
+                        metavar="FOLDER")
+    args = parser.parse_args()
+    main(args.destination)
