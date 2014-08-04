@@ -2,44 +2,103 @@
 
 {% block content %}
     {% if model_detailed is not null %}
+        {% if uid != 10 %}
         <table>
             <tr>
                 <td>ID</td>
                 <td>{{ model_detailed.id }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td>name</td>
+                <td>{{ model_detailed.name }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td>topology</td>
+                <td>{{ model_detailed.topology }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td>parent</td>
+                <td><a href="?details={{ model_detailed.parent }}">{{ model_detailed.parent }}</a></td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td>testresult</td>
+                <td>{{ model_detailed.testresult | trim | nl2br }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td valign="top">preprocessing</td>
+                <td>{{ model_detailed.preprocessing | trim | nl2br }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td valign="top">features</td>
+                <td>{{ model_detailed.features | trim | nl2br }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td valign="top">training</td>
+                <td>{{ model_detailed.training | trim | nl2br }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td valign="top">details</td>
+                <td>{{ model_detailed.details | trim | nl2br }}</td>
             </tr>
         </table>
+        {% else %}
+        <form role="form" method="post">
+            <input type="hidden" class="form-control"
+                   name="id" value="{{ model_detailed.id }}"/>
+            <div class="form-group">
+                <label for="id">id</label>
+                <input type="text" class="form-control"
+                       id="id" name="id"
+                       value="{{ model_detailed.id }}" disabled="disabled"/>
+            </div>
+            <div class="form-group">
+                <label for="name">name</label>
+                <input type="text" class="form-control"
+                       id="name" name="name"
+                       value="{{ model_detailed.name }}" />
+            </div>
+            <div class="form-group">
+                <label for="topology">topology</label>
+                <input type="text" class="form-control"
+                       id="topology" name="topology"
+                       value="{{ model_detailed.topology }}" />
+            </div>
+            <div class="form-group">
+                <label for="parent">parent</label>
+                <input type="text" class="form-control"
+                       id="parent" name="parent"
+                       value="{{ model_detailed.parent }}"
+                       disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label for="testresult">testresult</label>
+                <input type="text" class="form-control"
+                       id="testresult" name="testresult"
+                       value="{{ model_detailed.testresult }}" />
+            </div>
+            <div class="form-group">
+                <label for="preprocessing">preprocessing</label>
+                <textarea name="preprocessing" id="preprocessing"
+                          class="form-control" rows="5">{{ model_detailed.preprocessing | trim }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="features">features</label>
+                <textarea name="features" id="features"
+                          class="form-control" rows="5">{{ model_detailed.features | trim }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="training">training</label>
+                <textarea name="training" id="training"
+                          class="form-control" rows="5">{{ model_detailed.training | trim }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="details">details</label>
+                <textarea name="details" id="details"
+                          class="form-control" rows="5">{{ model_detailed.details | trim }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        {% endif %}
     {% endif %}
 
     <table class="table">
@@ -64,4 +123,34 @@
             </tr>
         {% endfor %}
     </table>
+
+{% if uid == 10 %}
+<h2>Create new model</h2>
+<form action="?create_new_model=1" method="post" role="form">
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" required="required"
+           class="form-control"
+           id="name" name="name"
+           placeholder="2014-08-04-00-08" />
+  </div>
+  <div class="form-group">
+    <label for="parent">Parent</label>
+    <input type="number"
+           class="form-control"
+           id="parent" name="parent"
+           placeholder="10" />
+  </div>
+  <div class="form-group">
+    <label for="topology">Topology</label>
+    <input type="text" required="required"
+           class="form-control"
+           id="topology" name="topology"
+           placeholder="161:483:369" />
+  </div>
+  <textarea class="form-control" rows="3" name="details" id="details"
+            placeholder="d make mlp 244:488:369 > 2014-08-08-00-07.json"></textarea>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endif %}
 {% endblock %}
