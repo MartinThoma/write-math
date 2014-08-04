@@ -55,7 +55,7 @@ def main(handwriting_datasets_file):
 
 
 def is_valid_file(parser, arg):
-    if not os.path.exists(arg):
+    if not os.path.exists(os.path.abspath(arg)):
         parser.error("The file %s does not exist!" % arg)
     else:
         return arg
