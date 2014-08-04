@@ -18,12 +18,10 @@ this:
 
 import HandwrittenData
 import preprocessing
-import json
 import urllib
 import os
 import Image
-import tempfile
-import shutil
+
 
 def get_class(name):
     if name == "Stroke_Count":
@@ -34,8 +32,11 @@ def get_class(name):
         return First_N_Points
     elif name == "Bitmap":
         return Bitmap
+    elif name == "Ink":
+        return Ink
     else:
         return None
+
 
 class Stroke_Count(object):
     def __repr__(self):
@@ -103,11 +104,14 @@ class Constant_Point_Coordinates(object):
                         x.append(self.fill_empty_with)
                         x.append(self.fill_empty_with)
         else:
-            # Space evenly should be called before!
             for point in handwritten_data.get_pointlist()[0]:
+                if len(x) >= 3*self.points_per_line:
+                    break
                 x.append(point['x'])
                 x.append(point['y'])
-                x.append(point['pen_down'])
+                x.append(int(point['pen_down']))
+            while len(x) != 3*self.points_per_line:
+                x.append(self.fill_empty_with)
         return x
 
 
@@ -186,3 +190,29 @@ class Bitmap(object):
                 # pixel_image[i][j] = pix[i, j]
                 x.append(pix[i, j])
         return x
+
+
+class Ink(object):
+    def __repr__(self):
+        return "Ink"
+
+    def __str__(self):
+        return "ink"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        ink = 0
+        # calculate ink used for this symbol
+        # TODO: What about dots? What about speed?
+        for line in handwritten_data.get_pointlist():
+            last_point = None
+            for point in line:
+                if last_point is not None:
+                    preprocessing._euclidean_distance(last_point, point)
+                last_point = point
+        return [ink]
