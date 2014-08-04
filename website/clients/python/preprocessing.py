@@ -112,19 +112,6 @@ def space_evenly(handwritten_data, number=100, kind='cubic'):
     pointlist = sorted(pointlist, key=lambda line: line[0]['time'])
 
     for i in range(len(pointlist)-1):
-        # TODO: Remove this and check data before adding it to the database
-        if not (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]):
-            with open("fix-time.txt", "a") as f:
-                if hasattr(handwritten_data, 'raw_data_id'):
-                    f.write(str(handwritten_data.raw_data_id) + "i:" + str(i) +
-                            ":" + str(pointlist[i][-1]["time"]) + ":" +
-                            str(pointlist[i+1][0]["time"]) + "\n")
-                else:
-                    f.write(str(handwritten_data.raw_data_id) + "i:" + str(i) +
-                            ":" + str(pointlist[i][-1]["time"]) + ":" +
-                            str(pointlist[i+1][0]["time"]) + "\n")
-            return
-
         # The last point of the previous line should be lower than the first
         # point of the next line
         assert (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]), \
