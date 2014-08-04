@@ -3,6 +3,8 @@
 
 import cPickle as pickle
 
+""" Create a crossvalidation (hence: binned) dataset from a dataset.pickle."""
+
 
 def main(MIN_OCCURENCES=100, K_FOLD=10):
     loaded = pickle.load(open("handwriting_datasets.pickle"))
