@@ -9,10 +9,12 @@ import preprocessing
 
 class HandwrittenData(object):
     """Represents a handwritten symbol."""
-    def __init__(self, raw_data_json, formula_id=None, raw_data_id=None):
+    def __init__(self, raw_data_json, formula_id=None, raw_data_id=None,
+                 formula_in_latex=None):
         self.raw_data_json = raw_data_json
         self.formula_id = formula_id
         self.raw_data_id = raw_data_id
+        self.formula_in_latex = formula_in_latex
         assert type(json.loads(self.raw_data_json)) is list, \
             "raw_data_json is not JSON: %r" % self.raw_data_json
         assert len(self.get_pointlist()) >= 1, \
@@ -91,7 +93,11 @@ class HandwrittenData(object):
         assert type(algorithms) is list
         features = []
         for algorithm in algorithms:
-            features += algorithm(self)
+            new_features = algorithm(self)
+            assert len(new_features) == algorithm.get_dimension(), \
+                "Expected %i features from algorithm %s, got %i features" % \
+                (algorithm.get_dimension(), str(algorithm), len(new_features))
+            features += new_features
         return features
 
     def show(self):
