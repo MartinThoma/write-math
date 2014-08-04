@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Print which symbols are contained in a datasets.pickle file.
+Print which symbols are contained in a crossvalidation datasets.pickle file.
 """
 
 import cPickle as pickle
@@ -8,6 +8,7 @@ import cPickle as pickle
 
 def main(picklefile):
     a = pickle.load(open(picklefile))
+    print(a.keys())
     s = ""
     for symbol, count in sorted(a['symbols'].items(), key=lambda n: n[0]):
         if symbol in ['a', '0', 'A']:
