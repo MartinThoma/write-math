@@ -85,10 +85,13 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__)
+    archive_path = os.path.abspath(os.path.join(os.path.realpath(__file__),
+                                                "../../archive/datasets"))
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-d", "--destination", dest="destination",
-                        default="/var/www/write-math/archive",
+                        default=archive_path,
                         help="where do write the handwriting_dataset.pickle",
                         type=lambda x: is_valid_file(parser, x),
                         metavar="FOLDER")

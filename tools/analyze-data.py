@@ -63,8 +63,9 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__)
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-d", "--handwriting_datasets",
                         dest="handwriting_datasets",
                         help="where are the pickled handwriting_datasets?",

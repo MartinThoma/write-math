@@ -62,6 +62,10 @@ def main(mysql):
 
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    args = parser.parse_args()
     with open("db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
