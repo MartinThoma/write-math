@@ -20,10 +20,11 @@ import os
 import cPickle as pickle
 sys.path.append("/var/www/write-math/website/clients/python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
-import preprocessing
+import preprocessing  # Needed because of pickle
 import features
 import time
 import datetime
+import gc
 
 
 def make_pfile(dataset_name, folder, features, data, time_prefix):
@@ -41,7 +42,6 @@ def make_pfile(dataset_name, folder, features, data, time_prefix):
                                                    ))
 
     # create raw data file for pfile_create
-    logging.info("write to '%s' ..." % input_filename)
     with open(input_filename, "w") as f:
         for symbolnr, instance in enumerate(data):
             feature_string, label = instance
@@ -58,17 +58,13 @@ def make_pfile(dataset_name, folder, features, data, time_prefix):
     os.remove(input_filename)
 
 
-def prepare_dataset(dataset,
-                    formula_id2index,
-                    preprocessing_queue,
-                    feature_list):
+def prepare_dataset(dataset, formula_id2index, feature_list):
     """Transform each instance of dataset to a (Features, Label) tuple."""
     prepared = []
     start_time = time.time()
     for i, data in enumerate(dataset):
         x = []
         handwriting = data['handwriting']
-        handwriting.preprocessing(preprocessing_queue)  # Apply Preprocessing
         x = handwriting.feature_extraction(feature_list)  # Feature selection
         y = formula_id2index[data['formula_id']]  # Get label
         prepared.append((x, y))
@@ -124,32 +120,27 @@ def get_sets(path_to_data):
                 else:
                     training_set.append(raw_data)
                 i = (i + 1) % 10
-    return training_set, validation_set, test_set, formula_id2index
+    if 'preprocessing_queue' in loaded:
+        preprocessing_queue = loaded['preprocessing_queue']
+    else:
+        preprocessing_queue = []
+    return (training_set, validation_set, test_set, formula_id2index,
+            preprocessing_queue)
 
 
 def create_pfile(handwriting_datasets, folder):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
-    print("Get sets...")
-    training_set, validation_set, test_set, formula_id2index = \
-        get_sets(handwriting_datasets)
-
-    # Define which preprocessing methods will get applied
-    preprocessing_queue = [# (preprocessing.scale_and_shift, []),
-                           # (preprocessing.connect_lines, []),
-                           # (preprocessing.douglas_peucker,
-                           #  {'EPSILON': 0.005}),
-                           (preprocessing.space_evenly,
-                            {'number': 100, 'kind': 'linear'}),
-                           #(preprocessing.scale_and_shift, [])
-                           ]
+    logging.info("Get sets...")
+    (training_set, validation_set, test_set, formula_id2index,
+     preprocessing_queue) = get_sets(handwriting_datasets)
 
     # Define which features will get extracted
     feature_list = [features.Stroke_Count(),
-                    # features.Constant_Point_Coordinates(lines=-1,
-                    #                                     points_per_line=81,
-                    #                                     fill_empty_with=0)
+                    features.Constant_Point_Coordinates(lines=-1,
+                                                        points_per_line=81,
+                                                        fill_empty_with=0)
                     #features.First_N_Points(81)
                     #features.Bitmap(28)
                     ]
@@ -171,7 +162,7 @@ def create_pfile(handwriting_datasets, folder):
     for algorithm in feature_list:
         print("* %s" % str(algorithm))
     print("```")
-    print("## Start creating pfiles")
+    logging.info("## Start creating pfiles")
 
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
 
@@ -181,16 +172,16 @@ def create_pfile(handwriting_datasets, folder):
         t0 = time.time()
         prepared = prepare_dataset(dataset,
                                    formula_id2index,
-                                   preprocessing_queue,
                                    feature_list)
-        print("start 'make_pfile' ...")
+        logging.info("start 'make_pfile' ...")
         make_pfile(dataset_name,
                    folder,
                    INPUT_FEATURES,
                    prepared,
                    time_prefix)
         t1 = time.time() - t0
-        print("%s was written. Needed %0.2f seconds" % (dataset_name, t1))
+        logging.info("%s was written. Needed %0.2f seconds" % (dataset_name, t1))
+        gc.collect()
 
 
 def is_valid_file(parser, arg):
@@ -203,11 +194,13 @@ if __name__ == '__main__':
     logging.info("Started creation of pfiles.")
     from argparse import ArgumentParser
     parser = ArgumentParser(description=__doc__)
-    parser.add_argument("--handwriting_datasets", dest="handwriting_datasets",
+    parser.add_argument("-d", "--handwriting_datasets",
+                        dest="handwriting_datasets",
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default="/var/www/write-math/archive/handwriting_datasets-2014-08-01.pickle")
+                        default=("/var/www/write-math/archive/"
+                                 "handwriting_datasets-2014-08-01.pickle"))
     parser.add_argument("--folder", dest="folder",
                         help="where should the pfiles be put?",
                         metavar="FOLDER",
