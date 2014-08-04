@@ -45,6 +45,7 @@ def create_preprocessed_dataset(path_to_data, preprocessing_queue):
 
 
 def is_valid_file(parser, arg):
+    arg = os.path.abspath(arg)
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
@@ -58,8 +59,9 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("/var/www/write-math/archive/"
-                                 "handwriting_datasets-2014-08-01.pickle"))
+                        default=("../../../archive/datasets/"
+                                 "2014-08-03-18-06-"
+                                 "handwriting_datasets-raw.pickle"))
     args = parser.parse_args()
     # Define which preprocessing methods will get applied
     preprocessing_queue = []
@@ -71,4 +73,5 @@ if __name__ == '__main__':
     preprocessing_queue.append((preprocessing.space_evenly,
                                 {'number': 100,
                                  'kind': 'cubic'}))
+    preprocessing_queue.append((preprocessing.scale_and_shift, []))
     create_preprocessed_dataset(args.handwriting_datasets, preprocessing_queue)

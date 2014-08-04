@@ -59,7 +59,9 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("-f", "--file", dest="picklefile",
-                        default='handwriting.pickle',
+                        default=("../archive/datasets/"
+                                 "2014-08-03-18-06-"
+                                 "handwriting_datasets-raw.pickle"),
                         type=lambda x: is_valid_file(parser, x),
                         help="where is the picklefile", metavar="FILE")
     args = parser.parse_args()

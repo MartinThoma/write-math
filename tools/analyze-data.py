@@ -71,6 +71,7 @@ if __name__ == '__main__':
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
                         default=("../archive/datasets/"
-                                 "handwriting_datasets-2014-08-03.pickle"))
+                                 "2014-08-03-18-06-"
+                                 "handwriting_datasets-raw.pickle"))
     args = parser.parse_args()
     main(args.handwriting_datasets)

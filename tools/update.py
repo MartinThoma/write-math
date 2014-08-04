@@ -15,7 +15,6 @@ sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData
 import preprocessing
 sys.path.append("../website/clients/dtw-python")
-from classification import dtw
 import yaml
 # Database stuff
 import MySQLdb
@@ -43,6 +42,9 @@ def main(cfg):
     connection_local.close()
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description=__doc__)
+    args = parser.parse_args()
     with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     main(cfg)

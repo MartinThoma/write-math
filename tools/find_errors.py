@@ -18,7 +18,7 @@ import MySQLdb
 import MySQLdb.cursors
 
 sys.path.append("../website/clients/dtw-python")
-from classification import dtw
+from distance_metric import handwritten_data_greedy_matching_distance as dtw
 
 import preprocessing
 import webbrowser
@@ -247,9 +247,8 @@ def main(cfg, raw_data_start_id):
             # This formula id is for trash. No need to look at it.
             continue
         # Get data
-        logger.info("Get data for formula_id %i (%s)" % (formula_id,
-                                                         formulaid2latex[formula_id])
-              )
+        logger.info("Get data for formula_id %i (%s)" %
+                    (formula_id, formulaid2latex[formula_id]))
         sql = ("SELECT `id`, `data`, `accepted_formula_id`, "
                "`wild_point_count`, `missing_line`, `has_hook`, "
                "`has_too_long_line`, `is_image`, `administrator_edit`, "
@@ -291,16 +290,19 @@ def main(cfg, raw_data_start_id):
                 else:
                     if not alread_shown_in_browser:
                         alread_shown_in_browser = True
-                        webbrowser.open("http://www.martin-thoma.de/write-math/view/?raw_data_id=%i" % data['id'], 2) 
+                        webbrowser.open("http://www.martin-thoma.de/"
+                                        "write-math/view/?"
+                                        "raw_data_id=%i" % data['id'], 2)
                     B.show()
                     if B.ok:
                         As.append(B.get_pointlist())
                         update_data(cfg, B)
                     else:
                         update_data(cfg, B, True)
-        logger.info("[Status] Checked formulas: %i of %i" % (checked_formulas,
-                                                       len(formulaid2latex)))
-        logger.info("[Status] Checked raw_data_instances: %i" % checked_raw_data_instances)
+        logger.info("[Status] Checked formulas: %i of %i" %
+                    (checked_formulas, len(formulaid2latex)))
+        logger.info("[Status] Checked raw_data_instances: %i" %
+                    checked_raw_data_instances)
     logger.info("done")
 
 if __name__ == '__main__':
