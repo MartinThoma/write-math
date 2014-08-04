@@ -11,10 +11,9 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-sys.path.append("../website/clients/python")
+# My modules
 from HandwrittenData import HandwrittenData
 import preprocessing
-sys.path.append("../website/clients/dtw-python")
 import yaml
 # Database stuff
 import MySQLdb

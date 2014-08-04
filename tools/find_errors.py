@@ -11,18 +11,16 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-sys.path.append("../website/clients/python")
-from HandwrittenData import HandwrittenData
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
-
-sys.path.append("../website/clients/dtw-python")
-from distance_metric import handwritten_data_greedy_matching_distance as dtw
-
-import preprocessing
+# Other
 import webbrowser
 import yaml
+# My classes
+from HandwrittenData import HandwrittenData
+from distance_metric import handwritten_data_greedy_matching_distance as dtw
+import preprocessing
 
 
 def update_data(cfg, a, unaccept=False):

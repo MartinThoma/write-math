@@ -23,8 +23,7 @@ def main(destination):
     filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
     destination_path = os.path.join(destination, filename)
     logging.info("Data will be written to '%s'" % destination_path)
-    path = "/var/www/write-math/website/clients/python/"
-    with open("%sdb.config.yml" % path, 'r') as ymlfile:
+    with open("db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     mysql = cfg['mysql_online']
     connection = MySQLdb.connect(host=mysql['host'],

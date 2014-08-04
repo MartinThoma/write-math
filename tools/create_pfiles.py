@@ -18,7 +18,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import os
 import cPickle as pickle
-sys.path.append("../python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
 import features

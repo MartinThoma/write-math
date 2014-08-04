@@ -14,7 +14,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import time
 import datetime
-sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 
 

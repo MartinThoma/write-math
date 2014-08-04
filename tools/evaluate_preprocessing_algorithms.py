@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
-sys.path.append("../website/clients/dtw-python")
 import preprocessing
 from copy import deepcopy
 

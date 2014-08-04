@@ -34,7 +34,7 @@ def create_preprocessed_dataset(path_to_data, preprocessing_queue):
             sys.stdout.flush()
         # Do the work
         raw_dataset['handwriting'].preprocessing(preprocessing_queue)
-
+    print("")
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     pickle.dump({'handwriting_datasets': raw_datasets,
                  'formula_id2latex': loaded['formula_id2latex'],
