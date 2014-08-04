@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import time
 import datetime
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("/var/www/write-math/archive/"
+                        default=("../archive/"
                                  "handwriting_datasets-2014-08-03.pickle"))
     args = parser.parse_args()
     main(args.handwriting_datasets)

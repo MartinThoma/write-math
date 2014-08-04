@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 import cPickle as pickle
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 from collections import defaultdict
 

@@ -18,7 +18,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import os
 import cPickle as pickle
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../python")
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
 import features
@@ -180,13 +180,14 @@ def create_pfile(handwriting_datasets, folder):
                    prepared,
                    time_prefix)
         t1 = time.time() - t0
-        logging.info("%s was written. Needed %0.2f seconds" % (dataset_name, t1))
+        logging.info("%s was written. Needed %0.2f seconds" %
+                     (dataset_name, t1))
         gc.collect()
 
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
+        parser.error("The file %s does not exist!" % os.path.abspath(arg))
     else:
         return arg
 
@@ -199,8 +200,8 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("/var/www/write-math/archive/"
-                                 "handwriting_datasets-2014-08-01.pickle"))
+                        default=("../../../archive/datasets/"
+                                 "2014-08-03-18-06-handwriting_datasets-raw.pickle"))
     parser.add_argument("--folder", dest="folder",
                         help="where should the pfiles be put?",
                         metavar="FOLDER",

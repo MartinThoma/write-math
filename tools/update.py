@@ -11,18 +11,15 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData
+import preprocessing
+sys.path.append("../website/clients/dtw-python")
+from classification import dtw
+import yaml
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
-
-sys.path.append("/var/www/write-math/website/clients/dtw-python")
-from classification import dtw
-
-import preprocessing
-import webbrowser
-import yaml
 
 
 def main(cfg):
@@ -46,6 +43,6 @@ def main(cfg):
     connection_local.close()
 
 if __name__ == '__main__':
-    with open("/var/www/write-math/website/clients/python/db.config.yml", 'r') as ymlfile:
+    with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     main(cfg)

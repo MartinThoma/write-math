@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../website/clients/python")
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
 from dbconfig import mysql_local, mysql_online
-sys.path.append("/var/www/write-math/website/clients/dtw-python")
+sys.path.append("../website/clients/dtw-python")
 
 
 def update_data(sql):

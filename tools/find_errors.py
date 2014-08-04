@@ -11,13 +11,13 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-sys.path.append("/var/www/write-math/website/clients/python")
+sys.path.append("../website/clients/python")
 from HandwrittenData import HandwrittenData
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
 
-sys.path.append("/var/www/write-math/website/clients/dtw-python")
+sys.path.append("../website/clients/dtw-python")
 from classification import dtw
 
 import preprocessing
@@ -313,6 +313,6 @@ if __name__ == '__main__':
                         help="at which raw_data_id should it start?",
                         metavar="RAW_DATA_ID")
     args = parser.parse_args()
-    with open("/var/www/write-math/website/clients/python/db.config.yml", 'r') as ymlfile:
+    with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     main(cfg, args.i)
