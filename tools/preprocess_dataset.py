@@ -13,15 +13,17 @@ import cPickle as pickle
 import datetime
 import time
 import preprocessing
+import yaml
+import natsort
 
 
-def create_preprocessed_dataset(path_to_data, preprocessing_queue):
-    # Calculate output path
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    filename = "%s-handwriting_datasets_preprocessed.pickle" % time_prefix
-    outputpath = os.path.join("../archive/datasets", filename)
-    outputpath = os.path.abspath(outputpath)
+def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
+    # Log everything
+    logging.info("Data soure %s" % path_to_data)
     logging.info("Output will be stored in %s" % outputpath)
+    logging.info("Preprocessing Queue:")
+    for el in preprocessing_queue:
+        logging.info(el)
     # Load from pickled file
     logging.info("Start loading data...")
     loaded = pickle.load(open(path_to_data))
@@ -58,26 +60,53 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__)
-    parser.add_argument("-d", "--handwriting_datasets",
-                        dest="handwriting_datasets",
-                        help="where are the pickled handwriting_datasets?",
+    # Get latest model description file
+    home = os.path.expanduser("~")
+    rcfile = os.path.join(home, ".writemathrc")
+    with open(rcfile, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+    PROJECT_ROOT = cfg['root']
+    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
+    latest_model = ""
+    for my_file in natsort.natsorted(os.listdir(models_folder), reverse=True):
+        if my_file.endswith(".yml"):
+            latest_model = os.path.join(models_folder, my_file)
+
+    # Get command line arguments
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-m", "--model_description_file",
+                        dest="model_description_file",
+                        help="where is the model description YAML file?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("../archive/datasets/"
-                                 "2014-08-04-18-24-"
-                                 "handwriting_datasets-raw.pickle"))
+                        default=latest_model)
     args = parser.parse_args()
-    # Define which preprocessing methods will get applied
+
+    # Read the model description file
+    with open(args.model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+    # Get the path of the raw data
+    raw_datapath = os.path.join(PROJECT_ROOT,
+                                model_description['data-source'])
+    # Get the path were the preprocessed file should be put
+    outputpath = os.path.join(PROJECT_ROOT,
+                              model_description['preprocessed'])
+    # Get the preprocessing queue
     preprocessing_queue = []
-    preprocessing_queue.append((preprocessing.scale_and_shift, []))
-    preprocessing_queue.append((preprocessing.connect_lines,
-                                {'minimum_distance': 0.01}))
-    preprocessing_queue.append((preprocessing.douglas_peucker,
-                               {'EPSILON': 0.01}))
-    preprocessing_queue.append((preprocessing.space_evenly,
-                                {'number': 100,
-                                 'kind': 'cubic'}))
-    preprocessing_queue.append((preprocessing.scale_and_shift, []))
-    create_preprocessed_dataset(args.handwriting_datasets, preprocessing_queue)
+    print(model_description['preprocessing'])
+    for el in model_description['preprocessing']:
+        parameters = {}
+        algorithms = el.keys()
+        for algorithm in algorithms:
+            parameters = {}
+            if el[algorithm] is not None:
+                for param in el[algorithm]:
+                    for key in param.keys():
+                        print(key)
+                        parameters[key] = param[key]
+            algorithm = preprocessing.get_algorithm(algorithm)
+            preprocessing_queue.append((algorithm, parameters))
+    # Do it! Preprcess the data!
+    create_preprocessed_dataset(raw_datapath, outputpath, preprocessing_queue)
