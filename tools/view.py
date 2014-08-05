@@ -6,7 +6,7 @@ Display a raw_data_id.
 from HandwrittenData import HandwrittenData
 import MySQLdb
 import MySQLdb.cursors
-import yaml
+import utils
 
 
 def main(s):
@@ -24,8 +24,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Import configuration file
-    with open("db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
 
     # Establish database connection
     connection = MySQLdb.connect(host=cfg[args.mysql]['host'],

@@ -3,6 +3,8 @@
 
 """Find raw_datasets which are not accepted by the administrator and look
    different than other known datasets with the same accepted_formula_id.
+
+   (So: Find outliers)
 """
 import sys
 import logging
@@ -16,11 +18,11 @@ import MySQLdb
 import MySQLdb.cursors
 # Other
 import webbrowser
-import yaml
 # My classes
 from HandwrittenData import HandwrittenData
 from distance_metric import handwritten_data_greedy_matching_distance as dtw
 import preprocessing
+import utils
 
 
 def update_data(cfg, a, unaccept=False):
@@ -306,13 +308,12 @@ def main(cfg, raw_data_start_id):
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=__doc__)
 
     # Add more options if you like
     parser.add_argument("-i", dest="i",
                         help="at which raw_data_id should it start?",
                         metavar="RAW_DATA_ID")
     args = parser.parse_args()
-    with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
     main(cfg, args.i)

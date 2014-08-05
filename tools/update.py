@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 # My modules
 from HandwrittenData import HandwrittenData
 import preprocessing
-import yaml
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
+import utils
 
 
 def main(cfg):
@@ -44,6 +44,5 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description=__doc__)
     args = parser.parse_args()
-    with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
     main(cfg)

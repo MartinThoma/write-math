@@ -13,9 +13,9 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import MySQLdb
 import MySQLdb.cursors
-import yaml
 from HandwrittenData import HandwrittenData
 import time
+import utils
 
 
 def main(destination):
@@ -23,8 +23,7 @@ def main(destination):
     filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
     destination_path = os.path.join(destination, filename)
     logging.info("Data will be written to '%s'" % destination_path)
-    with open("db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
     mysql = cfg['mysql_online']
     connection = MySQLdb.connect(host=mysql['host'],
                                  user=mysql['user'],
@@ -84,8 +83,8 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
-    archive_path = os.path.abspath(os.path.join(os.path.realpath(__file__),
-                                                "../../archive/datasets"))
+    PROJECT_ROOT = utils.get_project_root()
+    archive_path = os.path.join(PROJECT_ROOT, "archive/datasets")
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

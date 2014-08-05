@@ -117,4 +117,5 @@ def handwritten_data_greedy_matching_distance(a, b):
     return distance_sum
 
 if __name__ == '__main__':
-    pass
+    import doctest
+    doctest.testmod()

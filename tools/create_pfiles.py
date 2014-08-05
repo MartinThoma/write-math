@@ -24,7 +24,7 @@ import features
 import time
 import datetime
 import gc
-import natsort
+import utils
 
 
 def make_pfile(dataset_name, folder, features, data, time_prefix):
@@ -102,7 +102,8 @@ def get_sets(path_to_data):
             dataset_by_formula_id[dataset['formula_id']].append(dataset)
         else:
             dataset_by_formula_id[dataset['formula_id']] = [dataset]
-        sys.stdout.write("\rGroup data ... %0.2f%%" % (float(i)/len(datasets)*100))
+        sys.stdout.write("\rGroup data ... %0.2f%%" %
+                         (float(i)/len(datasets)*100))
         sys.stdout.flush()
     print("")
 
@@ -132,6 +133,7 @@ def create_pfile(path_to_data, folder):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
+    logging.info("Start creation of pfiles...")
     logging.info("Get sets from '%s' ..." % path_to_data)
     (training_set, validation_set, test_set, formula_id2index,
      preprocessing_queue) = get_sets(path_to_data)
@@ -192,17 +194,15 @@ def is_valid_file(parser, arg):
         return arg
 
 if __name__ == '__main__':
-    logging.info("Started creation of pfiles.")
+    PROJECT_ROOT = utils.get_project_root()
 
-    scriptpath = os.path.dirname(os.path.realpath(__file__))
-    joined = os.path.join(scriptpath, "../archive/datasets")
-    dataset_dir = os.path.abspath(joined)
-    latest_preprocessed_raw = ""
-    for my_file in natsort.natsorted(os.listdir(dataset_dir), reverse=True):
-        if my_file.endswith("preprocessed.pickle"):
-            latest_preprocessed_raw = os.path.join(dataset_dir, my_file)
-
-    pfile_folder = os.path.abspath(os.path.join(dataset_dir, "../pfiles"))
+    # Get latest model description file
+    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
+    latest_preprocessed_raw = utils.get_latest_in_folder(models_folder,
+                                                         "preprocessed.pickle")
+    # Set pfile folder
+    pfile_folder = os.path.abspath(os.path.join(PROJECT_ROOT,
+                                                "archive/pfiles"))
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,

@@ -15,6 +15,7 @@ import time
 import preprocessing
 import yaml
 import natsort
+import utils
 
 
 def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
@@ -60,17 +61,11 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
+    PROJECT_ROOT = utils.get_project_root()
+
     # Get latest model description file
-    home = os.path.expanduser("~")
-    rcfile = os.path.join(home, ".writemathrc")
-    with open(rcfile, 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
-    PROJECT_ROOT = cfg['root']
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = ""
-    for my_file in natsort.natsorted(os.listdir(models_folder), reverse=True):
-        if my_file.endswith(".yml"):
-            latest_model = os.path.join(models_folder, my_file)
+    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter

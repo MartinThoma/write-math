@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import yaml
+"""Find error in the stored JSON string in the database and fix them."""
+
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
+# My miscallenious helper functions
+import utils
 
 
 def update_data(sql, mysql_local, mysql_online):
@@ -74,6 +77,5 @@ if __name__ == '__main__':
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
     args = parser.parse_args()
-    with open("db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
     main(cfg['mysql_local'], cfg['mysql_online'])

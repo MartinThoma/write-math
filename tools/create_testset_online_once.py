@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
+"""
+Add `is_in_testset` to raw_datasets in MySQL database, so that at least 10%
+of the data online has the flag `is_in_testset`.
+"""
+
 import MySQLdb
 import MySQLdb.cursors
 from HandwrittenData import HandwrittenData
 import random
 import math
-import yaml
-
-"""
-Add `is_in_testset` to raw_datasets in MySQL database, so that at least 10%
-of the data online has the flag `is_in_testset`.
-"""
+import utils
 
 
 def main(mysql):
@@ -66,8 +66,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
     args = parser.parse_args()
-    with open("db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
 
     main(cfg['mysql_online'])
     main(cfg['mysql_local'])

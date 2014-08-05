@@ -16,6 +16,7 @@ import time
 import datetime
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import numpy
+import utils
 
 
 def get_bounding_box_sizes(raw_datasets):
@@ -72,8 +73,10 @@ def get_time_between_controll_points(raw_datasets):
                 if last_point_end is not None:
                     times_between_points.append(point['time'] - last_point_end)
                 last_point_end = point['time']
-        average_between_points.write("%0.2f\n" % numpy.average(times_between_points))
-        average_between_lines.write("%0.2f\n" % numpy.average(times_between_lines))
+        average_between_points.write("%0.2f\n" %
+                                     numpy.average(times_between_points))
+        average_between_lines.write("%0.2f\n" %
+                                    numpy.average(times_between_lines))
 
     average_between_points.close()
     average_between_lines.close()
@@ -97,6 +100,12 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
+    PROJECT_ROOT = utils.get_project_root()
+
+    # Get latest model description file
+    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
+    latest_dataset = utils.get_latest_in_folder(models_folder, ".pickle")
+
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
@@ -105,8 +114,6 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("../archive/datasets/"
-                                 "2014-08-04-18-24-"
-                                 "handwriting_datasets-raw.pickle"))
+                        default=latest_dataset)
     args = parser.parse_args()
     main(args.handwriting_datasets)

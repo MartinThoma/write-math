@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Find outliers in the dataset."""
+
 from HandwrittenData import HandwrittenData
 # Database stuff
 import MySQLdb
 import MySQLdb.cursors
 import preprocessing
 from copy import deepcopy
+import utils
 
 
 class HandwrittenDataM(HandwrittenData):
@@ -211,6 +214,5 @@ if __name__ == '__main__':
                         help="at which raw_data_id should it start?",
                         metavar="RAW_DATA_ID")
     args = parser.parse_args()
-    with open("../website/clients/python/db.config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = utils.get_database_configuration()
     main(cfg, args.i)
