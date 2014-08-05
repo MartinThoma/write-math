@@ -13,6 +13,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 from collections import defaultdict
+import utils
 
 
 def main(picklefile):
@@ -55,12 +56,16 @@ def is_valid_file(parser, arg):
 
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__)
+    PROJECT_ROOT = utils.get_project_root()
+
+    # Get latest data file file
+    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
+    latest_raw = utils.get_latest_in_folder(models_folder, ".pickle")
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--file", dest="picklefile",
-                        default=("../archive/datasets/"
-                                 "2014-08-03-18-06-"
-                                 "handwriting_datasets-raw.pickle"),
+                        default=latest_raw,
                         type=lambda x: is_valid_file(parser, x),
                         help="where is the picklefile", metavar="FILE")
     args = parser.parse_args()

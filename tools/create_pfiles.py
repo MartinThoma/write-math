@@ -196,7 +196,7 @@ def is_valid_file(parser, arg):
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest model description file
+    # Get latest preprocessed data file file
     models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
     latest_preprocessed_raw = utils.get_latest_in_folder(models_folder,
                                                          "preprocessed.pickle")
