@@ -25,8 +25,8 @@ It was tested once on a machine with a Pentium P6200 processor, 4GB ram and a
 * Only 'scale and shift': 476,44s
 * 'scale and shift', 'connect lines', 'douglas_peucker', 'space_evenly': 5420,27s
 
-## Scripts
+### Other script execution times
 
-* `fix_json_errors.py`: Runs automatically over the whole dataset and corrects
-                        JSON strings (raw_data) that are wrong.
-* `find_errors.py`: 
+A: computer with 12GB RAM, Intel(R) Pentium(R) CPU P6200 @ 2.13GHz, INTEL SSDSA2CW16
+
+* `create_pfiles.py`: 3min 30 secons (on A)
