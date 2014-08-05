@@ -25,7 +25,7 @@ def which(program):
 
 def check_python_modules():
     print("## Check modules")
-    required_modules = ['argparse', 'matplotlib', 'detl']
+    required_modules = ['argparse', 'matplotlib', 'natsort', 'detl']
     all_ok = True
 
     for required_module in required_modules:
@@ -45,6 +45,9 @@ def check_python_modules():
         print("argparse version: %s (1.1 tested)" % argparse.__version__)
         import matplotlib
         print("matplotlib version: %s (1.2.1 tested)" % matplotlib.__version__)
+        import natsort
+        print("natsort version: %s (3.4.0 tested, 3.4.0 > required)" %
+              natsort.__version__)
 
 
 def check_executables():
