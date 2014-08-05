@@ -25,22 +25,19 @@ import time
 import datetime
 import gc
 import utils
+import yaml
 
 
-def make_pfile(dataset_name, folder, features, data, time_prefix):
+def make_pfile(dataset_name, features, data, time_prefix,
+               output_filename):
     """ Create the pfile.
     @param filename name of the file that pfile_create will use to create
                     the pfile.
     @param features integer, number of features
     @param data     list of tuples ('feature_string', 'label')
     """
-    input_filename = os.path.abspath(os.path.join(folder,
-                                                  "%s.raw" % dataset_name))
-    output_filename = os.path.abspath(os.path.join(folder,
-                                                   "%s-%s.pfile" %
-                                                   (time_prefix, dataset_name)
-                                                   ))
-
+    input_filename = os.path.abspath("%s.raw" % dataset_name)
+    logging.info("Temporary file: '%s'" % input_filename)
     # create raw data file for pfile_create
     with open(input_filename, "w") as f:
         for symbolnr, instance in enumerate(data):
@@ -77,7 +74,7 @@ def prepare_dataset(dataset, formula_id2index, feature_list):
             sys.stdout.write("\r%0.2f%% (%s remaining)   " %
                              (percentage_done*100, str(tmp)))
             sys.stdout.flush()
-    sys.stdout.write("\r100%                            \n")
+    sys.stdout.write("\r100%" + " "*80 + "\n")
     sys.stdout.flush()
     return prepared
 
@@ -129,7 +126,7 @@ def get_sets(path_to_data):
             preprocessing_queue)
 
 
-def create_pfile(path_to_data, folder):
+def create_pfile(path_to_data, target_paths):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
@@ -177,10 +174,10 @@ def create_pfile(path_to_data, folder):
                                    feature_list)
         logging.info("start 'make_pfile' ...")
         make_pfile(dataset_name,
-                   folder,
                    INPUT_FEATURES,
                    prepared,
-                   time_prefix)
+                   time_prefix,
+                   target_paths[dataset_name])
         t1 = time.time() - t0
         logging.info("%s was written. Needed %0.2f seconds" %
                      (dataset_name, t1))
@@ -196,27 +193,37 @@ def is_valid_file(parser, arg):
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest preprocessed data file file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_preprocessed_raw = utils.get_latest_in_folder(models_folder,
-                                                         "preprocessed.pickle")
-    # Set pfile folder
-    pfile_folder = os.path.abspath(os.path.join(PROJECT_ROOT,
-                                                "archive/pfiles"))
+    # Get latest model description file
+    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
+    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
 
+    # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-d", "--handwriting_datasets",
-                        dest="handwriting_datasets",
-                        help="where are the pickled handwriting_datasets?",
+    parser.add_argument("-m", "--model_description_file",
+                        dest="model_description_file",
+                        help="where is the model description YAML file?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=latest_preprocessed_raw)
-    parser.add_argument("--folder", dest="folder",
-                        help="where should the pfiles be put?",
-                        metavar="FOLDER",
-                        type=lambda x: is_valid_file(parser, x),
-                        default=pfile_folder)
+                        default=latest_model)
     args = parser.parse_args()
-    create_pfile(args.handwriting_datasets, args.folder)
+
+    # Read the model description file
+    with open(args.model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+    # Get preprocessed .pickle file from model description file
+    handwriting_datasets = os.path.join(PROJECT_ROOT,
+                                        model_description['preprocessed'])
+    target_paths = {}
+    for key in model_description['data']:
+        model_description['data'][key] = os.path.join(PROJECT_ROOT,
+                                                      model_description['data'][key])
+        if key == 'training':
+            target_paths['traindata'] = model_description['data'][key]
+        elif key == 'validating':
+            target_paths['validdata'] = model_description['data'][key]
+        elif key == 'testing':
+            target_paths['testdata'] = model_description['data'][key]
+
+    create_pfile(handwriting_datasets, target_paths)
