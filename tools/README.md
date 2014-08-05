@@ -23,5 +23,5 @@ Step 3 and 4 might be done in `../theano-based`:
 
 ## TODO after downloading
 
-* Adjust the `project.yml` to fit to your setup. If you don't have one, you can
-  use `project.template.yml` as a template.
+* Adjust the `~/.writemathrc` to fit to your setup. If you don't have one, you
+  can use `writemathrc.template.yml` as a template.
