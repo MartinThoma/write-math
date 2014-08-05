@@ -77,7 +77,7 @@ def prepare_dataset(dataset, formula_id2index, feature_list):
             sys.stdout.write("\r%0.2f%% (%s remaining)   " %
                              (percentage_done*100, str(tmp)))
             sys.stdout.flush()
-    sys.stdout.write("\r100%%     \n")
+    sys.stdout.write("\r100%                            \n")
     sys.stdout.flush()
     return prepared
 
@@ -202,6 +202,8 @@ if __name__ == '__main__':
         if my_file.endswith("preprocessed.pickle"):
             latest_preprocessed_raw = os.path.join(dataset_dir, my_file)
 
+    pfile_folder = os.path.abspath(os.path.join(dataset_dir, "../pfiles"))
+
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
@@ -215,6 +217,6 @@ if __name__ == '__main__':
                         help="where should the pfiles be put?",
                         metavar="FOLDER",
                         type=lambda x: is_valid_file(parser, x),
-                        default=".")
+                        default=pfile_folder)
     args = parser.parse_args()
     create_pfile(args.handwriting_datasets, args.folder)
