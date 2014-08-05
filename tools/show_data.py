@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Print which symbols are contained in a crossvalidation datasets.pickle file.
+Print which symbols are contained in a datasets .pickle file.
 """
 
 from __future__ import print_function
@@ -34,6 +34,7 @@ def main(picklefile):
             s += "%s (%i), " % (symbol, count)
     print("## Data")
     print("Symbols: %i" % len(symbols))
+    print("Recordings: %i" % sum(symbols.values()))
     print("```")
     print(s[:-1])
     print("```")
