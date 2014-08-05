@@ -25,7 +25,7 @@ def which(program):
 
 def check_python_modules():
     print("## Check modules")
-    required_modules = ['argparse', 'matplotlib', 'natsort', 'detl']
+    required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb', 'detl']
     all_ok = True
 
     for required_module in required_modules:
@@ -48,6 +48,9 @@ def check_python_modules():
         import natsort
         print("natsort version: %s (3.4.0 tested, 3.4.0 > required)" %
               natsort.__version__)
+        import MySQLdb
+        print("MySQLdb version: %s (1.2.3 tested)" %
+              MySQLdb.__version__)
 
 
 def check_executables():
