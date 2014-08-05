@@ -24,6 +24,7 @@ import features
 import time
 import datetime
 import gc
+import natsort
 
 
 def make_pfile(dataset_name, folder, features, data, time_prefix):
@@ -192,6 +193,15 @@ def is_valid_file(parser, arg):
 
 if __name__ == '__main__':
     logging.info("Started creation of pfiles.")
+
+    scriptpath = os.path.dirname(os.path.realpath(__file__))
+    joined = os.path.join(scriptpath, "../archive/datasets")
+    dataset_dir = os.path.abspath(joined)
+    latest_preprocessed_raw = ""
+    for my_file in natsort.natsorted(os.listdir(dataset_dir), reverse=True):
+        if my_file.endswith("preprocessed.pickle"):
+            latest_preprocessed_raw = os.path.join(dataset_dir, my_file)
+
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
@@ -200,8 +210,7 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("../../../archive/datasets/"
-                                 "2014-08-03-18-06-handwriting_datasets-raw.pickle"))
+                        default=latest_preprocessed_raw)
     parser.add_argument("--folder", dest="folder",
                         help="where should the pfiles be put?",
                         metavar="FOLDER",
