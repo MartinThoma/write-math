@@ -20,3 +20,8 @@ Step 3 and 4 might be done in `../theano-based`:
 
 * Only 'scale and shift': 476,44s
 * 'scale and shift', 'connect lines', 'douglas_peucker', 'space_evenly': 5420,27s
+
+## TODO after downloading
+
+* Adjust the `project.yml` to fit to your setup. If you don't have one, you can
+  use `project.template.yml` as a template.
