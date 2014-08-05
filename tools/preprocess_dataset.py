@@ -16,6 +16,12 @@ import preprocessing
 
 
 def create_preprocessed_dataset(path_to_data, preprocessing_queue):
+    # Calculate output path
+    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
+    filename = "%s-handwriting_datasets_preprocessed.pickle" % time_prefix
+    outputpath = os.path.join("../archive/datasets", filename)
+    outputpath = os.path.abspath(outputpath)
+    logging.info("Output will be stored in %s" % outputpath)
     # Load from pickled file
     logging.info("Start loading data...")
     loaded = pickle.load(open(path_to_data))
@@ -34,14 +40,13 @@ def create_preprocessed_dataset(path_to_data, preprocessing_queue):
             sys.stdout.flush()
         # Do the work
         raw_dataset['handwriting'].preprocessing(preprocessing_queue)
+    sys.stdout.write("\r%0.2f%% (done)   \n" % (100))
     print("")
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     pickle.dump({'handwriting_datasets': raw_datasets,
                  'formula_id2latex': loaded['formula_id2latex'],
                  'preprocessing_queue': preprocessing_queue
                  },
-                open("%s-handwriting_datasets_preprocessed.pickle" %
-                     time_prefix, "wb"))
+                open(outputpath, "wb"))
 
 
 def is_valid_file(parser, arg):
@@ -61,7 +66,7 @@ if __name__ == '__main__':
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
                         default=("../archive/datasets/"
-                                 "2014-08-03-18-06-"
+                                 "2014-08-04-18-24-"
                                  "handwriting_datasets-raw.pickle"))
     args = parser.parse_args()
     # Define which preprocessing methods will get applied
