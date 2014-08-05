@@ -55,11 +55,12 @@ def is_valid_file(parser, arg):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description=__doc__)
-    parser.add_argument("--handwriting_datasets", dest="handwriting_datasets",
+    parser.add_argument("-d", "--handwriting_datasets",
+                        dest="handwriting_datasets",
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: is_valid_file(parser, x),
-                        default=("../../../archive/datasets/"
+                        default=("../archive/datasets/"
                                  "2014-08-03-18-06-"
                                  "handwriting_datasets-raw.pickle"))
     args = parser.parse_args()
