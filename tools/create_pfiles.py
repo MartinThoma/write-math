@@ -126,7 +126,7 @@ def get_sets(path_to_data):
             preprocessing_queue)
 
 
-def create_pfile(path_to_data, target_paths):
+def create_pfile(path_to_data, feature_list, target_paths):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
@@ -134,15 +134,6 @@ def create_pfile(path_to_data, target_paths):
     logging.info("Get sets from '%s' ..." % path_to_data)
     (training_set, validation_set, test_set, formula_id2index,
      preprocessing_queue) = get_sets(path_to_data)
-
-    # Define which features will get extracted
-    feature_list = [features.Stroke_Count(),
-                    features.Constant_Point_Coordinates(lines=-1,
-                                                        points_per_line=81,
-                                                        fill_empty_with=0)
-                    #features.First_N_Points(81)
-                    #features.Bitmap(28)
-                    ]
 
     # Get the dimension of the feature vector
     INPUT_FEATURES = sum(map(lambda n: n.get_dimension(), feature_list))
@@ -226,4 +217,18 @@ if __name__ == '__main__':
         elif key == 'testing':
             target_paths['testdata'] = model_description['data'][key]
 
-    create_pfile(handwriting_datasets, target_paths)
+    # Get a list of all used features
+    feature_list = []
+    for feature in model_description['features']:
+        for feat, params in feature.items():
+            feat = features.get_class(feat)
+            if params is None:
+                feature_list.append(feat())
+            else:
+                parameters = {}
+                for dicts in params:
+                    for param_name, param_value in dicts.items():
+                        parameters[param_name] = param_value
+                feature_list.append(feat(**parameters))
+    # Create pfiles!
+    create_pfile(handwriting_datasets, feature_list, target_paths)
