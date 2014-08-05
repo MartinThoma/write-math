@@ -8,18 +8,22 @@ called `YYYY-MM-DD-HH-MM.yml`. Those YAML files should have names like this:
 All paths should be relative to the `write-math` root path.
 
 ```yaml
-data-source: archive/handwriting_datasets-2014-08-01.pickle
+data-source: archive/datasets/2014-08-04-18-24-handwriting_datasets-raw.pickle
+preprocessed: archive/datasets/2014-08-04-18-24-handwriting_datasets-preprocessed.pickle
 data:
-    training: archive/pfiles/2014-08-01-testdata.pfile
-    validating: archive/pfiles/2014-08-01-validdata.pfile
-    testing: archive/pfiles/2014-08-01-traindata.pfile
+    training: archive/pfiles/2014-08-05-17-29-traindata.pfile
+    validating: archive/pfiles/2014-08-05-17-29-validdata.pfile
+    testing: archive/pfiles/2014-08-05-17-29-testdata.pfile
 preprocessing:
-    scale_and_shift:
-    connect_lines:
-    space_evenly:
+    - scale_and_shift:
+    - connect_lines:
+        - minimum_distance: 0.01
+    - douglas_peucker:
+        - EPSILON: 0.01
+    - space_evenly:
         - kind: cubic
         - number: 100
-    scale_and_shift:
+    - scale_and_shift:
 features:
     Stroke_Count:
     Constant_Point_Coordinates:
@@ -29,5 +33,5 @@ features:
 model:
     type: mlp
     topology: '244:488:370'
-    file: '/var/www/write-math/archive/2014-08-01-21-41.json'
+    file: 'archive/2014-08-01-21-41.json'
 ```
