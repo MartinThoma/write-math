@@ -128,13 +128,13 @@ def get_sets(path_to_data):
             preprocessing_queue)
 
 
-def create_pfile(handwriting_datasets, folder):
+def create_pfile(path_to_data, folder):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
-    logging.info("Get sets...")
+    logging.info("Get sets from '%s' ..." % path_to_data)
     (training_set, validation_set, test_set, formula_id2index,
-     preprocessing_queue) = get_sets(handwriting_datasets)
+     preprocessing_queue) = get_sets(path_to_data)
 
     # Define which features will get extracted
     feature_list = [features.Stroke_Count(),
