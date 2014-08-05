@@ -5,12 +5,14 @@ Put all JSON models in here. All models should be named like this:
 Additional information about the model should be organzied in a YAML file
 called `YYYY-MM-DD-HH-MM.yml`. Those YAML files should have names like this:
 
+All paths should be relative to the `write-math` root path.
+
 ```yaml
-data-source: /var/www/write-math/archive/handwriting_datasets-2014-08-01.pickle
+data-source: archive/handwriting_datasets-2014-08-01.pickle
 data:
-    training: /var/www/write-math/archive/2014-08-01-testdata.pfile
-    validating: /var/www/write-math/archive/2014-08-01-validdata.pfile
-    testing: /var/www/write-math/archive/2014-08-01-testdata.pfile
+    training: archive/pfiles/2014-08-01-testdata.pfile
+    validating: archive/pfiles/2014-08-01-validdata.pfile
+    testing: archive/pfiles/2014-08-01-traindata.pfile
 preprocessing:
     scale_and_shift:
     connect_lines:
