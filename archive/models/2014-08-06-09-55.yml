@@ -1,9 +1,9 @@
 data-source: archive/datasets/2014-08-04-18-24-handwriting_datasets-raw.pickle
 preprocessed: archive/datasets/2014-08-05-13-59-handwriting_datasets-preprocessed.pickle
 data:
-    training: archive/pfiles/2014-08-05-17-29-traindata.pfile
-    validating: archive/pfiles/2014-08-05-17-29-validdata.pfile
-    testing: archive/pfiles/2014-08-05-17-29-testdata.pfile
+    training: archive/pfiles/2014-08-06-09-55-traindata.pfile
+    validating: archive/pfiles/2014-08-06-09-55-validdata.pfile
+    testing: archive/pfiles/2014-08-06-09-55-testdata.pfile
 training: nntoolkit train --epochs 300 --learning-rate 1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
 preprocessing:
     - scale_and_shift:
@@ -26,4 +26,4 @@ model:
     type: mlp
     topology: '163:488:370'
     folder: 'archive/models/'
-    basename: '2014-08-05-21-00'
+    basename: '2014-08-06-09-55'
