@@ -9,13 +9,15 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import time
 from HandwrittenData import HandwrittenData  # Needed because of pickle
-import preprocessing
 from dtw_classifier import dtw_classifier
 from make_crossvalidation_dataset import main as make_crossvalidation_dataset
 from download_dataset import main as download_dataset
 import cPickle as pickle
 import logging
 from argparse import ArgumentParser
+import os
+import datetime
+import utils
 
 
 def pp_results(results, data, formula_id2latex):
@@ -23,9 +25,10 @@ def pp_results(results, data, formula_id2latex):
     s = "Raw-Data-ID: %i; Reality: %s\n" % \
         (data['id'], formula_id2latex[data['formula_id']])
     for result in results:
-        s += "\t%0.3f for\t%s\n" % \
+        s += "\t%0.3f for\t%s (Raw_dataset_id: %i)\n" % \
              (result['p'],
-              formula_id2latex[result['formula_id']['formula_id']])
+              formula_id2latex[result['formula_id']['formula_id']],
+              result['formula_id']['handwriting'].raw_data_id)
     return s
 
 
@@ -36,20 +39,15 @@ def main(K_FOLD=10, get_new_dataset=False):
         logging.info("make_crossvalidation_dataset ...")
         make_crossvalidation_dataset()
 
-    logging.info("Load data")
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    tmp = pickle.load(open('cv_datasets.pickle'))
+    PROJECT_ROOT = utils.get_project_root()
+
+    # Get latest model description file
+    cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
+    latest_cv_dataset = utils.get_latest_in_folder(cv_folder, ".pickle")
+    logging.info("Load '%s' ..." % latest_cv_dataset)
+    tmp = pickle.load(open(latest_cv_dataset))
     cv = tmp['cv']
     formula_id2latex = tmp['formula_id2latex']
-
-    # apply preprocessing
-    logging.info("Apply Preprocessing")
-    for i in range(K_FOLD):
-        for data in cv[i]:
-            data['handwriting'].preprocessing(
-                [(preprocessing.scale_and_shift, []),
-                 (preprocessing.douglas_peucker, {'EPSILON': 0.2}),
-                 (preprocessing.space_evenly, {'number': 100})])
 
     # start testing
     logging.info("Start testing")
@@ -67,7 +65,17 @@ def main(K_FOLD=10, get_new_dataset=False):
             if i != testset:
                 learndata += cv[i]
         classifier.learn(learndata)
-        for data in cv[testset]:
+        start_time = time.time()
+        for i_loop, data in enumerate(cv[testset]):
+            if i_loop % 10 == 0 and i_loop > 0:
+                # Show how much work was done / how much work is remaining
+                percentage_done = float(i)/len(cv[testset])
+                current_running_time = time.time() - start_time
+                remaining_seconds = current_running_time / percentage_done
+                tmp = datetime.timedelta(seconds=remaining_seconds)
+                sys.stdout.write("\r%0.2f%% (%s remaining)   " %
+                                 (percentage_done*100, str(tmp)))
+                sys.stdout.flush()
             i += 1
             start = time.time()
             results = classifier.classify(data['handwriting'])
@@ -98,8 +106,9 @@ def main(K_FOLD=10, get_new_dataset=False):
                 ca[testset]['wrong'] += 1
                 ca[testset]['w10'] += 1
 
-            if i % 100 == 0:
+            if i % 1 == 0:
                 logging.info(ca)
+        print("\r100%"+"\033[K\n")
     return ca
 
 if __name__ == '__main__':

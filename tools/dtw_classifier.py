@@ -6,7 +6,7 @@ from collections import defaultdict
 
 
 class dtw_classifier(object):
-    def __init__(self, THRESHOLD=100):
+    def __init__(self, THRESHOLD=1000000):
         self.datasets = []
         # Maximum distance a symbol may have
         self.THRESHOLD = THRESHOLD
@@ -39,37 +39,38 @@ class dtw_classifier(object):
 
         assert type(A) is HandwrittenData.HandwrittenData
 
-        results = []
+        # key: formula_id, value: (dtw, Handwriting) (lowest prefered)
+        best_by_symbol = {}
 
         for key, dataset in enumerate(self.datasets):
             B = dataset['handwriting']
             d = distance_metric.handwritten_data_greedy_matching_distance(A, B)
-            results.append(dict({"dtw": d}.items() + dataset.items()))
+            if d < self.THRESHOLD:
+                if B.formula_id in best_by_symbol:
+                    if d < best_by_symbol[B.formula_id]:
+                        best_by_symbol[B.formula_id] = (d, B)
+                else:
+                    best_by_symbol[B.formula_id] = (d, B)
 
-        results = sorted(results, key=lambda k: k['dtw'])
-        results = filter(lambda var: var['dtw'] < self.THRESHOLD, results)
-        # get only best match for each single symbol
-        results2 = {}
-        for row in results:
-            if row['handwriting'].formula_id in results2:
-                results2[row['handwriting'].formula_id] = min(results2[row['handwriting'].formula_id],
-                                                  row['dtw'])
-            else:
-                results2[row['handwriting'].formula_id] = row['dtw']
-
-        results = [{'formula_id': key, 'dtw': el}
-                   for key, el in results2.items()]
+        results = []
+        for formula_id, tmp in best_by_symbol.items():
+            d, B = tmp
+            results.append({'p': -1,
+                            'dtw': d,
+                            'formula_id': B.formula_id,
+                            'handwriting': B})
         results = sorted(results, key=lambda k: k['dtw'])[:10]
 
         def get_probability_from_distance(results):
             """ Get a list of results with dtw and formula id and return a
                 dict mapping formula-ids to probabilities.
             """
-            distances = [-result['dtw'] for result in results]
+            numeric_factor = 100
+            distances = [-result['dtw']/numeric_factor for result in results]
             softmax_results = distance_metric.softmax(distances)
             probabilities = []
-            for formula_id, p in zip(results, softmax_results):
-                probabilities.append({'formula_id': formula_id, 'p': p})
+            for dictionary, p in zip(results, softmax_results):
+                probabilities.append({'formula_id': dictionary, 'p': p})
             return sorted(probabilities, key=lambda k: k['p'], reverse=True)
 
         return get_probability_from_distance(results)
