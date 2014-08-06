@@ -32,8 +32,8 @@ def create_model(model_folder, basename, model_type, topology, training,
     else:
         latest_model = models[0]
         i = int(latest_model.split("-")[-1].split(".")[0])
-        model_src = os.path.json(model_folder, "%s-%i.json" % (basename, i))
-        model_target = os.path.json(model_folder,
+        model_src = os.path.join(model_folder, "%s-%i.json" % (basename, i))
+        model_target = os.path.join(model_folder,
                                     "%s-%i.json" % (basename, i+1))
 
     # train the model
@@ -69,9 +69,14 @@ if __name__ == "__main__":
     print(model_description['model'])
     modelfile = os.path.join(PROJECT_ROOT,
                              model_description['model']['folder'])
+    data = {}
+    data['training'] = os.path.join(PROJECT_ROOT,
+                                    model_description['data']['training'])
+    data['validating'] = os.path.join(PROJECT_ROOT,
+                                      model_description['data']['validating'])
     create_model(modelfile,
                  model_description['model']['basename'],
                  model_description['model']['type'],
                  model_description['model']['topology'],
                  model_description['training'],
-                 model_description['data'])
+                 data)
