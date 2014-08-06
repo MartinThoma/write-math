@@ -106,10 +106,7 @@ def space_evenly(handwritten_data, number=100, kind='cubic'):
     """Space the points evenly. """
 
     # Make sure that the lists are sorted
-    pointlist = handwritten_data.get_pointlist()
-    for i in range(len(pointlist)):
-        pointlist[i] = sorted(pointlist[i], key=lambda p: p['time'])
-    pointlist = sorted(pointlist, key=lambda line: line[0]['time'])
+    pointlist = handwritten_data.get_sorted_pointlist()
 
     for i in range(len(pointlist)-1):
         # The last point of the previous line should be lower than the first

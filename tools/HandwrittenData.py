@@ -38,6 +38,14 @@ class HandwrittenData(object):
                             self.raw_data_json + "' in `wm_raw_draw_data`.")
         return pointlist
 
+    def get_sorted_pointlist(self):
+        """Make sure that the points and lines are in order."""
+        pointlist = self.get_pointlist()
+        for i in range(len(pointlist)):
+            pointlist[i] = sorted(pointlist[i], key=lambda p: p['time'])
+        pointlist = sorted(pointlist, key=lambda line: line[0]['time'])
+        return pointlist
+
     def set_pointlist(self, pointlist):
         assert type(pointlist) is list, \
             "pointlist is not of type list, but %r" % type(pointlist)

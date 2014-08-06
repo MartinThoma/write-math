@@ -64,7 +64,7 @@ def get_time_between_controll_points(raw_datasets):
         times_between_points = []
         times_between_lines = []
         last_line_end = None
-        for line in raw_dataset['handwriting'].get_pointlist():
+        for line in raw_dataset['handwriting'].get_sorted_pointlist():
             if last_line_end is not None:
                 times_between_lines.append(line[-1]['time'] - last_line_end)
             last_line_end = line[-1]['time']
@@ -91,14 +91,6 @@ def main(handwriting_datasets_file):
     get_time_between_controll_points(raw_datasets)
 
 
-def is_valid_file(parser, arg):
-    arg = os.path.abspath(arg)
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return arg
-
-
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
@@ -113,7 +105,7 @@ if __name__ == '__main__':
                         dest="handwriting_datasets",
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
-                        type=lambda x: is_valid_file(parser, x),
+                        type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_dataset)
     args = parser.parse_args()
     main(args.handwriting_datasets)
