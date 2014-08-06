@@ -40,6 +40,7 @@ def get_bounding_box_sizes(raw_datasets):
         widthfile.write(str(b["maxx"] - b["minx"]) + "\n")
         heightfile.write(str(b["maxy"] - b["miny"]) + "\n")
         timefile.write(str(b["maxt"] - b["mint"]) + "\n")
+    print("\r100%"+"\033[K\n")
     widthfile.close()
     heightfile.close()
     timefile.close()
@@ -64,31 +65,41 @@ def get_time_between_controll_points(raw_datasets):
         times_between_points = []
         times_between_lines = []
         last_line_end = None
+        if len(raw_dataset['handwriting'].get_pointlist()) == 0:
+            logging.warning("%i has no content." % raw_dataset['handwriting'].raw_data_id)
+            continue
         for line in raw_dataset['handwriting'].get_sorted_pointlist():
             if last_line_end is not None:
-                times_between_lines.append(line[-1]['time'] - last_line_end)
+                tmp = line[-1]['time'] - last_line_end
+                times_between_lines.append(tmp)
             last_line_end = line[-1]['time']
             last_point_end = None
             for point in line:
                 if last_point_end is not None:
                     times_between_points.append(point['time'] - last_point_end)
                 last_point_end = point['time']
-        average_between_points.write("%0.2f\n" %
-                                     numpy.average(times_between_points))
-        average_between_lines.write("%0.2f\n" %
-                                    numpy.average(times_between_lines))
-
+        # The recording might only have one point
+        if len(times_between_points) > 0:
+            average_between_points.write("%0.2f\n" %
+                                         numpy.average(times_between_points))
+        # The recording might only have one line
+        if len(times_between_lines) > 0:
+            average_between_lines.write("%0.2f\n" %
+                                        numpy.average(times_between_lines))
+    print("\r100%"+"\033[K\n")
     average_between_points.close()
     average_between_lines.close()
 
 
 def main(handwriting_datasets_file):
     # Load from pickled file
-    logging.info("Start loading data...")
+    logging.info("Start loading data '%s' ..." % handwriting_datasets_file)
     loaded = pickle.load(open(handwriting_datasets_file))
     raw_datasets = loaded['handwriting_datasets']
-    logging.info("Start analyzing")
-    get_time_between_controll_points(raw_datasets)
+    logging.info("%i datasets loaded." % len(raw_datasets))
+    logging.info("Start analyzing...")
+    #get_time_between_controll_points(raw_datasets)
+    get_bounding_box_sizes(raw_datasets)
 
 
 if __name__ == '__main__':
@@ -96,7 +107,7 @@ if __name__ == '__main__':
 
     # Get latest model description file
     models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_dataset = utils.get_latest_in_folder(models_folder, ".pickle")
+    latest_dataset = utils.get_latest_in_folder(models_folder, "raw.pickle")
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
