@@ -56,30 +56,39 @@ class Stroke_Count(object):
 
 
 class Constant_Point_Coordinates(object):
-    def __init__(self, lines=4, points_per_line=20, fill_empty_with=0):
+    def __init__(self, lines=4, points_per_line=20, fill_empty_with=0,
+                 pen_down=True):
         self.lines = lines
         self.points_per_line = points_per_line
         self.fill_empty_with = fill_empty_with
+        self.pen_down = pen_down
 
     def __repr__(self):
         return ("Constant_Point_Coordinates\n"
                 " - lines: %i\n"
                 " - points per line: %i\n"
-                " - fill empty with: %i\n") % \
-               (self.lines, self.points_per_line, self.fill_empty_with)
+                " - fill empty with: %i\n"
+                " - pen down feature: %r\n") % \
+               (self.lines, self.points_per_line, self.fill_empty_with,
+                self.pen_down)
 
     def __str__(self):
         return ("constant point coordinates\n"
                 " - lines: %i\n"
                 " - points per line: %i\n"
-                " - fill empty with: %i\n") % \
-               (self.lines, self.points_per_line, self.fill_empty_with)
+                " - fill empty with: %i\n"
+                " - pen down feature: %r\n") % \
+               (self.lines, self.points_per_line, self.fill_empty_with,
+                self.pen_down)
 
     def get_dimension(self):
         if self.lines > 0:
             return 2*self.lines * self.points_per_line
         else:
-            return 3*self.points_per_line
+            if self.pen_down:
+                return 3*self.points_per_line
+            else:
+                return 2*self.points_per_line
 
     def __call__(self, handwritten_data):
         assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
@@ -109,9 +118,14 @@ class Constant_Point_Coordinates(object):
                     break
                 x.append(point['x'])
                 x.append(point['y'])
-                x.append(int(point['pen_down']))
-            while len(x) != 3*self.points_per_line:
-                x.append(self.fill_empty_with)
+                if self.pen_down:
+                    x.append(int(point['pen_down']))
+            if self.pen_down:
+                while len(x) != 3*self.points_per_line:
+                    x.append(self.fill_empty_with)
+            else:
+                while len(x) != 2*self.points_per_line:
+                    x.append(self.fill_empty_with)
         return x
 
 
