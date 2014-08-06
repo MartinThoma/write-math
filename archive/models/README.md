@@ -14,6 +14,7 @@ data:
     training: archive/pfiles/2014-08-05-17-29-traindata.pfile
     validating: archive/pfiles/2014-08-05-17-29-validdata.pfile
     testing: archive/pfiles/2014-08-05-17-29-testdata.pfile
+training: nntoolkit train --epochs 300 --learning-rate 1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
 preprocessing:
     - scale_and_shift:
     - connect_lines:
@@ -33,5 +34,6 @@ features:
 model:
     type: mlp
     topology: '244:488:370'
-    file: 'archive/2014-08-01-21-41.json'
+    folder: 'archive/models/'
+    basename: '2014-08-05-21-00'
 ```
