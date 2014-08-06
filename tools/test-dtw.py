@@ -106,7 +106,7 @@ def main(K_FOLD=10, get_new_dataset=False):
                 ca[testset]['wrong'] += 1
                 ca[testset]['w10'] += 1
 
-            if i % 1 == 0:
+            if i % 100 == 0:
                 logging.info(ca)
         print("\r100%"+"\033[K\n")
     return ca
