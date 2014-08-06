@@ -4,7 +4,7 @@ data:
     training: archive/pfiles/2014-08-06-09-55-traindata.pfile
     validating: archive/pfiles/2014-08-06-09-55-validdata.pfile
     testing: archive/pfiles/2014-08-06-09-55-testdata.pfile
-training: nntoolkit train --epochs 300 --learning-rate 1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
+training: nntoolkit train --epochs 300 --learning-rate 0.1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
 preprocessing:
     - scale_and_shift:
     - connect_lines:
