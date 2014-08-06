@@ -5,6 +5,15 @@ import yaml
 import natsort
 
 
+def is_valid_file(parser, arg):
+    """Check if arg is a valid file that already exists on the file system."""
+    arg = os.path.abspath(arg)
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
+
 def get_project_root():
     """Get the project root folder as a string."""
     home = os.path.expanduser("~")

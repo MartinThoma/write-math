@@ -51,14 +51,6 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
                 open(outputpath, "wb"))
 
 
-def is_valid_file(parser, arg):
-    arg = os.path.abspath(arg)
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return arg
-
-
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
@@ -74,7 +66,7 @@ if __name__ == '__main__':
                         dest="model_description_file",
                         help="where is the model description YAML file?",
                         metavar="FILE",
-                        type=lambda x: is_valid_file(parser, x),
+                        type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
     args = parser.parse_args()
 

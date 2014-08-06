@@ -49,13 +49,6 @@ def main(picklefile):
     print(a.keys())
 
 
-def is_valid_file(parser, arg):
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return arg
-
-
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
@@ -67,7 +60,7 @@ if __name__ == '__main__':
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--file", dest="picklefile",
                         default=latest_raw,
-                        type=lambda x: is_valid_file(parser, x),
+                        type=lambda x: utils.is_valid_file(parser, x),
                         help="where is the picklefile", metavar="FILE")
     args = parser.parse_args()
     main(args.picklefile)

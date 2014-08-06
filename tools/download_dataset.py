@@ -75,13 +75,6 @@ def main(destination):
                 open(destination_path, "wb"))
 
 
-def is_valid_file(parser, arg):
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return arg
-
-
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
     archive_path = os.path.join(PROJECT_ROOT, "archive/datasets")
@@ -91,7 +84,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--destination", dest="destination",
                         default=archive_path,
                         help="where do write the handwriting_dataset.pickle",
-                        type=lambda x: is_valid_file(parser, x),
+                        type=lambda x: utils.is_valid_file(parser, x),
                         metavar="FOLDER")
     args = parser.parse_args()
     main(args.destination)
