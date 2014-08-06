@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+import logging
 import sys
-sys.path.append("/var/www/write-math/website/clients/python")
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
+import time
+from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing
 from dtw_classifier import dtw_classifier
 from make_crossvalidation_dataset import main as make_crossvalidation_dataset
 from download_dataset import main as download_dataset
 import cPickle as pickle
 import logging
-import time
 from argparse import ArgumentParser
-logging.basicConfig(stream=sys.stdout,  # filename='test.log',
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s: %(message)s')
 
 
 def pp_results(results, data, formula_id2latex):
@@ -29,12 +31,13 @@ def pp_results(results, data, formula_id2latex):
 
 def main(K_FOLD=10, get_new_dataset=False):
     if get_new_dataset:
-        print("Download dataset ...")
+        logging.info("Download dataset ...")
         download_dataset()
-        print("make_crossvalidation_dataset ...")
+        logging.info("make_crossvalidation_dataset ...")
         make_crossvalidation_dataset()
 
     logging.info("Load data")
+    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     tmp = pickle.load(open('cv_datasets.pickle'))
     cv = tmp['cv']
     formula_id2latex = tmp['formula_id2latex']

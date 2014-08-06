@@ -2,6 +2,7 @@
 
 import HandwrittenData
 import distance_metric
+from collections import defaultdict
 
 
 class dtw_classifier(object):
@@ -9,6 +10,7 @@ class dtw_classifier(object):
         self.datasets = []
         # Maximum distance a symbol may have
         self.THRESHOLD = THRESHOLD
+        self.datasets_counter = defaultdict(int)  # count data by symbol_id
 
     def learn(self, trainingdata):
         """
@@ -23,7 +25,9 @@ class dtw_classifier(object):
                               HandwrittenData.HandwrittenData), \
                 ("handwritten data is not of type HandwrittenData, "
                  "but of %r") % type(data['handwriting'])
-            self.datasets.append(data)
+            if self.datasets_counter[data['handwriting'].formula_id] < 50:
+                self.datasets_counter[data['handwriting'].formula_id] += 1
+                self.datasets.append(data)
 
     def classify(self, A):
         """
