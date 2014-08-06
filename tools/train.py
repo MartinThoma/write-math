@@ -18,7 +18,7 @@ import utils
 def create_model(model_folder, basename, model_type, topology, training,
                  data):
     models = filter(lambda n: n.endswith(".json"), os.listdir(model_folder))
-    models = filter(lambda n: n.beginswith(basename), models)
+    models = filter(lambda n: n.startswith(basename), models)
     models = natsort.natsorted(models, reverse=True)
     if len(models) == 0:
         logging.info("No base model. Create it...")
