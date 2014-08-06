@@ -114,7 +114,8 @@ class Constant_Point_Coordinates(object):
                         x.append(self.fill_empty_with)
         else:
             for point in handwritten_data.get_pointlist()[0]:
-                if len(x) >= 3*self.points_per_line:
+                if len(x) >= 3*self.points_per_line or \
+                   len(x) >= 2*self.points_per_line and self.pen_down:
                     break
                 x.append(point['x'])
                 x.append(point['y'])

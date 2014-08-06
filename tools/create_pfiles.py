@@ -160,6 +160,7 @@ def create_pfile(path_to_data, feature_list, target_paths):
                                   ("validdata", validation_set),
                                   ("traindata", training_set)]:
         t0 = time.time()
+        logging.info("Start preparing '%s' ..." % dataset_name)
         prepared = prepare_dataset(dataset,
                                    formula_id2index,
                                    feature_list)
