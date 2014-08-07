@@ -5,3 +5,5 @@ python:
 install: "pip install natsort"
 script:
     - cd tools
+after_success:
+  - coveralls

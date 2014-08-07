@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/MartinThoma/write-math.svg?branch=master)](https://travis-ci.org/MartinThoma/write-math)
+[![Coverage Status](https://coveralls.io/repos/MartinThoma/write-math/badge.png)](https://coveralls.io/r/MartinThoma/write-math)
+
 write-math
 ==========
 
