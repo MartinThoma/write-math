@@ -13,7 +13,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import cPickle as pickle
 import time
-import datetime
 import numpy
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import features

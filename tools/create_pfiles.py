@@ -22,7 +22,6 @@ from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
 import features
 import time
-import datetime
 import gc
 import utils
 import yaml

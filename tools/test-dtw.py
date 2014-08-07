@@ -14,7 +14,6 @@ from make_crossvalidation_dataset import main as make_crossvalidation_dataset
 import cPickle as pickle
 import logging
 import os
-import datetime
 import utils
 
 
