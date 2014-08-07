@@ -11,10 +11,8 @@ import time
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 from dtw_classifier import dtw_classifier
 from make_crossvalidation_dataset import main as make_crossvalidation_dataset
-from download_dataset import main as download_dataset
 import cPickle as pickle
 import logging
-from argparse import ArgumentParser
 import os
 import datetime
 import utils
@@ -35,6 +33,7 @@ def pp_results(results, data, formula_id2latex):
 def main(K_FOLD=10, get_new_dataset=False):
     if get_new_dataset:
         logging.info("Download dataset ...")
+        from download_dataset import main as download_dataset
         download_dataset()
         logging.info("make_crossvalidation_dataset ...")
         make_crossvalidation_dataset()
@@ -147,9 +146,9 @@ def main(K_FOLD=10, get_new_dataset=False):
     return ca
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
-
-    # Add more options if you like
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-k", "--kfold", dest="kfold", type=int, default=10,
                         help="K Fold cross validation")
     parser.add_argument("-r", "--refresh", dest="refresh_dataset",
