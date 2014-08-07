@@ -22,7 +22,7 @@ def main(MIN_OCCURENCES=100, K_FOLD=10):
     latest_dataset_file = utils.get_latest_in_folder(models_folder,
                                                      "raw.pickle")
 
-    logging.info("Load raw datasets ...")
+    logging.info("Load raw datasets '%s' ..." % latest_dataset_file)
     loaded = pickle.load(open(latest_dataset_file))
     datasets = loaded['handwriting_datasets']
     logging.info("Raw datasets loaded. Create bins ...")
