@@ -221,13 +221,13 @@ class Ink(object):
         assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
             "handwritten data is not of type HandwrittenData, but of %r" % \
             type(handwritten_data)
-        ink = 0
+        ink = 0.
         # calculate ink used for this symbol
         # TODO: What about dots? What about speed?
         for line in handwritten_data.get_pointlist():
             last_point = None
             for point in line:
                 if last_point is not None:
-                    preprocessing._euclidean_distance(last_point, point)
+                    ink += preprocessing._euclidean_distance(last_point, point)
                 last_point = point
         return [ink]

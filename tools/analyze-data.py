@@ -14,9 +14,32 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import time
 import datetime
-from HandwrittenData import HandwrittenData  # Needed because of pickle
 import numpy
+from HandwrittenData import HandwrittenData  # Needed because of pickle
+import features
 import utils
+
+
+def get_summed_symbol_strok_lengts(raw_datasets):
+    """For each symbol: sum up the length of all strokes."""
+    strokefile = open("stroke-lengths.txt", "a")
+    start_time = time.time()
+    calculate_ink = features.Ink()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            # Show how much work was done / how much work is remaining
+            percentage_done = float(i)/len(raw_datasets)
+            current_running_time = time.time() - start_time
+            remaining_seconds = current_running_time / percentage_done
+            tmp = datetime.timedelta(seconds=remaining_seconds)
+            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
+                             (percentage_done*100, str(tmp)))
+            sys.stdout.flush()
+        # Do the work
+        ink = calculate_ink(raw_dataset['handwriting'])[0]
+        strokefile.write("%0.2f\n" % ink)
+    print("\r100%"+"\033[K\n")
+    strokefile.close()
 
 
 def get_bounding_box_sizes(raw_datasets):
@@ -66,7 +89,8 @@ def get_time_between_controll_points(raw_datasets):
         times_between_lines = []
         last_line_end = None
         if len(raw_dataset['handwriting'].get_pointlist()) == 0:
-            logging.warning("%i has no content." % raw_dataset['handwriting'].raw_data_id)
+            logging.warning("%i has no content." %
+                            raw_dataset['handwriting'].raw_data_id)
             continue
         for line in raw_dataset['handwriting'].get_sorted_pointlist():
             if last_line_end is not None:
@@ -99,7 +123,8 @@ def main(handwriting_datasets_file):
     logging.info("%i datasets loaded." % len(raw_datasets))
     logging.info("Start analyzing...")
     #get_time_between_controll_points(raw_datasets)
-    get_bounding_box_sizes(raw_datasets)
+    #get_bounding_box_sizes(raw_datasets)
+    get_summed_symbol_strok_lengts(raw_datasets)
 
 
 if __name__ == '__main__':
