@@ -76,14 +76,7 @@ def main(K_FOLD=10, get_new_dataset=False):
         start_time = time.time()
         for i_loop, data in enumerate(cv[testset]):
             if i_loop % 10 == 0 and i_loop > 0:
-                # Show how much work was done / how much work is remaining
-                percentage_done = float(i)/len(cv[testset])
-                current_running_time = time.time() - start_time
-                remaining_seconds = current_running_time / percentage_done
-                tmp = datetime.timedelta(seconds=remaining_seconds)
-                sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                                 (percentage_done*100, str(tmp)))
-                sys.stdout.flush()
+                utils.print_status(len(cv[testset]), i, start_time)
             i += 1
             start = time.time()
             results = classifier.classify(data['handwriting'])

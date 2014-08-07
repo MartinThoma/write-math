@@ -1,8 +1,25 @@
 #!/usr/bin/env python
 
+"""Utility functions that can be used in multiple scripts."""
+
+import sys
 import os
 import yaml
 import natsort
+import time
+import datetime
+
+
+def print_status(total, current, start_time=None):
+    """Show how much work was done / how much work is remaining"""
+    percentage_done = float(current)/total
+    sys.stdout.write("\r%0.2f%% " % percentage_done*100)
+    if start_time is not None:
+        current_running_time = time.time() - start_time
+        remaining_seconds = current_running_time / percentage_done
+        tmp = datetime.timedelta(seconds=remaining_seconds)
+        sys.stdout.write("(%s remaining)   " % str(tmp))
+    sys.stdout.flush()
 
 
 def is_valid_file(parser, arg):
@@ -24,7 +41,10 @@ def get_project_root():
 
 
 def get_latest_in_folder(folder, ending="", default=""):
-    latest = ""
+    """Get the file that comes last with natural sorting in folder and has
+       file ending 'ending'.
+    """
+    latest = default
     for my_file in natsort.natsorted(os.listdir(folder), reverse=True):
         if my_file.endswith(ending):
             latest = os.path.join(folder, my_file)
@@ -32,11 +52,12 @@ def get_latest_in_folder(folder, ending="", default=""):
 
 
 def get_database_config_file():
-    PROJECT_ROOT = get_project_root()
-    return os.path.join(PROJECT_ROOT, "tools/db.config.yml")
+    """Get the absolute path to the database configuration file."""
+    return os.path.join(get_project_root(), "tools/db.config.yml")
 
 
 def get_database_configuration():
+    """Get database configuration as dictionary."""
     with open(get_database_config_file(), 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     return cfg

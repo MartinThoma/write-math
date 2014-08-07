@@ -28,28 +28,28 @@ import utils
 import yaml
 
 
-def make_pfile(dataset_name, features, data, time_prefix,
+def make_pfile(dataset_name, feature_count, data,
                output_filename):
     """ Create the pfile.
     @param filename name of the file that pfile_create will use to create
                     the pfile.
-    @param features integer, number of features
+    @param feature_count integer, number of features
     @param data     list of tuples ('feature_string', 'label')
     """
     input_filename = os.path.abspath("%s.raw" % dataset_name)
-    logging.info("Temporary file: '%s'" % input_filename)
+    logging.info("Temporary file: '%s'", input_filename)
     # create raw data file for pfile_create
     with open(input_filename, "w") as f:
         for symbolnr, instance in enumerate(data):
             feature_string, label = instance
-            assert len(feature_string) == features, \
+            assert len(feature_string) == feature_count, \
                 "Expected %i features, got %i features" % \
-                (features, len(feature_string))
+                (feature_count, len(feature_string))
             feature_string = " ".join(map(str, feature_string))
             line = "%i 0 %s %i" % (symbolnr, feature_string, label)
             print(line, file=f)
     command = "pfile_create -i %s -f %i -l 1 -o %s" % \
-              (input_filename, features, output_filename)
+              (input_filename, feature_count, output_filename)
     logging.info(command)
     os.system(command)
     os.remove(input_filename)
@@ -66,14 +66,7 @@ def prepare_dataset(dataset, formula_id2index, feature_list):
         y = formula_id2index[data['formula_id']]  # Get label
         prepared.append((x, y))
         if i % 100 == 0 and i > 0:
-            # Show how much work was done / how much work is remaining
-            percentage_done = float(i)/len(dataset)
-            current_running_time = time.time() - start_time
-            remaining_seconds = current_running_time / percentage_done
-            tmp = datetime.timedelta(seconds=remaining_seconds)
-            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                             (percentage_done*100, str(tmp)))
-            sys.stdout.flush()
+            utils.print_status(len(dataset), i, start_time)
     sys.stdout.write("\r100%" + " "*80 + "\n")
     sys.stdout.flush()
     return prepared
@@ -99,9 +92,8 @@ def get_sets(path_to_data):
             dataset_by_formula_id[dataset['formula_id']].append(dataset)
         else:
             dataset_by_formula_id[dataset['formula_id']] = [dataset]
-        sys.stdout.write("\rGroup data ... %0.2f%%" %
-                         (float(i)/len(datasets)*100))
-        sys.stdout.flush()
+        logging.info("Group data ...")
+        utils.print_status(len(datasets), i)
     print("")
 
     # Create the test-, validation- and training set
@@ -154,8 +146,6 @@ def create_pfile(path_to_data, feature_list, target_paths):
     print("```")
     logging.info("## Start creating pfiles")
 
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-
     for dataset_name, dataset in [("testdata", test_set),
                                   ("validdata", validation_set),
                                   ("traindata", training_set)]:
@@ -168,7 +158,6 @@ def create_pfile(path_to_data, feature_list, target_paths):
         make_pfile(dataset_name,
                    INPUT_FEATURES,
                    prepared,
-                   time_prefix,
                    target_paths[dataset_name])
         t1 = time.time() - t0
         logging.info("%s was written. Needed %0.2f seconds" %
@@ -203,8 +192,8 @@ if __name__ == '__main__':
                                         model_description['preprocessed'])
     target_paths = {}
     for key in model_description['data']:
-        model_description['data'][key] = os.path.join(PROJECT_ROOT,
-                                                      model_description['data'][key])
+        tmp = os.path.join(PROJECT_ROOT, model_description['data'][key])
+        model_description['data'][key] = tmp
         if key == 'training':
             target_paths['traindata'] = model_description['data'][key]
         elif key == 'validating':

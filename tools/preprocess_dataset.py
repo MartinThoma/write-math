@@ -32,14 +32,7 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
     start_time = time.time()
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
-            # Show how much work was done / how much work is remaining
-            percentage_done = float(i)/len(raw_datasets)
-            current_running_time = time.time() - start_time
-            remaining_seconds = current_running_time / percentage_done
-            tmp = datetime.timedelta(seconds=remaining_seconds)
-            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                             (percentage_done*100, str(tmp)))
-            sys.stdout.flush()
+            utils.print_status(len(raw_datasets), i, start_time)
         # Do the work
         raw_dataset['handwriting'].preprocessing(preprocessing_queue)
     sys.stdout.write("\r%0.2f%% (done)   \n" % (100))

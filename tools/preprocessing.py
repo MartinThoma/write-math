@@ -23,14 +23,17 @@ from math import sqrt
 
 
 def _euclidean_distance(p1, p2):
+    """Calculate the euclidean distance of two 2D points."""
     return sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
 
 
 def _flatten(two_dimensional_list):
+    """Flatten a 2D list into a 1D list"""
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
 
 def get_algorithm(algorithm_name):
+    """Get function pointer by string."""
     if algorithm_name == 'scale_and_shift':
         return scale_and_shift
     elif algorithm_name == 'space_evenly':
@@ -170,7 +173,8 @@ def space_evenly(handwritten_data, number=100, kind='cubic'):
         else:
             # linear interpolation
             x, y = numpy.array(x), numpy.array(y)
-            fx, fy = interp1d(t, x, kind='linear'), interp1d(t, y, kind='linear')
+            fx = interp1d(t, x, kind='linear')
+            fy = interp1d(t, y, kind='linear')
         line_info['fx'] = fx
         line_info['fy'] = fy
         times.append(line_info)
@@ -254,14 +258,14 @@ def douglas_peucker(handwritten_data, EPSILON=10):
         # Wenn die maximale Entfernung größer als EPSILON ist, dann rekursiv
         # vereinfachen
         if dmax >= EPSILON:
-                # Recursive call
-                recResults1 = DouglasPeucker(PointList[0:index], EPSILON)
-                recResults2 = DouglasPeucker(PointList[index:], EPSILON)
+            # Recursive call
+            recResults1 = DouglasPeucker(PointList[0:index], EPSILON)
+            recResults2 = DouglasPeucker(PointList[index:], EPSILON)
 
-                # Ergebnisliste aufbauen
-                ResultList = recResults1[:-1] + recResults2
+            # Ergebnisliste aufbauen
+            ResultList = recResults1[:-1] + recResults2
         else:
-                ResultList = [PointList[0], PointList[-1]]
+            ResultList = [PointList[0], PointList[-1]]
 
         # Ergebnis zurückgeben
         return ResultList

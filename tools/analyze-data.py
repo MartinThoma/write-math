@@ -27,15 +27,7 @@ def get_summed_symbol_strok_lengts(raw_datasets):
     calculate_ink = features.Ink()
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
-            # Show how much work was done / how much work is remaining
-            percentage_done = float(i)/len(raw_datasets)
-            current_running_time = time.time() - start_time
-            remaining_seconds = current_running_time / percentage_done
-            tmp = datetime.timedelta(seconds=remaining_seconds)
-            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                             (percentage_done*100, str(tmp)))
-            sys.stdout.flush()
-        # Do the work
+            utils.print_status(len(raw_datasets), i, start_time)
         ink = calculate_ink(raw_dataset['handwriting'])[0]
         strokefile.write("%0.2f\n" % ink)
     print("\r100%"+"\033[K\n")
@@ -43,6 +35,9 @@ def get_summed_symbol_strok_lengts(raw_datasets):
 
 
 def get_bounding_box_sizes(raw_datasets):
+    """Get and save the metrics of each recordings bounding box.
+       That includes width, height and time.
+    """
     bouding_box_sizes = []
     start_time = time.time()
     widthfile = open("widths.txt", "a")
@@ -50,19 +45,11 @@ def get_bounding_box_sizes(raw_datasets):
     timefile = open("times.txt", "a")
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
-            # Show how much work was done / how much work is remaining
-            percentage_done = float(i)/len(raw_datasets)
-            current_running_time = time.time() - start_time
-            remaining_seconds = current_running_time / percentage_done
-            tmp = datetime.timedelta(seconds=remaining_seconds)
-            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                             (percentage_done*100, str(tmp)))
-            sys.stdout.flush()
-        # Do the work
-        b = raw_dataset['handwriting'].get_bounding_box()
-        widthfile.write(str(b["maxx"] - b["minx"]) + "\n")
-        heightfile.write(str(b["maxy"] - b["miny"]) + "\n")
-        timefile.write(str(b["maxt"] - b["mint"]) + "\n")
+            utils.print_status(len(raw_datasets), i, start_time)
+        box = raw_dataset['handwriting'].get_bounding_box()
+        widthfile.write(str(box["maxx"] - box["minx"]) + "\n")
+        heightfile.write(str(box["maxy"] - box["miny"]) + "\n")
+        timefile.write(str(box["maxt"] - box["mint"]) + "\n")
     print("\r100%"+"\033[K\n")
     widthfile.close()
     heightfile.close()
@@ -71,22 +58,18 @@ def get_bounding_box_sizes(raw_datasets):
 
 
 def get_time_between_controll_points(raw_datasets):
+    """For each recording: Store the average time between controll points of
+       one stroke / controll points of two different lines.
+    """
     average_between_points = open("average_time_between_points.txt", "a")
     average_between_lines = open("average_time_between_lines.txt", "a")
     start_time = time.time()
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
-            # Show how much work was done / how much work is remaining
-            percentage_done = float(i)/len(raw_datasets)
-            current_running_time = time.time() - start_time
-            remaining_seconds = current_running_time / percentage_done
-            tmp = datetime.timedelta(seconds=remaining_seconds)
-            sys.stdout.write("\r%0.2f%% (%s remaining)   " %
-                             (percentage_done*100, str(tmp)))
-            sys.stdout.flush()
+            utils.print_status(len(raw_datasets), i, start_time)
+
         # Do the work
-        times_between_points = []
-        times_between_lines = []
+        times_between_points, times_between_lines = [], []
         last_line_end = None
         if len(raw_dataset['handwriting'].get_pointlist()) == 0:
             logging.warning("%i has no content." %
@@ -94,8 +77,7 @@ def get_time_between_controll_points(raw_datasets):
             continue
         for line in raw_dataset['handwriting'].get_sorted_pointlist():
             if last_line_end is not None:
-                tmp = line[-1]['time'] - last_line_end
-                times_between_lines.append(tmp)
+                times_between_lines.append(line[-1]['time'] - last_line_end)
             last_line_end = line[-1]['time']
             last_point_end = None
             for point in line:
@@ -116,11 +98,12 @@ def get_time_between_controll_points(raw_datasets):
 
 
 def main(handwriting_datasets_file):
+    """Start the creation of the wanted metric."""
     # Load from pickled file
-    logging.info("Start loading data '%s' ..." % handwriting_datasets_file)
+    logging.info("Start loading data '%s' ...", handwriting_datasets_file)
     loaded = pickle.load(open(handwriting_datasets_file))
     raw_datasets = loaded['handwriting_datasets']
-    logging.info("%i datasets loaded." % len(raw_datasets))
+    logging.info("%i datasets loaded.", len(raw_datasets))
     logging.info("Start analyzing...")
     #get_time_between_controll_points(raw_datasets)
     #get_bounding_box_sizes(raw_datasets)
@@ -131,8 +114,8 @@ if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
     # Get latest model description file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_dataset = utils.get_latest_in_folder(models_folder, "raw.pickle")
+    MODELS_FOLDER = os.path.join(PROJECT_ROOT, "archive/datasets")
+    LATEST_DATASET = utils.get_latest_in_folder(MODELS_FOLDER, "raw.pickle")
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
@@ -142,6 +125,6 @@ if __name__ == '__main__':
                         help="where are the pickled handwriting_datasets?",
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
-                        default=latest_dataset)
+                        default=LATEST_DATASET)
     args = parser.parse_args()
     main(args.handwriting_datasets)
