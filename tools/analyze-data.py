@@ -14,9 +14,138 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import time
 import numpy
+# My modules
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import features
+import Geometry
 import utils
+
+
+def get_bounding_box_distance(raw_datasets):
+    """Get the distances between bounding boxes of strokes of a single symbol.
+       Can only be applied to recordings with at least two strokes.
+    """
+
+    # TODO: Deal with http://www.martin-thoma.de/write-math/symbol/?id=167
+    # 193
+    # 524
+
+    def get_stroke_bounding_box(stroke):
+        min_x, max_x = stroke[0]['x'], stroke[0]['x']
+        min_y, max_y = stroke[0]['y'], stroke[0]['y']
+        #  if len(stroke) == 1: ?
+        for point in stroke:
+            min_x = min(point['x'], min_x)
+            max_x = max(point['x'], max_x)
+            min_y = min(point['y'], min_y)
+            max_y = max(point['y'], max_y)
+        minp = Geometry.Point(min_x, min_y)
+        maxp = Geometry.Point(max_x, max_y)
+        return Geometry.BoundingBox(minp, maxp)
+
+    def get_bb_distance(a, b):
+        points_a = [Geometry.Point(a.p1.x, a.p1.y),
+                    Geometry.Point(a.p1.x, a.p2.y),
+                    Geometry.Point(a.p2.x, a.p1.y),
+                    Geometry.Point(a.p2.x, a.p2.y)]
+        points_b = [Geometry.Point(b.p1.x, b.p1.y),
+                    Geometry.Point(b.p1.x, b.p2.y),
+                    Geometry.Point(b.p2.x, b.p1.y),
+                    Geometry.Point(b.p2.x, b.p2.y)]
+        min_distance = points_a[0].dist_to(points_b[0])
+        for pa in points_a:
+            for pb in points_b:
+                min_distance = min(min_distance, pa.dist_to(pb))
+        lines_a = [Geometry.LineSegment(points_a[0], points_a[1]),
+                   Geometry.LineSegment(points_a[1], points_a[2]),
+                   Geometry.LineSegment(points_a[2], points_a[3]),
+                   Geometry.LineSegment(points_a[3], points_a[0])]
+        lines_b = [Geometry.LineSegment(points_b[0], points_b[1]),
+                   Geometry.LineSegment(points_b[1], points_b[2]),
+                   Geometry.LineSegment(points_b[2], points_b[3]),
+                   Geometry.LineSegment(points_b[3], points_b[0])]
+        for la in lines_a:
+            for lb in lines_b:
+                min_distance = min(min_distance, la.dist_to(lb))
+        return min_distance
+
+    bbfile = open("bounding_boxdist.txt", "a")
+    start_time = time.time()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            utils.print_status(len(raw_datasets), i, start_time)
+        pointlist = raw_dataset['handwriting'].get_pointlist()
+        if len(pointlist) < 2:
+            continue
+        bounding_boxes = []
+        for stroke in pointlist:
+            # TODO: Get bounding boxes of strokes
+            bounding_boxes.append(get_stroke_bounding_box(stroke))
+
+        got_change = True
+        while got_change:
+            got_change = False
+            i = 0
+            while i < len(bounding_boxes):
+                j = i + 1
+                while j < len(bounding_boxes):
+                    if Geometry.do_bb_intersect(bounding_boxes[i],
+                                                bounding_boxes[j]):
+                        got_change = True
+                        new_bounding_boxes = []
+                        p1x = min(bounding_boxes[i].p1.x, bounding_boxes[j].p1.x)
+                        p1y = min(bounding_boxes[i].p1.y, bounding_boxes[j].p1.y)
+                        p2x = max(bounding_boxes[i].p2.x, bounding_boxes[j].p2.x)
+                        p2y = max(bounding_boxes[i].p2.y, bounding_boxes[j].p2.y)
+                        p1 = Geometry.Point(p1x, p1y)
+                        p2 = Geometry.Point(p2x, p2y)
+                        new_bounding_boxes.append(Geometry.BoundingBox(p1, p2))
+                        for k in range(len(bounding_boxes)):
+                            if k != i and k != j:
+                                new_bounding_boxes.append(bounding_boxes[k])
+                        bounding_boxes = new_bounding_boxes
+                    j += 1
+                i += 1
+
+        # sort bounding boxes (decreasing) by size
+        bounding_boxes = sorted(bounding_boxes,
+                                key=lambda bbox: bbox.get_area(),
+                                reverse=True)
+
+        # Bounding boxes have been merged as far as possible
+        # check their distance and compare it with the highest dimension
+        # (length/height) of the biggest bounding box
+        if len(bounding_boxes) != 1:
+            dist = []
+            for k, bb in enumerate(bounding_boxes):
+                dist_tmp = []
+                for j, bb2 in enumerate(bounding_boxes):
+                    if k == j:
+                        continue
+                    dist_tmp.append(get_bb_distance(bb, bb2))
+                dist.append(min(dist_tmp))
+            dist = max(dist)
+            for i in range(1, len(bounding_boxes)):
+                dist = max(dist, get_bb_distance(bounding_boxes[0],
+                                                 bounding_boxes[i]))
+            dim = max([bb.get_largest_dimension() for bb in bounding_boxes])
+            if dist > dim/2:
+                # print("bounding box largest dimension: %0.2f" % dim)
+                # print("distance of bounding boxes: %0.2f" % dist)
+                # print("bboxes: %s" % str(bounding_boxes))
+                if raw_dataset['handwriting'].formula_id not in [167, 635, 260,
+                                                                 992, 941, 936,
+                                                                 934, 636,
+                                                                 524, 193]:
+                    bbfile.write("%i\n" % raw_dataset['handwriting'].raw_data_id)
+    print("\r100%"+"\033[K\n")
+
+
+def get_max_distances(raw_datasets):
+    """For each symbol and each line of the symbol: Get the maximum
+       two points have. Print this distance to a file.
+    """
+    pass
 
 
 def get_summed_symbol_strok_lengts(raw_datasets):
@@ -49,6 +178,8 @@ def get_bounding_box_sizes(raw_datasets):
         widthfile.write(str(box["maxx"] - box["minx"]) + "\n")
         heightfile.write(str(box["maxy"] - box["miny"]) + "\n")
         timefile.write(str(box["maxt"] - box["mint"]) + "\n")
+        if box["maxx"] - box["minx"] > 400:
+            raw_dataset['handwriting'].show()
     print("\r100%"+"\033[K\n")
     widthfile.close()
     heightfile.close()
@@ -104,9 +235,10 @@ def main(handwriting_datasets_file):
     raw_datasets = loaded['handwriting_datasets']
     logging.info("%i datasets loaded.", len(raw_datasets))
     logging.info("Start analyzing...")
-    #get_time_between_controll_points(raw_datasets)
-    #get_bounding_box_sizes(raw_datasets)
-    get_summed_symbol_strok_lengts(raw_datasets)
+    # get_time_between_controll_points(raw_datasets)
+    # get_bounding_box_sizes(raw_datasets)
+    # get_summed_symbol_strok_lengts(raw_datasets)
+    get_bounding_box_distance(raw_datasets)
 
 
 if __name__ == '__main__':
