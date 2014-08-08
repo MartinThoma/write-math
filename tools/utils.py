@@ -13,7 +13,7 @@ import datetime
 def print_status(total, current, start_time=None):
     """Show how much work was done / how much work is remaining"""
     percentage_done = float(current)/total
-    sys.stdout.write("\r%0.2f%% " % percentage_done*100)
+    sys.stdout.write("\r%0.2f%% " % (percentage_done*100))
     if start_time is not None:
         current_running_time = time.time() - start_time
         remaining_seconds = current_running_time / percentage_done

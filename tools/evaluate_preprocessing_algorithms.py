@@ -191,8 +191,10 @@ def main(cfg, raw_data_start_id):
             Bs = deepcopy(B)
             Bs.preprocessing([(preprocessing.dot_reduction, [0.01])])
             if B != Bs:
-                before_pointcount = sum([len(line) for line in B.get_pointlist()])
-                after_pointcount = sum([len(line) for line in Bs.get_pointlist()])
+                before_pointcount = sum([len(line)
+                                         for line in B.get_pointlist()])
+                after_pointcount = sum([len(line)
+                                        for line in Bs.get_pointlist()])
                 print("Reduced %i lines to %i lines." %
                       (len(B.get_pointlist()), len(Bs.get_pointlist())))
                 print("Reduced %i points to %i points." %
@@ -203,7 +205,8 @@ def main(cfg, raw_data_start_id):
 
         print("[Status] Checked formulas: %i of %i" % (checked_formulas,
                                                        len(formulaid2latex)))
-        print("[Status] Checked raw_data_instances: %i" % checked_raw_data_instances)
+        print("[Status] Checked raw_data_instances: %i" %
+              checked_raw_data_instances)
     print("done")
 
 if __name__ == '__main__':
