@@ -231,3 +231,23 @@ class Ink(object):
                     ink += preprocessing._euclidean_distance(last_point, point)
                 last_point = point
         return [ink]
+
+
+class AspectRatio(object):
+    def __repr__(self):
+        return "Ink"
+
+    def __str__(self):
+        return "ink"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        bb = handwritten_data.get_bounding_box()
+        width = float((bb['maxx']+1) - (bb['minx']-1))
+        height = float((bb['maxy']+1) - (bb['miny']-1))
+        return [width/height]
