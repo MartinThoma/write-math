@@ -1,5 +1,5 @@
-data-source: archive/datasets/2014-08-04-18-24-handwriting_datasets-raw.pickle
-preprocessed: archive/datasets/2014-08-05-13-59-handwriting_datasets-preprocessed.pickle
+data-source: archive/datasets/2014-08-09-16-19-handwriting_datasets-raw.pickle
+preprocessed: archive/datasets/2014-08-09-19-23-handwriting_datasets-preprocessed.pickle
 data:
     training: archive/pfiles/2014-08-05-17-29-traindata.pfile
     validating: archive/pfiles/2014-08-05-17-29-validdata.pfile
