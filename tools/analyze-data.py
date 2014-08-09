@@ -19,6 +19,53 @@ from HandwrittenData import HandwrittenData  # Needed because of pickle
 import features
 import Geometry
 import utils
+from collections import defaultdict
+
+
+def sort_by_formula_id(raw_datasets):
+    by_formula_id = defaultdict(list)
+    for el in raw_datasets:
+        by_formula_id[el['handwriting'].formula_id].append(el['handwriting'])
+    return by_formula_id
+
+
+def analyze_aspect_ratio(raw_datasets):
+    filename = "aspect_ratios-int.txt"
+    open(filename, 'w').close()  # Truncate the file
+    strokefile = open(filename, "a")
+
+    by_formula_id = sort_by_formula_id(raw_datasets)
+    aspect_ratio = features.AspectRatio()
+    data_list = []
+    for formula_id, datasets in by_formula_id.items():
+        values = []
+        for data in datasets:
+            values.append(aspect_ratio(data)[0])
+            if data.formula_id == 183:
+                strokefile.write("%0.4f\n" % aspect_ratio(data)[0])
+        data_list.append((datasets[0].formula_in_latex,
+                          numpy.mean(values),
+                          numpy.std(values)))
+    strokefile.close()
+    data_list = sorted(data_list, key=lambda n: n[2], reverse=True)
+    for latex, mean, std in data_list:
+        print("%s: mean: %0.2f, std: %0.2f" % (latex, mean, std))
+
+
+def get_aspect_ratio(raw_datasets):
+    """For each symbol: sum up the length of all strokes."""
+    filename = "aspect_ratios.txt"
+    open(filename, 'w').close()  # Truncate the file
+    strokefile = open(filename, "a")
+    start_time = time.time()
+    aspect_ratio = features.AspectRatio()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            utils.print_status(len(raw_datasets), i, start_time)
+        ink = aspect_ratio(raw_dataset['handwriting'])[0]
+        strokefile.write("%0.2f\n" % ink)
+    print("\r100%"+"\033[K\n")
+    strokefile.close()
 
 
 def get_bounding_box_distance(raw_datasets):
@@ -69,7 +116,7 @@ def get_bounding_box_distance(raw_datasets):
                 min_distance = min(min_distance, la.dist_to(lb))
         return min_distance
 
-    bbfile = open("bounding_boxdist.txt", "a")
+    bbfile = open("bounding_boxdist.html", "a")
     start_time = time.time()
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
@@ -116,28 +163,43 @@ def get_bounding_box_distance(raw_datasets):
         # check their distance and compare it with the highest dimension
         # (length/height) of the biggest bounding box
         if len(bounding_boxes) != 1:
-            dist = []
+            bb_dist = []
             for k, bb in enumerate(bounding_boxes):
                 dist_tmp = []
                 for j, bb2 in enumerate(bounding_boxes):
                     if k == j:
                         continue
                     dist_tmp.append(get_bb_distance(bb, bb2))
-                dist.append(min(dist_tmp))
-            dist = max(dist)
-            for i in range(1, len(bounding_boxes)):
-                dist = max(dist, get_bb_distance(bounding_boxes[0],
-                                                 bounding_boxes[i]))
+                bb_dist.append(min(dist_tmp))
+            bb_dist = max(bb_dist)
             dim = max([bb.get_largest_dimension() for bb in bounding_boxes])
-            if dist > dim/2:
-                # print("bounding box largest dimension: %0.2f" % dim)
-                # print("distance of bounding boxes: %0.2f" % dist)
-                # print("bboxes: %s" % str(bounding_boxes))
-                if raw_dataset['handwriting'].formula_id not in [167, 635, 260,
-                                                                 992, 941, 936,
-                                                                 934, 636,
-                                                                 524, 193]:
-                    bbfile.write("%i\n" % raw_dataset['handwriting'].raw_data_id)
+            if bb_dist > 1.5*dim:
+                # bounding_box_h = raw_dataset['handwriting'].get_bounding_box()
+                # bbsize = (bounding_box_h['maxx'] - bounding_box_h['minx']) * \
+                #          (bounding_box_h['maxy'] - bounding_box_h['miny'])
+                if raw_dataset['handwriting'].formula_id not in \
+                   [635, 636, 936, 992, 260, 941, 934, 184] and \
+                   raw_dataset['handwriting'].wild_point_count == 0 and \
+                   raw_dataset['handwriting'].missing_line == 0:
+                    # logging.debug("bb_dist: %0.2f" % bb_dist)
+                    # logging.debug("dim: %0.2f" % dim)
+                    # for bb in bounding_boxes:
+                    #     print(bb)
+                    #     print("width: %0.2f" % bb.get_width())
+                    #     print("height: %0.2f" % bb.get_height())
+                    #     print("maxdim: %0.2f" % bb.get_largest_dimension())
+                    # bb_dist = []
+                    # for k, bb in enumerate(bounding_boxes):
+                    #     dist_tmp = []
+                    #     for j, bb2 in enumerate(bounding_boxes):
+                    #         if k == j:
+                    #             continue
+                    #         dist_tmp.append(get_bb_distance(bb, bb2))
+                    #     print(dist_tmp)
+                    #     bb_dist.append(min(dist_tmp))
+                    # raw_dataset['handwriting'].show()
+                    # exit()
+                    bbfile.write("<a href='http://www.martin-thoma.de/write-math/view/?raw_data_id=%i'>a</a>\n" % raw_dataset['handwriting'].raw_data_id)
     print("\r100%"+"\033[K\n")
 
 
@@ -238,7 +300,8 @@ def main(handwriting_datasets_file):
     # get_time_between_controll_points(raw_datasets)
     # get_bounding_box_sizes(raw_datasets)
     # get_summed_symbol_strok_lengts(raw_datasets)
-    get_bounding_box_distance(raw_datasets)
+    # get_bounding_box_distance(raw_datasets)
+    analyze_aspect_ratio(raw_datasets)
 
 
 if __name__ == '__main__':
