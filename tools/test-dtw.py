@@ -43,10 +43,10 @@ def main(K_FOLD=10, get_new_dataset=False):
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     LOGFILE = os.path.join(logging_folder, "%s-DTW.log" % time_prefix)
     with open(LOGFILE, "a") as f:
-        f.write("Correct_Formula_ID,RAW_DATA_ID,1,2,3,4,5,6,7,8,9,10,"
-                "confused 1,confused 2,confused 3,confused 4, confused 5,"
-                "confused 6,confused 7,confused 8, confused 9,"
-                "confused 10\n")
+        stmp = "Correct_Formula_ID,RAW_DATA_ID"
+        for i in range(1, 10+1):
+            stmp += ",%i,confused %i" % i
+        f.write(stmp + "\n")
 
     # Get latest model description file
     cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
@@ -82,30 +82,12 @@ def main(K_FOLD=10, get_new_dataset=False):
             end = time.time()
 
             with open(LOGFILE, "a") as f:
-                f.write(("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,"
-                         "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n") %
-                        (data['formula_id'],
-                         data['id'],
-                         results[0]['formula_id']['formula_id'],
-                         results[1]['formula_id']['formula_id'],
-                         results[2]['formula_id']['formula_id'],
-                         results[3]['formula_id']['formula_id'],
-                         results[4]['formula_id']['formula_id'],
-                         results[5]['formula_id']['formula_id'],
-                         results[6]['formula_id']['formula_id'],
-                         results[7]['formula_id']['formula_id'],
-                         results[8]['formula_id']['formula_id'],
-                         results[9]['formula_id']['formula_id'],
-                         results[0]['formula_id']['handwriting'].raw_data_id,
-                         results[1]['formula_id']['handwriting'].raw_data_id,
-                         results[2]['formula_id']['handwriting'].raw_data_id,
-                         results[3]['formula_id']['handwriting'].raw_data_id,
-                         results[4]['formula_id']['handwriting'].raw_data_id,
-                         results[5]['formula_id']['handwriting'].raw_data_id,
-                         results[6]['formula_id']['handwriting'].raw_data_id,
-                         results[7]['formula_id']['handwriting'].raw_data_id,
-                         results[8]['formula_id']['handwriting'].raw_data_id,
-                         results[9]['formula_id']['handwriting'].raw_data_id))
+                f.write("%i,%i" % (data['formula_id'], data['id']))
+                for i in len(results):
+                    f.write(",%i,%i" % (
+                        results[i]['formula_id']['formula_id'],
+                        results[i]['formula_id']['handwriting'].raw_data_id))
+                f.write("\n")
 
             ca[testset]['processed_datasets'] += 1
             ca[testset]['time'] += end - start
