@@ -69,15 +69,15 @@ class BoundingBox(object):
         """
         return self.p2.x - self.p1.x
 
-    def get_largest_dimension(self):
-        return max(self.get_height(), self.get_width())
-
     def get_height(self):
         """
         >>> BoundingBox(Point(0,0), Point(3,2)).get_height()
         2.0
         """
-        return self.p2.y - self.p1.x
+        return self.p2.y - self.p1.y
+
+    def get_largest_dimension(self):
+        return max(self.get_height(), self.get_width())
 
 
 def do_bb_intersect(a, b):
