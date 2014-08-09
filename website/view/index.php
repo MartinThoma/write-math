@@ -244,6 +244,9 @@ if (isset($_GET['raw_data_id'])) {
                                      "This happens when you try to unaccept ".
                                      "a classification of a formula you ".
                                      "did not write. ");
+        } else {
+            # Redirect to prevent multiple submission
+            header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
         }
     } elseif (isset($_GET['vote'])) {
         // TODO: Check if user has right to vote
