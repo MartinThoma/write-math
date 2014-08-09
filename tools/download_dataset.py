@@ -46,7 +46,9 @@ def main(destination):
     # Go through each formula and download every raw_data instance
     for formula in formulas:
         formula_id2latex[formula['id']] = formula['formula_in_latex']
-        sql = ("SELECT `id`, `data`, `is_in_testset` FROM `wm_raw_draw_data` "
+        sql = ("SELECT `id`, `data`, `is_in_testset`, `wild_point_count`, "
+               "`missing_line` "
+               "FROM `wm_raw_draw_data` "
                "WHERE `accepted_formula_id` = %s" % str(formula['id']))
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
@@ -57,7 +59,9 @@ def main(destination):
                 handwriting = HandwrittenData(raw_data['data'],
                                               formula['id'],
                                               raw_data['id'],
-                                              formula['formula_in_latex'])
+                                              formula['formula_in_latex'],
+                                              raw_data['wild_point_count'],
+                                              raw_data['missing_line'])
                 handwriting_datasets.append({'handwriting': handwriting,
                                              'id': raw_data['id'],
                                              'formula_id': formula['id'],
