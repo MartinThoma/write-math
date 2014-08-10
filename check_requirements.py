@@ -27,31 +27,31 @@ def check_python_modules():
     print("## Check modules")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
                         'cPickle', 'detl']
-    all_ok = True
-
+    found = []
     for required_module in required_modules:
         try:
             imp.find_module(required_module)
             check = "module '%s' ... found" % required_module
-            if hasattr(required_module, '__version__'):
-                check += " (version: %s)" % str(required_module.__version__)
             print(check)
-
+            found.append(required_module)
         except ImportError:
             print("module '%s' ... NOT found" % required_module)
-            all_ok = False
 
-    if all_ok:
+    if "argparse" in found:
         import argparse
         print("argparse version: %s (1.1 tested)" % argparse.__version__)
+    if "matplotlib" in found:
         import matplotlib
         print("matplotlib version: %s (1.2.1 tested)" % matplotlib.__version__)
+    if "natsort" in found:
         import natsort
         print("natsort version: %s (3.4.0 tested, 3.4.0 > required)" %
               natsort.__version__)
+    if "MySQLdb" in found:
         import MySQLdb
         print("MySQLdb version: %s (1.2.3 tested)" %
               MySQLdb.__version__)
+    if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
               cPickle.__version__)
