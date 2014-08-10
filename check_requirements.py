@@ -25,7 +25,8 @@ def which(program):
 
 def check_python_modules():
     print("## Check modules")
-    required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb', 'detl']
+    required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
+                        'cPickle', 'detl']
     all_ok = True
 
     for required_module in required_modules:
@@ -51,6 +52,11 @@ def check_python_modules():
         import MySQLdb
         print("MySQLdb version: %s (1.2.3 tested)" %
               MySQLdb.__version__)
+        import cPickle
+        print("cPickle version: %s (1.71 tested)" %
+              cPickle.__version__)
+        print("cPickle HIGHEST_PROTOCOL: %s (2 required)" %
+              cPickle.HIGHEST_PROTOCOL)
 
 
 def check_executables():
