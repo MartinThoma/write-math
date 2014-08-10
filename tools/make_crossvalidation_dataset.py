@@ -61,7 +61,8 @@ def main(MIN_OCCURENCES=100, K_FOLD=10):
                  'formula_id2index': formula_id2index,
                  'symbols': symbols
                  },
-                open(target_filename, "wb"))
+                open(target_filename, "wb"),
+                2)
 
 
 if __name__ == '__main__':

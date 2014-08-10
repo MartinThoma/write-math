@@ -76,7 +76,8 @@ def main(destination):
     pickle.dump({'handwriting_datasets': handwriting_datasets,
                  'formula_id2latex': formula_id2latex,
                  },
-                open(destination_path, "wb"))
+                open(destination_path, "wb"),
+                2)
 
 
 if __name__ == '__main__':

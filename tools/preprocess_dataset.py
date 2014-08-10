@@ -40,7 +40,8 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
                  'formula_id2latex': loaded['formula_id2latex'],
                  'preprocessing_queue': preprocessing_queue
                  },
-                open(outputpath, "wb"))
+                open(outputpath, "wb"),
+                2)
 
 
 if __name__ == '__main__':
