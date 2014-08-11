@@ -12,7 +12,6 @@ from HandwrittenData import HandwrittenData  # Needed because of pickle
 from dtw_classifier import dtw_classifier
 from make_crossvalidation_dataset import main as make_crossvalidation_dataset
 import cPickle as pickle
-import logging
 import os
 import utils
 
@@ -29,7 +28,60 @@ def pp_results(results, data, formula_id2latex):
     return s
 
 
+def get_cv_data(PROJECT_ROOT):
+    """Get latest cv dataset."""
+    cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
+    latest_cv_dataset = utils.get_latest_in_folder(cv_folder, ".pickle")
+    logging.info("Load '%s' ...", latest_cv_dataset)
+    tmp = pickle.load(open(latest_cv_dataset))
+    cv = tmp['cv']
+    formula_id2latex = tmp['formula_id2latex']
+    return cv, formula_id2latex
+
+
+def store_classification_result_data(ca, results, data, testset,
+                                     formula_id2latex, start, LOGFILE):
+    """Insert latest classification result into ca."""
+    end = time.time()
+
+    # Write hypothesis to logfile
+    with open(LOGFILE, "a") as f:
+        f.write("%i,%i" % (data['formula_id'], data['id']))
+        for i in len(results):
+            f.write(",%i,%i" % (
+                results[i]['formula_id']['formula_id'],
+                results[i]['formula_id']['handwriting'].raw_data_id))
+        f.write("\n")
+
+    ca[testset]['processed_datasets'] += 1
+    ca[testset]['time'] += end - start
+    if len(results) > 0:
+        if results[0]['formula_id']['formula_id'] == data['formula_id']:
+            ca[testset]['correct'] += 1
+            ca[testset]['c10'] += 1
+        else:
+            ca[testset]['wrong'] += 1
+
+            if data['formula_id'] in [r['formula_id']['formula_id']
+                                      for r in results]:
+                ca[testset]['c10'] += 1
+            else:
+                ca[testset]['w10'] += 1
+                # logging.info(pp_results(results,
+                #                         data,
+                #                         formula_id2latex))
+    else:
+        logging.debug("No result for Raw-Data-ID: %i; Reality: %s\n",
+                      data['id'],
+                      formula_id2latex[data['formula_id']])
+        ca[testset]['wrong'] += 1
+        ca[testset]['w10'] += 1
+    return ca
+
+
 def main(K_FOLD=10, get_new_dataset=False):
+    """Do a K_FOLD cross-validation on the latest cv-datasets .pickle file.
+    """
     if get_new_dataset:
         logging.info("Download dataset ...")
         from download_dataset import main as download_dataset
@@ -39,22 +91,21 @@ def main(K_FOLD=10, get_new_dataset=False):
 
     PROJECT_ROOT = utils.get_project_root()
 
+    # Get name of logfile
     logging_folder = os.path.join(PROJECT_ROOT, "archive/logs")
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     LOGFILE = os.path.join(logging_folder, "%s-DTW.log" % time_prefix)
+
+    open(LOGFILE, 'w').close()  # Truncate the file
+
+    # Write header
     with open(LOGFILE, "a") as f:
         stmp = "Correct_Formula_ID,RAW_DATA_ID"
         for i in range(1, 10+1):
             stmp += ",%i,confused %i" % i
         f.write(stmp + "\n")
 
-    # Get latest model description file
-    cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
-    latest_cv_dataset = utils.get_latest_in_folder(cv_folder, ".pickle")
-    logging.info("Load '%s' ..." % latest_cv_dataset)
-    tmp = pickle.load(open(latest_cv_dataset))
-    cv = tmp['cv']
-    formula_id2latex = tmp['formula_id2latex']
+    cv, formula_id2latex = get_cv_data(PROJECT_ROOT)
 
     # start testing
     logging.info("Start testing")
@@ -62,7 +113,7 @@ def main(K_FOLD=10, get_new_dataset=False):
     i = 0
 
     for testset in range(K_FOLD):
-        logging.info("Start test set: %i" % testset)
+        logging.info("Start test set: %i", testset)
         ca.append({'correct': 0, 'wrong': 0, 'c10': 0, 'w10': 0, 'time': 0,
                    'processed_datasets': 0})
         classifier = dtw_classifier()
@@ -77,42 +128,14 @@ def main(K_FOLD=10, get_new_dataset=False):
             if i_loop % 10 == 0 and i_loop > 0:
                 utils.print_status(len(cv[testset]), i, start_time)
             i += 1
+
+            # Classify
             start = time.time()
             results = classifier.classify(data['handwriting'])
-            end = time.time()
-
-            with open(LOGFILE, "a") as f:
-                f.write("%i,%i" % (data['formula_id'], data['id']))
-                for i in len(results):
-                    f.write(",%i,%i" % (
-                        results[i]['formula_id']['formula_id'],
-                        results[i]['formula_id']['handwriting'].raw_data_id))
-                f.write("\n")
-
-            ca[testset]['processed_datasets'] += 1
-            ca[testset]['time'] += end - start
-
-            if len(results) > 0:
-                if results[0]['formula_id']['formula_id'] == data['formula_id']:
-                    ca[testset]['correct'] += 1
-                    ca[testset]['c10'] += 1
-                else:
-                    ca[testset]['wrong'] += 1
-
-                    if data['formula_id'] in [r['formula_id']['formula_id']
-                                              for r in results]:
-                        ca[testset]['c10'] += 1
-                    else:
-                        ca[testset]['w10'] += 1
-                        # logging.info(pp_results(results,
-                        #                         data,
-                        #                         formula_id2latex))
-            else:
-                logging.debug("No result for Raw-Data-ID: %i; Reality: %s\n" %
-                              (data['id'],
-                               formula_id2latex[data['formula_id']]))
-                ca[testset]['wrong'] += 1
-                ca[testset]['w10'] += 1
+            # Store results
+            ca = store_classification_result_data(ca, results, data, testset,
+                                                  formula_id2latex, start,
+                                                  LOGFILE)
 
             if i % 100 == 0:
                 logging.info(ca)
@@ -130,5 +153,4 @@ if __name__ == '__main__':
                         help="refresh dataset")
 
     args = parser.parse_args()
-    ca = main(args.kfold, args.refresh_dataset)
-    print(ca)
+    print(main(args.kfold, args.refresh_dataset))
