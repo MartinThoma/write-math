@@ -5,21 +5,21 @@
 """
 
 from __future__ import print_function
+import os
 import logging
 import sys
-import os
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 import cPickle as pickle
 import time
 import numpy
+from collections import defaultdict
 # My modules
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import features
 import Geometry
 import utils
-from collections import defaultdict
 
 
 def sort_by_formula_id(raw_datasets):
@@ -27,6 +27,33 @@ def sort_by_formula_id(raw_datasets):
     for el in raw_datasets:
         by_formula_id[el['handwriting'].formula_id].append(el['handwriting'])
     return by_formula_id
+
+
+def analyze_feature(raw_datasets, feature, filename):
+    """
+    @param feature - for example feature = features.AspectRatio()
+                   the feature has to be 1 dimensional at the moment
+    @param filename - where to store the result
+    """
+    open(filename, 'w').close()  # Truncate the file
+    f = open(filename, "a")
+
+    by_formula_id = sort_by_formula_id(raw_datasets)
+
+    data_list = []
+    for formula_id, datasets in by_formula_id.items():
+        values = []
+        for data in datasets:
+            values.append(feature(data)[0])
+            if data.formula_id == 183:
+                f.write("%0.4f\n" % feature(data)[0])
+        data_list.append((datasets[0].formula_in_latex,
+                          numpy.mean(values),
+                          numpy.std(values)))
+    f.close()
+    data_list = sorted(data_list, key=lambda n: n[2], reverse=True)
+    for latex, mean, std in data_list:
+        print("%s: mean: %0.2f, std: %0.2f" % (latex, mean, std))
 
 
 def analyze_aspect_ratio(raw_datasets):
