@@ -51,10 +51,10 @@ def store_classification_result_data(ca, results, data, testset,
     # Write hypothesis to logfile
     with open(LOGFILE, "a") as f:
         f.write("%i,%i" % (data['formula_id'], data['id']))
-        for i in len(results):
+        for result in results:
             f.write(",%i,%i" % (
-                results[i]['formula_id']['formula_id'],
-                results[i]['formula_id']['handwriting'].raw_data_id))
+                result['formula_id']['formula_id'],
+                result['formula_id']['handwriting'].raw_data_id))
         f.write("\n")
 
     ca[testset]['processed_datasets'] += 1
