@@ -18,7 +18,8 @@ import time
 import utils
 
 
-def main(destination):
+def main(destination=os.path.join(utils.get_project_root(),
+                                  "archive/datasets")):
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
     destination_path = os.path.join(destination, filename)
