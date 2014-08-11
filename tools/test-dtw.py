@@ -32,11 +32,15 @@ def get_cv_data(PROJECT_ROOT):
     """Get latest cv dataset."""
     cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
     latest_cv_dataset = utils.get_latest_in_folder(cv_folder, ".pickle")
-    logging.info("Load '%s' ...", latest_cv_dataset)
-    tmp = pickle.load(open(latest_cv_dataset))
-    cv = tmp['cv']
-    formula_id2latex = tmp['formula_id2latex']
-    return cv, formula_id2latex
+    if os.path.isfile(latest_cv_dataset):
+        logging.info("Load '%s' ...", latest_cv_dataset)
+        tmp = pickle.load(open(latest_cv_dataset))
+        cv = tmp['cv']
+        formula_id2latex = tmp['formula_id2latex']
+        return cv, formula_id2latex
+    else:
+        sys.exit("No cv-dataset found in archive/cv-datasets. "
+                 "You could try make_crossvalidation_dataset.py.")
 
 
 def store_classification_result_data(ca, results, data, testset,
