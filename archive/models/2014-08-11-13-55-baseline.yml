@@ -1,0 +1,26 @@
+data-source: archive/datasets/2014-08-10-16-58-handwriting_datasets-raw.pickle
+preprocessed: archive/datasets/2014-08-11-13-56-handwriting_datasets-preprocessed.pickle
+data:
+    training: archive/pfiles/2014-08-06-09-55-traindata.pfile
+    validating: archive/pfiles/2014-08-06-09-55-validdata.pfile
+    testing: archive/pfiles/2014-08-06-09-55-testdata.pfile
+training: nntoolkit train --epochs 300 --learning-rate 0.1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
+preprocessing:
+    - remove_duplicate_time:
+    - scale_and_shift:
+    - space_evenly_per_line:
+        - kind: cubic
+        - number: 100
+    - scale_and_shift:
+features:
+    - Stroke_Count:
+    - Constant_Point_Coordinates:
+        - lines: 4
+        - points_per_line: 81
+        - fill_empty_with: 0
+        - pen_down: False
+model:
+    type: mlp
+    topology: '163:488:369'
+    folder: 'archive/models/'
+    basename: '2014-08-11-13-55-baseline'
