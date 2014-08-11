@@ -38,6 +38,8 @@ def get_algorithm(algorithm_name):
         return scale_and_shift
     elif algorithm_name == 'space_evenly':
         return space_evenly
+    elif algorithm_name == 'space_evenly_per_line':
+        return space_evenly_per_line
     elif algorithm_name == 'douglas_peucker':
         return douglas_peucker
     elif algorithm_name == 'connect_lines':
@@ -194,6 +196,38 @@ def space_evenly(handwritten_data, number=100, kind='cubic'):
                 new_pointlist.append({'x': x, 'y': y, 'time': time,
                                       'pen_down': line_intervall['pen_down']})
     handwritten_data.set_pointlist([new_pointlist])
+
+
+def space_evenly_per_line(handwritten_data, number=100, kind='cubic'):
+    """Space the points evenly for every single line seperatly. """
+
+    pointlist = handwritten_data.get_pointlist()
+    new_pointlist = []
+
+    for line in pointlist:
+        new_line = []
+        if len(line) < 4:
+            # Don't do anything if there are less than 4 points
+            new_line = line
+        else:
+            line = sorted(line, key=lambda p: p['time'])
+
+            x, y, t = [], [], []
+
+            for point in line:
+                if point['time'] not in t:
+                    x.append(point['x'])
+                    y.append(point['y'])
+                    t.append(point['time'])
+
+            x, y = numpy.array(x), numpy.array(y)
+            fx, fy = interp1d(t, x, kind=kind), interp1d(t, y, kind=kind)
+            tnew = numpy.linspace(t[0], t[-1], number)
+
+            for x, y, t in zip(fx(tnew), fy(tnew), tnew):
+                new_line.append({'x': x, 'y': y, 'time': t})
+        new_pointlist.append(new_line)
+    handwritten_data.set_pointlist(new_pointlist)
 
 
 def douglas_peucker(handwritten_data, EPSILON=10):
