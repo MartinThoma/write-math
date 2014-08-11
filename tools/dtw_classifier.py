@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+Classify data with a greedy algorithm that is simmilar to DTW (but not DTW!).
+"""
+
 import HandwrittenData
 import distance_metric
 from collections import defaultdict
@@ -42,7 +46,7 @@ class dtw_classifier(object):
         # key: formula_id, value: (dtw, Handwriting) (lowest prefered)
         best_by_symbol = {}
 
-        for key, dataset in enumerate(self.datasets):
+        for dataset in self.datasets:
             B = dataset['handwriting']
             d = distance_metric.handwritten_data_greedy_matching_distance(A, B)
             if d < self.THRESHOLD:
@@ -53,7 +57,7 @@ class dtw_classifier(object):
                     best_by_symbol[B.formula_id] = (d, B)
 
         results = []
-        for formula_id, tmp in best_by_symbol.items():
+        for _, tmp in best_by_symbol.items():
             d, B = tmp
             results.append({'p': -1,
                             'dtw': d,
