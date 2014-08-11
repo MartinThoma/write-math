@@ -2,4 +2,4 @@ All raw / preprocessed .pickle files go here.
 
 You can start with
 
-https://www.dropbox.com/s/3rydk9rcaxttabx/2014-08-09-16-19-handwriting_datasets-raw.pickle
+https://www.dropbox.com/s/eai1gf8e9mayuij/2014-08-10-16-58-handwriting_datasets-raw.pickle

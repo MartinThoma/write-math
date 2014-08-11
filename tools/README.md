@@ -30,3 +30,4 @@ It was tested once on a machine with a Pentium P6200 processor, 4GB ram and a
 A: computer with 12GB RAM, Intel(R) Pentium(R) CPU P6200 @ 2.13GHz, INTEL SSDSA2CW16
 
 * `create_pfiles.py`: 3min 30 secons (on A)
+* `make_crossvalidation_dataset.py`: 33.784s (on A)

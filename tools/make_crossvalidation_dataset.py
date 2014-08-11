@@ -17,12 +17,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 def main(MIN_OCCURENCES=100, K_FOLD=10):
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest model description file
+    # Get latest picke file.
+    # If preprocessing is wanted, it should be done there.
     models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
     latest_dataset_file = utils.get_latest_in_folder(models_folder,
-                                                     "raw.pickle")
+                                                     ".pickle")
 
-    logging.info("Load raw datasets '%s' ..." % latest_dataset_file)
+    logging.info("Load datasets '%s' ..." % latest_dataset_file)
     loaded = pickle.load(open(latest_dataset_file))
     datasets = loaded['handwriting_datasets']
     logging.info("Raw datasets loaded. Create bins ...")
