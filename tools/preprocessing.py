@@ -48,8 +48,29 @@ def get_algorithm(algorithm_name):
         return dot_reduction
     elif algorithm_name == 'remove_wild_points':
         return remove_wild_points
+    elif algorithm_name == 'remove_duplicate_time':
+        return remove_duplicate_time
     else:
         return None
+
+
+def remove_duplicate_time(handwritten_data):
+    """ Make sure that every "time" value is unique.
+    """
+    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+        "handwritten data is not of type HandwrittenData, but of %r" % \
+        type(handwritten_data)
+    pointlist = handwritten_data.get_pointlist()
+    new_pointlist = []
+    t = []
+    for line in pointlist:
+        new_line = []
+        for point in line:
+            if point['time'] not in t:
+                new_line.append(point)
+                t.append(point['time'])
+        new_pointlist.append(new_line)
+    handwritten_data.set_pointlist(new_pointlist)
 
 
 def scale_and_shift(handwritten_data, center=False):

@@ -1,6 +1,7 @@
 data-source: archive/datasets/2014-08-10-16-58-handwriting_datasets-raw.pickle
 preprocessed: archive/datasets/2014-08-11-13-00-handwriting_datasets-preprocessed.pickle
 preprocessing:
+    - remove_duplicate_time:
     - scale_and_shift:
     - connect_lines:
         - minimum_distance: 0.01
