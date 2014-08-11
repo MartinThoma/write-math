@@ -102,7 +102,7 @@ def main(K_FOLD=10, get_new_dataset=False):
     with open(LOGFILE, "a") as f:
         stmp = "Correct_Formula_ID,RAW_DATA_ID"
         for i in range(1, 10+1):
-            stmp += ",%i,confused %i" % i
+            stmp += ",%i,confused %i" % (i, i)
         f.write(stmp + "\n")
 
     cv, formula_id2latex = get_cv_data(PROJECT_ROOT)
