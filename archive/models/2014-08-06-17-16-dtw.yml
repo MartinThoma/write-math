@@ -6,7 +6,7 @@ preprocessing:
         - minimum_distance: 0.01
     - douglas_peucker:
         - EPSILON: 0.01
-    - space_evenly:
+    - space_evenly_per_line:
         - kind: cubic
         - number: 100
     - scale_and_shift:
