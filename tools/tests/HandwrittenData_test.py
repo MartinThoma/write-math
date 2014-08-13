@@ -4,8 +4,10 @@ import sys
 sys.path.append("..")
 from HandwrittenData import HandwrittenData
 import os
+import nose.tools
 
 
+# Test helpers
 def get_all_symbols():
     current_folder = os.path.dirname(os.path.realpath(__file__))
     symbol_folder = os.path.join(current_folder, "symbols")
@@ -21,11 +23,32 @@ def get_symbol(raw_data_id):
     return file_path
 
 
+def get_symbol_as_handwriting(raw_data_id):
+    symbol_file = get_symbol(raw_data_id)
+    with open(symbol_file) as f:
+        data = f.read()
+    a = HandwrittenData(data)
+    return a
+
+
+# Tests
 def load_symbol_test():
     for symbol_file in get_all_symbols():
         with open(symbol_file) as f:
             data = f.read()
-        HandwrittenData(data)
+        a = HandwrittenData(data)
+        assert isinstance(a, HandwrittenData)
+
+
+def set_pointlist_test():
+    a = get_symbol_as_handwriting(97705)
+    a.set_pointlist([[]])
+    nose.tools.assert_equal(a.get_pointlist(), [[]])
+
+
+def show_test():
+    a = get_symbol_as_handwriting(97705)
+    # a.show()  # TODO: how?
 
 
 def width_test():
