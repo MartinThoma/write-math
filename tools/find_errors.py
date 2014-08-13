@@ -230,12 +230,10 @@ def main(cfg, raw_data_start_id):
     for el in formulas:
         formulaid2latex[el['id']] = el['formula_in_latex']
 
-    preprocessing_queue = [(preprocessing.scale_and_shift, []),
-                           # (preprocessing.douglas_peucker,
-                           #  {'EPSILON': 0.2}),
-                           # (preprocessing.space_evenly,
-                           #  {'number': 100,
-                           #   'KIND': 'cubic'})
+    preprocessing_queue = [preprocessing.Scale_and_shift(),
+                           # preprocessing.Douglas_peucker(EPSILON=0.2),
+                           # preprocessing.Space_evenly(number=100,
+                           #                            kind='cubic')
                            ]
 
     checked_formulas = 0

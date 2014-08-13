@@ -6,14 +6,14 @@
 Each algorithm works on the HandwrittenData class. They have to be applied like
 this:
 
->>> import features
->>> a = HandwrittenData(...)
->>> feature_list = [features.Stroke_Count(),
-                    features.Constant_Point_Coordinates(lines=4,
-                                                        points_per_line=20,
-                                                        fill_empty_with=0)
+ >> import features
+ >> a = HandwrittenData(...)
+ >> feature_list = [features.Stroke_Count(), \
+                    features.Constant_Point_Coordinates(lines=4, \
+                                                        points_per_line=20, \
+                                                        fill_empty_with=0)\
                     ]
->>> x = a.feature_extraction(feature_list)
+ >> x = a.feature_extraction(feature_list)
 """
 
 import HandwrittenData
@@ -36,6 +36,47 @@ def get_class(name):
         return Ink
     else:
         return None
+
+
+def get_features(model_description_features):
+    """Get features from a list of dictionaries
+
+    >>> l = [{'Stroke_Count': None}, \
+             {'Constant_Point_Coordinates': \
+              [{'lines': 4}, \
+               {'points_per_line': 81}, \
+               {'fill_empty_with': 0}, \
+               {'pen_down': False}] \
+             } \
+            ]
+    >>> get_features(l)
+    [Stroke_Count, Constant_Point_Coordinates
+     - lines: 4
+     - points per line: 81
+     - fill empty with: 0
+     - pen down feature: False
+    ]
+    """
+    feature_list = []
+    for feature in model_description_features:
+        for feat, params in feature.items():
+            feat = get_class(feat)
+            if params is None:
+                feature_list.append(feat())
+            else:
+                parameters = {}
+                for dicts in params:
+                    for param_name, param_value in dicts.items():
+                        parameters[param_name] = param_value
+                feature_list.append(feat(**parameters))
+    return feature_list
+
+# Only feature calculation classes follow
+# Everyone must have a __str__, __repr__, __call__ and get_dimension function
+# where
+# * __call__ must take exactly one argument of type HandwrittenData
+# * __call__ must return a list of length get_dimension()
+# * get_dimension must return a positive number
 
 
 class Stroke_Count(object):
@@ -251,3 +292,8 @@ class AspectRatio(object):
         width = float((bb['maxx']+1) - (bb['minx']-1))
         height = float((bb['maxy']+1) - (bb['miny']-1))
         return [width/height]
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

@@ -6,15 +6,15 @@ data:
     testing: archive/pfiles/2014-08-06-09-55-testdata.pfile
 training: nntoolkit train --newbob --learning-rate 0.1 --momentum 0.1 {{training}} {{validation}} < {{src_model}} > {{target_model}}
 preprocessing:
-    - scale_and_shift:
-    - connect_lines:
+    - Scale_and_shift:
+    - Connect_lines:
         - minimum_distance: 0.01
-    - douglas_peucker:
+    - Douglas_peucker:
         - EPSILON: 0.01
-    - space_evenly:
+    - Space_evenly:
         - kind: cubic
         - number: 100
-    - scale_and_shift:
+    - Scale_and_shift:
 features:
     - Stroke_Count:
     - Constant_Point_Coordinates:

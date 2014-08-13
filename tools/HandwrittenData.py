@@ -108,13 +108,8 @@ class HandwrittenData(object):
         >>> a.preprocessing(preprocessing_queue)
         """
         assert type(algorithms) is list
-        for algorithm, parameters in algorithms:
-            if type(parameters) is dict:
-                algorithm(self, **parameters)
-            elif type(parameters) is list:
-                algorithm(self, *parameters)
-            else:
-                raise Exception
+        for algorithm in algorithms:
+            algorithm(self)
 
     def feature_extraction(self, algorithms):
         """Get a list of features.

@@ -34,38 +34,27 @@ def fetch_data(raw_data_id):
     return data
 
 
-def display_data(raw_data_string, raw_data_id):
+def display_data(raw_data_string, raw_data_id, latest_model):
+    # Read the model description file
+    with open(latest_model, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+
+    # Get the preprocessing queue
+    tmp = model_description['preprocessing']
+    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
+    # Get Handwriting
+    a = HandwrittenData(raw_data_string, raw_data_id=raw_data_id)
+    a.preprocessing(preprocessing_queue)
+    a.show()
+
+if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
     # Get latest model description file
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
     latest_model = utils.get_latest_in_folder(models_folder, ".yml")
 
-    # Read the model description file
-    with open(latest_model, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-
-    # Get the preprocessing queue
-    preprocessing_queue = []
-    print(model_description['preprocessing'])
-    for el in model_description['preprocessing']:
-        parameters = {}
-        algorithms = el.keys()
-        for algorithm in algorithms:
-            parameters = {}
-            if el[algorithm] is not None:
-                for param in el[algorithm]:
-                    for key in param.keys():
-                        print(key)
-                        parameters[key] = param[key]
-            algorithm = preprocessing.get_algorithm(algorithm)
-            preprocessing_queue.append((algorithm, parameters))
-
-    a = HandwrittenData(raw_data_string, raw_data_id=raw_data_id)
-    a.preprocessing(preprocessing_queue)
-    a.show()
-
-if __name__ == '__main__':
+    # Parse command line arguments
     from argparse import ArgumentParser
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("-i", "--id", dest="id", default=279062,
@@ -73,10 +62,17 @@ if __name__ == '__main__':
                         help="which RAW_DATA_ID do you want?")
     parser.add_argument("--mysql", dest="mysql", default='mysql_online',
                         help="which mysql configuration should be used?")
+    parser.add_argument("-m", "--model_description_file",
+                        dest="model_description_file",
+                        help="where is the model description YAML file?",
+                        metavar="FILE",
+                        type=lambda x: utils.is_valid_file(parser, x),
+                        default=latest_model)
     args = parser.parse_args()
 
+    # do something
     data = fetch_data(args.id)
     if data is None:
         print("RAW_DATA_ID %i does not exist." % args.id)
     else:
-        display_data(data['data'], data['id'])
+        display_data(data['data'], data['id'], args.model_description_file)

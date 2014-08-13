@@ -30,7 +30,7 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
     logging.info("Start applying preprocessing methods")
     start_time = time.time()
     for i, raw_dataset in enumerate(raw_datasets):
-        if i % 100 == 0 and i > 0:
+        if i % 10 == 0 and i > 0:
             utils.print_status(len(raw_datasets), i, start_time)
         # Do the work
         raw_dataset['handwriting'].preprocessing(preprocessing_queue)
@@ -73,19 +73,8 @@ if __name__ == '__main__':
     outputpath = os.path.join(PROJECT_ROOT,
                               model_description['preprocessed'])
     # Get the preprocessing queue
-    preprocessing_queue = []
-    print(model_description['preprocessing'])
-    for el in model_description['preprocessing']:
-        parameters = {}
-        algorithms = el.keys()
-        for algorithm in algorithms:
-            parameters = {}
-            if el[algorithm] is not None:
-                for param in el[algorithm]:
-                    for key in param.keys():
-                        print(key)
-                        parameters[key] = param[key]
-            algorithm = preprocessing.get_algorithm(algorithm)
-            preprocessing_queue.append((algorithm, parameters))
+    tmp = model_description['preprocessing']
+    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
+
     # Do it! Preprcess the data!
     create_preprocessed_dataset(raw_datapath, outputpath, preprocessing_queue)

@@ -268,7 +268,8 @@ def get_bounding_box_sizes(raw_datasets):
         heightfile.write(str(box["maxy"] - box["miny"]) + "\n")
         timefile.write(str(box["maxt"] - box["mint"]) + "\n")
         if box["maxx"] - box["minx"] > 400:
-            raw_dataset['handwriting'].show()
+            #raw_dataset['handwriting'].show()  # Disable for testing
+            pass
     print("\r100%"+"\033[K\n")
     widthfile.close()
     heightfile.close()
@@ -324,10 +325,15 @@ def main(handwriting_datasets_file):
     raw_datasets = loaded['handwriting_datasets']
     logging.info("%i datasets loaded.", len(raw_datasets))
     logging.info("Start analyzing...")
-    # get_time_between_controll_points(raw_datasets)
-    # get_bounding_box_sizes(raw_datasets)
-    # get_summed_symbol_strok_lengts(raw_datasets)
-    # get_bounding_box_distance(raw_datasets)
+    logging.info("get_time_between_controll_points...")
+    get_time_between_controll_points(raw_datasets)
+    logging.info("Bounding box sizes...")
+    get_bounding_box_sizes(raw_datasets)
+    logging.info("get_summed_symbol_strok_lengts...")
+    get_summed_symbol_strok_lengts(raw_datasets)
+    logging.info("get_bounding_box_distance...")
+    get_bounding_box_distance(raw_datasets)
+    logging.info("analyze_aspect_ratio...")
     analyze_aspect_ratio(raw_datasets)
 
 

@@ -7,13 +7,12 @@ Preprocessing algorithms.
 Each algorithm works on the HandwrittenData class. They have to be applied like
 this:
 
->>> a = HandwrittenData(...)
->>> preprocessing_queue = [(preprocessing.scale_and_shift, []), \
-                           (preprocessing.connect_lines, []), \
-                           (preprocessing.douglas_peucker, \
-                            {'EPSILON': 0.2}), \
-                           (preprocessing.space_evenly, {'number': 100})]
->>> a.preprocessing(preprocessing_queue)
+ >> a = HandwrittenData(...)
+ >> preprocessing_queue = [Scale_and_shift(), \
+                           Connect_lines(), \
+                           Douglas_peucker(EPSILON=0.2), \
+                           Space_evenly(number=100)]
+ >> a.preprocessing(preprocessing_queue)
 """
 
 import HandwrittenData
@@ -37,61 +36,116 @@ def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
 
-def get_algorithm(algorithm_name):
+def get_class(algorithm_name):
     """Get function pointer by string."""
-    if algorithm_name == 'scale_and_shift':
-        return scale_and_shift
-    elif algorithm_name == 'space_evenly':
-        return space_evenly
-    elif algorithm_name == 'space_evenly_per_line':
-        return space_evenly_per_line
-    elif algorithm_name == 'douglas_peucker':
-        return douglas_peucker
-    elif algorithm_name == 'connect_lines':
-        return connect_lines
-    elif algorithm_name == 'dot_reduction':
-        return dot_reduction
-    elif algorithm_name == 'remove_wild_points':
-        return remove_wild_points
-    elif algorithm_name == 'remove_duplicate_time':
-        return remove_duplicate_time
+    if algorithm_name == 'Scale_and_shift':
+        return Scale_and_shift
+    elif algorithm_name == 'Space_evenly':
+        return Space_evenly
+    elif algorithm_name == 'Space_evenly_per_line':
+        return Space_evenly_per_line
+    elif algorithm_name == 'Douglas_peucker':
+        return Douglas_peucker
+    elif algorithm_name == 'Connect_lines':
+        return Connect_lines
+    elif algorithm_name == 'Dot_reduction':
+        return Dot_reduction
+    elif algorithm_name == 'Remove_wild_points':
+        return Remove_wild_points
+    elif algorithm_name == 'Remove_duplicate_time':
+        return Remove_duplicate_time
     else:
+        logging.debug("Unknown algorithm '%s'.", algorithm_name)
         return None
 
 
-def remove_duplicate_time(handwritten_data):
-    """ Make sure that every "time" value is unique.
+def get_preprocessing_queue(model_description_preprocessing):
+    """Get preprocessing queue from a list of dictionaries
+
+    >>> l = [{'Remove_duplicate_time': None}, \
+             {'Scale_and_shift': [{'center': True}]} \
+            ]
+    >>> get_preprocessing_queue(l)
+    [Remove_duplicate_time, Scale_and_shift
+     - center: True
+     - max_width: 1
+     - max_height: 1
+    ]
     """
-    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
-        "handwritten data is not of type HandwrittenData, but of %r" % \
-        type(handwritten_data)
-    pointlist = handwritten_data.get_pointlist()
-    new_pointlist = []
-    t = []
-    for line in pointlist:
-        new_line = []
-        for point in line:
-            if point['time'] not in t:
-                new_line.append(point)
-                t.append(point['time'])
-        new_pointlist.append(new_line)
-    handwritten_data.set_pointlist(new_pointlist)
+    preprocessing_queue = []
+    for preprocessing in model_description_preprocessing:
+        for alg, params in preprocessing.items():
+            alg = get_class(alg)
+            if params is None:
+                preprocessing_queue.append(alg())
+            else:
+                parameters = {}
+                for dicts in params:
+                    for param_name, param_value in dicts.items():
+                        parameters[param_name] = param_value
+                preprocessing_queue.append(alg(**parameters))
+    return preprocessing_queue
+
+# Only preprocessing classes follow
+# Everyone must have a __str__, __repr__ and __call__
+# where
+# * __call__ must take exactly one argument of type HandwrittenData
+# * __call__ must call the Handwriting.set_points
 
 
-def scale_and_shift(handwritten_data,
-                    center=False, max_width=1, max_height=1):
+class Remove_duplicate_time(object):
+    """Make sure that every 'time' value is unique."""
+    def __repr__(self):
+        return "Remove_duplicate_time"
+
+    def __str__(self):
+        return "remove duplicate time"
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pointlist = handwritten_data.get_pointlist()
+        new_pointlist = []
+        t = []
+        for line in pointlist:
+            new_line = []
+            for point in line:
+                if point['time'] not in t:
+                    new_line.append(point)
+                    t.append(point['time'])
+            new_pointlist.append(new_line)
+        handwritten_data.set_pointlist(new_pointlist)
+
+
+class Scale_and_shift(object):
     """ Take a list of points and scale and move it so that it's in the
         unit square. Keep the aspect ratio. Optionally center the points
         inside of the unit square.
     """
-    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
-        "handwritten data is not of type HandwrittenData, but of %r" % \
-        type(handwritten_data)
+    def __init__(self, center=False, max_width=1., max_height=1.):
+        self.center = center
+        self.max_width = max_width
+        self.max_height = max_height
 
-    def get_scale_and_shift_parameters(handwritten_data, center=False,
-                                       max_width=1., max_height=1.):
+    def __repr__(self):
+        return ("Scale_and_shift\n"
+                " - center: %r\n"
+                " - max_width: %i\n"
+                " - max_height: %i\n") % \
+            (self.center, self.max_width, self.max_height)
+
+    def __str__(self):
+        return ("Scale and shift\n"
+                " - center: %r\n"
+                " - max_width: %i\n"
+                " - max_height: %i\n") % \
+            (self.center, self.max_width, self.max_height)
+
+    def get_scale_and_shift_parameters(self, handwritten_data):
         """ Take a list of points and calculate the factors for scaling and
-            moving it so that it's in the unit square. Keept the aspect ratio.
+            moving it so that it's in the unit square. Keept the aspect
+            ratio.
             Optionally center the points inside of the unit square.
         """
         a = handwritten_data.get_bounding_box()
@@ -101,15 +155,15 @@ def scale_and_shift(handwritten_data,
 
         factorX, factorY = 1, 1
         if width != 0:
-            factorX = max_width/width
+            factorX = self.max_width/width
 
         if height != 0:
-            factorY = max_height/height
+            factorY = self.max_height/height
 
         factor = min(factorX, factorY)
         addx, addy = 0, 0
 
-        if center:
+        if self.center:
             add = (1 - (max(factorX, factorY) / factor)) / 2
 
             if factor == factorX:
@@ -120,176 +174,232 @@ def scale_and_shift(handwritten_data,
         return {"factor": factor, "addx": addx, "addy": addy,
                 "minx": a['minx'], "miny": a['miny'], "mint": a['mint']}
 
-    tmp = get_scale_and_shift_parameters(handwritten_data, center)
-    factor, addx, addy = tmp['factor'], tmp['addx'], tmp['addy']
-    minx, miny, mint = tmp['minx'], tmp['miny'], tmp['mint']
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
 
-    pointlist = handwritten_data.get_pointlist()
-    for linenr, line in enumerate(pointlist):
-        for key, p in enumerate(line):
-            pointlist[linenr][key] = {"x": (p["x"] - minx) * factor + addx,
-                                      "y": (p["y"] - miny) * factor + addy,
-                                      "time": p["time"] - mint}
-            if "pen_down" in p:
-                pointlist[linenr][key]["pen_down"] = p["pen_down"]
-    handwritten_data.set_pointlist(pointlist)
+        tmp = self.get_scale_and_shift_parameters(handwritten_data)
+        factor, addx, addy = tmp['factor'], tmp['addx'], tmp['addy']
+        minx, miny, mint = tmp['minx'], tmp['miny'], tmp['mint']
+
+        pointlist = handwritten_data.get_pointlist()
+        for linenr, line in enumerate(pointlist):
+            for key, p in enumerate(line):
+                pointlist[linenr][key] = {"x": (p["x"] - minx) * factor + addx,
+                                          "y": (p["y"] - miny) * factor + addy,
+                                          "time": p["time"] - mint}
+                if "pen_down" in p:
+                    pointlist[linenr][key]["pen_down"] = p["pen_down"]
+        handwritten_data.set_pointlist(pointlist)
+        assert self.max_width - handwritten_data.get_width() >= -0.00001, \
+            "max_width: %0.5f; width: %0.5f" % (self.max_width,
+                                                handwritten_data.get_width())
+        assert self.max_height - handwritten_data.get_height() >= -0.00001, \
+            "max_height: %0.5f; height: %0.5f" % \
+            (self.max_height, handwritten_data.get_height())
 
 
-def space_evenly(handwritten_data, number=100, kind='cubic'):
+class Space_evenly(object):
     """Space the points evenly. """
+    def __init__(self, number=100, kind='cubic'):
+        self.number = number
+        self.kind = kind
 
-    # Make sure that the lists are sorted
-    pointlist = handwritten_data.get_sorted_pointlist()
+    def __repr__(self):
+        return ("Space_evenly\n"
+                " - number: %i\n"
+                " - kind: %s\n") % \
+            (self.number, self.kind)
 
-    for i in range(len(pointlist)-1):
-        # The last point of the previous line should be lower than the first
-        # point of the next line
-        assert (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]), \
-            ("Something is wrong with the time. The last point of line %i "
-             "has a time of %0.2f, but the first point of line %i has a "
-             "time of %0.2f. See raw_data_id %s") % \
-            (i,
-             pointlist[i][-1]["time"],
-             i+1,
-             pointlist[i+1][0]["time"],
-             str(handwritten_data.raw_data_id))
+    def __str__(self):
+        return ("Space evenly\n"
+                " - number: %i\n"
+                " - kind: %s\n") % \
+            (self.number, self.kind)
 
-    # calculate "pen_down" strokes
-    times = []
-    for i, line in enumerate(pointlist):
-        line_info = {"start": line[0]['time'],
-                     "end": line[-1]['time'],
-                     "pen_down": True}
-        # set up variables for interpolation
-        x, y, t = [], [], []
-        for point in line:
-            if point['time'] not in t:
-                x.append(point['x'])
-                y.append(point['y'])
-                t.append(point['time'])
-        x, y = numpy.array(x), numpy.array(y)
-        if len(t) == 1:
-            # constant interpolation
-            fx, fy = lambda x: float(x), lambda y: float(y)
-        elif len(t) == 2:
-            # linear interpolation
-            fx, fy = interp1d(t, x, 'linear'), interp1d(t, y, 'linear')
-        elif len(t) == 3:
-            # quadratic interpolation
-            fx, fy = interp1d(t, x, 'quadratic'), interp1d(t, y, 'quadratic')
-        else:
-            fx, fy = interp1d(t, x, kind), interp1d(t, y, kind)
-        line_info['fx'] = fx
-        line_info['fy'] = fy
-        times.append(line_info)
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        # Make sure that the lists are sorted
+        pointlist = handwritten_data.get_sorted_pointlist()
 
-    # Model "pen_up" strokes
-    for i in range(len(pointlist) - 1):
-        line_info = {"start": pointlist[i][-1],
-                     "end": pointlist[i+1][0],
-                     "pen_down": False}
-        x, y, t = [], [], []
-        for point in [pointlist[i][-1], pointlist[i+1][0]]:
-            if point['time'] not in t:
-                x.append(point['x'])
-                y.append(point['y'])
-                t.append(point['time'])
-            else:
-                # TODO: That should not happen
-                pass
-        if len(x) == 1:
-            # constant interpolation
-            fx, fy = lambda x: float(x), lambda y: float(y)
-        else:
-            # linear interpolation
-            x, y = numpy.array(x), numpy.array(y)
-            fx = interp1d(t, x, kind='linear')
-            fy = interp1d(t, y, kind='linear')
-        line_info['fx'] = fx
-        line_info['fy'] = fy
-        times.append(line_info)
+        for i in range(len(pointlist)-1):
+            # The last point of the previous line should be lower than the
+            # first point of the next line
+            assert (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]), \
+                ("Something is wrong with the time. The last point of line %i "
+                 "has a time of %0.2f, but the first point of line %i has a "
+                 "time of %0.2f. See raw_data_id %s") % \
+                (i,
+                 pointlist[i][-1]["time"],
+                 i+1,
+                 pointlist[i+1][0]["time"],
+                 str(handwritten_data.raw_data_id))
 
-    new_pointlist = []
-
-    tnew = numpy.linspace(pointlist[0][0]['time'],
-                          pointlist[-1][-1]['time'],
-                          number)
-
-    for time in tnew:
-        for line_intervall in times:
-            if line_intervall["start"] <= time <= line_intervall["end"]:
-                x = float(line_intervall['fx'](time))
-                y = float(line_intervall['fy'](time))
-                time = float(time)
-                new_pointlist.append({'x': x, 'y': y, 'time': time,
-                                      'pen_down': line_intervall['pen_down']})
-    handwritten_data.set_pointlist([new_pointlist])
-
-
-def space_evenly_per_line(handwritten_data, number=100, kind='cubic'):
-    """Space the points evenly for every single line seperatly. """
-
-    pointlist = handwritten_data.get_pointlist()
-    new_pointlist = []
-
-    for line in pointlist:
-        new_line = []
-        if len(line) < 4:
-            # Don't do anything if there are less than 4 points
-            new_line = line
-        else:
-            line = sorted(line, key=lambda p: p['time'])
-
+        # calculate "pen_down" strokes
+        times = []
+        for i, line in enumerate(pointlist):
+            line_info = {"start": line[0]['time'],
+                         "end": line[-1]['time'],
+                         "pen_down": True}
+            # set up variables for interpolation
             x, y, t = [], [], []
-
             for point in line:
                 if point['time'] not in t:
                     x.append(point['x'])
                     y.append(point['y'])
                     t.append(point['time'])
-
             x, y = numpy.array(x), numpy.array(y)
-            failed = False
-            try:
-                fx = interp1d(t, x, kind=kind)
-                fy = interp1d(t, y, kind=kind)
-            except Exception as e:
-                if handwritten_data.raw_data_id is not None:
-                    logging.debug("spline failed for raw_data_id %i",
-                                  handwritten_data.raw_data_id)
+            if len(t) == 1:
+                # constant interpolation
+                fx, fy = lambda x: float(x), lambda y: float(y)
+            elif len(t) == 2:
+                # linear interpolation
+                fx, fy = interp1d(t, x, 'linear'), interp1d(t, y, 'linear')
+            elif len(t) == 3:
+                # quadratic interpolation
+                fx = interp1d(t, x, 'quadratic')
+                fy = interp1d(t, y, 'quadratic')
+            else:
+                fx, fy = interp1d(t, x, self.kind), interp1d(t, y, self.kind)
+            line_info['fx'] = fx
+            line_info['fy'] = fy
+            times.append(line_info)
+
+        # Model "pen_up" strokes
+        for i in range(len(pointlist) - 1):
+            line_info = {"start": pointlist[i][-1],
+                         "end": pointlist[i+1][0],
+                         "pen_down": False}
+            x, y, t = [], [], []
+            for point in [pointlist[i][-1], pointlist[i+1][0]]:
+                if point['time'] not in t:
+                    x.append(point['x'])
+                    y.append(point['y'])
+                    t.append(point['time'])
                 else:
-                    logging.debug("spline failed")
-                logging.debug(e)
-                failed = True
+                    # TODO: That should not happen
+                    pass
+            if len(x) == 1:
+                # constant interpolation
+                fx, fy = lambda x: float(x), lambda y: float(y)
+            else:
+                # linear interpolation
+                x, y = numpy.array(x), numpy.array(y)
+                fx = interp1d(t, x, kind='linear')
+                fy = interp1d(t, y, kind='linear')
+            line_info['fx'] = fx
+            line_info['fy'] = fy
+            times.append(line_info)
 
-            tnew = numpy.linspace(t[0], t[-1], number)
+        new_pointlist = []
 
-            # linear interpolation fallback due to
-            # https://github.com/scipy/scipy/issues/3868
-            if failed:
+        tnew = numpy.linspace(pointlist[0][0]['time'],
+                              pointlist[-1][-1]['time'],
+                              self.number)
+
+        for time in tnew:
+            for line_intervall in times:
+                if line_intervall["start"] <= time <= line_intervall["end"]:
+                    x = float(line_intervall['fx'](time))
+                    y = float(line_intervall['fy'](time))
+                    time = float(time)
+                    new_pointlist.append({'x': x, 'y': y, 'time': time,
+                                          'pen_down':
+                                          line_intervall['pen_down']})
+        handwritten_data.set_pointlist([new_pointlist])
+
+
+class Space_evenly_per_line(object):
+    """Space the points evenly for every single line seperatly. """
+    def __init__(self, number=100, kind='cubic'):
+        self.number = number
+        self.kind = kind
+
+    def __repr__(self):
+        return ("Space_evenly_per_line\n"
+                " - number: %i\n"
+                " - kind: %s\n") % \
+            (self.number, self.kind)
+
+    def __str__(self):
+        return ("Space evenly per line\n"
+                " - number: %i\n"
+                " - kind: %s\n") % \
+            (self.number, self.kind)
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pointlist = handwritten_data.get_pointlist()
+        new_pointlist = []
+
+        for line in pointlist:
+            new_line = []
+            if len(line) < 4:
+                # Don't do anything if there are less than 4 points
+                new_line = line
+            else:
+                line = sorted(line, key=lambda p: p['time'])
+
+                x, y, t = [], [], []
+
+                for point in line:
+                    x.append(point['x'])
+                    y.append(point['y'])
+                    t.append(point['time'])
+
+                x, y = numpy.array(x), numpy.array(y)
+                failed = False
                 try:
-                    fx = interp1d(t, x, kind='linear')
-                    fy = interp1d(t, y, kind='linear')
-                    failed = False
+                    fx = interp1d(t, x, kind=self.kind)
+                    fy = interp1d(t, y, kind=self.kind)
                 except Exception as e:
-                    raise e
+                    if handwritten_data.raw_data_id is not None:
+                        logging.debug("spline failed for raw_data_id %i",
+                                      handwritten_data.raw_data_id)
+                    else:
+                        logging.debug("spline failed")
+                    logging.debug(e)
+                    failed = True
 
-            for x, y, t in zip(fx(tnew), fy(tnew), tnew):
-                new_line.append({'x': x, 'y': y, 'time': t})
-        new_pointlist.append(new_line)
-    handwritten_data.set_pointlist(new_pointlist)
+                tnew = numpy.linspace(t[0], t[-1], self.number)
+
+                # linear interpolation fallback due to
+                # https://github.com/scipy/scipy/issues/3868
+                if failed:
+                    try:
+                        fx = interp1d(t, x, kind='linear')
+                        fy = interp1d(t, y, kind='linear')
+                        failed = False
+                    except Exception as e:
+                        raise e
+
+                for x, y, t in zip(fx(tnew), fy(tnew), tnew):
+                    new_line.append({'x': x, 'y': y, 'time': t})
+            new_pointlist.append(new_line)
+        handwritten_data.set_pointlist(new_pointlist)
 
 
-def douglas_peucker(handwritten_data, EPSILON=10):
+class Douglas_peucker(object):
     """
      Apply the Douglas-Peucker algorithm to each line of $pointlist seperately.
      @param  array $pointlist see pointList()
      @return pointlist
     """
+    def __init__(self, EPSILON):
+        self.EPSILON = EPSILON
 
-    pointlist = handwritten_data.get_pointlist()
+    def __repr__(self):
+        return "Douglas_peucker (EPSILON: %0.2f)\n" % self.EPSILON
 
-    def DouglasPeucker(PointList, EPSILON):
+    def __str__(self):
+        return "Douglas_peucker (EPSILON: %0.2f)\n" % self.EPSILON
+
+    def DouglasPeucker(self, PointList, EPSILON):
         def LotrechterAbstand(p3, p1, p2):
             """
              * Calculate the distance from p3 to the line defined by p1 and p2.
@@ -343,8 +453,8 @@ def douglas_peucker(handwritten_data, EPSILON=10):
         # vereinfachen
         if dmax >= EPSILON:
             # Recursive call
-            recResults1 = DouglasPeucker(PointList[0:index], EPSILON)
-            recResults2 = DouglasPeucker(PointList[index:], EPSILON)
+            recResults1 = self.DouglasPeucker(PointList[0:index], EPSILON)
+            recResults2 = self.DouglasPeucker(PointList[index:], EPSILON)
 
             # Ergebnisliste aufbauen
             ResultList = recResults1[:-1] + recResults2
@@ -354,91 +464,141 @@ def douglas_peucker(handwritten_data, EPSILON=10):
         # Ergebnis zurückgeben
         return ResultList
 
-    for i in range(0, len(pointlist)):
-        pointlist[i] = DouglasPeucker(pointlist[i], EPSILON)
-    handwritten_data.set_pointlist(pointlist)
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pointlist = handwritten_data.get_pointlist()
+
+        for i in range(0, len(pointlist)):
+            pointlist[i] = self.DouglasPeucker(pointlist[i], self.EPSILON)
+        handwritten_data.set_pointlist(pointlist)
 
 
-def connect_lines(handwritten_data, minimum_distance=0.05):
+class Connect_lines(object):
     """Detect if lines were probably accidentially disconnected. If that is the
        case, connect them.
     """
-    assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
-        "handwritten data is not of type HandwrittenData, but of %r" % \
-        type(handwritten_data)
+    def __init__(self, minimum_distance=0.05):
+        self.minimum_distance = minimum_distance
 
-    pointlist = handwritten_data.get_pointlist()
+    def __repr__(self):
+        return "Connect_lines (minimum_distance: %0.2f)" % \
+            self.minimum_distance
 
-    # Connecting lines makes only sense when there are multiple lines
-    if len(pointlist) > 1:
-        lines = []
-        last_appended = False
-        i = 0
-        while i < len(pointlist)-1:
-            last_point = pointlist[i][-1]
-            first_point = pointlist[i+1][0]
-            if _euclidean_distance(last_point, first_point) < minimum_distance:
-                lines.append(pointlist[i]+pointlist[i+1])
-                pointlist[i+1] = lines[-1]
-                if i == len(pointlist)-2:
-                    last_appended = True
+    def __str__(self):
+        return "Connect lines (minimum_distance: %0.2f)" % \
+            self.minimum_distance
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pointlist = handwritten_data.get_pointlist()
+
+        # Connecting lines makes only sense when there are multiple lines
+        if len(pointlist) > 1:
+            lines = []
+            last_appended = False
+            i = 0
+            while i < len(pointlist)-1:
+                last_point = pointlist[i][-1]
+                first_point = pointlist[i+1][0]
+                if _euclidean_distance(last_point, first_point) < \
+                   self.minimum_distance:
+                    lines.append(pointlist[i]+pointlist[i+1])
+                    pointlist[i+1] = lines[-1]
+                    if i == len(pointlist)-2:
+                        last_appended = True
+                    i += 1
+                else:
+                    lines.append(pointlist[i])
                 i += 1
-            else:
-                lines.append(pointlist[i])
-            i += 1
-        if not last_appended:
-            lines.append(pointlist[-1])
-        handwritten_data.set_pointlist(lines)
+            if not last_appended:
+                lines.append(pointlist[-1])
+            handwritten_data.set_pointlist(lines)
 
 
-def dot_reduction(handwritten_data, threshold):
+class Dot_reduction(object):
     """Reduce lines where the maximum distance between points is below a
        threshold to a single dot.
     """
+    def __init__(self, threshold):
+        self.threshold = threshold
 
-    def get_max_distance(L):
-        """Find the maximum distance between two points in a list of points
-        @param  list L list of points
-        @return float  maximum distance bewtween two points
-        """
-        if len(L) <= 1:
-            return -1
-        else:
-            max_dist = _euclidean_distance(L[0], L[1])
-            for i in range(len(L)-1):
-                for j in range(i+1, len(L)):
-                    max_dist = max(_euclidean_distance(L[i], L[j]), max_dist)
-            return max_dist
+    def __repr__(self):
+        return "Dot_reduction (threshold: %0.2f)" % \
+            self.threshold
 
-    def get_average_point(L):
-        """Calculate the average point.
-        @param  list L List of points
-        @return dict   a single point
-        """
-        x, y, t = 0, 0, 0
-        for point in L:
-            x += point['x']
-            y += point['y']
-            t += point['time']
-        x = float(x) / len(L)
-        y = float(y) / len(L)
-        t = float(t) / len(L)
-        return {'x': x, 'y': y, 'time': t}
+    def __str__(self):
+        return "Dot_reduction (threshold: %0.2f)" % \
+            self.threshold
 
-    new_pointlist = []
-    pointlist = handwritten_data.get_pointlist()
-    for line in pointlist:
-        new_line = line
-        if len(line) > 1 and get_max_distance(line) < threshold:
-            new_line = [get_average_point(line)]
-        new_pointlist.append(new_line)
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
 
-    handwritten_data.set_pointlist(new_pointlist)
+        def get_max_distance(L):
+            """Find the maximum distance between two points in a list of points
+            @param  list L list of points
+            @return float  maximum distance bewtween two points
+            """
+            if len(L) <= 1:
+                return -1
+            else:
+                max_dist = _euclidean_distance(L[0], L[1])
+                for i in range(len(L)-1):
+                    for j in range(i+1, len(L)):
+                        max_dist = max(_euclidean_distance(L[i], L[j]),
+                                       max_dist)
+                return max_dist
+
+        def get_average_point(L):
+            """Calculate the average point.
+            @param  list L List of points
+            @return dict   a single point
+            """
+            x, y, t = 0, 0, 0
+            for point in L:
+                x += point['x']
+                y += point['y']
+                t += point['time']
+            x = float(x) / len(L)
+            y = float(y) / len(L)
+            t = float(t) / len(L)
+            return {'x': x, 'y': y, 'time': t}
+
+        new_pointlist = []
+        pointlist = handwritten_data.get_pointlist()
+        for line in pointlist:
+            new_line = line
+            if len(line) > 1 and get_max_distance(line) < self.threshold:
+                new_line = [get_average_point(line)]
+            new_pointlist.append(new_line)
+
+        handwritten_data.set_pointlist(new_pointlist)
 
 
-def remove_wild_points(handwritten_data):
+class Remove_wild_points(object):
     """Find wild points and remove them."""
-    # Bounding box criterion:
-    # If the distance from point to all others strokes bounding boxes is
-    # more than 1/5 of the whole size, it is a wild point
-    pass
+    def __repr__(self):
+        return "Connect_lines"
+
+    def __str__(self):
+        return "Connect lines (minimum_distance: %0.2f)" % \
+            self.minimum_distance
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pass
+        # Bounding box criterion:
+        # If the distance from point to all others strokes bounding boxes is
+        # more than 1/5 of the whole size, it is a wild point
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

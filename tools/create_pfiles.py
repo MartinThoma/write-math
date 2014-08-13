@@ -134,8 +134,8 @@ def create_pfile(path_to_data, feature_list, target_paths):
 
     print("#### Preprocessing")
     print("```")
-    for algorithm, options in preprocessing_queue:
-        print("* %r with %r" % (algorithm, options))
+    for algorithm in preprocessing_queue:
+        print("* " + str(algorithm))
     print("```")
 
     print("#### Features (%i)" % INPUT_FEATURES)
@@ -153,6 +153,7 @@ def create_pfile(path_to_data, feature_list, target_paths):
         prepared = prepare_dataset(dataset,
                                    formula_id2index,
                                    feature_list)
+        logging.info("%s length: %i", dataset_name, len(prepared))
         logging.info("start 'make_pfile' ...")
         make_pfile(dataset_name,
                    INPUT_FEATURES,
@@ -201,17 +202,7 @@ if __name__ == '__main__':
             target_paths['testdata'] = model_description['data'][key]
 
     # Get a list of all used features
-    feature_list = []
-    for feature in model_description['features']:
-        for feat, params in feature.items():
-            feat = features.get_class(feat)
-            if params is None:
-                feature_list.append(feat())
-            else:
-                parameters = {}
-                for dicts in params:
-                    for param_name, param_value in dicts.items():
-                        parameters[param_name] = param_value
-                feature_list.append(feat(**parameters))
+    feature_list = features.get_features(model_description['features'])
+
     # Create pfiles!
     create_pfile(handwriting_datasets, feature_list, target_paths)

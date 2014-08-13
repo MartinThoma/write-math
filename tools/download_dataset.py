@@ -19,9 +19,13 @@ import utils
 
 
 def main(destination=os.path.join(utils.get_project_root(),
-                                  "archive/datasets")):
+                                  "archive/datasets"),
+         small_dataset=False):
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
+    if small_dataset:
+        filename = "%s-handwriting_datasets-small-raw.pickle" % time_prefix
+    else:
+        filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
     destination_path = os.path.join(destination, filename)
     logging.info("Data will be written to '%s'" % destination_path)
     cfg = utils.get_database_configuration()
@@ -34,10 +38,19 @@ def main(destination=os.path.join(utils.get_project_root(),
     cursor = connection.cursor()
 
     # Get all formulas that should get examined
-    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-           "WHERE `is_important` = 1 "  # only use the important symbol subset
-           "AND id != 1 "  # exclude trash class
-           "ORDER BY `id` ASC")
+    if small_dataset:
+        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
+               # only use the important symbol subset
+               "WHERE `is_important` = 1 "
+               "AND id != 1 "  # exclude trash class
+               "AND id <= 56 "
+               "ORDER BY `id` ASC")
+    else:
+        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
+               # only use the important symbol subset
+               "WHERE `is_important` = 1 "
+               "AND id != 1 "  # exclude trash class
+               "ORDER BY `id` ASC")
     cursor.execute(sql)
     formulas = cursor.fetchall()
 
@@ -92,5 +105,9 @@ if __name__ == '__main__':
                         help="where do write the handwriting_dataset.pickle",
                         type=lambda x: utils.is_valid_file(parser, x),
                         metavar="FOLDER")
+    parser.add_argument("-s", "--small", dest="small",
+                        action="store_true", default=False,
+                        help=("should only a small dataset (with all capital "
+                              "letters) be created?"))
     args = parser.parse_args()
-    main(args.destination)
+    main(args.destination, args.small)

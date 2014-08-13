@@ -137,19 +137,16 @@ def main(cfg, raw_data_start_id):
     for el in formulas:
         formulaid2latex[el['id']] = el['formula_in_latex']
 
-    preprocessing_queue = [(preprocessing.scale_and_shift, []),
-                           # (preprocessing.douglas_peucker,
-                           #  {'EPSILON': 0.2}),
-                           # (preprocessing.space_evenly,
-                           #  {'number': 100,
-                           #   'KIND': 'cubic'})
+    preprocessing_queue = [preprocessing.Scale_and_shift(),
+                           # preprocessing.Douglas_peucker(EPSILON=0.2),
+                           # preprocessing.Space_evenly(number=100,
+                           #                            kind='cubic')
                            ]
 
     checked_formulas = 0
     checked_raw_data_instances = 0
 
     for formula_id in formulaid2latex.keys():
-        alread_shown_in_browser = False
         if formula_id == 1:
             # This formula id is for trash. No need to look at it.
             continue
@@ -189,7 +186,7 @@ def main(cfg, raw_data_start_id):
                                  formulaid2latex[formula_id])
             B.preprocessing(preprocessing_queue)
             Bs = deepcopy(B)
-            Bs.preprocessing([(preprocessing.dot_reduction, [0.01])])
+            Bs.preprocessing([preprocessing.Dot_reduction(0.01)])
             if B != Bs:
                 before_pointcount = sum([len(line)
                                          for line in B.get_pointlist()])
