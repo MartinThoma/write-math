@@ -20,6 +20,11 @@ import HandwrittenData
 import numpy
 from scipy.interpolate import interp1d
 from math import sqrt
+import logging
+import sys
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
 
 
 def _euclidean_distance(p1, p2):
@@ -73,7 +78,8 @@ def remove_duplicate_time(handwritten_data):
     handwritten_data.set_pointlist(new_pointlist)
 
 
-def scale_and_shift(handwritten_data, center=False):
+def scale_and_shift(handwritten_data,
+                    center=False, max_width=1, max_height=1):
     """ Take a list of points and scale and move it so that it's in the
         unit square. Keep the aspect ratio. Optionally center the points
         inside of the unit square.
@@ -82,7 +88,8 @@ def scale_and_shift(handwritten_data, center=False):
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(handwritten_data)
 
-    def get_scale_and_shift_parameters(handwritten_data, center=False):
+    def get_scale_and_shift_parameters(handwritten_data, center=False,
+                                       max_width=1., max_height=1.):
         """ Take a list of points and calculate the factors for scaling and
             moving it so that it's in the unit square. Keept the aspect ratio.
             Optionally center the points inside of the unit square.
@@ -94,10 +101,10 @@ def scale_and_shift(handwritten_data, center=False):
 
         factorX, factorY = 1, 1
         if width != 0:
-            factorX = 1./width
+            factorX = max_width/width
 
         if height != 0:
-            factorY = 1./height
+            factorY = max_height/height
 
         factor = min(factorX, factorY)
         addx, addy = 0, 0
@@ -242,8 +249,30 @@ def space_evenly_per_line(handwritten_data, number=100, kind='cubic'):
                     t.append(point['time'])
 
             x, y = numpy.array(x), numpy.array(y)
-            fx, fy = interp1d(t, x, kind=kind), interp1d(t, y, kind=kind)
+            failed = False
+            try:
+                fx = interp1d(t, x, kind=kind)
+                fy = interp1d(t, y, kind=kind)
+            except Exception as e:
+                if handwritten_data.raw_data_id is not None:
+                    logging.debug("spline failed for raw_data_id %i",
+                                  handwritten_data.raw_data_id)
+                else:
+                    logging.debug("spline failed")
+                logging.debug(e)
+                failed = True
+
             tnew = numpy.linspace(t[0], t[-1], number)
+
+            # linear interpolation fallback due to
+            # https://github.com/scipy/scipy/issues/3868
+            if failed:
+                try:
+                    fx = interp1d(t, x, kind='linear')
+                    fy = interp1d(t, y, kind='linear')
+                    failed = False
+                except Exception as e:
+                    raise e
 
             for x, y, t in zip(fx(tnew), fy(tnew), tnew):
                 new_line.append({'x': x, 'y': y, 'time': t})

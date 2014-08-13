@@ -31,3 +31,7 @@ A: computer with 12GB RAM, Intel(R) Pentium(R) CPU P6200 @ 2.13GHz, INTEL SSDSA2
 
 * `create_pfiles.py`: 3min 30 secons (on A)
 * `make_crossvalidation_dataset.py`: 33.784s (on A)
+
+## Tests
+
+Run `nosetests --with-coverage --cover-package=.` for coverage test
