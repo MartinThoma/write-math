@@ -8,10 +8,11 @@ training: nntoolkit train --epochs 300 --learning-rate 0.1 --momentum 0.1 {{trai
 preprocessing:
     - Remove_duplicate_time:
     - Scale_and_shift:
-        - max_width: 100.
-        - max_height: 100.
+        - max_width: 1.
+        - max_height: 1.
+        - center: True
     - Space_evenly_per_line:
-        - kind: cubic
+        - kind: linear
         - number: 20
     - Scale_and_shift:
 features:
