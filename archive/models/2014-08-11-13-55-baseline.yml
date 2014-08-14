@@ -27,6 +27,6 @@ features:
         - pen_down: False
 model:
     type: mlp
-    topology: '163:488:369'
+    topology: '161:500:369'
     folder: 'archive/models/'
     basename: '2014-08-11-13-55-baseline'
