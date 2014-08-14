@@ -19,7 +19,6 @@ preprocessing:
         - max_height: 1.
         - center: True
 features:
-    - Stroke_Count:
     - Constant_Point_Coordinates:
         - lines: 4
         - points_per_line: 20
@@ -27,6 +26,6 @@ features:
         - pen_down: False
 model:
     type: mlp
-    topology: '161:500:369'
+    topology: '160:500:369'
     folder: 'archive/models/'
     basename: '2014-08-11-13-55-baseline'
