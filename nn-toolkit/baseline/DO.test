@@ -16,6 +16,7 @@ MODEL_NAME="baseline"
 ROOT_PATH="/home/mthoma/write-math"
 TRAIN_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-traindata.pfile"
 VALID_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-validdata.pfile"
+TEST_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-testdata.pfile"
 TEMP_PATH="$here/${MODEL_NAME}"
 TRAINED_PATH="${ROOT_PATH}/archive/models"
 
@@ -23,6 +24,6 @@ echo starting with:
 echo out: ${TRAINED_PATH}
 
 
-$detlPath make mlp 160:500:500:369 > "${here}/model-0.json"
+$detlPath test ${TEST_DATA} < "${here}/model-1.json"
 
-if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}.log"; exit 1; } fi
+if [ $? -ne 0 ]; then { echo "** Testing failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}-test.log"; exit 1; } fi
