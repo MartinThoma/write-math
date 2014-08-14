@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# General
+export PATH="/usr/local/cuda/bin/:$PATH"
+export PYTHONPATH="/opt/atlas/lib64/python2.7/site-packages/:/project/ASR_dev2012/DNN/detl/:/project/ASR_dev2012/DNN/detl-extras/"
+
+export LD_LIBRARY_PATH="/usr/local/cuda/lib64/:/usr/local/cuda/lib/:/opt/atlas/lib:/opt/atlas/include:$LD_LIBRARY_PATH"
+export THEANO_FLAGS="mode=FAST_RUN,device=gpu0,floatX=float32,allow_gc=False"
+
+detlPath="/project/ASR_dev2012/DNN/detl/scripts/detl"
+
+here=`pwd`
+
+# Path and Name Declarations
+MODEL_NAME="baseline"
+ROOT_PATH="/home/mthoma/write-math"
+TRAIN_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-traindata.pfile"
+VALID_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-validdata.pfile"
+TEMP_PATH="$here/${MODEL_NAME}"
+TRAINED_PATH="${ROOT_PATH}/archive/models/"
+
+echo starting with:
+echo tmp: ${TEMP_PATH}
+echo out: ${TRAINED_PATH}
+mkdir -p ${TEMP_PATH}
+mkdir -p ${TRAINED_PATH}
+mkdir -p m
+mkdir -p Logs
+
+$detlPath train --epochs 300 --learning-rate 0.1 --momentum 0.1
+  ${TRAIN_DATA} ${VALID_DATA} \
+  > "${TRAINED_PATH}/final_${NL}l.json" \
+  2>> "Logs/${MODEL_NAME}.log"
+
+if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}.log"; exit 1; } fi
+# Place the model somwhere, e.g. in a m/ sub-directory
+#gzip -f "${TDIR}/final_${NL}l.json" 
+cp "${TRAINED_PATH}/final_${NL}l.json" m/
+$detlPath tomat < "m/final_${NL}l.json" > "m/final_${NL}l.mat"
+
+
