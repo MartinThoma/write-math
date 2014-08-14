@@ -6,4 +6,4 @@
 #==============================================================================
 
 
-sbatch -p GPU --gres=gpu:1 -w i13hpc50 -t 50:0 -J write-math DO.GPUtrain
+sbatch -p GPU --gres=gpu:1 -w i13hpc51 -t 10:0:0 -J write-math DO.GPUtrain

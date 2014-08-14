@@ -22,12 +22,7 @@ TRAINED_PATH="${ROOT_PATH}/archive/models"
 echo starting with:
 echo out: ${TRAINED_PATH}
 
-mkdir -p "${here}/logs"
 
-$detlPath train --epochs 300 --learning-rate 0.1 --momentum 0.1 \
-  ${TRAIN_DATA} ${VALID_DATA} \
-  < "${here}/model-0.json" \
-  > "${here}/model-1.json" \
-  2>> "${here}/logs/${MODEL_NAME}.log"
+$detlPath make mlp 160:500:500:369 > "${here}/model-1.json"
 
 if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}.log"; exit 1; } fi
