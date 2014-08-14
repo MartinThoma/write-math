@@ -31,6 +31,7 @@ def create_model(model_folder, basename, model_type, topology, training,
         os.system(command)
     else:
         latest_model = models[0]
+        logging.info("Model '%s' found.", latest_model)
         i = int(latest_model.split("-")[-1].split(".")[0])
         model_src = os.path.join(model_folder, "%s-%i.json" % (basename, i))
         model_target = os.path.join(model_folder,
