@@ -12,7 +12,7 @@ detlPath="/project/ASR_dev2012/DNN/detl/scripts/detl"
 here=`pwd`
 
 # Path and Name Declarations
-MODEL_NAME="baseline-2hidden"
+MODEL_NAME="baseline"
 ROOT_PATH="/home/mthoma/write-math"
 TRAIN_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-traindata.pfile"
 VALID_DATA="${ROOT_PATH}/archive/pfiles/2014-08-06-09-55-validdata.pfile"
@@ -23,6 +23,6 @@ echo starting with:
 echo out: ${TRAINED_PATH}
 
 
-$detlPath make mlp 160:500:500:369 > "${here}/model-1.json"
+$detlPath make mlp 160:500:369 > "${here}/model-1.json"
 
 if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}.log"; exit 1; } fi
