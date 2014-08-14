@@ -23,6 +23,6 @@ echo starting with:
 echo out: ${TRAINED_PATH}
 
 
-$detlPath make mlp 160:500:369 > "${here}/model-1.json"
+$detlPath make mlp 160:500:369 > "${here}/model-0.json"
 
 if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/logs/${MODEL_NAME}.log"; exit 1; } fi
