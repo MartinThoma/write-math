@@ -91,7 +91,6 @@ def get_sets(path_to_data):
             dataset_by_formula_id[dataset['formula_id']].append(dataset)
         else:
             dataset_by_formula_id[dataset['formula_id']] = [dataset]
-        logging.info("Group data ...")
         utils.print_status(len(datasets), i)
     print("")
 
