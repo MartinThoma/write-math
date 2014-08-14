@@ -15,11 +15,14 @@ preprocessing:
         - kind: linear
         - number: 20
     - Scale_and_shift:
+        - max_width: 1.
+        - max_height: 1.
+        - center: True
 features:
     - Stroke_Count:
     - Constant_Point_Coordinates:
         - lines: 4
-        - points_per_line: 81
+        - points_per_line: 20
         - fill_empty_with: 0
         - pen_down: False
 model:

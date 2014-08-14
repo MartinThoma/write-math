@@ -15,6 +15,9 @@ preprocessing:
         - kind: linear
         - number: 20
     - Scale_and_shift:
+        - max_width: 1.
+        - max_height: 1.
+        - center: True
 features:
     - Stroke_Count:
     - Constant_Point_Coordinates:
