@@ -1,5 +1,5 @@
-data-source: archive/datasets/2014-08-13-16-31-handwriting_datasets-small-raw.pickle
-preprocessed: archive/datasets/2014-08-13-16-31-handwriting_datasets-small-preprocessed.pickle
+data-source: archive/datasets/2014-08-13-20-27-handwriting_datasets-small-raw.pickle
+preprocessed: archive/datasets/2014-08-13-20-27-handwriting_datasets-small-preprocessed.pickle
 data:
     training: archive/pfiles/2014-08-06-09-55-small-traindata.pfile
     validating: archive/pfiles/2014-08-06-09-55-small-validdata.pfile
@@ -8,8 +8,8 @@ training: nntoolkit train --epochs 300 --learning-rate 0.1 --momentum 0.1 {{trai
 preprocessing:
     - Remove_duplicate_time:
     - Scale_and_shift:
-        - max_width: 100.
-        - max_height: 100.
+        - max_width: 1.
+        - max_height: 1.
     - Space_evenly_per_line:
         - kind: cubic
         - number: 20
@@ -23,6 +23,6 @@ features:
         - pen_down: False
 model:
     type: mlp
-    topology: '161:488:26'
+    topology: '161:488:38'
     folder: 'archive/models/'
     basename: '2014-08-11-13-55-baseline-small'

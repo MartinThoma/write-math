@@ -43,7 +43,7 @@ def main(destination=os.path.join(utils.get_project_root(),
                # only use the important symbol subset
                "WHERE `is_important` = 1 "
                "AND id != 1 "  # exclude trash class
-               "AND id <= 56 "
+               "AND id <= 81 "
                "ORDER BY `id` ASC")
     else:
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
