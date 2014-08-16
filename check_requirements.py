@@ -26,7 +26,7 @@ def which(program):
 def check_python_modules():
     print("## Check modules")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
-                        'cPickle', 'detl']
+                        'cPickle', 'detl', 'theano']
     found = []
     for required_module in required_modules:
         try:
@@ -51,6 +51,10 @@ def check_python_modules():
         import MySQLdb
         print("MySQLdb version: %s (1.2.3 tested)" %
               MySQLdb.__version__)
+    if "theano" in found:
+        import theano
+        print("theano version: %s (0.6.0 tested)" %
+              theano.__version__)
     if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
