@@ -29,54 +29,39 @@ def sort_by_formula_id(raw_datasets):
     return by_formula_id
 
 
-def analyze_feature(raw_datasets, feature, filename):
-    """
-    @param feature - for example feature = features.AspectRatio()
-                   the feature has to be 1 dimensional at the moment
-    @param filename - where to store the result
-    """
+def filter_label(label):
+    bad_names = ['celsius', 'degree', 'ohm', 'venus', 'mars', 'astrosun',
+                 'fullmoon', 'leftmoon', 'female', 'male', 'checked',
+                 'diameter', 'sun', 'Bowtie', 'sqrt',
+                 'cong', 'copyright', 'dag', 'parr', 'notin', 'dotsc',
+                 'mathds'
+                 ]
+    if any(label[1:].startswith(bad) for bad in bad_names):
+        return label[1:]
+    else:
+        return label
+
+
+def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
+    # prepare file
     open(filename, 'w').close()  # Truncate the file
-    f = open(filename, "a")
+    write_file = open(filename, "a")
+    write_file.write("label,mean,variance\n")  # heading
 
     by_formula_id = sort_by_formula_id(raw_datasets)
-
-    data_list = []
+    print_data = []
     for formula_id, datasets in by_formula_id.items():
         values = []
         for data in datasets:
             values.append(feature(data)[0])
-            if data.formula_id == 183:
-                f.write("%0.4f\n" % feature(data)[0])
-        data_list.append((datasets[0].formula_in_latex,
-                          numpy.mean(values),
-                          numpy.std(values)))
-    f.close()
-    data_list = sorted(data_list, key=lambda n: n[2], reverse=True)
-    for latex, mean, std in data_list:
-        print("%s: mean: %0.2f, std: %0.2f" % (latex, mean, std))
-
-
-def analyze_aspect_ratio(raw_datasets):
-    filename = "aspect_ratios-int.txt"
-    open(filename, 'w').close()  # Truncate the file
-    strokefile = open(filename, "a")
-
-    by_formula_id = sort_by_formula_id(raw_datasets)
-    aspect_ratio = features.AspectRatio()
-    data_list = []
-    for formula_id, datasets in by_formula_id.items():
-        values = []
-        for data in datasets:
-            values.append(aspect_ratio(data)[0])
-            if data.formula_id == 183:
-                strokefile.write("%0.4f\n" % aspect_ratio(data)[0])
-        data_list.append((datasets[0].formula_in_latex,
-                          numpy.mean(values),
-                          numpy.std(values)))
-    strokefile.close()
-    data_list = sorted(data_list, key=lambda n: n[2], reverse=True)
-    for latex, mean, std in data_list:
-        print("%s: mean: %0.2f, std: %0.2f" % (latex, mean, std))
+        label = filter_label(datasets[0].formula_in_latex)
+        print_data.append((label, numpy.mean(values), numpy.std(values)))
+    # Sort the data by highest mean, descending
+    print_data = sorted(print_data, key=lambda n: n[1], reverse=True)
+    # Write data to file
+    for label, mean, std in print_data:
+        write_file.write("%s,%0.2f,%0.2f\n" % (label, mean, std))
+    write_file.close()
 
 
 def get_aspect_ratio(raw_datasets):
@@ -257,9 +242,12 @@ def get_bounding_box_sizes(raw_datasets):
     """
     bouding_box_sizes = []
     start_time = time.time()
-    widthfile = open("widths.txt", "a")
-    heightfile = open("height.txt", "a")
-    timefile = open("times.txt", "a")
+    widthfile = open("widths.csv", "a")
+    widthfile.write("label,mean,variance")
+    heightfile = open("height.csv", "a")
+    heightfile.write("label,mean,variance")
+    timefile = open("times.csv", "a")
+    timefile.write("label,mean,variance")
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
             utils.print_status(len(raw_datasets), i, start_time)
@@ -325,16 +313,23 @@ def main(handwriting_datasets_file):
     raw_datasets = loaded['handwriting_datasets']
     logging.info("%i datasets loaded.", len(raw_datasets))
     logging.info("Start analyzing...")
-    logging.info("get_time_between_controll_points...")
-    get_time_between_controll_points(raw_datasets)
-    logging.info("Bounding box sizes...")
-    get_bounding_box_sizes(raw_datasets)
-    logging.info("get_summed_symbol_strok_lengts...")
-    get_summed_symbol_strok_lengts(raw_datasets)
-    logging.info("get_bounding_box_distance...")
-    get_bounding_box_distance(raw_datasets)
-    logging.info("analyze_aspect_ratio...")
-    analyze_aspect_ratio(raw_datasets)
+    # logging.info("get_time_between_controll_points...")
+    # get_time_between_controll_points(raw_datasets)
+    # logging.info("Bounding box sizes...")
+    # get_bounding_box_sizes(raw_datasets)
+    # logging.info("get_summed_symbol_strok_lengts...")
+    # get_summed_symbol_strok_lengts(raw_datasets)
+    # logging.info("get_bounding_box_distance...")
+    # get_bounding_box_distance(raw_datasets)
+    f = [(features.AspectRatio(), "aspect_ratio.csv"),
+         (features.Height(), "height.csv"),
+         (features.Width(), "width.csv"),
+         (features.Time(), "time.csv"),
+         (features.Ink(), "ink.csv"),
+         (features.Stroke_Count(), "stroke-count.csv")]
+    for feat, filename in f:
+        logging.info("create %s..." % filename)
+        analyze_feature(raw_datasets, feat, filename)
 
 
 if __name__ == '__main__':
