@@ -276,10 +276,10 @@ class Ink(object):
 
 class AspectRatio(object):
     def __repr__(self):
-        return "Ink"
+        return "Aspect Ratio"
 
     def __str__(self):
-        return "ink"
+        return "Aspect Ratio"
 
     def get_dimension(self):
         return 1
@@ -288,10 +288,60 @@ class AspectRatio(object):
         assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
             "handwritten data is not of type HandwrittenData, but of %r" % \
             type(handwritten_data)
-        bb = handwritten_data.get_bounding_box()
-        width = float((bb['maxx']+1) - (bb['minx']-1))
-        height = float((bb['maxy']+1) - (bb['miny']-1))
+        width = float(handwritten_data.get_width()+1)
+        height = float(handwritten_data.get_height()+1)
         return [width/height]
+
+
+class Width(object):
+    def __repr__(self):
+        return "Width"
+
+    def __str__(self):
+        return "Width"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        return [float(handwritten_data.get_width())]
+
+
+class Height(object):
+    def __repr__(self):
+        return "Height"
+
+    def __str__(self):
+        return "Height"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        return [float(handwritten_data.get_height())]
+
+
+class Time(object):
+    def __repr__(self):
+        return "Time"
+
+    def __str__(self):
+        return "Time"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        return [float(handwritten_data.get_time())]
 
 
 if __name__ == '__main__':
