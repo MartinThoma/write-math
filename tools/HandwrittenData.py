@@ -13,13 +13,14 @@ class HandwrittenData(object):
     """Represents a handwritten symbol."""
     def __init__(self, raw_data_json, formula_id=None, raw_data_id=None,
                  formula_in_latex=None, wild_point_count=0,
-                 missing_line=0):
+                 missing_line=0, user_id=0):
         self.raw_data_json = raw_data_json
         self.formula_id = formula_id
         self.raw_data_id = raw_data_id
         self.formula_in_latex = formula_in_latex
         self.wild_point_count = wild_point_count
         self.missing_line = missing_line
+        self.user_id = user_id
         assert type(json.loads(self.raw_data_json)) is list, \
             "raw_data_json is not JSON: %r" % self.raw_data_json
         assert len(self.get_pointlist()) >= 1, \
@@ -93,6 +94,11 @@ class HandwrittenData(object):
         """Get the height of the rectangular, axis-parallel bounding box."""
         box = self.get_bounding_box()
         return box['maxy'] - box['miny']
+
+    def get_time(self):
+        """Get the time in which the recording was created."""
+        box = self.get_bounding_box()
+        return box['maxt'] - box['mint']
 
     def preprocessing(self, algorithms):
         """Apply preprocessing algorithms.

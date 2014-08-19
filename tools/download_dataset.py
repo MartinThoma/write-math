@@ -61,7 +61,7 @@ def main(destination=os.path.join(utils.get_project_root(),
     for formula in formulas:
         formula_id2latex[formula['id']] = formula['formula_in_latex']
         sql = ("SELECT `id`, `data`, `is_in_testset`, `wild_point_count`, "
-               "`missing_line` "
+               "`missing_line`, `user_id` "
                "FROM `wm_raw_draw_data` "
                "WHERE `accepted_formula_id` = %s" % str(formula['id']))
         cursor.execute(sql)
@@ -75,7 +75,8 @@ def main(destination=os.path.join(utils.get_project_root(),
                                               raw_data['id'],
                                               formula['formula_in_latex'],
                                               raw_data['wild_point_count'],
-                                              raw_data['missing_line'])
+                                              raw_data['missing_line'],
+                                              raw_data['user_id'])
                 handwriting_datasets.append({'handwriting': handwriting,
                                              'id': raw_data['id'],
                                              'formula_id': formula['id'],
