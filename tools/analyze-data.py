@@ -43,17 +43,31 @@ def filter_label(label):
 
 
 def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
-    # prepare file
-    open(filename, 'w').close()  # Truncate the file
-    write_file = open(filename, "a")
+    # get folder
+    root = utils.get_project_root()
+    folder = os.path.join(root, "archive/analyzation/")
+    # prepare files
+    # symbol-wise
+    metafile = os.path.join(folder, filename)
+    open(metafile, 'w').close()  # Truncate the file
+    write_file = open(metafile, 'a')
     write_file.write("label,mean,variance\n")  # heading
+    # raw
+    rawfilename = os.path.join(folder, filename+'.raw')
+    open(rawfilename, 'w').close()  # Truncate the file
+    raw_file = open(rawfilename, 'a')
+    raw_file.write("latex,raw_data_id,value\n")
 
     by_formula_id = sort_by_formula_id(raw_datasets)
     print_data = []
     for formula_id, datasets in by_formula_id.items():
         values = []
         for data in datasets:
-            values.append(feature(data)[0])
+            value = feature(data)[0]
+            values.append(value)
+            raw_file.write("%s,%i,%0.2f\n" % (datasets[0].formula_in_latex,
+                                              data.raw_data_id,
+                                              value))
         label = filter_label(datasets[0].formula_in_latex)
         print_data.append((label, numpy.mean(values), numpy.std(values)))
     # Sort the data by highest mean, descending
@@ -61,6 +75,36 @@ def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
     # Write data to file
     for label, mean, std in print_data:
         write_file.write("%s,%0.2f,%0.2f\n" % (label, mean, std))
+    write_file.close()
+
+
+def analyze_creator(raw_datasets, filename="creator.csv"):
+    """Analyze who created most of the data."""
+    from collections import defaultdict
+
+    # prepare file
+    root = utils.get_project_root()
+    folder = os.path.join(root, "archive/analyzation/")
+    workfilename = os.path.join(folder, filename)
+    open(workfilename, 'w').close()  # Truncate the file
+    write_file = open(workfilename, "a")
+    write_file.write("creatorid,nr of symbols\n")  # heading
+
+    print_data = defaultdict(int)
+    start_time = time.time()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            utils.print_status(len(raw_datasets), i, start_time)
+        print_data[raw_dataset['handwriting'].user_id] += 1
+    print("\r100%"+"\033[K\n")
+    # Sort the data by highest value, descending
+    print_data = sorted(print_data.items(),
+                        key=lambda n: n[1],
+                        reverse=True)
+    # Write data to file
+    write_file.write("total,%i\n" % sum([value for _, value in print_data]))
+    for userid, value in print_data:
+        write_file.write("%i,%i\n" % (userid, value))
     write_file.close()
 
 
@@ -152,10 +196,14 @@ def get_bounding_box_distance(raw_datasets):
                                                 bounding_boxes[j]):
                         got_change = True
                         new_bounding_boxes = []
-                        p1x = min(bounding_boxes[i].p1.x, bounding_boxes[j].p1.x)
-                        p1y = min(bounding_boxes[i].p1.y, bounding_boxes[j].p1.y)
-                        p2x = max(bounding_boxes[i].p2.x, bounding_boxes[j].p2.x)
-                        p2y = max(bounding_boxes[i].p2.y, bounding_boxes[j].p2.y)
+                        p1x = min(bounding_boxes[i].p1.x,
+                                  bounding_boxes[j].p1.x)
+                        p1y = min(bounding_boxes[i].p1.y,
+                                  bounding_boxes[j].p1.y)
+                        p2x = max(bounding_boxes[i].p2.x,
+                                  bounding_boxes[j].p2.x)
+                        p2y = max(bounding_boxes[i].p2.y,
+                                  bounding_boxes[j].p2.y)
                         p1 = Geometry.Point(p1x, p1y)
                         p2 = Geometry.Point(p2x, p2y)
                         new_bounding_boxes.append(Geometry.BoundingBox(p1, p2))
@@ -211,7 +259,10 @@ def get_bounding_box_distance(raw_datasets):
                     #     bb_dist.append(min(dist_tmp))
                     # raw_dataset['handwriting'].show()
                     # exit()
-                    bbfile.write("<a href='http://www.martin-thoma.de/write-math/view/?raw_data_id=%i'>a</a>\n" % raw_dataset['handwriting'].raw_data_id)
+                    url_base = "http://www.martin-thoma.de/write-math/view"
+                    bbfile.write("<a href='%s/?raw_data_id=%i'>a</a>\n" %
+                                 (url_base,
+                                  raw_dataset['handwriting'].raw_data_id))
     print("\r100%"+"\033[K\n")
 
 
@@ -220,49 +271,6 @@ def get_max_distances(raw_datasets):
        two points have. Print this distance to a file.
     """
     pass
-
-
-def get_summed_symbol_strok_lengts(raw_datasets):
-    """For each symbol: sum up the length of all strokes."""
-    strokefile = open("stroke-lengths.txt", "a")
-    start_time = time.time()
-    calculate_ink = features.Ink()
-    for i, raw_dataset in enumerate(raw_datasets):
-        if i % 100 == 0 and i > 0:
-            utils.print_status(len(raw_datasets), i, start_time)
-        ink = calculate_ink(raw_dataset['handwriting'])[0]
-        strokefile.write("%0.2f\n" % ink)
-    print("\r100%"+"\033[K\n")
-    strokefile.close()
-
-
-def get_bounding_box_sizes(raw_datasets):
-    """Get and save the metrics of each recordings bounding box.
-       That includes width, height and time.
-    """
-    bouding_box_sizes = []
-    start_time = time.time()
-    widthfile = open("widths.csv", "a")
-    widthfile.write("label,mean,variance")
-    heightfile = open("height.csv", "a")
-    heightfile.write("label,mean,variance")
-    timefile = open("times.csv", "a")
-    timefile.write("label,mean,variance")
-    for i, raw_dataset in enumerate(raw_datasets):
-        if i % 100 == 0 and i > 0:
-            utils.print_status(len(raw_datasets), i, start_time)
-        box = raw_dataset['handwriting'].get_bounding_box()
-        widthfile.write(str(box["maxx"] - box["minx"]) + "\n")
-        heightfile.write(str(box["maxy"] - box["miny"]) + "\n")
-        timefile.write(str(box["maxt"] - box["mint"]) + "\n")
-        if box["maxx"] - box["minx"] > 400:
-            #raw_dataset['handwriting'].show()  # Disable for testing
-            pass
-    print("\r100%"+"\033[K\n")
-    widthfile.close()
-    heightfile.close()
-    timefile.close()
-    return bouding_box_sizes
 
 
 def get_time_between_controll_points(raw_datasets):
@@ -315,12 +323,9 @@ def main(handwriting_datasets_file):
     logging.info("Start analyzing...")
     # logging.info("get_time_between_controll_points...")
     # get_time_between_controll_points(raw_datasets)
-    # logging.info("Bounding box sizes...")
-    # get_bounding_box_sizes(raw_datasets)
-    # logging.info("get_summed_symbol_strok_lengts...")
-    # get_summed_symbol_strok_lengts(raw_datasets)
     # logging.info("get_bounding_box_distance...")
     # get_bounding_box_distance(raw_datasets)
+
     f = [(features.AspectRatio(), "aspect_ratio.csv"),
          (features.Height(), "height.csv"),
          (features.Width(), "width.csv"),
@@ -330,6 +335,9 @@ def main(handwriting_datasets_file):
     for feat, filename in f:
         logging.info("create %s..." % filename)
         analyze_feature(raw_datasets, feat, filename)
+
+    logging.info("creator...")
+    analyze_creator(raw_datasets)
 
 
 if __name__ == '__main__':
