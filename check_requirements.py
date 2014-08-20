@@ -26,7 +26,8 @@ def which(program):
 def check_python_modules():
     print("## Check modules")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
-                        'cPickle', 'detl', 'theano']
+                        'cPickle', 'detl', 'theano', 'dropbox',
+                        'webbrowser', 'hashlib']
     found = []
     for required_module in required_modules:
         try:
