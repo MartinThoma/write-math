@@ -58,7 +58,7 @@ def dropbox_upload(filename, directory, client):
     uploader.upload_chunked()
     uploader.finish(online_path, overwrite=True)
     return client.share(online_path,
-                        short_url=True)['url'].encode('ascii', 'ignore')
+                        short_url=False)['url'].encode('ascii', 'ignore')
 
 
 def sync_directory(directory):
