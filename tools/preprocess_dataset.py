@@ -16,6 +16,29 @@ import yaml
 import utils
 
 
+def main(model_description_file):
+    raw_datapath, outputpath, p_queue = get_parameters(model_description_file)
+    create_preprocessed_dataset(raw_datapath, outputpath, p_queue)
+
+
+def get_parameters(model_description_file):
+    PROJECT_ROOT = utils.get_project_root()
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+
+    # Get the path of the raw data
+    raw_datapath = os.path.join(PROJECT_ROOT,
+                                model_description['data-source'])
+    # Get the path were the preprocessed file should be put
+    outputpath = os.path.join(PROJECT_ROOT,
+                              model_description['preprocessed'])
+    # Get the preprocessing queue
+    tmp = model_description['preprocessing']
+    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
+    return (raw_datapath, outputpath, preprocessing_queue)
+
+
 def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
     # Log everything
     logging.info("Data soure %s" % path_to_data)
@@ -62,19 +85,4 @@ if __name__ == '__main__':
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
     args = parser.parse_args()
-
-    # Read the model description file
-    with open(args.model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-    # Get the path of the raw data
-    raw_datapath = os.path.join(PROJECT_ROOT,
-                                model_description['data-source'])
-    # Get the path were the preprocessed file should be put
-    outputpath = os.path.join(PROJECT_ROOT,
-                              model_description['preprocessed'])
-    # Get the preprocessing queue
-    tmp = model_description['preprocessing']
-    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
-
-    # Do it! Preprcess the data!
-    create_preprocessed_dataset(raw_datapath, outputpath, preprocessing_queue)
+    main(args.model_description_file)

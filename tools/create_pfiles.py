@@ -27,6 +27,33 @@ import utils
 import yaml
 
 
+def main(model_description_file):
+    PROJECT_ROOT = utils.get_project_root()
+
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+    # Get preprocessed .pickle file from model description file
+    handwriting_datasets = os.path.join(PROJECT_ROOT,
+                                        model_description['preprocessed'])
+    target_paths = {}
+    for key in model_description['data']:
+        tmp = os.path.join(PROJECT_ROOT, model_description['data'][key])
+        model_description['data'][key] = tmp
+        if key == 'training':
+            target_paths['traindata'] = model_description['data'][key]
+        elif key == 'validating':
+            target_paths['validdata'] = model_description['data'][key]
+        elif key == 'testing':
+            target_paths['testdata'] = model_description['data'][key]
+
+    # Get a list of all used features
+    feature_list = features.get_features(model_description['features'])
+
+    # Create pfiles!
+    create_pfile(handwriting_datasets, feature_list, target_paths)
+
+
 def make_pfile(dataset_name, feature_count, data,
                output_filename):
     """ Create the pfile.
@@ -183,25 +210,4 @@ if __name__ == '__main__':
                         default=latest_model)
     args = parser.parse_args()
 
-    # Read the model description file
-    with open(args.model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-    # Get preprocessed .pickle file from model description file
-    handwriting_datasets = os.path.join(PROJECT_ROOT,
-                                        model_description['preprocessed'])
-    target_paths = {}
-    for key in model_description['data']:
-        tmp = os.path.join(PROJECT_ROOT, model_description['data'][key])
-        model_description['data'][key] = tmp
-        if key == 'training':
-            target_paths['traindata'] = model_description['data'][key]
-        elif key == 'validating':
-            target_paths['validdata'] = model_description['data'][key]
-        elif key == 'testing':
-            target_paths['testdata'] = model_description['data'][key]
-
-    # Get a list of all used features
-    feature_list = features.get_features(model_description['features'])
-
-    # Create pfiles!
-    create_pfile(handwriting_datasets, feature_list, target_paths)
+    main(args.model_description_file)
