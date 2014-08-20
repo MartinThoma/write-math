@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Download raw data from online server and store it as
+Download raw data from online server and back it up (e.g. on dropbox)
 handwriting_datasets.pickle.
 """
 
@@ -13,9 +13,119 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import cPickle as pickle
 import MySQLdb
 import MySQLdb.cursors
+import dropbox
+import hashlib
+import webbrowser
+import yaml
 from HandwrittenData import HandwrittenData
 import time
 import utils
+
+
+def input_string(question=""):
+    """A function that works for both, Python 2.x and Python 3.x.
+       It asks the user for input and returns it as a string.
+    """
+    import sys
+    if sys.version_info[0] == 2:
+        return raw_input(question)
+    else:
+        return input(question)
+
+
+def check_dropbox():
+    """Check if the dropbox signin data is correct."""
+    cfg = utils.get_project_configuration()
+    if 'dropbox_app_key' not in cfg:
+        logging.error("'dropbox_app_key' was not found.")
+        return False
+    elif 'dropbox_app_secret' not in cfg:
+        logging.error("'dropbox_app_key' was not found.")
+        return False
+    else:
+        return True
+
+
+def dropbox_upload(filename, directory, client):
+    local_path = os.path.join(utils.get_project_root(), directory, filename)
+    online_path = os.path.join(directory, filename)
+    filesize = os.path.getsize(local_path)
+    if filesize > 100*2**20:  # TODO: remove this after debugging
+        return "asdf"
+    logging.info("Start uploading '%s' (%s)...",
+                 filename,
+                 utils.sizeof_fmt(filesize))
+    f = open(local_path, 'rb')
+    uploader = client.get_chunked_uploader(f, filesize)
+    uploader.upload_chunked()
+    uploader.finish(online_path, overwrite=True)
+    return client.share(online_path,
+                        short_url=True)['url'].encode('ascii', 'ignore')
+
+
+def sync_directory(directory):
+    """Sync a directory. Return if syncing was successful."""
+    # Developers should read
+    # https://www.dropbox.com/developers/core/start/python
+    # before modifying the following code
+    cfg = utils.get_project_configuration()
+
+    # Information about files in this folder
+    PROJECT_ROOT = utils.get_project_root()
+    directory_information_file = os.path.join(PROJECT_ROOT,
+                                              directory, "info.yml")
+    if not os.path.isfile(directory_information_file):  # create if not exists
+        with open(directory_information_file, 'w') as ymlfile:
+            ymlfile.write(yaml.dump([]))
+
+    # Dropbox stuff
+    APP_KEY = cfg['dropbox_app_key']
+    APP_SECRET = cfg['dropbox_app_secret']
+
+    flow = dropbox.client.DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
+    authorize_url = flow.start()
+    webbrowser.open_new_tab(authorize_url)
+    print("1. Go to: " + authorize_url)
+    print("2. Click 'Allow' (you might have to log in first)")
+    print("3. Copy the authorization code.")
+    access_token = input_string().strip()
+
+    try:
+        # This will fail if the user enters an invalid authorization code
+        access_token, user_id = flow.finish(access_token)
+        client = dropbox.client.DropboxClient(access_token)
+    except Exception as e:
+        logging.error("Dropbox connection error: %s", e)
+        return False
+
+    # Get all local files
+    local_path = os.path.join(PROJECT_ROOT, directory)
+    files = [f for f in os.listdir(local_path)
+             if os.path.isfile(os.path.join(local_path, f))]
+    files = filter(lambda n: n.endswith(".pickle"), files)
+
+    new_yaml_content = []
+
+    # upload them
+    for filename in files:
+        file_meta = {}
+        file_meta['filename'] = filename
+        file_meta['online_path'] = os.path.join(directory, filename)
+        local_path_file = os.path.join(local_path, filename)
+        file_meta['md5'] = hashlib.md5(open(local_path_file,
+                                            'rb').read()).hexdigest()
+        new_yaml_content.append(file_meta)
+        file_meta['url'] = dropbox_upload(filename, directory, client)
+        if not file_meta['url']:
+            return False
+
+    # TODO: Remove all files from Dropbox that are not in local folder
+
+    # Update YAML file
+    with open(directory_information_file, 'w') as ymlfile:
+        ymlfile.write(yaml.dump(new_yaml_content, default_flow_style=False))
+
+    return True
 
 
 def main(destination=os.path.join(utils.get_project_root(),
@@ -111,4 +221,12 @@ if __name__ == '__main__':
                         help=("should only a small dataset (with all capital "
                               "letters) be created?"))
     args = parser.parse_args()
-    main(args.destination, args.small)
+    if not check_dropbox():
+        logging.error("Dropbox login data was not correct. "
+                      "Please check your '~/.writemathrc' file.")
+    else:
+        main(args.destination, args.small)
+        if sync_directory("archive/datasets"):
+            logging.info("Successfully uploaded files to Dropbox.")
+        else:
+            logging.info("Uploading files to Dropbox failed.")
