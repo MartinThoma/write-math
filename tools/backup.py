@@ -8,7 +8,7 @@ import logging
 import sys
 import os
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                    level=logging.DEBUG,
+                    level=logging.INFO,
                     stream=sys.stdout)
 import cPickle as pickle
 import MySQLdb
@@ -50,8 +50,6 @@ def dropbox_upload(filename, directory, client):
     local_path = os.path.join(utils.get_project_root(), directory, filename)
     online_path = os.path.join(directory, filename)
     filesize = os.path.getsize(local_path)
-    if filesize > 100*2**20:  # TODO: remove this after debugging
-        return "asdf"
     logging.info("Start uploading '%s' (%s)...",
                  filename,
                  utils.sizeof_fmt(filesize))
@@ -220,12 +218,17 @@ if __name__ == '__main__':
                         action="store_true", default=False,
                         help=("should only a small dataset (with all capital "
                               "letters) be created?"))
+    parser.add_argument("-o", "--onlydropbox", dest="onlydropbox",
+                        action="store_true", default=False,
+                        help=("don't download new files; only upload to "
+                              "dropbox"))
     args = parser.parse_args()
     if not check_dropbox():
         logging.error("Dropbox login data was not correct. "
                       "Please check your '~/.writemathrc' file.")
     else:
-        main(args.destination, args.small)
+        if not args.onlydropbox:
+            main(args.destination, args.small)
         if sync_directory("archive/datasets"):
             logging.info("Successfully uploaded files to Dropbox.")
         else:

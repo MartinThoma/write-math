@@ -1,7 +1,15 @@
+- filename: 2014-08-19-19-28-handwriting_datasets-small-raw.pickle
+  md5: 6a9cd8521734cb587e7d45a1049a1940
+  online_path: archive/datasets/2014-08-19-19-28-handwriting_datasets-small-raw.pickle
+  url: https://db.tt/VWTNB1r0
 - filename: 2014-08-10-16-58-handwriting_datasets-raw.pickle
   md5: 3b4da2eb9af2c6508a5c1db69f18b3b4
   online_path: archive/datasets/2014-08-10-16-58-handwriting_datasets-raw.pickle
-  url: asdf
+  url: https://db.tt/CT8H2Jdm
+- filename: 2014-08-19-19-46-handwriting_datasets-raw.pickle
+  md5: 98cabb60a0d31d5b1eb0312ea709d7cc
+  online_path: archive/datasets/2014-08-19-19-46-handwriting_datasets-raw.pickle
+  url: https://db.tt/j6vvQY1P
 - filename: 2014-08-18-16-40-handwriting_datasets-small-raw.pickle
   md5: 5ada51363eacc7d5562b2127b15dca4d
   online_path: archive/datasets/2014-08-18-16-40-handwriting_datasets-small-raw.pickle
@@ -9,7 +17,7 @@
 - filename: 2014-08-18-16-51-handwriting_datasets-raw.pickle
   md5: c31bdb7a876de70d238aa2c7ec9810fe
   online_path: archive/datasets/2014-08-18-16-51-handwriting_datasets-raw.pickle
-  url: asdf
+  url: https://db.tt/zofdlV9G
 - filename: 2014-08-13-20-27-handwriting_datasets-small-preprocessed.pickle
   md5: 0c23aba858b4f991834b2fb63ffe69d7
   online_path: archive/datasets/2014-08-13-20-27-handwriting_datasets-small-preprocessed.pickle

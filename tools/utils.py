@@ -31,12 +31,18 @@ def is_valid_file(parser, arg):
         return arg
 
 
-def get_project_root():
-    """Get the project root folder as a string."""
+def get_project_configuration():
+    """Get project configuration as dictionary."""
     home = os.path.expanduser("~")
     rcfile = os.path.join(home, ".writemathrc")
     with open(rcfile, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
+    return cfg
+
+
+def get_project_root():
+    """Get the project root folder as a string."""
+    cfg = get_project_configuration()
     return cfg['root']
 
 
@@ -61,3 +67,11 @@ def get_database_configuration():
     with open(get_database_config_file(), 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     return cfg
+
+
+def sizeof_fmt(num):
+    """Takes the a filesize in bytes and returns a nicely formatted string. """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
