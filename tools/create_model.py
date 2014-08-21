@@ -1,45 +1,32 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-"""Create and train a given model."""
 
 import os
 import yaml
+import natsort
 import logging
 import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
-import natsort
 # mine
 import utils
 
 
-def create_model(model_folder, basename, training, data):
+def create_model(model_folder, basename, model_type, topology, override):
     models = filter(lambda n: n.endswith(".json"), os.listdir(model_folder))
     models = filter(lambda n: n.startswith(basename), models)
     models = natsort.natsorted(models, reverse=True)
-    if len(models) == 0:
-        logging.error("There is no model with basename '%s'.", basename)
-        sys.exit(1)
-    else:
-        latest_model = models[0]
-        logging.info("Model '%s' found.", latest_model)
-        i = int(latest_model.split("-")[-1].split(".")[0])
-        model_src = os.path.join(model_folder, "%s-%i.json" % (basename, i))
-        model_target = os.path.join(model_folder,
-                                    "%s-%i.json" % (basename, i+1))
-
-    # train the model
-    training = training.replace("{{training}}", data['training'])
-    training = training.replace("{{validation}}", data['validating'])
-    training = training.replace("{{src_model}}", model_src)
-    training = training.replace("{{target_model}}", model_target)
-    logging.info(training)
-    os.system(training)
+    if (len(models) == 0) or override:
+        logging.info("No base model. Create it...")
+        model_src = os.path.join(model_folder, "%s-0.json" % basename)
+        command = "nntoolkit make %s %s > %s" % (model_type,
+                                                 topology,
+                                                 model_src)
+        logging.info(command)
+        os.system(command)
 
 
-def main(model_description_file):
+def main(model_description_file, override):
     PROJECT_ROOT = utils.get_project_root()
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
@@ -48,15 +35,12 @@ def main(model_description_file):
     print(model_description['model'])
     modelfile = os.path.join(PROJECT_ROOT,
                              model_description['model']['folder'])
-    data = {}
-    data['training'] = os.path.join(PROJECT_ROOT,
-                                    model_description['data']['training'])
-    data['validating'] = os.path.join(PROJECT_ROOT,
-                                      model_description['data']['validating'])
     create_model(modelfile,
                  model_description['model']['basename'],
-                 model_description['training'],
-                 data)
+                 model_description['model']['type'],
+                 model_description['model']['topology'],
+                 override)
+
 
 if __name__ == "__main__":
     PROJECT_ROOT = utils.get_project_root()
@@ -75,5 +59,10 @@ if __name__ == "__main__":
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
+    parser.add_argument("-o", "--override",
+                        action="store_true", dest="override",
+                        default=False,
+                        help=("should the model be overridden "
+                              "if it already exists?"))
     args = parser.parse_args()
-    main(args.model_description_file)
+    main(args.model_description_file, args.override)
