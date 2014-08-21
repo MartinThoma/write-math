@@ -156,6 +156,9 @@ class Constant_Point_Coordinates(object):
             else:
                 while len(x) != 2*self.points_per_line:
                     x.append(self.fill_empty_with)
+        assert self.get_dimension() == len(x), \
+            "Dimension of %s should be %i, but was %i" % \
+            (self.__str__(), self.get_dimension(), len(x))
         return x
 
 
@@ -191,6 +194,9 @@ class First_N_Points(object):
                     left -= 1
                     x.append(point['x'])
                     x.append(point['y'])
+        assert self.get_dimension() == len(x), \
+            "Dimension of %s should be %i, but was %i" % \
+            (self.__str__(), self.get_dimension(), len(x))
         return x
 
 
@@ -252,6 +258,9 @@ class Bitmap(object):
             for j in range(28):
                 # pixel_image[i][j] = pix[i, j]
                 x.append(pix[i, j])
+        assert self.get_dimension() == len(x), \
+            "Dimension of %s should be %i, but was %i" % \
+            (self.__str__(), self.get_dimension(), len(x))
         return x
 
 
