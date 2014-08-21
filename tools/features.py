@@ -21,6 +21,11 @@ import preprocessing
 import urllib
 import os
 import Image
+import logging
+import sys
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
 
 
 def get_class(name):
@@ -34,7 +39,16 @@ def get_class(name):
         return Bitmap
     elif name == "Ink":
         return Ink
+    elif name == "AspectRatio":
+        return AspectRatio
+    elif name == "Width":
+        return Width
+    elif name == "Height":
+        return Height
+    elif name == "Time":
+        return Time
     else:
+        logging.debug("Unknown algorithm '%s'.", name)
         return None
 
 
@@ -79,21 +93,7 @@ def get_features(model_description_features):
 # * get_dimension must return a positive number
 
 
-class Stroke_Count(object):
-    def __repr__(self):
-        return "Stroke_Count"
-
-    def __str__(self):
-        return "stroke count"
-
-    def get_dimension(self):
-        return 1
-
-    def __call__(self, handwritten_data):
-        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
-            "handwritten data is not of type HandwrittenData, but of %r" % \
-            type(handwritten_data)
-        return [len(handwritten_data.get_pointlist())]
+# Local features
 
 
 class Constant_Point_Coordinates(object):
@@ -204,6 +204,25 @@ class First_N_Points(object):
                     x.append(point['x'])
                     x.append(point['y'])
         return x
+
+
+# Global features
+
+class Stroke_Count(object):
+    def __repr__(self):
+        return "Stroke_Count"
+
+    def __str__(self):
+        return "stroke count"
+
+    def get_dimension(self):
+        return 1
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        return [len(handwritten_data.get_pointlist())]
 
 
 class Bitmap(object):
