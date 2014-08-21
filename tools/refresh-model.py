@@ -12,6 +12,8 @@ import time
 import utils
 import preprocess_dataset
 import create_pfiles
+import train
+import features
 
 
 def update_model_description_file(model_description_file, raw_data):
@@ -59,6 +61,14 @@ def update_model_description_file(model_description_file, raw_data):
     md['data']['validating'] = "archive/pfiles/%s-validdata.pfile" % \
         time_prefix
     md['data']['testing'] = "archive/pfiles/%s-testdata.pfile" % time_prefix
+
+    # Update topology (input neurons)
+    feature_list = features.get_features(md['features'])
+    feature_count = sum(map(lambda n: n.get_dimension(), feature_list))
+    all_except_first = ":".join(md['model']['topology'].split(":")[1:])
+    new_top = str(feature_count) + ":" + all_except_first
+    md['model']['topology'] = new_top
+
     # Write the file
     with open(model_description_file, 'w') as ymlfile:
         ymlfile.write(ordered_dump(md,
@@ -108,6 +118,11 @@ def main(model_description_file, latest_data):
                                     "no")
     if refresh_it:
         create_pfiles.main(model_description_file)
+
+    # Train model
+    refresh_it = utils.query_yes_no("Do you want to train the model?", "no")
+    if refresh_it:
+        train.main(model_description_file)
 
 
 if __name__ == '__main__':
