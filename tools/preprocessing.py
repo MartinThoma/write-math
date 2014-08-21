@@ -9,7 +9,7 @@ this:
 
  >> a = HandwrittenData(...)
  >> preprocessing_queue = [Scale_and_shift(), \
-                           Connect_lines(), \
+                           Stroke_connect(), \
                            Douglas_peucker(EPSILON=0.2), \
                            Space_evenly(number=100)]
  >> a.preprocessing(preprocessing_queue)
@@ -38,7 +38,7 @@ def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
 
-def get_class_new(name):
+def get_class(name):
     """Get function pointer by string."""
     clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
     for string_name, act_class in clsmembers:
@@ -464,7 +464,7 @@ class Douglas_peucker(object):
         handwritten_data.set_pointlist(pointlist)
 
 
-class Connect_lines(object):
+class Stroke_connect(object):
     """Detect if lines were probably accidentially disconnected. If that is the
        case, connect them.
     """
@@ -472,11 +472,11 @@ class Connect_lines(object):
         self.minimum_distance = minimum_distance
 
     def __repr__(self):
-        return "Connect_lines (minimum_distance: %0.2f)" % \
+        return "Stroke_connect (minimum_distance: %0.2f)" % \
             self.minimum_distance
 
     def __str__(self):
-        return "Connect lines (minimum_distance: %0.2f)" % \
+        return "Stroke connect (minimum_distance: %0.2f)" % \
             self.minimum_distance
 
     def __call__(self, handwritten_data):
@@ -589,6 +589,7 @@ class Wild_point_filter(object):
         new_pointlist = []
         pointlist = handwritten_data.get_pointlist()
         debug_did_print = False
+        debug_detecte_wildpoints = 0
         for line in pointlist:
             new_line = []
             last_point = line[0]
@@ -599,10 +600,13 @@ class Wild_point_filter(object):
                 speed = space_dist/time_dist
                 if not (speed >= self.threshold):
                     new_line.append(point)
-                elif not debug_did_print:
-                    logging.debug("\nthreshold for raw_data_id '%i'",
-                                  handwritten_data.raw_data_id)
-                    debug_did_print = True
+                else:
+                    debug_detecte_wildpoints += 1
+                    if debug_detecte_wildpoints > handwritten_data.wild_point_count and not debug_did_print:
+                        logging.debug("threshold for raw_data_id '%i'",
+                                      handwritten_data.raw_data_id)
+                        debug_did_print = True
+
             new_pointlist.append(new_line)
         # Bounding box criterion:
         # If the distance from point to all others strokes bounding boxes is

@@ -30,7 +30,7 @@ import HandwrittenData
 import preprocessing
 
 
-def get_class_new(name):
+def get_class(name):
     """Get function pointer by string."""
     clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
     for string_name, act_class in clsmembers:
