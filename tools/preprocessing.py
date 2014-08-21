@@ -16,6 +16,7 @@ this:
 """
 
 import numpy
+import inspect
 from scipy.interpolate import interp1d
 import math
 import logging
@@ -37,27 +38,14 @@ def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
 
-def get_class(name):
+def get_class_new(name):
     """Get function pointer by string."""
-    if name == 'Scale_and_shift':
-        return Scale_and_shift
-    elif name == 'Space_evenly':
-        return Space_evenly
-    elif name == 'Space_evenly_per_line':
-        return Space_evenly_per_line
-    elif name == 'Douglas_peucker':
-        return Douglas_peucker
-    elif name == 'Connect_lines':
-        return Connect_lines
-    elif name == 'Dot_reduction':
-        return Dot_reduction
-    elif name == 'Wild_point_filter':
-        return Wild_point_filter
-    elif name == 'Remove_duplicate_time':
-        return Remove_duplicate_time
-    else:
-        logging.debug("Unknown algorithm '%s'.", name)
-        return None
+    clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    for string_name, act_class in clsmembers:
+        if string_name == name:
+            return act_class
+    logging.debug("Unknown class '%s'.", name)
+    return None
 
 
 def get_preprocessing_queue(model_description_preprocessing):

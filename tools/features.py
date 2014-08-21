@@ -16,8 +16,7 @@ this:
  >> x = a.feature_extraction(feature_list)
 """
 
-import HandwrittenData
-import preprocessing
+import inspect
 import urllib
 import os
 import Image
@@ -26,30 +25,19 @@ import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
+# mine
+import HandwrittenData
+import preprocessing
 
 
-def get_class(name):
-    if name == "Stroke_Count":
-        return Stroke_Count
-    elif name == "Constant_Point_Coordinates":
-        return Constant_Point_Coordinates
-    elif name == "First_N_Points":
-        return First_N_Points
-    elif name == "Bitmap":
-        return Bitmap
-    elif name == "Ink":
-        return Ink
-    elif name == "AspectRatio":
-        return AspectRatio
-    elif name == "Width":
-        return Width
-    elif name == "Height":
-        return Height
-    elif name == "Time":
-        return Time
-    else:
-        logging.debug("Unknown algorithm '%s'.", name)
-        return None
+def get_class_new(name):
+    """Get function pointer by string."""
+    clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    for string_name, act_class in clsmembers:
+        if string_name == name:
+            return act_class
+    logging.debug("Unknown class '%s'.", name)
+    return None
 
 
 def get_features(model_description_features):
