@@ -35,16 +35,19 @@ def fetch_data(raw_data_id):
 
 
 def display_data(raw_data_string, raw_data_id, latest_model):
-    # Read the model description file
-    with open(latest_model, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-
-    # Get the preprocessing queue
-    tmp = model_description['preprocessing']
-    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
     # Get Handwriting
     a = HandwrittenData(raw_data_string, raw_data_id=raw_data_id)
-    a.preprocessing(preprocessing_queue)
+
+    # Read the model description file
+    if latest_model is not None:
+        with open(latest_model, 'r') as ymlfile:
+            model_description = yaml.load(ymlfile)
+
+        # Get the preprocessing queue
+        tmp = model_description['preprocessing']
+        preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
+
+        a.preprocessing(preprocessing_queue)
     a.show()
 
 if __name__ == '__main__':
@@ -67,7 +70,7 @@ if __name__ == '__main__':
                         help="where is the model description YAML file?",
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
-                        default=latest_model)
+                        default=None)
     args = parser.parse_args()
 
     # do something
