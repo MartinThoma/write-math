@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""Run everything again for a model. Adjust the model file if
+   this is desired.
+"""
+
 import os
 import logging
 import sys
@@ -15,6 +19,7 @@ import create_pfiles
 import train
 import features
 import create_model
+import test
 
 
 def update_model_description_file(model_description_file, raw_data):
@@ -120,7 +125,7 @@ def main(model_description_file, latest_data):
     if refresh_it:
         create_pfiles.main(model_description_file)
 
-    # Train model
+    # Create model
     refresh_it = utils.query_yes_no("Do you want to recreate the model?", "no")
     if refresh_it:
         create_model.main(model_description_file, override=True)
@@ -129,6 +134,12 @@ def main(model_description_file, latest_data):
     refresh_it = utils.query_yes_no("Do you want to train the model?", "no")
     if refresh_it:
         train.main(model_description_file)
+
+    # Test model
+    refresh_it = utils.query_yes_no("Do you want to test the model?", "no")
+    if refresh_it:
+        error = test.main(model_description_file)
+        logging.info(error)
 
 
 if __name__ == '__main__':
