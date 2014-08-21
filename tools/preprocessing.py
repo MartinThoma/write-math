@@ -15,20 +15,21 @@ this:
  >> a.preprocessing(preprocessing_queue)
 """
 
-import HandwrittenData
 import numpy
 from scipy.interpolate import interp1d
-from math import sqrt
+import math
 import logging
 import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
+# mine
+import HandwrittenData
 
 
 def _euclidean_distance(p1, p2):
     """Calculate the euclidean distance of two 2D points."""
-    return sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
+    return math.sqrt((p1["x"]-p2["x"])**2 + (p1["y"]-p2["y"])**2)
 
 
 def _flatten(two_dimensional_list):
@@ -36,26 +37,26 @@ def _flatten(two_dimensional_list):
     return [i for inner_list in two_dimensional_list for i in inner_list]
 
 
-def get_class(algorithm_name):
+def get_class(name):
     """Get function pointer by string."""
-    if algorithm_name == 'Scale_and_shift':
+    if name == 'Scale_and_shift':
         return Scale_and_shift
-    elif algorithm_name == 'Space_evenly':
+    elif name == 'Space_evenly':
         return Space_evenly
-    elif algorithm_name == 'Space_evenly_per_line':
+    elif name == 'Space_evenly_per_line':
         return Space_evenly_per_line
-    elif algorithm_name == 'Douglas_peucker':
+    elif name == 'Douglas_peucker':
         return Douglas_peucker
-    elif algorithm_name == 'Connect_lines':
+    elif name == 'Connect_lines':
         return Connect_lines
-    elif algorithm_name == 'Dot_reduction':
+    elif name == 'Dot_reduction':
         return Dot_reduction
-    elif algorithm_name == 'Remove_wild_points':
-        return Remove_wild_points
-    elif algorithm_name == 'Remove_duplicate_time':
+    elif name == 'Wild_point_filter':
+        return Wild_point_filter
+    elif name == 'Remove_duplicate_time':
         return Remove_duplicate_time
     else:
-        logging.debug("Unknown algorithm '%s'.", algorithm_name)
+        logging.debug("Unknown algorithm '%s'.", name)
         return None
 
 
@@ -437,7 +438,7 @@ class Douglas_peucker(object):
             # can just return the squared distance instead
             # (i.e. remove the sqrt) to gain a little performance
 
-            dist = sqrt(dx*dx + dy*dy)
+            dist = math.sqrt(dx*dx + dy*dy)
             return dist
 
         # Finde den Punkt mit dem größten Abstand
@@ -580,20 +581,41 @@ class Dot_reduction(object):
         handwritten_data.set_pointlist(new_pointlist)
 
 
-class Remove_wild_points(object):
+class Wild_point_filter(object):
     """Find wild points and remove them."""
+    def __init__(self, threshold):
+        """The threshold is a speed threshold"""
+        self.threshold = threshold
+
     def __repr__(self):
-        return "Connect_lines"
+        return "Wild_point_filter"
 
     def __str__(self):
-        return "Connect lines (minimum_distance: %0.2f)" % \
-            self.minimum_distance
+        return "Wild point filter (threshold: %0.2f)" % \
+            self.threshold
 
     def __call__(self, handwritten_data):
         assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
             "handwritten data is not of type HandwrittenData, but of %r" % \
             type(handwritten_data)
-        pass
+        new_pointlist = []
+        pointlist = handwritten_data.get_pointlist()
+        debug_did_print = False
+        for line in pointlist:
+            new_line = []
+            last_point = line[0]
+            for point in line[1:]:
+                space_dist = math.hypot(last_point['x'] - point['x'],
+                                        last_point['y'] - point['y'])
+                time_dist = float(point['time'] - last_point['time'])
+                speed = space_dist/time_dist
+                if not (speed >= self.threshold):
+                    new_line.append(point)
+                elif not debug_did_print:
+                    logging.debug("\nthreshold for raw_data_id '%i'",
+                                  handwritten_data.raw_data_id)
+                    debug_did_print = True
+            new_pointlist.append(new_line)
         # Bounding box criterion:
         # If the distance from point to all others strokes bounding boxes is
         # more than 1/5 of the whole size, it is a wild point
