@@ -45,6 +45,28 @@ def create_model(model_folder, basename, model_type, topology, training,
     logging.info(training)
     os.system(training)
 
+
+def main(model_description_file):
+    PROJECT_ROOT = utils.get_project_root()
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+    # Analyze model
+    print(model_description['model'])
+    modelfile = os.path.join(PROJECT_ROOT,
+                             model_description['model']['folder'])
+    data = {}
+    data['training'] = os.path.join(PROJECT_ROOT,
+                                    model_description['data']['training'])
+    data['validating'] = os.path.join(PROJECT_ROOT,
+                                      model_description['data']['validating'])
+    create_model(modelfile,
+                 model_description['model']['basename'],
+                 model_description['model']['type'],
+                 model_description['model']['topology'],
+                 model_description['training'],
+                 data)
+
 if __name__ == "__main__":
     PROJECT_ROOT = utils.get_project_root()
 
@@ -63,21 +85,4 @@ if __name__ == "__main__":
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
     args = parser.parse_args()
-    # Read the model description file
-    with open(args.model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-    # Analyze model
-    print(model_description['model'])
-    modelfile = os.path.join(PROJECT_ROOT,
-                             model_description['model']['folder'])
-    data = {}
-    data['training'] = os.path.join(PROJECT_ROOT,
-                                    model_description['data']['training'])
-    data['validating'] = os.path.join(PROJECT_ROOT,
-                                      model_description['data']['validating'])
-    create_model(modelfile,
-                 model_description['model']['basename'],
-                 model_description['model']['type'],
-                 model_description['model']['topology'],
-                 model_description['training'],
-                 data)
+    main(args.model_description_file)
