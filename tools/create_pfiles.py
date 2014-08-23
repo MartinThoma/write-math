@@ -85,17 +85,21 @@ def prepare_dataset(dataset, formula_id2index, feature_list):
     """Transform each instance of dataset to a (Features, Label) tuple."""
     prepared = []
     start_time = time.time()
+    translation = []
     for i, data in enumerate(dataset):
         x = []
         handwriting = data['handwriting']
         x = handwriting.feature_extraction(feature_list)  # Feature selection
         y = formula_id2index[data['formula_id']]  # Get label
+        translation.append((handwriting.raw_data_id,
+                            handwriting.formula_in_latex,
+                            handwriting.formula_id))
         prepared.append((x, y))
         if i % 100 == 0 and i > 0:
             utils.print_status(len(dataset), i, start_time)
     sys.stdout.write("\r100%" + " "*80 + "\n")
     sys.stdout.flush()
-    return prepared
+    return (prepared, translation)
 
 
 def get_sets(path_to_data):
@@ -110,6 +114,7 @@ def get_sets(path_to_data):
 
     dataset_by_formula_id = {}
     formula_id2index = {}
+    index2latex = {}
 
     # Group data in dataset_by_formula_id so that 10% can be used for the
     # validation set
@@ -124,6 +129,7 @@ def get_sets(path_to_data):
     # Create the test-, validation- and training set
     print("Create the test-, validation- and training set")
     for formula_id, dataset in dataset_by_formula_id.items():
+        index2latex[len(formula_id2index)] = dataset[0]['handwriting'].formula_in_latex
         formula_id2index[formula_id] = len(formula_id2index)
         i = 0
         for raw_data in dataset:
@@ -140,7 +146,7 @@ def get_sets(path_to_data):
     else:
         preprocessing_queue = []
     return (training_set, validation_set, test_set, formula_id2index,
-            preprocessing_queue)
+            preprocessing_queue, index2latex)
 
 
 def create_pfile(path_to_data, feature_list, target_paths):
@@ -150,7 +156,17 @@ def create_pfile(path_to_data, feature_list, target_paths):
     logging.info("Start creation of pfiles...")
     logging.info("Get sets from '%s' ..." % path_to_data)
     (training_set, validation_set, test_set, formula_id2index,
-     preprocessing_queue) = get_sets(path_to_data)
+     preprocessing_queue, index2latex) = get_sets(path_to_data)
+
+    PROJECT_ROOT = utils.get_project_root()
+    logfolder = os.path.join(PROJECT_ROOT, "archive/logs")
+
+    # Write formula_id2index for later lookup
+    index2formula_id = sorted(formula_id2index.items(), key=lambda n: n[1])
+    with open("%s/index2formula_id.csv" % logfolder, "w") as f:
+        f.write("index,formula_id,latex\n")
+        for formula_id, index in index2formula_id:
+            f.write("%i,%i,%s\n" % (index, formula_id, index2latex[index]))
 
     # Get the dimension of the feature vector
     INPUT_FEATURES = sum(map(lambda n: n.get_dimension(), feature_list))
@@ -176,15 +192,20 @@ def create_pfile(path_to_data, feature_list, target_paths):
                                   ("traindata", training_set)]:
         t0 = time.time()
         logging.info("Start preparing '%s' ..." % dataset_name)
-        prepared = prepare_dataset(dataset,
-                                   formula_id2index,
-                                   feature_list)
+        prepared, translation = prepare_dataset(dataset,
+                                                formula_id2index,
+                                                feature_list)
         logging.info("%s length: %i", dataset_name, len(prepared))
         logging.info("start 'make_pfile' ...")
         make_pfile(dataset_name,
                    INPUT_FEATURES,
                    prepared,
                    target_paths[dataset_name])
+        with open("%s/translation-%s.csv" % (logfolder, dataset_name), "w") as f:
+            f.write("index,raw_data_id,latex,formula_id\n")
+            for el in translation:
+                f.write("%i,%i,%s,%i\n" % (formula_id2index[el[2]],
+                                           el[0], el[1], el[2]))
         t1 = time.time() - t0
         logging.info("%s was written. Needed %0.2f seconds" %
                      (dataset_name, t1))
