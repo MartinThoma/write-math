@@ -119,3 +119,13 @@ def query_yes_no(question, default="yes"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' "
                              "(or 'y' or 'n').\n")
+
+
+def get_latest_model(model_folder, basename):
+    models = filter(lambda n: n.endswith(".json"), os.listdir(model_folder))
+    models = filter(lambda n: n.startswith(basename), models)
+    models = natsort.natsorted(models, reverse=True)
+    if len(models) == 0:
+        return None
+    else:
+        return os.path.join(model_folder, models[-1])

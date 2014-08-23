@@ -16,25 +16,22 @@ import utils
 
 
 def test_model(model_folder, basename, test_file):
-    models = filter(lambda n: n.endswith(".json"), os.listdir(model_folder))
-    models = filter(lambda n: n.startswith(basename), models)
-    models = natsort.natsorted(models, reverse=True)
-    if (len(models) == 0):
+    model_src = utils.get_latest_model(model_folder, basename)
+    if model_src is None:
         logging.error("No model with basename '%s' found in '%s'.",
                       basename,
                       model_folder)
     else:
         PROJECT_ROOT = utils.get_project_root()
         time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-        model_src = os.path.join(model_folder, models[-1])
         logging.info("Evaluate '%s'...", model_src)
         logfile = os.path.join(PROJECT_ROOT,
                                "archive/logs/%s-testing.log" %
                                time_prefix)
         with open(logfile, "w") as log, open(model_src, "r") as model_src_p:
-            p = subprocess.Popen(['nntoolkit', 'test', test_file],
+            p = subprocess.Popen(['nntoolkit', 'test', '--batch-size', '1',
+                                  test_file],
                                  stdin=model_src_p,
-                                 stdout=model_src_p,
                                  stderr=log)
             ret = p.wait()
             if ret != 0:
