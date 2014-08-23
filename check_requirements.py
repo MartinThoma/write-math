@@ -27,7 +27,7 @@ def check_python_modules():
     print("## Check modules")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
                         'cPickle', 'detl', 'theano', 'dropbox',
-                        'webbrowser', 'hashlib']
+                        'webbrowser', 'hashlib', 'shapely']
     found = []
     for required_module in required_modules:
         try:
@@ -56,6 +56,10 @@ def check_python_modules():
         import theano
         print("theano version: %s (0.6.0 tested)" %
               theano.__version__)
+    if "shapely" in found:
+        import shapely
+        print("shapely version: %s (1.2.14 tested)" %
+              shapely.__version__)
     if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
