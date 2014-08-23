@@ -3,6 +3,15 @@
 import imp
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+
 def which(program):
     import os
 
@@ -32,11 +41,15 @@ def check_python_modules():
     for required_module in required_modules:
         try:
             imp.find_module(required_module)
-            check = "module '%s' ... found" % required_module
+            check = "module '%s' ... %sfound%s" % (required_module,
+                                                   bcolors.OKGREEN,
+                                                   bcolors.ENDC)
             print(check)
             found.append(required_module)
         except ImportError:
-            print("module '%s' ... NOT found" % required_module)
+            print("module '%s' ... %sNOT%s found" % (required_module,
+                                                     bcolors.WARNING,
+                                                     bcolors.ENDC))
 
     if "argparse" in found:
         import argparse
@@ -74,9 +87,11 @@ def check_executables():
     for executable in required_executables:
         path = which(executable)
         if path is None:
-            print("%s ... NOT found" % executable)
+            print("%s ... %sNOT%s found" % (executable, bcolors.WARNING,
+                                            bcolors.ENDC))
         else:
-            print("%s ... found at %s" % (executable, path))
+            print("%s ... %sfound%s at %s" % (executable, bcolors.OKGREEN,
+                                              bcolors.ENDC, path))
 
 
 def main():
