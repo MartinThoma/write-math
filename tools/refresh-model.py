@@ -138,8 +138,8 @@ def main(model_description_file, latest_data):
     # Test model
     refresh_it = utils.query_yes_no("Do you want to test the model?", "no")
     if refresh_it:
-        error = test.main(model_description_file)
-        logging.info(error)
+        test_error = test.main(model_description_file)
+        logging.info("Test error: %0.4f", test_error)
 
 
 if __name__ == '__main__':
