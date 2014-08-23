@@ -25,6 +25,8 @@ import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
+from shapely.geometry import LineString
+import itertools
 # mine
 import HandwrittenData
 import preprocessing
@@ -36,7 +38,7 @@ def get_class(name):
     for string_name, act_class in clsmembers:
         if string_name == name:
             return act_class
-    logging.debug("Unknown class '%s'.", name)
+    logging.debug("Unknown feature class '%s'.", name)
     return None
 
 
@@ -358,6 +360,133 @@ class Time(object):
             "handwritten data is not of type HandwrittenData, but of %r" % \
             type(handwritten_data)
         return [float(handwritten_data.get_time())]
+
+
+class Center_of_mass(object):
+    def __repr__(self):
+        return "Center_of_mass"
+
+    def __str__(self):
+        return "Center of mass"
+
+    def get_dimension(self):
+        return 2
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        xs = []
+        ys = []
+        for line in handwritten_data.get_pointlist():
+            for point in line:
+                xs.append(point['x'])
+                ys.append(point['y'])
+        return [float(sum(xs))/len(xs), float(sum(ys))/len(ys)]
+
+
+class Stroke_intersections(object):
+    """ Count the number of intersections the symbol has.
+
+              stroke1 stroke2 stroke3
+    stroke1     0        1      0  ...
+    stroke2     1        2      0  ...
+    stroke3     0        0      0  ...
+
+    Returns values of upper triangular matrix (including diagonal)
+    from left to right, top to bottom.
+    """
+
+    def __init__(self, strokes=4):
+        self.strokes = strokes
+
+    def __repr__(self):
+        return "Stroke_intersections"
+
+    def __str__(self):
+        return "Stroke_intersections"
+
+    def get_dimension(self):
+        return int(round(float(self.strokes**2)/2 + float(self.strokes)/2))
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+
+        def count_stroke_selfintersections(stroke):
+            """ Get the number of self-intersections of a stroke."""
+            # This can be solved more efficiently with sweep line
+            counter = 0
+            lines = []
+            last = stroke[0]
+            for point in stroke[1:]:
+                line = LineString([(last['x'], last['y']),
+                                   (point['x'], point['y'])])
+                last = point
+                lines.append((len(lines), line))
+
+            for line1, line2 in itertools.combinations(lines, 2):
+                index1, line1 = line1
+                index2, line2 = line2
+                if line1.intersects(line2) and abs(index1 - index2) > 1:
+                    counter += 1
+            return counter
+
+        def count_intersections(stroke_a, stroke_b):
+            # This can be solved more efficiently with sweep line
+            counter = 0
+            # build data structure a
+            lines_a = []
+            last = stroke_a[0]
+            for point in stroke_a[1:]:
+                line = LineString([(last['x'], last['y']),
+                                   (point['x'], point['y'])])
+                lines_a.append(line)
+                last = point
+            # build data structure b
+            lines_b = []
+            last = stroke_b[0]
+            for point in stroke_b[1:]:
+                line = LineString([(last['x'], last['y']),
+                                   (point['x'], point['y'])])
+                lines_b.append(line)
+                last = point
+
+            # Calculate intersections
+            for line1, line2 in itertools.product(lines_a, lines_b):
+                if line1.intersects(line2):
+                    counter += 1
+            return counter
+
+        x = []
+        pointlist = handwritten_data.get_pointlist()
+        for i in range(self.strokes):
+            for j in range(i, self.strokes):
+                if len(pointlist) <= i or len(pointlist) <= j:
+                    # There are less strokes! If there is no stroke, nothing
+                    # can intersect
+                    x.append(0)
+                else:
+                    # Does stroke i intersect stroke j?
+                    if i == j:
+                        x.append(count_stroke_selfintersections(pointlist[i]))
+                    else:
+                        x.append(count_intersections(pointlist[i],
+                                                     pointlist[j]))
+        # print("%s - %i" % (handwritten_data.formula_in_latex,
+        #                    handwritten_data.raw_data_id))
+        curr = 0
+        for i in range(self.strokes, 0, -1):
+            line = "\t"*(self.strokes - i)
+            for j in range(i):
+                line += str(x[curr]) + "\t"
+                curr += 1
+
+        assert self.get_dimension() == len(x), \
+            "Dimension of %s should be %i, but was %i" % \
+            (self.__str__(), self.get_dimension(), len(x))
+        return x
 
 
 if __name__ == '__main__':
