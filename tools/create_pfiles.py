@@ -25,6 +25,7 @@ import time
 import gc
 import utils
 import yaml
+import numpy
 
 
 def main(model_description_file):
@@ -81,7 +82,7 @@ def make_pfile(dataset_name, feature_count, data,
     os.remove(input_filename)
 
 
-def prepare_dataset(dataset, formula_id2index, feature_list):
+def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
     """Transform each instance of dataset to a (Features, Label) tuple."""
     prepared = []
     start_time = time.time()
@@ -94,11 +95,43 @@ def prepare_dataset(dataset, formula_id2index, feature_list):
         translation.append((handwriting.raw_data_id,
                             handwriting.formula_in_latex,
                             handwriting.formula_id))
-        prepared.append((x, y))
+        prepared.append((numpy.array(x), y))
         if i % 100 == 0 and i > 0:
             utils.print_status(len(dataset), i, start_time)
     sys.stdout.write("\r100%" + " "*80 + "\n")
     sys.stdout.flush()
+
+    # Feature normalization
+    if is_traindata:
+        # Create feature only list
+        feats = []
+        for x, y in prepared:
+            feats.append(x)
+        # Calculate all means / mins / maxs
+        means = numpy.mean(feats, 0)
+        mins = numpy.min(feats, 0)
+        maxs = numpy.max(feats, 0)
+        # Calculate, min, max and mean vector for each feature with
+        # normalization
+        start = 0
+        for feature in feature_list:
+            end = start + feature.get_dimension()
+            # append the data to the feature class
+            feature.mean = numpy.array(means[start:end])
+            feature.min = numpy.array(mins[start:end])
+            feature.max = numpy.array(maxs[start:end])
+            start = end
+    start = 0
+    for feature in feature_list:
+        end = start + feature.get_dimension()
+        # TODO: Should I check if feature normalization is activated?
+        # For every instance in the dataset: Normalize!
+        for i in range(len(prepared)):
+            # The 0 is necessary as every element is (x, y)
+            feature_range = (feature.max - feature.min)
+            prepared[i][0][start:end] = (prepared[i][0][start:end] -
+                                         feature.mean) / feature_range
+        start = end
     return (prepared, translation)
 
 
@@ -187,14 +220,17 @@ def create_pfile(path_to_data, feature_list, target_paths):
     print("```")
     logging.info("## Start creating pfiles")
 
-    for dataset_name, dataset in [("testdata", test_set),
-                                  ("validdata", validation_set),
-                                  ("traindata", training_set)]:
+    # Traindata has to come first because of feature scaling
+    for dataset_name, dataset, is_traindata in \
+        [("traindata", training_set, True),
+         ("testdata", test_set, False),
+         ("validdata", validation_set, False)]:
         t0 = time.time()
         logging.info("Start preparing '%s' ..." % dataset_name)
         prepared, translation = prepare_dataset(dataset,
                                                 formula_id2index,
-                                                feature_list)
+                                                feature_list,
+                                                is_traindata)
         logging.info("%s length: %i", dataset_name, len(prepared))
         logging.info("start 'make_pfile' ...")
         make_pfile(dataset_name,

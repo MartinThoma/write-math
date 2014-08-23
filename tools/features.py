@@ -81,12 +81,16 @@ def get_features(model_description_features):
 # * __call__ must take exactly one argument of type HandwrittenData
 # * __call__ must return a list of length get_dimension()
 # * get_dimension must return a positive number
+# * have a 'normalize' attribute that is either true or false
 
 
 # Local features
 
 
 class Constant_Point_Coordinates(object):
+
+    normalize = False
+
     def __init__(self, lines=4, points_per_line=20, fill_empty_with=0,
                  pen_down=True):
         self.lines = lines
@@ -165,6 +169,9 @@ class Constant_Point_Coordinates(object):
 
 
 class First_N_Points(object):
+
+    normalize = False
+
     def __init__(self, n=81):
         self.n = n
 
@@ -205,6 +212,9 @@ class First_N_Points(object):
 # Global features
 
 class Stroke_Count(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Stroke_Count"
 
@@ -222,6 +232,9 @@ class Stroke_Count(object):
 
 
 class Bitmap(object):
+
+    normalize = True
+
     def __init__(self, n=28):
         self.n = n  # Size of the bitmap (n x n)
 
@@ -267,6 +280,9 @@ class Bitmap(object):
 
 
 class Ink(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Ink"
 
@@ -293,6 +309,9 @@ class Ink(object):
 
 
 class AspectRatio(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Aspect Ratio"
 
@@ -312,6 +331,9 @@ class AspectRatio(object):
 
 
 class Width(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Width"
 
@@ -329,6 +351,9 @@ class Width(object):
 
 
 class Height(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Height"
 
@@ -346,6 +371,9 @@ class Height(object):
 
 
 class Time(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Time"
 
@@ -363,6 +391,9 @@ class Time(object):
 
 
 class Center_of_mass(object):
+
+    normalize = True
+
     def __repr__(self):
         return "Center_of_mass"
 
@@ -396,6 +427,8 @@ class Stroke_intersections(object):
     Returns values of upper triangular matrix (including diagonal)
     from left to right, top to bottom.
     """
+
+    normalize = True
 
     def __init__(self, strokes=4):
         self.strokes = strokes
