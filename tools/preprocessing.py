@@ -600,12 +600,6 @@ class Wild_point_filter(object):
                 speed = space_dist/time_dist
                 if not (speed >= self.threshold):
                     new_line.append(point)
-                else:
-                    debug_detecte_wildpoints += 1
-                    if debug_detecte_wildpoints > handwritten_data.wild_point_count and not debug_did_print:
-                        logging.debug("threshold for raw_data_id '%i'",
-                                      handwritten_data.raw_data_id)
-                        debug_did_print = True
 
             new_pointlist.append(new_line)
         # Bounding box criterion:
