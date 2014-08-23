@@ -11,6 +11,7 @@ import MySQLdb
 import MySQLdb.cursors
 import utils
 import preprocessing
+import features
 
 
 def fetch_data(raw_data_id):
@@ -46,8 +47,13 @@ def display_data(raw_data_string, raw_data_id, latest_model):
         # Get the preprocessing queue
         tmp = model_description['preprocessing']
         preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
-
         a.preprocessing(preprocessing_queue)
+
+        tmp = model_description['features']
+        feature_list = features.get_features(tmp)
+        x = a.feature_extraction(feature_list)
+        t = [round(el, 3) for el in x]
+        print(t)
     a.show()
 
 if __name__ == '__main__':
