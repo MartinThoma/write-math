@@ -16,6 +16,53 @@ from collections import defaultdict
 # mine
 import utils
 import csv
+import itertools
+
+from collections import OrderedDict, Callable
+
+
+class DefaultOrderedDict(OrderedDict):
+    # Source: http://stackoverflow.com/a/6190500/562769
+    def __init__(self, default_factory=None, *a, **kw):
+        if (default_factory is not None and
+           not isinstance(default_factory, Callable)):
+            raise TypeError('first argument must be callable')
+        OrderedDict.__init__(self, *a, **kw)
+        self.default_factory = default_factory
+
+    def __getitem__(self, key):
+        try:
+            return OrderedDict.__getitem__(self, key)
+        except KeyError:
+            return self.__missing__(key)
+
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        self[key] = value = self.default_factory()
+        return value
+
+    def __reduce__(self):
+        if self.default_factory is None:
+            args = tuple()
+        else:
+            args = self.default_factory,
+        return type(self), args, None, None, self.items()
+
+    def copy(self):
+        return self.__copy__()
+
+    def __copy__(self):
+        return type(self)(self.default_factory, self)
+
+    def __deepcopy__(self, memo):
+        import copy
+        return type(self)(self.default_factory,
+                          copy.deepcopy(self.items()))
+
+    def __repr__(self):
+        return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
+                                               OrderedDict.__repr__(self))
 
 
 def get_test_results(model_folder, basename, test_file):
@@ -49,12 +96,82 @@ def get_test_results(model_folder, basename, test_file):
         #return error  # TODO: Adjust
 
 
+def make_all(tuplelist):
+    t = []
+    for confusiongroup in tuplelist:
+        for x, y in itertools.permutations(confusiongroup, 2):
+            t.append((x, y))
+    return t
+
+
 def create_report(true_data, eval_data, index2latex):
     # Gather data
     correct = []
     wrong = []
+    confusing = [('\perp', '\\bot'),
+                 ('\Sigma', '\sum'),
+                 ('\Pi', '\prod', '\sqcap'),
+                 ('\coprod', '\\amalg', '\\sqcup'),
+                 ('\models', '\\vDash'), ('\mid', '|'),
+                 ('\Delta', '\\triangle', '\\vartriangle'),
+                 ('\parallel', '\|'),
+                 ('\ohm', '\Omega'),
+                 ('\\backslash', '\setminus'),
+                 ('\checked', '\checkmark'),
+                 ('\with', '\&'),
+                 ('\sharp', '\#'),
+                 ('\mathsection', '\S'),
+                 ('\lhd', '\\triangleleft', '\\vartriangleleft'),
+                 ('\\varoiint', '\\oiint'),
+                 ('\mathbb{R}', '\mathds{R}')]
+    understandable = [('\\alpha', '\propto', '\\varpropto'),
+                      ('\epsilon', '\in'),
+                      ('\Lambda', '\wedge'),
+                      ('\emptyset', '\O', '\diameter', '\o', '\\varnothing'),
+                      ('\mathcal{E}', '\\varepsilon', '\epsilon'),
+                      ('o', 'O', '0', '\circ', '\degree', '\\fullmoon', '\mathcal{O}'),
+                      ('\\rightarrow', '\longrightarrow', '\shortrightarrow'),
+                      ('\mathbb{1}', '\mathds{1}'),
+                      ('\geqslant', '\geq'),
+                      ('\leqslant', '\leq'),
+                      ('\Pi', '\pi', '\prod'),
+                      ('\psi', '\Psi'),
+                      ('\phi', '\Phi'),
+                      ('\odot', '\\astrosun'),
+                      ('\\bullet', '\cdot'),
+                      ('\\theta', '\Theta'),
+                      ('\Longrightarrow', '\Rightarrow'),
+                      ('\Longleftrightarrow', '\Leftrightarrow'),
+                      ('\longmapsto', '\mapsto'),
+                      ('\mathscr{L}', '\mathcal{L}'),
+                      ('\phi', '\emptyset'),
+                      ('\\beta', '\ss'),
+                      ('\male', '\mars'),
+                      ('\\female', '\\venus'),
+                      ('\\triangledown', '\\nabla'),
+                      ('\\mathdsz', '\\nabla'),
+                      ('\Bowtie', '\\bowtie'),
+                      ('\\rho', '\\varrho'),
+                      ('\\mathds{Q}', '\\mathbb{Q}'),
+                      ('\\mathds{Z}', '\\mathbb{Z}', '\\mathcal{Z}'),
+                      ('\diamond', '\diamondsuit', '\lozenge'),
+                      ('\dots', '\dotsc', '\dotsc', '\cdot'),
+                      ('\mathcal{T}', '\\tau'),
+                      ('\mathcal{Adjust}', '\mathscr{A}', 'A'),
+                      ('\mathcal{D}', '\mathscr{D}', 'D'),
+                      ('\mathcal{N}', '\mathscr{N}', 'N'),
+                      ('\mathcal{R}', '\mathscr{R}', 'R'),
+                      ('\succeq', '\geq'),
+                      ('\mathcal{C}', 'C'),
+                      ('x', '\\times'),
+                      ('\\alpha', '\\ltimes'),
+                      ('\\chi', '\\mathcal{X}')]
+    confusing = make_all(confusing) + make_all(understandable)
     for known, evaluated in zip(true_data, eval_data):
         if known['index'] == evaluated:
+            correct.append(known)
+        elif (index2latex[known['index']],
+              index2latex[evaluated]) in confusing:  # Some confusions are ok!
             correct.append(known)
         else:
             formula_id = index2latex[evaluated]
@@ -65,11 +182,26 @@ def create_report(true_data, eval_data, index2latex):
                  (classification_error, len(wrong)))
 
     # Get the data
-    errors_by_correct_classification = defaultdict(list)
-    errors_by_wrong_classification = defaultdict(list)
+    errors_by_correct_classification = DefaultOrderedDict(list)
+    errors_by_wrong_classification = DefaultOrderedDict(list)
     for el in wrong:
         errors_by_correct_classification[el['latex']].append(el)
         errors_by_wrong_classification[el['confused']].append(el)
+
+    # Sort errors_by_correct_classification
+    errors_by_correct_classification = OrderedDict(sorted(errors_by_correct_classification.iteritems(),
+                                                   key=lambda n: len(n[1]),
+                                                   reverse=True))
+    for key in errors_by_correct_classification:
+        errors_by_correct_classification[key] = sorted(errors_by_correct_classification[key],
+                                                       key=lambda n: n['confused'])
+    # Sort errors_by_wrong_classification
+    errors_by_wrong_classification = OrderedDict(sorted(errors_by_wrong_classification.iteritems(),
+                                                 key=lambda n: len(n[1]),
+                                                 reverse=True))
+    for key in errors_by_wrong_classification:
+        errors_by_wrong_classification[key] = sorted(errors_by_wrong_classification[key],
+                                                     key=lambda n: n['latex'])
 
     # Get the tempalte
     PROJECT_ROOT = utils.get_project_root()
@@ -103,14 +235,14 @@ def create_report(true_data, eval_data, index2latex):
 def analyze_results(translation_csv, what_evaluated_file, evaluation_file):
     index2latex = {}
     with open(translation_csv) as csvfile:
-        spamreader = csv.DictReader(csvfile, delimiter=',', quotechar='|')
+        spamreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         for row in spamreader:
             index2latex[int(row['index'])] = row['latex']
     with open(evaluation_file) as f:
         eval_data = map(int, f.readlines())  # Has no heading
     true_data = []
     with open(what_evaluated_file) as csvfile:
-        spamreader = csv.DictReader(csvfile, delimiter=',', quotechar='|')
+        spamreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         for row in spamreader:
             row['index'] = int(row['index'])
             true_data.append(row)

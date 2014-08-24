@@ -8,7 +8,12 @@
 
     {{ recordings_nr }} recordings were in the test set. -->
 
-    <h2>Errors by correct classification</h2>
+    <ul>
+        <li><a href="#by_correct">by correct classification</a></li>
+        <li><a href="#by_wrong">by wrong classification</a></li>
+    </ul>
+
+    <h2><a name="by_correct"></a>Errors by correct classification</h2>
 
     {% for correct, wrongs_datasets in errors_by_correct_classification.items() %}
         <h3>{{ correct }}</h3>
@@ -19,7 +24,7 @@
         </ul>
     {% endfor %}
 
-    <h2>Errors by wrong classification</h2>
+    <h2><a name="by_wrong"></a>Errors by wrong classification</h2>
 
     {% for correct, wrongs_datasets in errors_by_wrong_classification.items() %}
         <h3>{{ correct }}</h3>
