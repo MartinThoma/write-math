@@ -223,6 +223,9 @@ if __name__ == '__main__':
                         help=("don't download new files; only upload to "
                               "dropbox"))
     args = parser.parse_args()
+
+    logging.info("Don't forget to run 'create_testset_online_once.py'.")
+
     if not check_dropbox():
         logging.error("Dropbox login data was not correct. "
                       "Please check your '~/.writemathrc' file.")
