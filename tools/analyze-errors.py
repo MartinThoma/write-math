@@ -108,65 +108,63 @@ def create_report(true_data, eval_data, index2latex):
     # Gather data
     correct = []
     wrong = []
-    confusing = [('\perp', '\\bot'),
-                 ('\Sigma', '\sum'),
-                 ('\Pi', '\prod', '\sqcap'),
+    confusing = [('\sum', '\Sigma'),
+                 ('\prod', '\Pi', '\sqcap'),
                  ('\coprod', '\\amalg', '\\sqcup'),
-                 ('\models', '\\vDash'), ('\mid', '|'),
+                 ('\perp', '\\bot'),
+                 ('\models', '\\vDash'),
+                 ('|', '\mid'),
                  ('\Delta', '\\triangle', '\\vartriangle'),
-                 ('\parallel', '\|'),
+                 ('\|', '\parallel'),
                  ('\ohm', '\Omega'),
-                 ('\\backslash', '\setminus'),
+                 ('\setminus', '\\backslash'),
                  ('\checked', '\checkmark'),
-                 ('\with', '\&'),
-                 ('\sharp', '\#'),
-                 ('\mathsection', '\S'),
+                 ('\&', '\with'),
+                 ('\#', '\sharp'),
+                 ('\S', '\mathsection'),
+                 ('\\nabla', '\\triangledown'),
                  ('\lhd', '\\triangleleft', '\\vartriangleleft'),
-                 ('\\varoiint', '\\oiint'),
-                 ('\mathbb{R}', '\mathds{R}')]
-    understandable = [('\\alpha', '\propto', '\\varpropto'),
-                      ('\epsilon', '\in'),
+                 ('\\oint', '\\varoint'),
+                 ('\\oiint', '\\varoiint'),
+                 ('\mathbb{R}', '\mathds{R}'),
+                 ('\mathcal{A}', '\mathscr{A}'),
+                 ('\mathcal{D}', '\mathscr{D}'),
+                 ('\mathcal{N}', '\mathscr{N}'),
+                 ('\mathcal{R}', '\mathscr{R}'),
+                 ('\propto', '\\varpropto')]
+    understandable = [('\\alpha', '\propto', '\\varpropto', '\ltimes'),
+                      ('0', 'O', 'o', '\circ', '\degree', '\\fullmoon', '\mathcal{O}'),
+                      ('\epsilon', '\\varepsilon', '\in', '\mathcal{E}'),
                       ('\Lambda', '\wedge'),
-                      ('\emptyset', '\O', '\diameter', '\o', '\\varnothing'),
-                      ('\mathcal{E}', '\\varepsilon', '\epsilon'),
-                      ('o', 'O', '0', '\circ', '\degree', '\\fullmoon', '\mathcal{O}'),
+                      ('\emptyset', '\O', '\o', '\diameter', '\\varnothing'),
                       ('\\rightarrow', '\longrightarrow', '\shortrightarrow'),
+                      ('\Rightarrow', '\Longrightarrow'),
+                      ('\Leftrightarrow', '\Longleftrightarrow'),
+                      ('\mapsto', '\longmapsto'),
                       ('\mathbb{1}', '\mathds{1}'),
-                      ('\geqslant', '\geq'),
-                      ('\leqslant', '\leq'),
+                      ('\mathscr{L}', '\mathcal{L}'),
+                      ('\\mathbb{Q}', '\\mathds{Q}'),
+                      ('\\mathbb{Z}', '\\mathds{Z}', '\\mathcal{Z}'),
+                      ('\geq', '\geqslant', '\succeq'),
+                      ('\leq', '\leqslant'),
                       ('\Pi', '\pi', '\prod'),
                       ('\psi', '\Psi'),
-                      ('\phi', '\Phi'),
-                      ('\odot', '\\astrosun'),
-                      ('\\bullet', '\cdot'),
+                      ('\phi', '\Phi', '\emptyset'),
+                      ('\\rho', '\\varrho'),
                       ('\\theta', '\Theta'),
-                      ('\Longrightarrow', '\Rightarrow'),
-                      ('\Longleftrightarrow', '\Leftrightarrow'),
-                      ('\longmapsto', '\mapsto'),
-                      ('\mathscr{L}', '\mathcal{L}'),
-                      ('\phi', '\emptyset'),
+                      ('\odot', '\\astrosun'),
+                      ('\cdot', '\\bullet'),
                       ('\\beta', '\ss'),
                       ('\male', '\mars'),
                       ('\\female', '\\venus'),
-                      ('\\triangledown', '\\nabla'),
-                      ('\\mathdsz', '\\nabla'),
                       ('\Bowtie', '\\bowtie'),
-                      ('\\rho', '\\varrho'),
-                      ('\\mathds{Q}', '\\mathbb{Q}'),
-                      ('\\mathds{Z}', '\\mathbb{Z}', '\\mathcal{Z}'),
                       ('\diamond', '\diamondsuit', '\lozenge'),
-                      ('\dots', '\dotsc', '\dotsc', '\cdot'),
+                      ('\dots', '\dotsc'),
                       ('\mathcal{T}', '\\tau'),
-                      ('\mathcal{Adjust}', '\mathscr{A}', 'A'),
-                      ('\mathcal{D}', '\mathscr{D}', 'D'),
-                      ('\mathcal{N}', '\mathscr{N}', 'N'),
-                      ('\mathcal{R}', '\mathscr{R}', 'R'),
-                      ('\succeq', '\geq'),
                       ('\mathcal{C}', 'C'),
-                      ('x', '\\times'),
-                      ('\\alpha', '\\ltimes'),
-                      ('\\chi', '\\mathcal{X}')]
+                      ('x', '\\times', 'X', '\\chi', '\\mathcal{X}')]
     confusing = make_all(confusing) + make_all(understandable)
+    # confusing = []
     for known, evaluated in zip(true_data, eval_data):
         if known['index'] == evaluated:
             correct.append(known)
@@ -250,24 +248,29 @@ def analyze_results(translation_csv, what_evaluated_file, evaluation_file):
     create_report(true_data, eval_data, index2latex)
 
 
-def main(model_description_file, translation_file):
+def main(model_description_file, translation_file, aset='test'):
     PROJECT_ROOT = utils.get_project_root()
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
     model_folder = os.path.join(PROJECT_ROOT,
                                 model_description['model']['folder'])
+    if aset == 'test':
+        key_model, key_file = 'testing', 'testdata'
+    elif aset == 'valid':
+        key_model, key_file = 'validating', 'validdata'
+    else:
+        key_model, key_file = 'training', 'traindata'
     test_data_path = os.path.join(PROJECT_ROOT,
-                                  model_description['data']['testing'])
+                                  model_description['data'][key_model])
     evaluation_file = get_test_results(model_folder,
                                        model_description['model']['basename'],
                                        test_data_path)
     translation_csv = os.path.join(PROJECT_ROOT,
                                    "archive/logs/index2formula_id.csv")
     a = os.path.join(PROJECT_ROOT, "archive/logs")
-    b = "testdata"
     what_evaluated_file = os.path.join(PROJECT_ROOT,
-                                       "%s/translation-%s.csv" % (a, b))
+                                       "%s/translation-%s.csv" % (a, key_file))
     analyze_results(translation_csv, what_evaluated_file, evaluation_file)
 
 
@@ -304,5 +307,10 @@ if __name__ == "__main__":
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
+    parser.add_argument("-s", "--set",
+                        dest="aset",
+                        choices=['test', 'train', 'valid'],
+                        help="which set should get analyzed?",
+                        default='test')
     args = parser.parse_args()
-    main(args.model_description_file, args.translation_file)
+    main(args.model_description_file, args.translation_file, args.aset)
