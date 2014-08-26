@@ -522,6 +522,50 @@ class Stroke_intersections(object):
         return x
 
 
+class Re_curvature(object):
+
+    normalize = True
+
+    def __init__(self, strokes=4):
+        self.strokes = strokes
+
+    def __repr__(self):
+        return "Re_curvature"
+
+    def __str__(self):
+        return "Re-curvature"
+
+    def get_dimension(self):
+        return self.strokes
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        x = []
+        for stroke in handwritten_data.get_pointlist():
+            stroke_y = [point['y'] for point in stroke]
+            height = max(stroke_y) - min(stroke_y)
+            length = 0.0
+            last_point = stroke[0]
+            for point in stroke[1:]:
+                length += preprocessing._euclidean_distance(point, last_point)
+                last_point = point
+
+            if length == 0:
+                x.append(1)
+            else:
+                x.append(height/length)
+            if len(x) == self.strokes:
+                break
+        while len(x) < self.strokes:
+            x.append(0)
+        assert self.get_dimension() == len(x), \
+            "Dimension of %s should be %i, but was %i" % \
+            (self.__str__(), self.get_dimension(), len(x))
+        return x
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
