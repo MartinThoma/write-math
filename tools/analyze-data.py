@@ -34,7 +34,7 @@ def filter_label(label):
                  'fullmoon', 'leftmoon', 'female', 'male', 'checked',
                  'diameter', 'sun', 'Bowtie', 'sqrt',
                  'cong', 'copyright', 'dag', 'parr', 'notin', 'dotsc',
-                 'mathds'
+                 'mathds', 'mathfrak'
                  ]
     if any(label[1:].startswith(bad) for bad in bad_names):
         return label[1:]
@@ -51,7 +51,7 @@ def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
     metafile = os.path.join(folder, filename)
     open(metafile, 'w').close()  # Truncate the file
     write_file = open(metafile, 'a')
-    write_file.write("label,mean,variance\n")  # heading
+    write_file.write("label,mean,std\n")  # heading
     # raw
     rawfilename = os.path.join(folder, filename+'.raw')
     open(rawfilename, 'w').close()  # Truncate the file
@@ -327,6 +327,7 @@ def main(handwriting_datasets_file):
     # get_bounding_box_distance(raw_datasets)
 
     f = [(features.AspectRatio(), "aspect_ratio.csv"),
+         (features.Re_curvature(1), "re_curvature.csv"),
          (features.Height(), "height.csv"),
          (features.Width(), "width.csv"),
          (features.Time(), "time.csv"),
