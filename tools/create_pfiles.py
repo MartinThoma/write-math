@@ -28,31 +28,33 @@ import yaml
 import numpy
 
 
-def main(model_description_file):
+def main(model_folder):
     PROJECT_ROOT = utils.get_project_root()
 
     # Read the model description file
-    with open(model_description_file, 'r') as ymlfile:
+    with open(os.path.join(model_folder, "model.yml"), 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
     # Get preprocessed .pickle file from model description file
     handwriting_datasets = os.path.join(PROJECT_ROOT,
                                         model_description['preprocessed'])
-    target_paths = {}
-    for key in model_description['data']:
-        tmp = os.path.join(PROJECT_ROOT, model_description['data'][key])
-        model_description['data'][key] = tmp
-        if key == 'training':
-            target_paths['traindata'] = model_description['data'][key]
-        elif key == 'validating':
-            target_paths['validdata'] = model_description['data'][key]
-        elif key == 'testing':
-            target_paths['testdata'] = model_description['data'][key]
+    if os.path.isdir(handwriting_datasets):
+        handwriting_datasets = os.path.join(handwriting_datasets,
+                                            "data.pickle")
+    target_paths = {'traindata': os.path.join(model_folder, "traindata.pfile"),
+                    'validdata': os.path.join(model_folder, "validdata.pfile"),
+                    'testdata': os.path.join(model_folder, "testdata.pfile")}
 
     # Get a list of all used features
     feature_list = features.get_features(model_description['features'])
 
+    if 'data-modification' in model_description and 'multiply' in \
+       model_description['data-modification']:
+        multiply = model_description['data-modification']['multiply']
+    else:
+        multiply = 1
+
     # Create pfiles!
-    create_pfile(handwriting_datasets, feature_list, target_paths)
+    create_pfile(model_folder, handwriting_datasets, feature_list, target_paths, multiply)
 
 
 def make_pfile(dataset_name, feature_count, data,
@@ -182,7 +184,8 @@ def get_sets(path_to_data):
             preprocessing_queue, index2latex)
 
 
-def create_pfile(path_to_data, feature_list, target_paths):
+def create_pfile(model_folder, path_to_data, feature_list, target_paths,
+                 multiply):
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
@@ -191,12 +194,17 @@ def create_pfile(path_to_data, feature_list, target_paths):
     (training_set, validation_set, test_set, formula_id2index,
      preprocessing_queue, index2latex) = get_sets(path_to_data)
 
-    PROJECT_ROOT = utils.get_project_root()
-    logfolder = os.path.join(PROJECT_ROOT, "archive/logs")
+    # Multiply traing_set
+    new_trainging_set = []
+    for i in range(multiply):
+        for el in training_set:
+            new_trainging_set.append(el)
+    training_set = new_trainging_set
 
     # Write formula_id2index for later lookup
     index2formula_id = sorted(formula_id2index.items(), key=lambda n: n[1])
-    with open("%s/index2formula_id.csv" % logfolder, "w") as f:
+    index2formula_file = os.path.join(model_folder, "index2formula_id.csv")
+    with open(index2formula_file, "w") as f:
         f.write("index,formula_id,latex\n")
         for formula_id, index in index2formula_id:
             f.write("%i,%i,%s\n" % (index, formula_id, index2latex[index]))
@@ -236,8 +244,8 @@ def create_pfile(path_to_data, feature_list, target_paths):
         make_pfile(dataset_name,
                    INPUT_FEATURES,
                    prepared,
-                   target_paths[dataset_name])
-        with open("%s/translation-%s.csv" % (logfolder, dataset_name), "w") as f:
+                   os.path.join(path_to_data, target_paths[dataset_name]))
+        with open("%s/translation-%s.csv" % (model_folder, dataset_name), "w") as f:
             f.write("index,raw_data_id,latex,formula_id\n")
             for el in translation:
                 f.write("%i,%i,%s,%i\n" % (formula_id2index[el[2]],
@@ -253,18 +261,18 @@ if __name__ == '__main__':
 
     # Get latest model description file
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
+    latest_model = utils.get_latest_folder(models_folder)
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
+    parser.add_argument("-m", "--model",
+                        dest="model_folder",
+                        help="where is the model folder (that contains a model.yml)?",
+                        metavar="FOLDER",
+                        type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)
     args = parser.parse_args()
 
-    main(args.model_description_file)
+    main(args.model_folder)

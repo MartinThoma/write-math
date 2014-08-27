@@ -50,23 +50,19 @@ def update_model_description_file(model_description_file, raw_data):
         return yaml.dump(data, stream, OrderedDumper, **kwds)
 
     # Read the model description file
-    with open(args.model_description_file, 'r') as ymlfile:
+    with open(model_description_file, 'r') as ymlfile:
         md = ordered_load(ymlfile, yaml.SafeLoader)
 
-    # Set new raw data
-    md['data-source'] = "archive/" + \
-                        "archive/".join(raw_data.split("archive/")[1:])
+    # TODO: Get raw path by looking at the preprocessed file
+    # update preprocessed
+    # note that this could change the number of input and output nodes
+
     # Get time string
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     # Update 'preprocessed'
-    md['preprocessed'] = ("archive/datasets/%s-"
+    md['preprocessed'] = ("archive/preprocessed/%s-"
                           "handwriting_datasets-preprocessed"
                           ".pickle") % time_prefix
-    # Update data
-    md['data']['training'] = "archive/pfiles/%s-traindata.pfile" % time_prefix
-    md['data']['validating'] = "archive/pfiles/%s-validdata.pfile" % \
-        time_prefix
-    md['data']['testing'] = "archive/pfiles/%s-testdata.pfile" % time_prefix
 
     # Update topology (input neurons)
     feature_list = features.get_features(md['features'])
@@ -83,8 +79,9 @@ def update_model_description_file(model_description_file, raw_data):
                                    indent=4).replace('-   ', '  - '))
 
 
-def main(model_description_file, latest_data):
+def main(model_folder, latest_data):
     # Read the model description file
+    model_description_file = os.path.join(model_folder, "model.yml")
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
 
@@ -150,18 +147,18 @@ if __name__ == '__main__':
     latest_model = utils.get_latest_in_folder(models_folder, ".yml")
 
     # Get latest raw data file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_data = utils.get_latest_in_folder(models_folder, "raw.pickle")
+    models_folder = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
+    latest_data = utils.get_latest_folder(models_folder, "raw.pickle")
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
+    parser.add_argument("-m", "--model",
+                        dest="model",
+                        help="where is the model folder (with model.yml)?",
+                        metavar="FOLDER",
+                        type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)
     parser.add_argument("-d", "--dataset",
                         dest="dataset",
@@ -169,5 +166,6 @@ if __name__ == '__main__':
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_data)
+    exit()  # TODO: Update this to work with latest project structure
     args = parser.parse_args()
-    main(args.model_description_file, args.dataset)
+    main(args.model, args.dataset)

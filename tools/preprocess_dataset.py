@@ -16,25 +16,26 @@ import yaml
 import utils
 
 
-def main(model_description_file):
-    raw_datapath, outputpath, p_queue = get_parameters(model_description_file)
+def main(folder):
+    raw_datapath, outputpath, p_queue = get_parameters(folder)
     create_preprocessed_dataset(raw_datapath, outputpath, p_queue)
 
 
-def get_parameters(model_description_file):
+def get_parameters(folder):
     PROJECT_ROOT = utils.get_project_root()
     # Read the model description file
-    with open(model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
+    with open(os.path.join(folder, "info.yml"), 'r') as ymlfile:
+        preprocessing_description = yaml.load(ymlfile)
 
     # Get the path of the raw data
     raw_datapath = os.path.join(PROJECT_ROOT,
-                                model_description['data-source'])
+                                "archive/raw-datasets",
+                                preprocessing_description['data-source'])
     # Get the path were the preprocessed file should be put
-    outputpath = os.path.join(PROJECT_ROOT,
-                              model_description['preprocessed'])
+    outputpath = os.path.join(folder, "data.pickle")
+
     # Get the preprocessing queue
-    tmp = model_description['preprocessing']
+    tmp = preprocessing_description['queue']
     preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
     return (raw_datapath, outputpath, preprocessing_queue)
 
@@ -43,9 +44,10 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
     # Log everything
     logging.info("Data soure %s" % path_to_data)
     logging.info("Output will be stored in %s" % outputpath)
-    logging.info("Preprocessing Queue:")
+    tmp = "Preprocessing Queue:\n"
     for el in preprocessing_queue:
-        logging.info(el)
+        tmp += str(el) + "\n"
+    logging.info(tmp)
     # Load from pickled file
     logging.info("Start loading data...")
     loaded = pickle.load(open(path_to_data))
@@ -57,7 +59,7 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
             utils.print_status(len(raw_datasets), i, start_time)
         # Do the work
         raw_dataset['handwriting'].preprocessing(preprocessing_queue)
-    sys.stdout.write("\r%0.2f%% (done)   \n" % (100))
+    sys.stdout.write("\r%0.2f%% (done)\033[K\n" % (100))
     print("")
     pickle.dump({'handwriting_datasets': raw_datasets,
                  'formula_id2latex': loaded['formula_id2latex'],
@@ -71,18 +73,19 @@ if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
     # Get latest model description file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
+    preprocessed_folder = os.path.join(PROJECT_ROOT, "archive/preprocessed")
+    latest_preprocessed = utils.get_latest_folder(preprocessed_folder)
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
-                        default=latest_model)
+    parser.add_argument("-f", "--folder",
+                        dest="folder",
+                        help="where is the preprocessing folder "
+                             "(that contains a info.yml)?",
+                        metavar="FOLDER",
+                        type=lambda x: utils.is_valid_folder(parser, x),
+                        default=latest_preprocessed)
     args = parser.parse_args()
-    main(args.model_description_file)
+    main(args.folder)

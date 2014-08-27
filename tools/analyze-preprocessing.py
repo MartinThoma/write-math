@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Analyze the effect of preprocessing by manually looking at the data."""
+
 # Logging
 import logging
 import sys
@@ -172,9 +174,9 @@ if __name__ == '__main__':
 
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest model description file
-    MODELS_FOLDER = os.path.join(PROJECT_ROOT, "archive/datasets")
-    LATEST_DATASET = utils.get_latest_in_folder(MODELS_FOLDER, "raw.pickle")
+    # Get latest raw dataset
+    DATASET_FOLDER = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
+    LATEST_DATASET = utils.get_latest_in_folder(DATASET_FOLDER, "raw.pickle")
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,

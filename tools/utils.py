@@ -31,6 +31,15 @@ def is_valid_file(parser, arg):
         return arg
 
 
+def is_valid_folder(parser, arg):
+    """Check if arg is a valid file that already exists on the file system."""
+    arg = os.path.abspath(arg)
+    if not os.path.isdir(arg):
+        parser.error("The folder %s does not exist!" % arg)
+    else:
+        return arg
+
+
 def get_project_configuration():
     """Get project configuration as dictionary."""
     home = os.path.expanduser("~")
@@ -55,6 +64,16 @@ def get_latest_in_folder(folder, ending="", default=""):
         if my_file.endswith(ending):
             latest = os.path.join(folder, my_file)
     return latest
+
+
+def get_latest_folder(folder):
+    """Get the absolute path of a subfolder that comes last with natural
+       sorting in the given folder.
+    """
+    folders = [os.path.join(folder, name) for name in os.listdir(folder)
+               if os.path.isdir(os.path.join(folder, name))]
+    folders = natsort.natsorted(folders, reverse=True)
+    return os.path.abspath(folders[0])
 
 
 def get_database_config_file():

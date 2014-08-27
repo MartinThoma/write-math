@@ -12,7 +12,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import yaml
 import subprocess
 import time
-from collections import defaultdict
 # mine
 import utils
 import csv
@@ -248,23 +247,21 @@ def analyze_results(translation_csv, what_evaluated_file, evaluation_file):
     create_report(true_data, eval_data, index2latex)
 
 
-def main(model_description_file, translation_file, aset='test'):
+def main(model_folder, aset='test'):
+    """
+    @param translation_file 'index2formula_id.csv'
+    """
     PROJECT_ROOT = utils.get_project_root()
-    # Read the model description file
-    with open(model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-    model_folder = os.path.join(PROJECT_ROOT,
-                                model_description['model']['folder'])
+
     if aset == 'test':
         key_model, key_file = 'testing', 'testdata'
     elif aset == 'valid':
         key_model, key_file = 'validating', 'validdata'
     else:
         key_model, key_file = 'training', 'traindata'
-    test_data_path = os.path.join(PROJECT_ROOT,
-                                  model_description['data'][key_model])
+    test_data_path = os.path.join(model_folder, key_file + ".pfile")
     evaluation_file = get_test_results(model_folder,
-                                       model_description['model']['basename'],
+                                       "model",
                                        test_data_path)
     translation_csv = os.path.join(PROJECT_ROOT,
                                    "archive/logs/index2formula_id.csv")
@@ -290,16 +287,16 @@ if __name__ == "__main__":
 
     # Get latest model description file
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
+    latest_model = utils.get_latest_folder(models_folder)
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
+    parser.add_argument("-m", "--model",
+                        dest="model",
+                        help="where is the model folder (with the model.yml)?",
                         metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
+                        type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)
     parser.add_argument("-t", "--translation_file",
                         dest="translation_file",
@@ -313,4 +310,4 @@ if __name__ == "__main__":
                         help="which set should get analyzed?",
                         default='test')
     args = parser.parse_args()
-    main(args.model_description_file, args.translation_file, args.aset)
+    main(args.model, args.aset)

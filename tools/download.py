@@ -29,7 +29,7 @@ def is_file_consistent(local_path_file, md5_hash):
 def main():
     # Read config file. This has to get updated via git
     PROJECT_ROOT = utils.get_project_root()
-    infofile = os.path.join(PROJECT_ROOT, "archive/datasets/info.yml")
+    infofile = os.path.join(PROJECT_ROOT, "archive/raw-datasets/info.yml")
     logging.info("Read '%s'...", infofile)
     with open(infofile, 'r') as ymlfile:
         datasets = yaml.load(ymlfile)

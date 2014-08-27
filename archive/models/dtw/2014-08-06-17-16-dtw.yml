@@ -1,0 +1,15 @@
+data-source: archive/datasets/2014-08-10-16-58-handwriting_datasets-raw.pickle
+preprocessed: archive/datasets/2014-08-11-13-00-handwriting_datasets-preprocessed.pickle
+preprocessing:
+    - Remove_duplicate_time:
+    - Scale_and_shift:
+    - Connect_lines:
+        - minimum_distance: 0.01
+    - Douglas_peucker:
+        - EPSILON: 0.01
+    - Space_evenly_per_line:
+        - kind: cubic
+        - number: 100
+    - Scale_and_shift:
+model:
+    type: dtw

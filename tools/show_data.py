@@ -52,14 +52,14 @@ def main(picklefile):
 if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest data file file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_raw = utils.get_latest_in_folder(models_folder, ".pickle")
+    # Get latest data file
+    DATASET_FOLDER = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
+    LATEST_DATASET = utils.get_latest_in_folder(DATASET_FOLDER, ".pickle")
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--file", dest="picklefile",
-                        default=latest_raw,
+                        default=LATEST_DATASET,
                         type=lambda x: utils.is_valid_file(parser, x),
                         help="where is the picklefile", metavar="FILE")
     args = parser.parse_args()

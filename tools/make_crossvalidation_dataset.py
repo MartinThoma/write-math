@@ -19,9 +19,9 @@ def main(MIN_OCCURENCES=100, K_FOLD=10):
 
     # Get latest picke file.
     # If preprocessing is wanted, it should be done there.
-    models_folder = os.path.join(PROJECT_ROOT, "archive/datasets")
-    latest_dataset_file = utils.get_latest_in_folder(models_folder,
-                                                     ".pickle")
+    PREPROCESSED_FOLDER = os.path.join(PROJECT_ROOT, "archive/preprocessed")
+    latest_dataset_file = utils.get_latest_folder(PREPROCESSED_FOLDER)
+    latest_dataset_file = os.path.join(latest_dataset_file, "data.pickle")
 
     logging.info("Load datasets '%s' ..." % latest_dataset_file)
     loaded = pickle.load(open(latest_dataset_file))

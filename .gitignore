@@ -85,5 +85,9 @@ wm_raw_draw_data_*.sql
 detexify-import/done/
 detexify-import/skipped/
 detexify-import/splitted/
-archive/
+*logs/
+*.csv
+tmp/
+analyzation/
 project.yml
+*.html
