@@ -42,7 +42,7 @@ def main(model_folder, override):
 if __name__ == "__main__":
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest model description file
+    # Get latest model folder
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
     latest_model = utils.get_latest_folder(models_folder)
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model",
                         dest="model",
                         help="where is the model folder (with a model.yml)?",
-                        metavar="FILE",
+                        metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)
     parser.add_argument("-o", "--override",

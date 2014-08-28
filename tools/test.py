@@ -46,17 +46,10 @@ def test_model(model_folder, basename, test_file):
         return error
 
 
-def main(model_description_file, run_native=False):
-    PROJECT_ROOT = utils.get_project_root()
-    # Read the model description file
-    with open(model_description_file, 'r') as ymlfile:
-        model_description = yaml.load(ymlfile)
-    model_folder = os.path.join(PROJECT_ROOT,
-                                model_description['model']['folder'])
-    test_data_path = os.path.join(PROJECT_ROOT,
-                                  model_description['data']['testing'])
+def main(model_folder, run_native=False):
+    test_data_path = os.path.join(model_folder, "testdata.pfile")
     error = test_model(model_folder,
-                       model_description['model']['basename'],
+                       "model",
                        test_data_path)
     if run_native:
         logging.info("Error: %0.4f", error)
@@ -66,19 +59,19 @@ def main(model_description_file, run_native=False):
 if __name__ == "__main__":
     PROJECT_ROOT = utils.get_project_root()
 
-    # Get latest model description file
+    # Get latest model folder
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
+    latest_model = utils.get_latest_folder(models_folder)
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
+    parser.add_argument("-m", "--model",
+                        dest="model",
+                        help="where is the model folder (with a model.yml)?",
+                        metavar="FOLDER",
+                        type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)
     args = parser.parse_args()
-    main(args.model_description_file, run_native=True)
+    main(args.model, run_native=True)

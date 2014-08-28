@@ -12,6 +12,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import yaml
 import time
+import cPickle as pickle
 # my modules
 import utils
 import preprocess_dataset
@@ -53,22 +54,42 @@ def update_model_description_file(model_description_file, raw_data):
     with open(model_description_file, 'r') as ymlfile:
         md = ordered_load(ymlfile, yaml.SafeLoader)
 
+    # Get the preprocessing information
+    PROJECT_ROOT = utils.get_project_root()
+    preprocessed = os.path.join(PROJECT_ROOT, md['preprocessed'],
+                                "info.yml")
+    # Read the preprocessing info file
+    with open(preprocessed, 'r') as ymlfile:
+        pd = ordered_load(ymlfile, yaml.SafeLoader)
+
+    # Update data source
+    datapath = raw_data.split("/archive/raw-datasets/")[1]
+    datapath = os.path.join(datapath)
+    pd['data-source'] = datapath
+
+    # Write the file
+    with open(preprocessed, 'w') as ymlfile:
+        ymlfile.write(ordered_dump(pd,
+                                   Dumper=yaml.SafeDumper,
+                                   default_flow_style=False,
+                                   indent=4).replace('-   ', '  - '))
+
     # TODO: Get raw path by looking at the preprocessed file
     # update preprocessed
     # note that this could change the number of input and output nodes
-
-    # Get time string
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    # Update 'preprocessed'
-    md['preprocessed'] = ("archive/preprocessed/%s-"
-                          "handwriting_datasets-preprocessed"
-                          ".pickle") % time_prefix
 
     # Update topology (input neurons)
     feature_list = features.get_features(md['features'])
     feature_count = sum(map(lambda n: n.get_dimension(), feature_list))
     all_except_first = ":".join(md['model']['topology'].split(":")[1:])
     new_top = str(feature_count) + ":" + all_except_first
+    md['model']['topology'] = new_top
+
+    # Update topology (output neurons = classes I want to recognize)
+    tmp = pickle.load(open(raw_data, "rb"))
+    output_neurons = len(tmp['formula_id2latex'])
+    all_except_first = ":".join(md['model']['topology'].split(":")[:-1])
+    new_top =  all_except_first + ":" + str(output_neurons)
     md['model']['topology'] = new_top
 
     # Write the file
@@ -91,51 +112,48 @@ def main(model_folder, latest_data):
         return 0
 
     # Make sure the user really wants to do this
-    logging.info("The model uses the raw dataset '%s'. "
-                 "The latest raw dataset is '%s'. ",
-                 model_description['data-source'],
+    logging.info("Do you want to update the model with the dataset '%s'? ",
                  latest_data)
-    refresh_it = utils.query_yes_no("Do you want to refresh the model file?",
+    refresh_it = utils.query_yes_no("Do you want to refresh the file '%s'?" %
+                                    model_description_file,
                                     "no")
     if refresh_it:
         # Refresh the model
         update_model_description_file(model_description_file, latest_data)
-
-    # Check if the data source is the latest one
-    if latest_data == model_description['data-source']:
-        logging.info("The latest raw dataset is '%s'. "
-                     "That was already used for the model '%s'",
-                     latest_data,
-                     model_description_file)
-        return 0
 
     # Preprocessing
     refresh_it = utils.query_yes_no("Do you want to refresh the "
                                     "preprocessing file?",
                                     "no")
     if refresh_it:
-        preprocess_dataset.main(model_description_file)
+        # Read the model description file
+        with open(model_description_file, 'r') as ymlfile:
+            md = yaml.load(ymlfile)
+        # Get the preprocessing information
+        PROJECT_ROOT = utils.get_project_root()
+        preprocessed = os.path.join(PROJECT_ROOT, md['preprocessed'])
+        preprocess_dataset.main(preprocessed)
 
     # Create pfiles
     refresh_it = utils.query_yes_no("Do you want to refresh the pfiles?",
                                     "no")
     if refresh_it:
-        create_pfiles.main(model_description_file)
+        create_pfiles.main(model_folder)
 
     # Create model
     refresh_it = utils.query_yes_no("Do you want to recreate the model?", "no")
     if refresh_it:
-        create_model.main(model_description_file, override=True)
+        create_model.main(model_folder, override=True)
 
     # Train model
     refresh_it = utils.query_yes_no("Do you want to train the model?", "no")
     if refresh_it:
-        train.main(model_description_file)
+        train.main(model_folder)
 
     # Test model
     refresh_it = utils.query_yes_no("Do you want to test the model?", "no")
     if refresh_it:
-        test_error = test.main(model_description_file)
+        test_error = test.main(model_folder)
         logging.info("Test error: %0.4f", test_error)
 
 
@@ -144,11 +162,11 @@ if __name__ == '__main__':
 
     # Get latest model description file
     models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_in_folder(models_folder, ".yml")
+    latest_model = utils.get_latest_folder(models_folder)
 
     # Get latest raw data file
     models_folder = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
-    latest_data = utils.get_latest_folder(models_folder, "raw.pickle")
+    latest_data = utils.get_latest_in_folder(models_folder, "raw.pickle")
 
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
@@ -166,6 +184,5 @@ if __name__ == '__main__':
                         metavar="FILE",
                         type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_data)
-    exit()  # TODO: Update this to work with latest project structure
     args = parser.parse_args()
     main(args.model, args.dataset)

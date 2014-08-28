@@ -9,7 +9,6 @@ import os
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
-import yaml
 import subprocess
 import time
 # mine
