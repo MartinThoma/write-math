@@ -17,6 +17,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 import os
+import csv
 import cPickle as pickle
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
@@ -116,13 +117,19 @@ def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
         # Calculate, min, max and mean vector for each feature with
         # normalization
         start = 0
-        for feature in feature_list:
-            end = start + feature.get_dimension()
-            # append the data to the feature class
-            feature.mean = numpy.array(means[start:end])
-            feature.min = numpy.array(mins[start:end])
-            feature.max = numpy.array(maxs[start:end])
-            start = end
+        with open("featurenormalization.csv", 'wb') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=';',
+                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for feature in feature_list:
+                end = start + feature.get_dimension()
+                # append the data to the feature class
+                feature.mean = numpy.array(means[start:end])
+                feature.min = numpy.array(mins[start:end])
+                feature.max = numpy.array(maxs[start:end])
+                start = end
+                for mean, fmax, fmin in zip(feature.mean, feature.max,
+                                            feature.min):
+                    spamwriter.writerow([mean, fmax - fmin])
     start = 0
     for feature in feature_list:
         end = start + feature.get_dimension()
@@ -189,6 +196,7 @@ def create_pfile(model_folder, path_to_data, feature_list, target_paths,
     """Set everything up for the creation of the 3 pfiles (test, validation,
        training).
     """
+    os.chdir(model_folder)
     logging.info("Start creation of pfiles...")
     logging.info("Get sets from '%s' ..." % path_to_data)
     (training_set, validation_set, test_set, formula_id2index,
