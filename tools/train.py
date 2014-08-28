@@ -18,15 +18,7 @@ def train_model(model_folder, model_description, data):
     os.chdir(model_folder)
     basename = "model"
     training = model_description['training']
-    i = 0
-    latest_model = ""
-    while latest_model == "" and i < 5:
-        latest_model = utils.get_latest_in_folder(model_folder, ".json")
-        # Cleanup in case a training was broken
-        if os.path.isfile(latest_model) and os.path.getsize(latest_model) < 10:
-            os.remove(latest_model)
-            latest_model = ""
-        i += 1
+    latest_model = utils.get_latest_working_model(model_folder)
 
     if latest_model == "":
         logging.error("There is no model with basename '%s'.", basename)

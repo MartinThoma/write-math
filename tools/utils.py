@@ -148,3 +148,17 @@ def get_latest_model(model_folder, basename):
         return None
     else:
         return os.path.join(model_folder, models[-1])
+
+
+def get_latest_working_model(model_folder):
+    """Get the latest working model. Delete all others that get touched."""
+    i = 0
+    latest_model = ""
+    while latest_model == "" and i < 5:
+        latest_model = get_latest_in_folder(model_folder, ".json")
+        # Cleanup in case a training was broken
+        if os.path.isfile(latest_model) and os.path.getsize(latest_model) < 10:
+            os.remove(latest_model)
+            latest_model = ""
+        i += 1
+    return latest_model
