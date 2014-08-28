@@ -44,8 +44,8 @@ def main():
                              )
             logging.info("Download the file '%s'...", dataset['online_path'])
             urllib.urlretrieve(dataset['url']+"?dl=1", local_path_file)
-            i += 10
-        else:
+            i += 1
+        if i < 10:
             logging.info("Found '%s'.", dataset['online_path'])
 
 
