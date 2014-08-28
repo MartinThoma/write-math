@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import imp
+import sys
+import platform
 
 
 class bcolors:
@@ -32,11 +34,25 @@ def which(program):
     return None
 
 
+def check_python_version():
+    # Required due to multiple with statements on one line
+    req_version = (2, 7)
+    cur_version = sys.version_info
+    if cur_version >= req_version:
+        print("Python version... %sOK%s (found %s, requires %s)" %
+              (bcolors.OKGREEN, bcolors.ENDC, str(platform.python_version()),
+               str(req_version[0]) + "." + str(req_version[1])))
+    else:
+        print("Python version... %sFAIL%s (found %s, requires %s)" %
+              (bcolors.OKGREEN, bcolors.ENDC, str(cur_version),
+               str(req_version)))
+
+
 def check_python_modules():
     print("\033[1mCheck modules\033[0m")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
                         'cPickle', 'detl', 'theano', 'dropbox',
-                        'webbrowser', 'hashlib', 'shapely', 'numpy']
+                        'webbrowser', 'hashlib', 'shapely', 'numpy', 'wget']
     found = []
     for required_module in required_modules:
         try:
@@ -77,6 +93,10 @@ def check_python_modules():
         import numpy
         print("numpy version: %s (1.8.1 tested)" %
               numpy.__version__)
+    if "wget" in found:
+        import wget
+        print("wget version: %s (2.2 tested)" %
+              wget.__version__)
     if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
@@ -99,6 +119,7 @@ def check_executables():
 
 
 def main():
+    check_python_version()
     check_python_modules()
     check_executables()
 
