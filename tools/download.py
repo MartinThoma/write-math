@@ -36,14 +36,14 @@ def main():
     for dataset in datasets:
         local_path_file = os.path.join(PROJECT_ROOT, dataset['online_path'])
         i = 0
-        while not is_file_consistent(local_path_file, dataset['md5']) and i < 10:
+        while not is_file_consistent(local_path_file, dataset['md5']) and i < 3:
             if os.path.isfile(local_path_file):
                 logging.info("MD5 codes differ. ")
                 logging.info("The file size of the downloaded file is %s." %
                              utils.sizeof_fmt(os.path.getsize(local_path_file))
                              )
             logging.info("Download the file '%s'...", dataset['online_path'])
-            urllib.urlretrieve(dataset['url']+"?dl=1", local_path_file)
+            urllib.urlretrieve(dataset['url'], local_path_file)
             i += 1
         if i < 10:
             logging.info("Found '%s'.", dataset['online_path'])
