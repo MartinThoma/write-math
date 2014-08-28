@@ -33,7 +33,7 @@ def which(program):
 
 
 def check_python_modules():
-    print("## Check modules")
+    print("\033[1mCheck modules\033[0m")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
                         'cPickle', 'detl', 'theano', 'dropbox',
                         'webbrowser', 'hashlib', 'shapely', 'numpy']
@@ -86,7 +86,7 @@ def check_python_modules():
 
 
 def check_executables():
-    print("## Check executables")
+    print("\033[1mCheck executables\033[0m")
     required_executables = ["pfile_create"]
     for executable in required_executables:
         path = which(executable)
