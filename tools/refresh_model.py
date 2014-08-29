@@ -143,6 +143,15 @@ def main(model_folder, latest_data):
     # Create model
     refresh_it = utils.query_yes_no("Do you want to recreate the model?", "no")
     if refresh_it:
+        # Delete all old models
+        models = [os.path.join(model_folder, name) for name in
+                  os.listdir(model_folder)
+                  if os.path.isfile(os.path.join(model_folder, name))]
+        models = filter(lambda n: n.endswith(".json"), models)
+        for model in models:
+            logging.info("Removed '%s'." % model)
+            os.remove(model)
+        # Recreate it
         create_model.main(model_folder, override=True)
 
     # Train model

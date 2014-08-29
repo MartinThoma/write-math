@@ -14,15 +14,25 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import utils
 
 
-def train_model(model_folder, model_description, data):
-    os.chdir(model_folder)
+def generate_training_command(model_folder):
+    model_description_file = os.path.join(model_folder, "model.yml")
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+
+    # Get the data paths (pfiles)
+    data = {}
+    data['training'] = os.path.join(model_folder, "traindata.pfile")
+    data['testing'] = os.path.join(model_folder, "testdata.pfile")
+    data['validating'] = os.path.join(model_folder, "validdata.pfile")
+
+    # Get latest model file
     basename = "model"
-    training = model_description['training']
     latest_model = utils.get_latest_working_model(model_folder)
 
     if latest_model == "":
         logging.error("There is no model with basename '%s'.", basename)
-        sys.exit(1)
+        return None
     else:
         logging.info("Model '%s' found.", latest_model)
         i = int(latest_model.split("-")[-1].split(".")[0])
@@ -30,12 +40,22 @@ def train_model(model_folder, model_description, data):
         model_target = os.path.join(model_folder,
                                     "%s-%i.json" % (basename, i+1))
 
-    # train the model
+    # generate the training command
+    training = model_description['training']
     training = training.replace("{{testing}}", data['testing'])
     training = training.replace("{{training}}", data['training'])
     training = training.replace("{{validation}}", data['validating'])
     training = training.replace("{{src_model}}", model_src)
     training = training.replace("{{target_model}}", model_target)
+    training = training.replace("{{nntoolkit}}", utils.get_nntoolkit())
+    return training
+
+
+def train_model(model_folder, model_description, data):
+    os.chdir(model_folder)
+    training = generate_training_command(model_folder)
+    if training is None:
+        return -1
     logging.info(training)
     os.system(training)
 
@@ -49,7 +69,6 @@ def main(model_folder):
 
     # Analyze model
     logging.info(model_description['model'])
-    modelfile = utils.get_latest_in_folder(model_folder, ".json")
     data = {}
     data['training'] = os.path.join(model_folder, "traindata.pfile")
     data['testing'] = os.path.join(model_folder, "testdata.pfile")

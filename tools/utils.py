@@ -55,6 +55,12 @@ def get_project_root():
     return cfg['root']
 
 
+def get_nntoolkit():
+    """Get the project root folder as a string."""
+    cfg = get_project_configuration()
+    return cfg['nntoolkit']
+
+
 def get_latest_in_folder(folder, ending="", default=""):
     """Get the file that comes last with natural sorting in folder and has
        file ending 'ending'.
@@ -105,6 +111,17 @@ def input_string(question=""):
         return raw_input(question)
     else:
         return input(question)
+
+
+def input_int_default(question="", default=0):
+    """A function that works for both, Python 2.x and Python 3.x.
+       It asks the user for input and returns it as a string.
+    """
+    answer = input_string(question)
+    if answer == "" or answer == "yes":
+        return default
+    else:
+        return int(answer)
 
 
 def query_yes_no(question, default="yes"):

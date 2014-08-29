@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import yaml
-import natsort
 import logging
 import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
@@ -15,19 +13,25 @@ import re
 import utils
 
 
+def get_error_from_logfile(logfile):
+    with open(logfile) as f:
+        log_content = f.read()
+    pattern = re.compile("errors = (\d\.\d+)")
+    error = float(pattern.findall(log_content)[-1])
+    return error
+
+
 def test_model(model_folder, basename, test_file):
-    model_src = utils.get_latest_model(model_folder, basename)
+    model_src = utils.get_latest_working_model(model_folder)
     if model_src is None:
         logging.error("No model with basename '%s' found in '%s'.",
                       basename,
                       model_folder)
     else:
-        PROJECT_ROOT = utils.get_project_root()
+        os.chdir(model_folder)
         time_prefix = time.strftime("%Y-%m-%d-%H-%M")
         logging.info("Evaluate '%s'...", model_src)
-        logfile = os.path.join(PROJECT_ROOT,
-                               "archive/logs/%s-testing.log" %
-                               time_prefix)
+        logfile = "%s-testing.log" % time_prefix
         with open(logfile, "w") as log, open(model_src, "r") as model_src_p:
             p = subprocess.Popen(['nntoolkit', 'test', '--batch-size', '1',
                                   test_file],
@@ -38,12 +42,7 @@ def test_model(model_folder, basename, test_file):
                 logging.error("nntoolkit finished with ret code %s", str(ret))
                 sys.exit()
 
-        # Get the error
-        with open(logfile) as f:
-            log_content = f.read()
-        pattern = re.compile("errors = (\d\.\d+)")
-        error = float(pattern.findall(log_content)[-1])
-        return error
+        return get_error_from_logfile(logfile)
 
 
 def main(model_folder, run_native=False):
