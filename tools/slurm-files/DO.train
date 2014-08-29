@@ -1,0 +1,23 @@
+#!/bin/bash
+# This script was generated automatically. Adjustments should be done
+# to the template only. The template is located in `tools/slurm-files`.
+
+# General
+export PATH="/usr/local/cuda/bin/:$PATH"
+export PYTHONPATH="/opt/atlas/lib64/python2.7/site-packages/:/project/ASR_dev2012/DNN/detl/:/project/ASR_dev2012/DNN/detl-extras/"
+
+export LD_LIBRARY_PATH="/usr/local/cuda/lib64/:/usr/local/cuda/lib/:/opt/atlas/lib:/opt/atlas/include:$LD_LIBRARY_PATH"
+export THEANO_FLAGS="mode=FAST_RUN,device=gpu0,floatX=float32,allow_gc=False"
+
+detlPath="/project/ASR_dev2012/DNN/detl/scripts/detl"
+
+here=`pwd`
+
+# Path and Name Declarations
+ROOT_PATH="/home/mthoma/write-math"
+
+echo start training
+
+{{ training }}
+
+if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/"; exit 1; } fi
