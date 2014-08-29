@@ -11,7 +11,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 import yaml
-import time
 import cPickle as pickle
 # my modules
 import utils
@@ -89,7 +88,7 @@ def update_model_description_file(model_description_file, raw_data):
     tmp = pickle.load(open(raw_data, "rb"))
     output_neurons = len(tmp['formula_id2latex'])
     all_except_first = ":".join(md['model']['topology'].split(":")[:-1])
-    new_top =  all_except_first + ":" + str(output_neurons)
+    new_top = all_except_first + ":" + str(output_neurons)
     md['model']['topology'] = new_top
 
     # Write the file
