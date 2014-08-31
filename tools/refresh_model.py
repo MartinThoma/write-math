@@ -101,7 +101,7 @@ def update_model_description_file(model_description_file, raw_data):
 
 def main(model_folder, latest_data):
     # Read the model description file
-    model_description_file = os.path.join(model_folder, "model.yml")
+    model_description_file = os.path.join(model_folder, "info.yml")
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-m", "--model",
                         dest="model",
-                        help="where is the model folder (with model.yml)?",
+                        help="where is the model folder (with info.yml)?",
                         metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)

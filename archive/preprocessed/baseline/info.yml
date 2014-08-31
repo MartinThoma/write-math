@@ -1,4 +1,4 @@
-data-source: 2014-08-26-20-14-handwriting_datasets-raw.pickle
+data-source: archive/raw-datasets/2014-08-26-20-14-handwriting_datasets-raw.pickle
 queue:
   - Remove_duplicate_time: null
   - Scale_and_shift:

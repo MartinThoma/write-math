@@ -15,16 +15,24 @@ import utils
 
 
 def generate_training_command(model_folder):
-    model_description_file = os.path.join(model_folder, "model.yml")
+    utils.update_if_outdated(model_folder)
+    model_description_file = os.path.join(model_folder, "info.yml")
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
 
     # Get the data paths (pfiles)
+    PROJECT_ROOT = utils.get_project_root()
     data = {}
-    data['training'] = os.path.join(model_folder, "traindata.pfile")
-    data['testing'] = os.path.join(model_folder, "testdata.pfile")
-    data['validating'] = os.path.join(model_folder, "validdata.pfile")
+    data['training'] = os.path.join(PROJECT_ROOT,
+                                    model_description["data-source"],
+                                    "traindata.pfile")
+    data['testing'] = os.path.join(PROJECT_ROOT,
+                                   model_description["data-source"],
+                                   "testdata.pfile")
+    data['validating'] = os.path.join(PROJECT_ROOT,
+                                      model_description["data-source"],
+                                      "validdata.pfile")
 
     # Get latest model file
     basename = "model"
@@ -61,7 +69,7 @@ def train_model(model_folder, model_description, data):
 
 
 def main(model_folder):
-    model_description_file = os.path.join(model_folder, "model.yml")
+    model_description_file = os.path.join(model_folder, "info.yml")
 
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
@@ -88,7 +96,7 @@ if __name__ == "__main__":
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-m", "--model",
                         dest="model",
-                        help="where is the model folder (with a model.yml)?",
+                        help="where is the model folder (with a info.yml)?",
                         metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)

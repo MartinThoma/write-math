@@ -2,12 +2,20 @@
 
 """Utility functions that can be used in multiple scripts."""
 
+import logging
 import sys
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG,
+                    stream=sys.stdout)
 import os
 import yaml
 import natsort
 import time
 import datetime
+# mine
+import preprocess_dataset
+import create_pfiles
+import create_model
 
 
 def print_status(total, current, start_time=None):
@@ -179,3 +187,78 @@ def get_latest_working_model(model_folder):
             latest_model = ""
         i += 1
     return latest_model
+
+
+def get_latest_successful_run(folder):
+    """Get the latest successful run timestamp."""
+    runfile = os.path.join(folder, "run.log")
+    if not os.path.isfile(runfile):
+        return None
+    with open(runfile) as f:
+        content = f.readlines()
+    return datetime.datetime.strptime(content[0],
+                                      "timestamp: '%Y-%m-%d %H:%M:%S'")
+
+
+def create_run_logfile(folder):
+    """Create a 'run.log' within folder. This file contains the time of the
+       latest successful run.
+    """
+    with open(os.path.join(folder, "run.log"), "w") as f:
+        datestring = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        f.write("timestamp: '%s'" % datestring)
+
+
+def update_if_outdated(folder):
+    """Check if the currently watched instance (model, feature or
+        preprocessing) is outdated and update it eventually.
+    """
+
+    folders = []
+    while os.path.isdir(folder):
+        folders.append(folder)
+        # Get info.yml
+        with open(os.path.join(folder, "info.yml")) as ymlfile:
+            content = yaml.load(ymlfile)
+        folder = os.path.join(get_project_root(), content['data-source'])
+    raw_source_file = folder
+    dt = os.path.getmtime(raw_source_file)
+    source_mtime = datetime.datetime.utcfromtimestamp(dt)
+    folders = folders[::-1]  # Reverse order to get the most "basic one first"
+
+    for target_folder in folders:
+        target_mtime = get_latest_successful_run(target_folder)
+        if target_mtime is None or source_mtime > target_mtime:
+            # The source is later than the target. That means we need to
+            # refresh the target
+            if "preprocessed" in target_folder:
+                logging.info("Preprocessed file was outdated. Update...")
+                preprocess_dataset.main(os.path.join(get_project_root(),
+                                                     target_folder))
+            elif "feature-files" in target_folder:
+                logging.info("Feature file was outdated. Update...")
+                create_pfiles.main(target_folder)
+            elif "model" in target_folder:
+                logging.info("Model file was outdated. Update...")
+                create_model.main(target_folder, True)
+            target_mtime = datetime.datetime.utcnow()
+        else:
+            logging.info("'%s' is up-to-date.", target_folder)
+        source_mtime = target_mtime
+
+
+def choose_raw_dataset(currently=""):
+    """Let the user choose a raw dataset. Return the absolute path."""
+    folder = os.path.join(get_project_root(), "archive/raw-datasets")
+    files = [os.path.join(folder, name) for name in os.listdir(folder)
+             if name.endswith(".pickle")]
+    default = -1
+    for i, filename in enumerate(files):
+        if os.path.basename(currently) == os.path.basename(filename):
+            default = i
+        if i != default:
+            print("[%i]\t%s" % (i, os.path.basename(filename)))
+        else:
+            print("\033[1m[%i]\033[0m\t%s" % (i, os.path.basename(filename)))
+    i = input_int_default("Choose a dataset by number: ", default)
+    return files[i]

@@ -1,19 +1,7 @@
-preprocessed: archive/preprocessed/c1
-data-modification:
-    multiply: 1
+data-source: archive/feature-files/baseline
 training: '{{nntoolkit}} train --epochs 1000 --learning-rate 1 --momentum 0.1 --hook=''!detl
     test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}}
     {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
-features:
-  - Stroke_Count: null
-  - Ink: null
-  - AspectRatio: null
-  - Center_of_mass: null
-  - Constant_Point_Coordinates:
-      - lines: 4
-      - points_per_line: 20
-  - Stroke_intersections:
-      - strokes: 2
 model:
     type: mlp
     topology: 168:150:100:369

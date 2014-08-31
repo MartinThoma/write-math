@@ -19,6 +19,7 @@ import utils
 def main(folder):
     raw_datapath, outputpath, p_queue = get_parameters(folder)
     create_preprocessed_dataset(raw_datapath, outputpath, p_queue)
+    utils.create_run_logfile(folder)
 
 
 def get_parameters(folder):
@@ -29,7 +30,6 @@ def get_parameters(folder):
 
     # Get the path of the raw data
     raw_datapath = os.path.join(PROJECT_ROOT,
-                                "archive/raw-datasets",
                                 preprocessing_description['data-source'])
     # Get the path were the preprocessed file should be put
     outputpath = os.path.join(folder, "data.pickle")
@@ -49,6 +49,15 @@ def create_preprocessed_dataset(path_to_data, outputpath, preprocessing_queue):
         tmp += str(el) + "\n"
     logging.info(tmp)
     # Load from pickled file
+    if not os.path.isfile(path_to_data):
+        logging.info(("'%s' does not exist. Please either abort this script "
+                      "or update the data location."), path_to_data)
+        raw_dataset_path = utils.choose_raw_dataset()
+        # Get project-relative path
+        raw_dataset_path = "archive/raw-datasets" + \
+                           raw_dataset_path.split("archive/raw-datasets")[1]
+        print(raw_dataset_path)
+        sys.exit()  # TODO: Update model!
     logging.info("Start loading data...")
     loaded = pickle.load(open(path_to_data))
     raw_datasets = loaded['handwriting_datasets']

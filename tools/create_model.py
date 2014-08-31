@@ -26,8 +26,8 @@ def create_model(model_folder, model_type, topology, override):
         logging.info("Model file already existed.")
 
 
-def main(model_folder, override):
-    model_description_file = os.path.join(model_folder, "model.yml")
+def main(model_folder, override=False):
+    model_description_file = os.path.join(model_folder, "info.yml")
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
@@ -37,6 +37,7 @@ def main(model_folder, override):
                  model_description['model']['type'],
                  model_description['model']['topology'],
                  override)
+    utils.create_run_logfile(model_folder)
 
 
 if __name__ == "__main__":
@@ -52,7 +53,7 @@ if __name__ == "__main__":
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-m", "--model",
                         dest="model",
-                        help="where is the model folder (with a model.yml)?",
+                        help="where is the model folder (with a info.yml)?",
                         metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)

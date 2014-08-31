@@ -1,0 +1,13 @@
+data-source: archive/preprocessed/baseline
+data-modification:
+    multiply: 1
+features:
+  - Stroke_Count: null
+  - Ink: null
+  - AspectRatio: null
+  - Center_of_mass: null
+  - Constant_Point_Coordinates:
+      - lines: 4
+      - points_per_line: 20
+  - Stroke_intersections:
+      - strokes: 2

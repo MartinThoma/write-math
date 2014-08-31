@@ -56,7 +56,7 @@ if __name__ == "__main__":
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-m", "--model",
                         dest="model",
-                        help="where is the model folder (with the model.yml)?",
+                        help="where is the model folder (with the info.yml)?",
                         metavar="FILE",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_model)

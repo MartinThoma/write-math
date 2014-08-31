@@ -1,0 +1,10 @@
+data-source: archive/preprocessed/small-baseline
+data-modification:
+    multiply: 1
+features:
+  - Stroke_Count: null
+  - Constant_Point_Coordinates:
+      - lines: 4
+      - points_per_line: 20
+      - fill_empty_with: 0
+      - pen_down: false

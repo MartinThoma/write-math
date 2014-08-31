@@ -14,7 +14,7 @@ import refresh_model
 
 def choose_dataset(model_folder):
     # Get the currently used raw dataset
-    model_description_file = os.path.join(model_folder, "model.yml")
+    model_description_file = os.path.join(model_folder, "info.yml")
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
         md = yaml.load(ymlfile)
@@ -28,21 +28,7 @@ def choose_dataset(model_folder):
     with open(preprocessed, 'r') as ymlfile:
         pd = yaml.load(ymlfile)
     currently = pd['data-source']
-
-    # Get all other datasets
-    folder = os.path.join(utils.get_project_root(), "archive/raw-datasets")
-    files = [os.path.join(folder, name) for name in os.listdir(folder)
-             if name.endswith(".pickle")]
-    default = -1
-    for i, filename in enumerate(files):
-        if os.path.basename(currently) == os.path.basename(filename):
-            default = i
-        if i != default:
-            print("[%i]\t%s" % (i, os.path.basename(filename)))
-        else:
-            print("\033[1m[%i]\033[0m\t%s" % (i, os.path.basename(filename)))
-    i = utils.input_int_default("Choose a dataset by number: ", default)
-    return files[i]
+    return utils.choose_raw_dataset(currently)
 
 
 def main():
