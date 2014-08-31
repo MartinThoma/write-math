@@ -140,8 +140,18 @@ def main(model_folder, latest_data):
         create_pfiles.main(model_folder)
 
     # Create model
-    refresh_it = utils.query_yes_no("Do you want to recreate the model?", "no")
+    refresh_it = utils.query_yes_no(("Do you want to recreate the model? "
+                                     "(save testresult_ if you want to "
+                                     "keep them)"), "no")
     if refresh_it:
+        # Delete all old test results
+        models = [os.path.join(model_folder, name) for name in
+                  os.listdir(model_folder)
+                  if os.path.isfile(os.path.join(model_folder, name))]
+        models = filter(lambda n: n.startswith("testresult_"), models)
+        for model in models:
+            logging.info("Removed '%s'." % model)
+            os.remove(model)
         # Delete all old models
         models = [os.path.join(model_folder, name) for name in
                   os.listdir(model_folder)

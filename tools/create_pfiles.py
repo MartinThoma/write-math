@@ -55,7 +55,8 @@ def main(model_folder):
         multiply = 1
 
     # Create pfiles!
-    create_pfile(model_folder, handwriting_datasets, feature_list, target_paths, multiply)
+    create_pfile(model_folder, handwriting_datasets, feature_list,
+                 target_paths, multiply)
 
 
 def make_pfile(dataset_name, feature_count, data,
@@ -134,13 +135,14 @@ def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
     for feature in feature_list:
         end = start + feature.get_dimension()
         # TODO: Should I check if feature normalization is activated?
-        # For every instance in the dataset: Normalize!
-        for i in range(len(prepared)):
-            # The 0 is necessary as every element is (x, y)
-            feature_range = (feature.max - feature.min)
-            prepared[i][0][start:end] = (prepared[i][0][start:end] -
-                                         feature.mean) / feature_range
-        start = end
+        if False:  # Deactivate feature normalization due to bug
+            # For every instance in the dataset: Normalize!
+            for i in range(len(prepared)):
+                # The 0 is necessary as every element is (x, y)
+                feature_range = (feature.max - feature.min)
+                prepared[i][0][start:end] = (prepared[i][0][start:end] -
+                                             feature.mean) / feature_range
+            start = end
     return (prepared, translation)
 
 
@@ -236,7 +238,7 @@ def create_pfile(model_folder, path_to_data, feature_list, target_paths,
     print("```")
     logging.info("## Start creating pfiles")
 
-    # Traindata has to come first because of feature scaling
+    # Traindata has to come first because of feature normalization
     for dataset_name, dataset, is_traindata in \
         [("traindata", training_set, True),
          ("testdata", test_set, False),

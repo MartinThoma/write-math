@@ -1,2 +1,0 @@
-#!/bin/sh
-rm -rf Logs m slurm*.out

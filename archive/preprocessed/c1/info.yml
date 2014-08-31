@@ -1,4 +1,4 @@
-data-source: 2014-08-26-17-59-handwriting_datasets-raw.pickle
+data-source: 2014-08-26-20-14-handwriting_datasets-raw.pickle
 queue:
   - Remove_duplicate_time: null
   - Dot_reduction:

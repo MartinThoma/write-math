@@ -1,6 +1,6 @@
 data-source: 2014-08-26-20-14-handwriting_datasets-raw.pickle
 queue:
-  - Remove_duplicate_time:
+  - Remove_duplicate_time: null
   - Scale_and_shift:
       - max_width: 1.0
       - max_height: 1.0

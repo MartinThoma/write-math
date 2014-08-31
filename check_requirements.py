@@ -44,7 +44,7 @@ def check_python_version():
                str(req_version[0]) + "." + str(req_version[1])))
     else:
         print("Python version... %sFAIL%s (found %s, requires %s)" %
-              (bcolors.OKGREEN, bcolors.ENDC, str(cur_version),
+              (bcolors.FAIL, bcolors.ENDC, str(cur_version),
                str(req_version)))
 
 

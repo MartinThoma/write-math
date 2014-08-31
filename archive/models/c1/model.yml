@@ -1,8 +1,9 @@
 preprocessed: archive/preprocessed/c1
 data-modification:
     multiply: 1
-training: nntoolkit train --epochs 1000 --learning-rate 1 --momentum 0.1 --hook='!detl test {{testing}},err=testlogs/testresult_%e.txt' {{training}}
-    {{validation}} {{testing}} < {{src_model}} > {{target_model}}
+training: '{{nntoolkit}} train --epochs 1000 --learning-rate 1 --momentum 0.1 --hook=''!detl
+    test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}}
+    {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
 features:
   - Stroke_Count: null
   - Ink: null
@@ -15,4 +16,4 @@ features:
       - strokes: 2
 model:
     type: mlp
-    topology: 168:150:100:38
+    topology: 168:150:100:369

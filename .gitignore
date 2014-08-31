@@ -91,3 +91,5 @@ tmp/
 analyzation/
 project.yml
 *.html
+testresult_*
+DO.*

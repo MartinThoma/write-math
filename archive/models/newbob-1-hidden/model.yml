@@ -1,8 +1,9 @@
 preprocessed: archive/preprocessed/baseline
 data-modification:
     multiply: 1
-training: nntoolkit train --newbob --epochs 300 --learning-rate 1 --momentum 0.1 --hook='!detl test {{testing}},err=testlogs/testresult_%e.txt' {{training}}
-    {{validation}} {{testing}} < {{src_model}} > {{target_model}}
+training: '{{nntoolkit}} train --newbob --epochs 1000 --learning-rate 0.1 --momentum 0.1 --hook=''!detl
+    test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}}
+    {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
 features:
   - Constant_Point_Coordinates:
       - lines: 4

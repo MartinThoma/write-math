@@ -12,10 +12,10 @@ import utils
 
 
 def clean_model_folder(model_folder):
-    """Remove all `DO.` files from a model folder."""
+    """Remove all `DO.` files and the Makefile from a model folder."""
     # remove all files that begin with "DO."
     for my_file in os.listdir(model_folder):
-        if my_file.startswith("DO."):
+        if my_file.startswith("DO.") or my_file == "Makefile":
             dofile = os.path.join(model_folder, my_file)
             os.remove(dofile)
 
@@ -27,7 +27,7 @@ def add_do_files(model_folder):
     template_folder = os.path.join(utils.get_project_root(),
                                    "tools/slurm-files")
     for my_file in os.listdir(template_folder):
-        if my_file.startswith("DO."):
+        if my_file.startswith("DO.") or my_file == "Makefile":
             # Get template as string
             template_file = os.path.join(template_folder, my_file)
             with open(template_file) as f:
