@@ -288,4 +288,4 @@ if __name__ == '__main__':
                         default=latest_featurefolder)
     args = parser.parse_args()
 
-    main(args.model_folder)
+    main(args.folder)
