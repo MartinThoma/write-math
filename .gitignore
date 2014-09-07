@@ -93,3 +93,4 @@ project.yml
 *.html
 testresult_*
 DO.*
+*.raw
