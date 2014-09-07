@@ -201,43 +201,44 @@ def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
     sys.stdout.flush()
 
     # Feature normalization
-    if is_traindata:
-        # Create feature only list
-        feats = []
-        for x, y in prepared:
-            feats.append(x)
-        # Calculate all means / mins / maxs
-        means = numpy.mean(feats, 0)
-        mins = numpy.min(feats, 0)
-        maxs = numpy.max(feats, 0)
-        # Calculate, min, max and mean vector for each feature with
-        # normalization
+    if False:
+        if is_traindata:
+            # Create feature only list
+            feats = []
+            for x, y in prepared:
+                feats.append(x)
+            # Calculate all means / mins / maxs
+            means = numpy.mean(feats, 0)
+            mins = numpy.min(feats, 0)
+            maxs = numpy.max(feats, 0)
+            # Calculate, min, max and mean vector for each feature with
+            # normalization
+            start = 0
+            with open("featurenormalization.csv", 'wb') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=';',
+                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                for feature in feature_list:
+                    end = start + feature.get_dimension()
+                    # append the data to the feature class
+                    feature.mean = numpy.array(means[start:end])
+                    feature.min = numpy.array(mins[start:end])
+                    feature.max = numpy.array(maxs[start:end])
+                    start = end
+                    for mean, fmax, fmin in zip(feature.mean, feature.max,
+                                                feature.min):
+                        spamwriter.writerow([mean, fmax - fmin])
         start = 0
-        with open("featurenormalization.csv", 'wb') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=';',
-                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for feature in feature_list:
-                end = start + feature.get_dimension()
-                # append the data to the feature class
-                feature.mean = numpy.array(means[start:end])
-                feature.min = numpy.array(mins[start:end])
-                feature.max = numpy.array(maxs[start:end])
+        for feature in feature_list:
+            end = start + feature.get_dimension()
+            # TODO: Should I check if feature normalization is activated?
+            if False:  # Deactivate feature normalization due to bug
+                # For every instance in the dataset: Normalize!
+                for i in range(len(prepared)):
+                    # The 0 is necessary as every element is (x, y)
+                    feature_range = (feature.max - feature.min)
+                    prepared[i][0][start:end] = (prepared[i][0][start:end] -
+                                                 feature.mean) / feature_range
                 start = end
-                for mean, fmax, fmin in zip(feature.mean, feature.max,
-                                            feature.min):
-                    spamwriter.writerow([mean, fmax - fmin])
-    start = 0
-    for feature in feature_list:
-        end = start + feature.get_dimension()
-        # TODO: Should I check if feature normalization is activated?
-        if False:  # Deactivate feature normalization due to bug
-            # For every instance in the dataset: Normalize!
-            for i in range(len(prepared)):
-                # The 0 is necessary as every element is (x, y)
-                feature_range = (feature.max - feature.min)
-                prepared[i][0][start:end] = (prepared[i][0][start:end] -
-                                             feature.mean) / feature_range
-            start = end
     return (prepared, translation)
 
 
@@ -265,7 +266,7 @@ def make_pfile(dataset_name, feature_count, data,
               (input_filename, feature_count, output_filename)
     logging.info(command)
     os.system(command)
-    os.remove(input_filename)
+    #os.remove(input_filename)
 
 
 if __name__ == '__main__':
