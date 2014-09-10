@@ -11,12 +11,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 import subprocess
 import time
-# mine
-import utils
+import yaml
 import csv
 import itertools
-
 from collections import OrderedDict, Callable
+# mine
+import utils
 
 
 class DefaultOrderedDict(OrderedDict):
@@ -72,7 +72,7 @@ def get_test_results(model_folder, basename, test_file):
     else:
         PROJECT_ROOT = utils.get_project_root()
         time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-        logging.info("Evaluate '%s'...", model_src)
+        logging.info("Evaluate '%s' with '%s'...", model_src, test_file)
         logfile = os.path.join(PROJECT_ROOT,
                                "archive/logs/%s-error-evaluation.log" %
                                time_prefix)
@@ -86,12 +86,6 @@ def get_test_results(model_folder, basename, test_file):
                 logging.error("nntoolkit finished with ret code %s", str(ret))
                 sys.exit()
         return logfile
-        # Get the error
-        #with open(logfile) as f:
-        #    log_content = f.read()
-        #pattern = re.compile("errors = (\d\.\d+)")
-        #error = float(pattern.findall(log_content)[-1])
-        #return error  # TODO: Adjust
 
 
 def make_all(tuplelist):
@@ -247,9 +241,6 @@ def analyze_results(translation_csv, what_evaluated_file, evaluation_file):
 
 
 def main(model_folder, aset='test'):
-    """
-    @param translation_file 'index2formula_id.csv'
-    """
     PROJECT_ROOT = utils.get_project_root()
 
     if aset == 'test':
@@ -258,15 +249,37 @@ def main(model_folder, aset='test'):
         key_model, key_file = 'validating', 'validdata'
     else:
         key_model, key_file = 'training', 'traindata'
-    test_data_path = os.path.join(model_folder, key_file + ".pfile")
+
+    # Get model description
+    model_description_file = os.path.join(model_folder, "info.yml")
+
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+
+    # Get the data paths (pfiles)
+    PROJECT_ROOT = utils.get_project_root()
+    data = {}
+    data['training'] = os.path.join(PROJECT_ROOT,
+                                    model_description["data-source"],
+                                    "traindata.pfile")
+    data['testing'] = os.path.join(PROJECT_ROOT,
+                                   model_description["data-source"],
+                                   "testdata.pfile")
+    data['validating'] = os.path.join(PROJECT_ROOT,
+                                      model_description["data-source"],
+                                      "validdata.pfile")
+
+    test_data_path = os.path.join(model_folder, data[key_model])
     evaluation_file = get_test_results(model_folder,
                                        "model",
                                        test_data_path)
     translation_csv = os.path.join(PROJECT_ROOT,
-                                   "archive/logs/index2formula_id.csv")
-    a = os.path.join(PROJECT_ROOT, "archive/logs")
+                                   model_description["data-source"],
+                                   "index2formula_id.csv")
     what_evaluated_file = os.path.join(PROJECT_ROOT,
-                                       "%s/translation-%s.csv" % (a, key_file))
+                                       model_description["data-source"],
+                                       "translation-%s.csv" % key_file)
     analyze_results(translation_csv, what_evaluated_file, evaluation_file)
 
 
@@ -294,14 +307,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model",
                         dest="model",
                         help="where is the model folder (with the info.yml)?",
-                        metavar="FILE",
+                        metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
-                        default=latest_model)
-    parser.add_argument("-t", "--translation_file",
-                        dest="translation_file",
-                        help="index2formula_id.csv - where is it?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
                         default=latest_model)
     parser.add_argument("-s", "--set",
                         dest="aset",
