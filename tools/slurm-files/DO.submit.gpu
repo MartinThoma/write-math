@@ -8,4 +8,4 @@
 #==============================================================================
 
 #      partition           computer     time     jobname      script
-sbatch -p GPU --gres=gpu:1 -w i13hpc51 -t 50:0 -J write-math DO.GPUtrain
+sbatch -p GPU --gres=gpu:1 -w i13hpc50 -t 50:0 -J write-math DO.GPUtrain

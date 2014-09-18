@@ -10,12 +10,4 @@ export LD_LIBRARY_PATH="/usr/local/cuda/lib64/:/usr/local/cuda/lib/:/opt/atlas/l
 
 echo "*** Running on `hostname`/2 ***" >&2
 
-if [ `hostname` = "i13hpc51" ]; then
-  # Workaround for hpc51, where CPU scheduling for CUDA jobs does not work
-  # (all jobs will end up on CPU0)
-  exec taskset -c 4 bash ./DO.train
-echo "something doesn't work"
-
-else
-  exec bash ./DO.train
-fi
+srun ./DO.train
