@@ -6,6 +6,7 @@ import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
+import stat
 #mine
 import train
 import utils
@@ -40,6 +41,10 @@ def add_do_files(model_folder):
             filename = os.path.join(model_folder, my_file)
             with open(filename, "w") as f:
                 f.write(template)
+            # Make file executable
+            if my_file != "Makefile":
+                st = os.stat(my_file)
+                os.chmod(my_file, st.st_mode | stat.S_IEXEC)
 
 
 def main():

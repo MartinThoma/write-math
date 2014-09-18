@@ -94,3 +94,4 @@ project.yml
 testresult_*
 DO.*
 *.raw
+Makefile

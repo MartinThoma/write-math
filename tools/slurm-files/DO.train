@@ -9,7 +9,8 @@ export PYTHONPATH="/opt/atlas/lib64/python2.7/site-packages/:/project/ASR_dev201
 export LD_LIBRARY_PATH="/usr/local/cuda/lib64/:/usr/local/cuda/lib/:/opt/atlas/lib:/opt/atlas/include:$LD_LIBRARY_PATH"
 export THEANO_FLAGS="mode=FAST_RUN,device=gpu0,floatX=float32,allow_gc=False"
 
-detlPath="/project/ASR_dev2012/DNN/detl/scripts/detl"
+detlPath="/project/ASR_dev2012/DNN/detl/scripts/"
+PATH=$PATH:$detlPath
 
 here=`pwd`
 
