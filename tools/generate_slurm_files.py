@@ -43,8 +43,8 @@ def add_do_files(model_folder):
                 f.write(template)
             # Make file executable
             if my_file != "Makefile":
-                st = os.stat(my_file)
-                os.chmod(my_file, st.st_mode | stat.S_IEXEC)
+                st = os.stat(filename)
+                os.chmod(filename, st.st_mode | stat.S_IEXEC)
 
 
 def main():
