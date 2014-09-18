@@ -33,6 +33,8 @@ def main(model_folder, override=False):
         model_description = yaml.load(ymlfile)
     # Analyze model
     logging.info(model_description['model'])
+    if model_description['model']['type'] != 'mlp':
+        return
     create_model(model_folder,
                  model_description['model']['type'],
                  model_description['model']['topology'],
