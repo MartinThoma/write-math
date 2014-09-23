@@ -3,6 +3,7 @@
 import imp
 import sys
 import platform
+import os
 
 
 class bcolors:
@@ -51,8 +52,9 @@ def check_python_version():
 def check_python_modules():
     print("\033[1mCheck modules\033[0m")
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
-                        'cPickle', 'detl', 'theano', 'dropbox',
-                        'webbrowser', 'hashlib', 'shapely', 'numpy', 'wget']
+                        'cPickle', 'detl', 'theano', 'dropbox', 'yaml',
+                        'webbrowser', 'hashlib', 'shapely', 'numpy', 'wget',
+                        '_tkinter']
     found = []
     for required_module in required_modules:
         try:
@@ -97,6 +99,10 @@ def check_python_modules():
         import wget
         print("wget version: %s (2.2 tested)" %
               wget.__version__)
+    if "yaml" in found:
+        import yaml
+        print("yaml version: %s (3.11 tested)" %
+              yaml.__version__)
     if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
@@ -113,6 +119,8 @@ def check_executables():
         if path is None:
             print("%s ... %sNOT%s found" % (executable, bcolors.WARNING,
                                             bcolors.ENDC))
+            print("Try 'http://martin-thoma.com/what-are-pfiles/' for "
+                  "instructions how to get it.")
         else:
             print("%s ... %sfound%s at %s" % (executable, bcolors.OKGREEN,
                                               bcolors.ENDC, path))
@@ -122,6 +130,15 @@ def main():
     check_python_version()
     check_python_modules()
     check_executables()
+    home = os.path.expanduser("~")
+    print("\033[1mCheck files\033[0m")
+    rcfile = os.path.join(home, ".writemathrc")
+    if os.path.isfile(rcfile):
+        print("~/.writemathrc... %sFOUND%s" %
+              (bcolors.OKGREEN, bcolors.ENDC))
+    else:
+        print("~/.writemathrc... %sNOT FOUND%s" %
+              (bcolors.FAIL, bcolors.ENDC))
 
 if __name__ == '__main__':
     main()
