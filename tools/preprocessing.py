@@ -107,6 +107,34 @@ class Remove_duplicate_time(object):
         handwritten_data.set_pointlist(new_pointlist)
 
 
+class Remove_points(object):
+    """Remove all single point strokes from the recording, except if
+       the whole recording consists of points only.
+    """
+    def __repr__(self):
+        return "Remove_points"
+
+    def __str__(self):
+        return "remove points"
+
+    def __call__(self, handwritten_data):
+        assert isinstance(handwritten_data, HandwrittenData.HandwrittenData), \
+            "handwritten data is not of type HandwrittenData, but of %r" % \
+            type(handwritten_data)
+        pointlist = handwritten_data.get_pointlist()
+        has_nonpoint_stroke = False
+        # Check if recording has non-point stroke:
+        for line in pointlist:
+            if len(line) > 1:
+                has_nonpoint_stroke = True
+        if has_nonpoint_stroke:
+            new_pointlist = []
+            for line in pointlist:
+                if len(line) > 1:
+                    new_pointlist.append(line)
+            handwritten_data.set_pointlist(new_pointlist)
+
+
 class Scale_and_shift(object):
     """ Take a list of points and scale and move it so that it's in the
         unit square. Keep the aspect ratio. Optionally center the points
