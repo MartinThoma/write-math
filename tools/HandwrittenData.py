@@ -95,6 +95,10 @@ class HandwrittenData(object):
         box = self.get_bounding_box()
         return box['maxy'] - box['miny']
 
+    def get_area(self):
+        """Get the area in square pixels of the recording."""
+        return (self.get_height()+1) * (self.get_width()+1)
+
     def get_time(self):
         """Get the time in which the recording was created."""
         box = self.get_bounding_box()
@@ -170,6 +174,16 @@ class HandwrittenData(object):
         plt.gca().invert_yaxis()
         ax.set_aspect('equal')
         plt.show()
+
+    def count_single_dots(self):
+        """Count all strokes of this recording that have only a single dot.
+        """
+        pointlist = self.get_pointlist()
+        single_dots = 0
+        for line in pointlist:
+            if len(line) == 1:
+                single_dots += 1
+        return single_dots
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
