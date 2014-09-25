@@ -9,6 +9,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 import subprocess
 import time
 import re
+import yaml
 # mine
 import utils
 
@@ -46,7 +47,15 @@ def test_model(model_folder, basename, test_file):
 
 
 def main(model_folder, run_native=False):
-    test_data_path = os.path.join(model_folder, "testdata.pfile")
+    PROJECT_ROOT = utils.get_project_root()
+     # Get model description
+    model_description_file = os.path.join(model_folder, "info.yml")
+    # Read the model description file
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+    test_data_path = os.path.join(PROJECT_ROOT,
+                                  model_description["data-source"],
+                                  "testdata.pfile")
     error = test_model(model_folder,
                        "model",
                        test_data_path)

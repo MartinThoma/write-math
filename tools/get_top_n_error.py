@@ -108,7 +108,7 @@ def make_all(tuplelist):
     return t
 
 
-def create_report(true_data, eval_data, index2latex, n):
+def create_report(true_data, eval_data, index2latex, n, merge=True):
     # Gather data
     correct = []
     wrong = []
@@ -168,7 +168,8 @@ def create_report(true_data, eval_data, index2latex, n):
                       ('\mathcal{C}', 'C'),
                       ('x', '\\times', 'X', '\\chi', '\\mathcal{X}')]
     confusing = make_all(confusing) + make_all(understandable)
-    # confusing = []
+    if not merge:
+        confusing = []
     for known, evaluated in zip(true_data, eval_data):
         evaluated_t1 = evaluated.keys()[0]
         if known['index'] in evaluated.keys()[:n]:
@@ -236,7 +237,8 @@ def create_report(true_data, eval_data, index2latex, n):
         f.write(rendered)
 
 
-def analyze_results(translation_csv, what_evaluated_file, evaluation_file, n):
+def analyze_results(translation_csv, what_evaluated_file, evaluation_file, n,
+                    merge=True):
     index2latex = {}
     with open(translation_csv) as csvfile:
         spamreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
@@ -270,10 +272,10 @@ def analyze_results(translation_csv, what_evaluated_file, evaluation_file, n):
             row['index'] = int(row['index'])
             true_data.append(row)
 
-    create_report(true_data, eval_data, index2latex, n)
+    create_report(true_data, eval_data, index2latex, n, merge)
 
 
-def main(model_folder, aset='test', n=3):
+def main(model_folder, aset='test', n=3, merge=True):
     PROJECT_ROOT = utils.get_project_root()
 
     if aset == 'test':
@@ -312,7 +314,8 @@ def main(model_folder, aset='test', n=3):
     what_evaluated_file = os.path.join(PROJECT_ROOT,
                                        model_description["data-source"],
                                        "translation-%s.csv" % key_file)
-    analyze_results(translation_csv, what_evaluated_file, evaluation_file, n)
+    analyze_results(translation_csv, what_evaluated_file, evaluation_file, n,
+                    merge)
 
 
 def is_valid_file(parser, arg):
@@ -347,8 +350,11 @@ if __name__ == "__main__":
                         choices=['test', 'train', 'valid'],
                         help="which set should get analyzed?",
                         default='test')
-    parser.add_argument("-n", 
-                        dest="n", default=3, type=int, 
+    parser.add_argument("-n",
+                        dest="n", default=3, type=int,
                         help="Top-N error")
+    parser.add_argument("--merge",
+                        action="store_true", dest="merge", default=False,
+                        help="merge problem classes that are easy to confuse")
     args = parser.parse_args()
-    main(args.model, args.aset, args.n)
+    main(args.model, args.aset, args.n, args.merge)
