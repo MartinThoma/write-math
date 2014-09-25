@@ -65,6 +65,7 @@ def train_model(model_folder, model_description, data):
     if training is None:
         return -1
     logging.info(training)
+    os.chdir(model_folder)
     os.system(training)
 
 
