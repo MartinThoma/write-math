@@ -54,7 +54,7 @@ def check_python_modules():
     required_modules = ['argparse', 'matplotlib', 'natsort', 'MySQLdb',
                         'cPickle', 'detl', 'theano', 'dropbox', 'yaml',
                         'webbrowser', 'hashlib', 'shapely', 'numpy', 'wget',
-                        '_tkinter']
+                        '_tkinter', 'jinja2']
     found = []
     for required_module in required_modules:
         try:
@@ -103,6 +103,10 @@ def check_python_modules():
         import yaml
         print("yaml version: %s (3.11 tested)" %
               yaml.__version__)
+    if "jinja2" in found:
+        import jinja2
+        print("jinja2 version: %s (2.7.3 tested)" %
+              jinja2.__version__)
     if "cPickle" in found:
         import cPickle
         print("cPickle version: %s (1.71 tested)" %
