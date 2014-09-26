@@ -275,28 +275,29 @@ def get_max_distances(raw_datasets):
 
 def get_time_between_controll_points(raw_datasets):
     """For each recording: Store the average time between controll points of
-       one stroke / controll points of two different lines.
+       one stroke / controll points of two different strokes.
     """
     average_between_points = open("average_time_between_points.txt", "a")
-    average_between_lines = open("average_time_between_lines.txt", "a")
+    average_between_strokes = open("average_time_between_strokes.txt", "a")
     start_time = time.time()
     for i, raw_dataset in enumerate(raw_datasets):
         if i % 100 == 0 and i > 0:
             utils.print_status(len(raw_datasets), i, start_time)
 
         # Do the work
-        times_between_points, times_between_lines = [], []
-        last_line_end = None
+        times_between_points, times_between_strokes = [], []
+        last_stroke_end = None
         if len(raw_dataset['handwriting'].get_pointlist()) == 0:
             logging.warning("%i has no content." %
                             raw_dataset['handwriting'].raw_data_id)
             continue
-        for line in raw_dataset['handwriting'].get_sorted_pointlist():
-            if last_line_end is not None:
-                times_between_lines.append(line[-1]['time'] - last_line_end)
-            last_line_end = line[-1]['time']
+        for stroke in raw_dataset['handwriting'].get_sorted_pointlist():
+            if last_stroke_end is not None:
+                times_between_strokes.append(stroke[-1]['time'] -
+                                             last_stroke_end)
+            last_stroke_end = stroke[-1]['time']
             last_point_end = None
-            for point in line:
+            for point in stroke:
                 if last_point_end is not None:
                     times_between_points.append(point['time'] - last_point_end)
                 last_point_end = point['time']
@@ -304,13 +305,13 @@ def get_time_between_controll_points(raw_datasets):
         if len(times_between_points) > 0:
             average_between_points.write("%0.2f\n" %
                                          numpy.average(times_between_points))
-        # The recording might only have one line
-        if len(times_between_lines) > 0:
-            average_between_lines.write("%0.2f\n" %
-                                        numpy.average(times_between_lines))
+        # The recording might only have one stroke
+        if len(times_between_strokes) > 0:
+            average_between_strokes.write("%0.2f\n" %
+                                          numpy.average(times_between_strokes))
     print("\r100%"+"\033[K\n")
     average_between_points.close()
-    average_between_lines.close()
+    average_between_strokes.close()
 
 
 def main(handwriting_datasets_file):
