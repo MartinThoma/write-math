@@ -128,9 +128,10 @@ def create_report(true_data, eval_data, index2latex, n, merge=True):
                  ('\S', '\mathsection'),
                  ('\\nabla', '\\triangledown'),
                  ('\lhd', '\\triangleleft', '\\vartriangleleft'),
-                 ('\\oint', '\\varoint'),
                  ('\\oiint', '\\varoiint'),
                  ('\mathbb{R}', '\mathds{R}'),
+                 ('\mathbb{Q}', '\mathds{Q}'),
+                 ('\mathbb{Z}', '\mathds{Z}'),
                  ('\mathcal{A}', '\mathscr{A}'),
                  ('\mathcal{D}', '\mathscr{D}'),
                  ('\mathcal{N}', '\mathscr{N}'),
@@ -167,9 +168,11 @@ def create_report(true_data, eval_data, index2latex, n, merge=True):
                       ('\mathcal{T}', '\\tau'),
                       ('\mathcal{C}', 'C'),
                       ('x', '\\times', 'X', '\\chi', '\\mathcal{X}')]
-    confusing = make_all(confusing) + make_all(understandable)
+    confusing = make_all(confusing)
     if not merge:
         confusing = []
+    if False:
+        confusing += make_all(understandable)
     for known, evaluated in zip(true_data, eval_data):
         evaluated_t1 = evaluated.keys()[0]
         if known['index'] in evaluated.keys()[:n]:
