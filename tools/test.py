@@ -18,7 +18,21 @@ def get_error_from_logfile(logfile):
     with open(logfile) as f:
         log_content = f.read()
     pattern = re.compile("errors = (\d\.\d+)")
-    error = float(pattern.findall(log_content)[-1])
+    errors = pattern.findall(log_content)
+    # Get number in logfile
+    _, ianhang = logfile.split("_")
+    i, _ = ianhang.split(".")
+    i = int(i)
+    # Back up in case of error with that file
+    while len(errors) == 0:
+        logfile = "testresult_%03d.txt" % (i-1)
+        with open(logfile) as f:
+            log_content = f.read()
+        pattern = re.compile("errors = (\d\.\d+)")
+        errors = pattern.findall(log_content)
+        print("Error with %i. Skip to %i." % (i, i-1))
+        i -= 1
+    error = float(errors[-1])
     return error
 
 
