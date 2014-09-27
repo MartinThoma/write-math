@@ -1,0 +1,9 @@
+data-source: archive/preprocessed/baseline
+data-modification:
+    multiply: 1
+features:
+  - Constant_Point_Coordinates:
+      - lines: 4
+      - points_per_line: 10
+      - fill_empty_with: 0
+      - pen_down: false
