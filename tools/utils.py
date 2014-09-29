@@ -262,3 +262,31 @@ def choose_raw_dataset(currently=""):
             print("\033[1m[%i]\033[0m\t%s" % (i, os.path.basename(filename)))
     i = input_int_default("Choose a dataset by number: ", default)
     return files[i]
+
+
+def get_readable_time(t):
+    """ Format the time to a readable format.
+    @param t: Time in ms
+    @return string that has the time splitted to highest used time
+            (minutes, hours, ...)
+    """
+    ms = t % 1000
+    t -= ms
+    t /= 1000
+
+    s = t % 60
+    t -= s
+    t /= 60
+
+    minutes = t % 60
+    t -= minutes
+    t /= 60
+
+    if t != 0:
+        return "%ih, %i minutes %is %ims" % (t, minutes, s, ms)
+    elif minutes != 0:
+        return "%i minutes %is %ims" % (minutes, s, ms)
+    elif s != 0:
+        return "%is %ims" % (s, ms)
+    else:
+        return "%ims" % ms

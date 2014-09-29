@@ -1,6 +1,11 @@
 data-source: archive/preprocessed/small-baseline
 data-modification:
-    multiply: 1
+  - Multiply:
+      - nr: 1
+  - Rotate:
+      - minimum: -30
+      - maximum: 30
+      - step: 5
 features:
   - Stroke_Count: null
   - Constant_Point_Coordinates:

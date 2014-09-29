@@ -34,9 +34,13 @@ def main(picklefile):
     single_dots = 0
     symbols_with_dots = ['i', 'j', '\cdot', '\div', '\\because', '\\therefore']
     percentages = []
+    time_max_threshold = 30*1000  # Max 30 sec pro symbol
+    time_max_list = []  # List with symbols that are over the time maximum
 
     for el in a['handwriting_datasets']:
         symbols[el['formula_in_latex']] += 1
+        if el['handwriting'].get_time() > time_max_threshold:
+            time_max_list.append(el['handwriting'])
         if el['handwriting'].wild_point_count > 0:
             wild_point_recs += 1
             wild_points += el['handwriting'].wild_point_count
@@ -90,6 +94,15 @@ def main(picklefile):
           (len(percentages),
            float(len(percentages))/len(a['handwriting_datasets'])*100))
 
+    time_max_list = sorted(time_max_list,
+                           key=lambda n: n.get_time(),
+                           reverse=True)
+    print("%i recordings took more than %i ms. That were: " %
+          (len(time_max_list), time_max_threshold))
+    for el in time_max_list:
+        print("* %ims: %s: %s" % (el.get_time(),
+                                  utils.get_readable_time(el.get_time()),
+                                  el))
     # Show preprocessing queue if possible
     if 'preprocessing_queue' in a:
         print("## Preprocessing Queue")

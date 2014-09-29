@@ -32,6 +32,9 @@ class HandwrittenData(object):
     def get_pointlist(self):
         """Get a list of lists of tuples from JSON raw data string.
            Those lists represent lines with control points.
+
+           Every point is a dictionary:
+           {'x': 123, 'y': 42, 'time': 1337}
         """
         try:
             pointlist = json.loads(self.raw_data_json)
@@ -184,6 +187,19 @@ class HandwrittenData(object):
             if len(line) == 1:
                 single_dots += 1
         return single_dots
+
+    def get_center_of_mass(self):
+        """Get a tuple (x,y) that is the center of mass. The center of mass
+           is not necessarily the same as the center of the bounding box.
+           Imagine a black square and a single dot wide outside of the square.
+        """
+        xsum, ysum, counter = 0., 0., 0
+        for line in self.get_pointlist():
+            for point in line:
+                xsum += point['x']
+                ysum += point['y']
+                counter += 1
+        return (xsum/counter, ysum/counter)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

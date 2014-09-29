@@ -29,6 +29,7 @@ from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
 import preprocess_dataset
 import features
+import data_multiplication
 
 
 def main(feature_folder):
@@ -53,11 +54,8 @@ def main(feature_folder):
     # Get a list of all used features
     feature_list = features.get_features(feature_description['features'])
 
-    if 'data-modification' in feature_description and 'multiply' in \
-       feature_description['data-modification']:
-        multiply = feature_description['data-modification']['multiply']
-    else:
-        multiply = 1
+    mult_queue = data_multiplication.get_data_multiplication_queue(
+        feature_description['data-modification'])
 
     # Set everything up for the creation of the 3 pfiles (test, validation,
     # training).
@@ -70,9 +68,17 @@ def main(feature_folder):
 
     # Multiply traing_set
     new_trainging_set = []
-    for i in range(multiply):
-        for el in training_set:
-            new_trainging_set.append(el)
+    logging.info("Multiply data...")
+    for el in training_set:
+        for alg in mult_queue:
+            samples = alg(el['handwriting'])
+            for sample in samples:
+                new_trainging_set.append({'id': el['id'],
+                                          'is_in_testset': 0,
+                                          'formula_id': el['formula_id'],
+                                          'handwriting': sample,
+                                          'formula_in_latex':
+                                          el['formula_in_latex']})
     training_set = new_trainging_set
 
     # Write formula_id2index for later lookup

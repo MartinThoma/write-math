@@ -1,6 +1,7 @@
 data-source: archive/preprocessed/baseline
 data-modification:
-    multiply: 20
+  - Multiply:
+      - nr: 1
 features:
   - Constant_Point_Coordinates:
       - lines: 4
