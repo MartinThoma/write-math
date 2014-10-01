@@ -24,6 +24,7 @@ import gc
 import utils
 import yaml
 import numpy
+from collections import defaultdict
 # mine
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
@@ -32,7 +33,7 @@ import features
 import data_multiplication
 
 
-def main(feature_folder):
+def main(feature_folder, create_learning_curve=False):
     PROJECT_ROOT = utils.get_project_root()
 
     # Read the feature description file
@@ -124,7 +125,8 @@ def main(feature_folder):
         make_pfile(dataset_name,
                    INPUT_FEATURES,
                    prepared,
-                   os.path.join(feature_folder, target_paths[dataset_name]))
+                   os.path.join(feature_folder, target_paths[dataset_name]),
+                   create_learning_curve)
         translationfilename = "%s/translation-%s.csv" % (feature_folder,
                                                          dataset_name)
         with open(translationfilename, "w") as f:
@@ -249,7 +251,7 @@ def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
 
 
 def make_pfile(dataset_name, feature_count, data,
-               output_filename):
+               output_filename, create_learning_curve):
     """ Create the pfile.
     @param filename name of the file that pfile_create will use to create
                     the pfile.
@@ -259,20 +261,49 @@ def make_pfile(dataset_name, feature_count, data,
     input_filename = os.path.abspath("%s.raw" % dataset_name)
     logging.info("Temporary file: '%s'", input_filename)
     # create raw data file for pfile_create
-    with open(input_filename, "w") as f:
-        for symbolnr, instance in enumerate(data):
-            feature_string, label = instance
-            assert len(feature_string) == feature_count, \
-                "Expected %i features, got %i features" % \
-                (feature_count, len(feature_string))
-            feature_string = " ".join(map(str, feature_string))
-            line = "%i 0 %s %i" % (symbolnr, feature_string, label)
-            print(line, file=f)
-    command = "pfile_create -i %s -f %i -l 1 -o %s" % \
-              (input_filename, feature_count, output_filename)
-    logging.info(command)
-    os.system(command)
-    #os.remove(input_filename)
+    if dataset_name == "traindata" and create_learning_curve:
+        max_trainingexamples = 50
+        output_filename_save = output_filename
+        for trainingexamples in range(1, max_trainingexamples):
+            # adjust output_filename
+            tmp = output_filename_save.split(".")
+            tmp[-2] += "-%i-examples" % trainingexamples
+            output_filename = ".".join(map(str, tmp))
+            # Count what has been written so far
+            seen_symbols = defaultdict(int)
+            with open(input_filename, "w") as f:
+                symbolnr = 0
+                for instance in data:
+                    feature_string, label = instance
+                    if seen_symbols[label] >= trainingexamples:
+                        continue
+                    seen_symbols[label] += 1
+                    assert len(feature_string) == feature_count, \
+                        "Expected %i features, got %i features" % \
+                        (feature_count, len(feature_string))
+                    feature_string = " ".join(map(str, feature_string))
+                    line = "%i 0 %s %i" % (symbolnr, feature_string, label)
+                    print(line, file=f)
+                    symbolnr += 1
+            command = "pfile_create -i %s -f %i -l 1 -o %s" % \
+                      (input_filename, feature_count, output_filename)
+            logging.info(command)
+            os.system(command)
+    else:
+        with open(input_filename, "w") as f:
+            for symbolnr, instance in enumerate(data):
+                feature_string, label = instance
+                assert len(feature_string) == feature_count, \
+                    "Expected %i features, got %i features" % \
+                    (feature_count, len(feature_string))
+                feature_string = " ".join(map(str, feature_string))
+                line = "%i 0 %s %i" % (symbolnr, feature_string, label)
+                print(line, file=f)
+        command = "pfile_create -i %s -f %i -l 1 -o %s" % \
+                  (input_filename, feature_count, output_filename)
+        logging.info(command)
+        os.system(command)
+        #os.remove(input_filename)
 
 
 if __name__ == '__main__':
@@ -288,11 +319,16 @@ if __name__ == '__main__':
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--folder",
                         dest="folder",
-                        help="where is the preprocessing folder "
+                        help="where is the feature file folder "
                              "(that contains a info.yml)?",
                         metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
                         default=latest_featurefolder)
+    parser.add_argument("-l", "--learning-curve",
+                        dest="create_learning_curve",
+                        help="create pfiles for a learning curve",
+                        action='store_true',
+                        default=False)
     args = parser.parse_args()
 
-    main(args.folder)
+    main(args.folder, args.create_learning_curve)
