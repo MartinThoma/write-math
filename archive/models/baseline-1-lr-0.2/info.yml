@@ -1,0 +1,7 @@
+data-source: archive/feature-files/baseline
+training: '{{nntoolkit}} train --epochs 1000 --learning-rate 0.2 --momentum 0.1 --hook=''!detl
+    test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}} {{testing}}
+    < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
+model:
+    type: mlp
+    topology: 160:500:369

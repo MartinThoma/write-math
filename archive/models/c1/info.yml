@@ -1,4 +1,4 @@
-data-source: archive/feature-files/baseline
+data-source: archive/feature-files/c1
 training: '{{nntoolkit}} train --epochs 1000 --learning-rate 1 --momentum 0.1 --hook=''!detl
     test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}}
     {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'

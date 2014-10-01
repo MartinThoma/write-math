@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Create pfiles.
+Create pfiles for a learning curve.
 
 Before this script is run, the `download.py` should get executed to generate
 a handwriting_datasets.pickle with exactly those symbols that should also
@@ -30,6 +30,7 @@ from HandwrittenData import HandwrittenData  # Needed because of pickle
 import preprocessing  # Needed because of pickle
 import preprocess_dataset
 import features
+import data_multiplication
 
 
 def main(feature_folder):
@@ -54,11 +55,8 @@ def main(feature_folder):
     # Get a list of all used features
     feature_list = features.get_features(feature_description['features'])
 
-    if 'data-modification' in feature_description and 'multiply' in \
-       feature_description['data-modification']:
-        multiply = feature_description['data-modification']['multiply']
-    else:
-        multiply = 1
+    mult_queue = data_multiplication.get_data_multiplication_queue(
+        feature_description['data-modification'])
 
     # Set everything up for the creation of the 3 pfiles (test, validation,
     # training).
@@ -71,9 +69,17 @@ def main(feature_folder):
 
     # Multiply traing_set
     new_trainging_set = []
-    for i in range(multiply):
-        for el in training_set:
-            new_trainging_set.append(el)
+    logging.info("Multiply data...")
+    for el in training_set:
+        for alg in mult_queue:
+            samples = alg(el['handwriting'])
+            for sample in samples:
+                new_trainging_set.append({'id': el['id'],
+                                          'is_in_testset': 0,
+                                          'formula_id': el['formula_id'],
+                                          'handwriting': sample,
+                                          'formula_in_latex':
+                                          el['formula_in_latex']})
     training_set = new_trainging_set
 
     # Write formula_id2index for later lookup
@@ -202,43 +208,44 @@ def prepare_dataset(dataset, formula_id2index, feature_list, is_traindata):
     sys.stdout.flush()
 
     # Feature normalization
-    if is_traindata:
-        # Create feature only list
-        feats = []
-        for x, y in prepared:
-            feats.append(x)
-        # Calculate all means / mins / maxs
-        means = numpy.mean(feats, 0)
-        mins = numpy.min(feats, 0)
-        maxs = numpy.max(feats, 0)
-        # Calculate, min, max and mean vector for each feature with
-        # normalization
+    if False:
+        if is_traindata:
+            # Create feature only list
+            feats = []
+            for x, y in prepared:
+                feats.append(x)
+            # Calculate all means / mins / maxs
+            means = numpy.mean(feats, 0)
+            mins = numpy.min(feats, 0)
+            maxs = numpy.max(feats, 0)
+            # Calculate, min, max and mean vector for each feature with
+            # normalization
+            start = 0
+            with open("featurenormalization.csv", 'wb') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=';',
+                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                for feature in feature_list:
+                    end = start + feature.get_dimension()
+                    # append the data to the feature class
+                    feature.mean = numpy.array(means[start:end])
+                    feature.min = numpy.array(mins[start:end])
+                    feature.max = numpy.array(maxs[start:end])
+                    start = end
+                    for mean, fmax, fmin in zip(feature.mean, feature.max,
+                                                feature.min):
+                        spamwriter.writerow([mean, fmax - fmin])
         start = 0
-        with open("featurenormalization.csv", 'wb') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=';',
-                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for feature in feature_list:
-                end = start + feature.get_dimension()
-                # append the data to the feature class
-                feature.mean = numpy.array(means[start:end])
-                feature.min = numpy.array(mins[start:end])
-                feature.max = numpy.array(maxs[start:end])
+        for feature in feature_list:
+            end = start + feature.get_dimension()
+            # TODO: Should I check if feature normalization is activated?
+            if False:  # Deactivate feature normalization due to bug
+                # For every instance in the dataset: Normalize!
+                for i in range(len(prepared)):
+                    # The 0 is necessary as every element is (x, y)
+                    feature_range = (feature.max - feature.min)
+                    prepared[i][0][start:end] = (prepared[i][0][start:end] -
+                                                 feature.mean) / feature_range
                 start = end
-                for mean, fmax, fmin in zip(feature.mean, feature.max,
-                                            feature.min):
-                    spamwriter.writerow([mean, fmax - fmin])
-    start = 0
-    for feature in feature_list:
-        end = start + feature.get_dimension()
-        # TODO: Should I check if feature normalization is activated?
-        if False:  # Deactivate feature normalization due to bug
-            # For every instance in the dataset: Normalize!
-            for i in range(len(prepared)):
-                # The 0 is necessary as every element is (x, y)
-                feature_range = (feature.max - feature.min)
-                prepared[i][0][start:end] = (prepared[i][0][start:end] -
-                                             feature.mean) / feature_range
-            start = end
     return (prepared, translation)
 
 
