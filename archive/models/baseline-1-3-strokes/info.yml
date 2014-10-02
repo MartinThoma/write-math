@@ -1,5 +1,5 @@
 data-source: archive/feature-files/baseline-3-strokes
-training: '{{nntoolkit}} train --epochs 1000 --learning-rate 0.1 --momentum 0.1 --hook=''!detl
+training: '{{nntoolkit}} train --epochs 1000 --learning-rate 0.1 --momentum 0.1 --print-errors --hook=''!detl
     test {{testing}},err=testresult_%e.txt'' {{training}} {{validation}}
     {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
 model:
