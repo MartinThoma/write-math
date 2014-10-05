@@ -95,3 +95,4 @@ testresult_*
 DO.*
 *.raw
 Makefile
+*.json.gz

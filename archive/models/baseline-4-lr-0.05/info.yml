@@ -1,5 +1,5 @@
 data-source: archive/feature-files/baseline
-training: '{{nntoolkit}} train --epochs 1000 --learning-rate 0.2 --momentum 0.1 
+training: '{{nntoolkit}} train --epochs 1000 --learning-rate 0.05 --momentum 0.1 
     --print-errors --hook=''!gzip -c,out=train_%e.json.gz'' {{training}} {{validation}}
     {{testing}} < {{src_model}} > {{target_model}} 2>> {{target_model}}.log'
 model:

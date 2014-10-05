@@ -57,12 +57,13 @@ def train_model(model_folder, model_description, data):
     if training is None:
         return -1
     os.chdir(model_folder)
-    steps = 5
-    for i in range(1, 50, steps):
+    steps = 10
+    for i in range(100, 501, steps):
         # Adjustmenst for learning curve
         folder = "%i-recording" % i
         if not os.path.exists(folder):
             os.makedirs(folder)
+            os.chdir(folder)
             newcommand = training.replace("traindata.pfile",
                                           "traindata-%i-examples.pfile" % i)
             newcommand = newcommand.replace("testresult_%e.txt",
@@ -70,7 +71,11 @@ def train_model(model_folder, model_description, data):
             newcommand = newcommand.replace("target.json",
                                             "%s/model-1.json" % folder)
             logging.info(newcommand)
-            os.system(newcommand)
+            out = os.system(newcommand)
+            if out != 0:
+                logging.error("Output: %s" % str(out))
+                return
+            os.chdir(model_folder)
 
 
 def main(model_folder):

@@ -262,9 +262,10 @@ def make_pfile(dataset_name, feature_count, data,
     logging.info("Temporary file: '%s'", input_filename)
     # create raw data file for pfile_create
     if dataset_name == "traindata" and create_learning_curve:
-        max_trainingexamples = 50
+        max_trainingexamples = 501
         output_filename_save = output_filename
-        for trainingexamples in range(1, max_trainingexamples):
+        steps = 10
+        for trainingexamples in range(100, max_trainingexamples, steps):
             # adjust output_filename
             tmp = output_filename_save.split(".")
             tmp[-2] += "-%i-examples" % trainingexamples
