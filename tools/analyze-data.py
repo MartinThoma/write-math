@@ -53,11 +53,15 @@ def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
     open(metafile, 'w').close()  # Truncate the file
     write_file = open(metafile, 'a')
     write_file.write("label,mean,std\n")  # heading
-    # raw
+    # write raw data
     rawfilename = os.path.join(folder, filename+'.raw')
     open(rawfilename, 'w').close()  # Truncate the file
     raw_file = open(rawfilename, 'a')
     raw_file.write("latex,raw_data_id,value\n")
+    # write only values
+    datafilename = os.path.join(folder, filename+'.txt')
+    open(datafilename, 'w').close()  # Truncate the file
+    data_file = open(datafilename, 'a')
 
     by_formula_id = sort_by_formula_id(raw_datasets)
     print_data = []
@@ -69,6 +73,7 @@ def analyze_feature(raw_datasets, feature, filename="aspect_ratios.csv"):
             raw_file.write("%s,%i,%0.2f\n" % (datasets[0].formula_in_latex,
                                               data.raw_data_id,
                                               value))
+            data_file.write("%0.2f\n" % value)
         label = filter_label(datasets[0].formula_in_latex)
         print_data.append((label, numpy.mean(values), numpy.std(values)))
     # Sort the data by highest mean, descending

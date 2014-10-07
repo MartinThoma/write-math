@@ -181,6 +181,7 @@ class Scale_and_shift(object):
         addx, addy = 0, 0
 
         if self.center:
+            # Only one dimension (x or y) has to be centered (the smaller one)
             add = (1 - (max(factorX, factorY) / factor)) / 2
 
             if factor == factorX:
@@ -203,9 +204,10 @@ class Scale_and_shift(object):
         pointlist = handwritten_data.get_pointlist()
         for strokenr, stroke in enumerate(pointlist):
             for key, p in enumerate(stroke):
-                pointlist[strokenr][key] = {"x": (p["x"] - minx) * factor + addx,
-                                          "y": (p["y"] - miny) * factor + addy,
-                                          "time": p["time"] - mint}
+                pointlist[strokenr][key] = {
+                    "x": (p["x"] - minx) * factor + addx,
+                    "y": (p["y"] - miny) * factor + addy,
+                    "time": p["time"] - mint}
                 if "pen_down" in p:
                     pointlist[strokenr][key]["pen_down"] = p["pen_down"]
         handwritten_data.set_pointlist(pointlist)
