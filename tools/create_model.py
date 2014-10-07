@@ -4,7 +4,6 @@
 
 import os
 import yaml
-import natsort
 import logging
 import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
