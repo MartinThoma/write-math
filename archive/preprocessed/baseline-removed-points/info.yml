@@ -6,7 +6,7 @@ queue:
       - max_width: 1.0
       - max_height: 1.0
       - center: true
-  - Space_evenly_per_line:
+  - Space_evenly_per_stroke:
       - kind: linear
       - number: 20
   - Scale_and_shift:

@@ -97,13 +97,13 @@ class Remove_duplicate_time(object):
         pointlist = handwritten_data.get_pointlist()
         new_pointlist = []
         t = []
-        for line in pointlist:
-            new_line = []
-            for point in line:
+        for stroke in pointlist:
+            new_stroke = []
+            for point in stroke:
                 if point['time'] not in t:
-                    new_line.append(point)
+                    new_stroke.append(point)
                     t.append(point['time'])
-            new_pointlist.append(new_line)
+            new_pointlist.append(new_stroke)
         handwritten_data.set_pointlist(new_pointlist)
 
 
@@ -124,14 +124,14 @@ class Remove_points(object):
         pointlist = handwritten_data.get_pointlist()
         has_nonpoint_stroke = False
         # Check if recording has non-point stroke:
-        for line in pointlist:
-            if len(line) > 1:
+        for stroke in pointlist:
+            if len(stroke) > 1:
                 has_nonpoint_stroke = True
         if has_nonpoint_stroke:
             new_pointlist = []
-            for line in pointlist:
-                if len(line) > 1:
-                    new_pointlist.append(line)
+            for stroke in pointlist:
+                if len(stroke) > 1:
+                    new_pointlist.append(stroke)
             handwritten_data.set_pointlist(new_pointlist)
 
 
@@ -201,13 +201,13 @@ class Scale_and_shift(object):
         minx, miny, mint = tmp['minx'], tmp['miny'], tmp['mint']
 
         pointlist = handwritten_data.get_pointlist()
-        for linenr, line in enumerate(pointlist):
-            for key, p in enumerate(line):
-                pointlist[linenr][key] = {"x": (p["x"] - minx) * factor + addx,
+        for strokenr, stroke in enumerate(pointlist):
+            for key, p in enumerate(stroke):
+                pointlist[strokenr][key] = {"x": (p["x"] - minx) * factor + addx,
                                           "y": (p["y"] - miny) * factor + addy,
                                           "time": p["time"] - mint}
                 if "pen_down" in p:
-                    pointlist[linenr][key]["pen_down"] = p["pen_down"]
+                    pointlist[strokenr][key]["pen_down"] = p["pen_down"]
         handwritten_data.set_pointlist(pointlist)
         assert self.max_width - handwritten_data.get_width() >= -0.00001, \
             "max_width: %0.5f; width: %0.5f" % (self.max_width,
@@ -243,12 +243,12 @@ class Space_evenly(object):
         pointlist = handwritten_data.get_sorted_pointlist()
 
         for i in range(len(pointlist)-1):
-            # The last point of the previous line should be lower than the
-            # first point of the next line
+            # The last point of the previous stroke should be lower than the
+            # first point of the next stroke
             assert (pointlist[i][-1]["time"] <= pointlist[i+1][0]["time"]), \
-                ("Something is wrong with the time. The last point of line %i "
-                 "has a time of %0.2f, but the first point of line %i has a "
-                 "time of %0.2f. See raw_data_id %s") % \
+                ("Something is wrong with the time. The last point of "
+                 "stroke %i has a time of %0.2f, but the first point of "
+                 "stroke %i has a time of %0.2f. See raw_data_id %s") % \
                 (i,
                  pointlist[i][-1]["time"],
                  i+1,
@@ -257,13 +257,13 @@ class Space_evenly(object):
 
         # calculate "pen_down" strokes
         times = []
-        for i, line in enumerate(pointlist):
-            line_info = {"start": line[0]['time'],
-                         "end": line[-1]['time'],
-                         "pen_down": True}
+        for i, stroke in enumerate(pointlist):
+            stroke_info = {"start": stroke[0]['time'],
+                           "end": stroke[-1]['time'],
+                           "pen_down": True}
             # set up variables for interpolation
             x, y, t = [], [], []
-            for point in line:
+            for point in stroke:
                 if point['time'] not in t:
                     x.append(point['x'])
                     y.append(point['y'])
@@ -281,15 +281,15 @@ class Space_evenly(object):
                 fy = interp1d(t, y, 'quadratic')
             else:
                 fx, fy = interp1d(t, x, self.kind), interp1d(t, y, self.kind)
-            line_info['fx'] = fx
-            line_info['fy'] = fy
-            times.append(line_info)
+            stroke_info['fx'] = fx
+            stroke_info['fy'] = fy
+            times.append(stroke_info)
 
         # Model "pen_up" strokes
         for i in range(len(pointlist) - 1):
-            line_info = {"start": pointlist[i][-1],
-                         "end": pointlist[i+1][0],
-                         "pen_down": False}
+            stroke_info = {"start": pointlist[i][-1],
+                           "end": pointlist[i+1][0],
+                           "pen_down": False}
             x, y, t = [], [], []
             for point in [pointlist[i][-1], pointlist[i+1][0]]:
                 if point['time'] not in t:
@@ -307,9 +307,9 @@ class Space_evenly(object):
                 x, y = numpy.array(x), numpy.array(y)
                 fx = interp1d(t, x, kind='linear')
                 fy = interp1d(t, y, kind='linear')
-            line_info['fx'] = fx
-            line_info['fy'] = fy
-            times.append(line_info)
+            stroke_info['fx'] = fx
+            stroke_info['fy'] = fy
+            times.append(stroke_info)
 
         new_pointlist = []
 
@@ -318,31 +318,31 @@ class Space_evenly(object):
                               self.number)
 
         for time in tnew:
-            for line_intervall in times:
-                if line_intervall["start"] <= time <= line_intervall["end"]:
-                    x = float(line_intervall['fx'](time))
-                    y = float(line_intervall['fy'](time))
+            for stroke_intervall in times:
+                if stroke_intervall["start"] <= time <= stroke_intervall["end"]:
+                    x = float(stroke_intervall['fx'](time))
+                    y = float(stroke_intervall['fy'](time))
                     time = float(time)
                     new_pointlist.append({'x': x, 'y': y, 'time': time,
                                           'pen_down':
-                                          line_intervall['pen_down']})
+                                          stroke_intervall['pen_down']})
         handwritten_data.set_pointlist([new_pointlist])
 
 
-class Space_evenly_per_line(object):
-    """Space the points evenly for every single line seperatly. """
+class Space_evenly_per_stroke(object):
+    """Space the points evenly for every single stroke seperatly. """
     def __init__(self, number=100, kind='cubic'):
         self.number = number
         self.kind = kind
 
     def __repr__(self):
-        return ("Space_evenly_per_line\n"
+        return ("Space_evenly_per_stroke\n"
                 " - number: %i\n"
                 " - kind: %s\n") % \
             (self.number, self.kind)
 
     def __str__(self):
-        return ("Space evenly per line\n"
+        return ("Space evenly per stroke\n"
                 " - number: %i\n"
                 " - kind: %s\n") % \
             (self.number, self.kind)
@@ -354,17 +354,17 @@ class Space_evenly_per_line(object):
         pointlist = handwritten_data.get_pointlist()
         new_pointlist = []
 
-        for line in pointlist:
-            new_line = []
-            if len(line) < 4:
+        for stroke in pointlist:
+            new_stroke = []
+            if len(stroke) < 4:
                 # Don't do anything if there are less than 4 points
-                new_line = line
+                new_stroke = stroke
             else:
-                line = sorted(line, key=lambda p: p['time'])
+                stroke = sorted(stroke, key=lambda p: p['time'])
 
                 x, y, t = [], [], []
 
-                for point in line:
+                for point in stroke:
                     x.append(point['x'])
                     y.append(point['y'])
                     t.append(point['time'])
@@ -396,14 +396,15 @@ class Space_evenly_per_line(object):
                         raise e
 
                 for x, y, t in zip(fx(tnew), fy(tnew), tnew):
-                    new_line.append({'x': x, 'y': y, 'time': t})
-            new_pointlist.append(new_line)
+                    new_stroke.append({'x': x, 'y': y, 'time': t})
+            new_pointlist.append(new_stroke)
         handwritten_data.set_pointlist(new_pointlist)
 
 
 class Douglas_peucker(object):
     """
-     Apply the Douglas-Peucker algorithm to each line of $pointlist seperately.
+     Apply the Douglas-Peucker algorithm to each stroke of $pointlist
+     seperately.
      @param  array $pointlist see pointList()
      @return pointlist
     """
@@ -419,9 +420,11 @@ class Douglas_peucker(object):
     def DouglasPeucker(self, PointList, EPSILON):
         def LotrechterAbstand(p3, p1, p2):
             """
-             * Calculate the distance from p3 to the line defined by p1 and p2.
-             * @param list p1 associative array with "x" and "y" start of line
-             * @param list p2 associative array with "x" and "y" end of line
+             * Calculate the distance from p3 to the stroke
+               defined by p1 andp2.
+             * @param list p1 associative array with "x" and "y"
+                      start of stroke
+             * @param list p2 associative array with "x" and "y" end of stroke
              * @param list p3 associative array with "x" and "y" point
             """
             x3 = p3['x']
@@ -493,8 +496,8 @@ class Douglas_peucker(object):
 
 
 class Stroke_connect(object):
-    """Detect if lines were probably accidentially disconnected. If that is the
-       case, connect them.
+    """Detect if strokes were probably accidentially disconnected. If that is
+       the case, connect them.
     """
     def __init__(self, minimum_distance=0.05):
         self.minimum_distance = minimum_distance
@@ -513,9 +516,9 @@ class Stroke_connect(object):
             type(handwritten_data)
         pointlist = handwritten_data.get_pointlist()
 
-        # Connecting lines makes only sense when there are multiple lines
+        # Connecting strokes makes only sense when there are multiple strokes
         if len(pointlist) > 1:
-            lines = []
+            strokes = []
             last_appended = False
             i = 0
             while i < len(pointlist)-1:
@@ -523,21 +526,21 @@ class Stroke_connect(object):
                 first_point = pointlist[i+1][0]
                 if _euclidean_distance(last_point, first_point) < \
                    self.minimum_distance:
-                    lines.append(pointlist[i]+pointlist[i+1])
-                    pointlist[i+1] = lines[-1]
+                    strokes.append(pointlist[i]+pointlist[i+1])
+                    pointlist[i+1] = strokes[-1]
                     if i == len(pointlist)-2:
                         last_appended = True
                     i += 1
                 else:
-                    lines.append(pointlist[i])
+                    strokes.append(pointlist[i])
                 i += 1
             if not last_appended:
-                lines.append(pointlist[-1])
-            handwritten_data.set_pointlist(lines)
+                strokes.append(pointlist[-1])
+            handwritten_data.set_pointlist(strokes)
 
 
 class Dot_reduction(object):
-    """Reduce lines where the maximum distance between points is below a
+    """Reduce strokes where the maximum distance between points is below a
        threshold to a single dot.
     """
     def __init__(self, threshold):
@@ -588,17 +591,19 @@ class Dot_reduction(object):
 
         new_pointlist = []
         pointlist = handwritten_data.get_pointlist()
-        for line in pointlist:
-            new_line = line
-            if len(line) > 1 and get_max_distance(line) < self.threshold:
-                new_line = [get_average_point(line)]
-            new_pointlist.append(new_line)
+        for stroke in pointlist:
+            new_stroke = stroke
+            if len(stroke) > 1 and get_max_distance(stroke) < self.threshold:
+                new_stroke = [get_average_point(stroke)]
+            new_pointlist.append(new_stroke)
 
         handwritten_data.set_pointlist(new_pointlist)
 
 
 class Wild_point_filter(object):
-    """Find wild points and remove them."""
+    """Find wild points and remove them. The threshold means
+       speed in pixels / ms.
+    """
     def __init__(self, threshold):
         """The threshold is a speed threshold"""
         self.threshold = threshold
@@ -615,21 +620,20 @@ class Wild_point_filter(object):
             "handwritten data is not of type HandwrittenData, but of %r" % \
             type(handwritten_data)
         new_pointlist = []
-        pointlist = handwritten_data.get_pointlist()
-        debug_did_print = False
-        debug_detecte_wildpoints = 0
-        for line in pointlist:
-            new_line = []
-            last_point = line[0]
-            for point in line[1:]:
+        pointlist = handwritten_data.get_sorted_pointlist()
+        for stroke in pointlist:
+            new_stroke = []
+            for last_point, point in zip(stroke, stroke[1:]):
                 space_dist = math.hypot(last_point['x'] - point['x'],
                                         last_point['y'] - point['y'])
                 time_dist = float(point['time'] - last_point['time'])
+                if time_dist == 0:
+                    continue
                 speed = space_dist/time_dist
-                if not (speed >= self.threshold):
-                    new_line.append(point)
+                if speed < self.threshold:
+                    new_stroke.append(point)
 
-            new_pointlist.append(new_line)
+            new_pointlist.append(new_stroke)
         # Bounding box criterion:
         # If the distance from point to all others strokes bounding boxes is
         # more than 1/5 of the whole size, it is a wild point

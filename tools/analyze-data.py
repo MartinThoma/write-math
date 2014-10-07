@@ -15,6 +15,7 @@ import cPickle as pickle
 import time
 import numpy
 from collections import defaultdict
+import math
 # My modules
 from HandwrittenData import HandwrittenData  # Needed because of pickle
 import features
@@ -105,6 +106,43 @@ def analyze_creator(raw_datasets, filename="creator.csv"):
     write_file.write("total,%i\n" % sum([value for _, value in print_data]))
     for userid, value in print_data:
         write_file.write("%i,%i\n" % (userid, value))
+    write_file.close()
+
+
+def analyze_instroke_speed(raw_datasets, filename="instroke_speed.csv"):
+    """Analyze how fast the points were in pixel/ms."""
+    # prepare file
+    root = utils.get_project_root()
+    folder = os.path.join(root, "archive/analyzation/")
+    workfilename = os.path.join(folder, filename)
+    open(workfilename, 'w').close()  # Truncate the file
+    write_file = open(workfilename, "a")
+    write_file.write("speed\n")  # heading
+
+    print_data = []
+    start_time = time.time()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            utils.print_status(len(raw_datasets), i, start_time)
+        pointlist = raw_dataset['handwriting'].get_sorted_pointlist()
+
+        for stroke in pointlist:
+            for last_point, point in zip(stroke, stroke[1:]):
+                space_dist = math.hypot(last_point['x'] - point['x'],
+                                        last_point['y'] - point['y'])
+                time_delta = point['time'] - last_point['time']
+                if time_delta == 0:
+                    continue
+                print_data.append(space_dist/time_delta)
+    print("\r100%"+"\033[K\n")
+    # Sort the data by highest value, descending
+    print_data = sorted(print_data, reverse=True)
+    # Write data to file
+    for value in print_data:
+        write_file.write("%0.8f\n" % (value))
+
+    logging.info("instroke speed mean: %0.8f" % numpy.mean(print_data))
+    logging.info("instroke speed std: %0.8f" % numpy.std(print_data))
     write_file.close()
 
 
@@ -340,6 +378,7 @@ def main(handwriting_datasets_file):
 
     logging.info("creator...")
     analyze_creator(raw_datasets)
+    analyze_instroke_speed(raw_datasets)
 
 
 if __name__ == '__main__':

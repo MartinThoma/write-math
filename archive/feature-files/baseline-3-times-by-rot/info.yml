@@ -1,0 +1,14 @@
+data-source: archive/preprocessed/baseline
+data-modification:
+  - Multiply:
+      - nr: 1
+  - Rotate:
+      - minimum: -3
+      - maximum: 3
+      - num: 3
+features:
+  - Constant_Point_Coordinates:
+      - lines: 4
+      - points_per_line: 20
+      - fill_empty_with: 0
+      - pen_down: false

@@ -1,0 +1,5 @@
+data-source: archive/raw-datasets/2014-08-26-20-14-handwriting_datasets-raw.pickle
+queue:
+  - Space_evenly_per_stroke:
+      - kind: linear
+      - number: 20

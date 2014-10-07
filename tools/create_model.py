@@ -12,6 +12,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     stream=sys.stdout)
 # mine
 import utils
+import features
 
 
 def create_model(model_folder, model_type, topology, override):
@@ -35,6 +36,19 @@ def main(model_folder, override=False):
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
         model_description = yaml.load(ymlfile)
+
+    PROJECT_ROOT = utils.get_project_root()
+    # Read the feature description file
+    feature_folder = os.path.join(PROJECT_ROOT,
+                                  model_description['data-source'])
+    with open(os.path.join(feature_folder, "info.yml"), 'r') as ymlfile:
+        feature_description = yaml.load(ymlfile)
+    # Get a list of all used features
+    feature_list = features.get_features(feature_description['features'])
+    # Get the dimension of the feature vector
+    INPUT_FEATURES = sum(map(lambda n: n.get_dimension(), feature_list))
+    logging.info("Number of features: %i" % INPUT_FEATURES)
+
     # Analyze model
     logging.info(model_description['model'])
     if model_description['model']['type'] != 'mlp':
