@@ -140,10 +140,13 @@ class Scale_and_shift(object):
         unit square. Keep the aspect ratio. Optionally center the points
         inside of the unit square.
     """
-    def __init__(self, center=False, max_width=1., max_height=1.):
+    def __init__(self, center=False, max_width=1., max_height=1.,
+                 width_add=0, height_add=0):
         self.center = center
         self.max_width = max_width
         self.max_height = max_height
+        self.width_add = width_add
+        self.height_add = height_add
 
     def __repr__(self):
         return ("Scale_and_shift\n"
@@ -167,8 +170,8 @@ class Scale_and_shift(object):
         """
         a = handwritten_data.get_bounding_box()
 
-        width = a['maxx'] - a['minx']
-        height = a['maxy'] - a['miny']
+        width = a['maxx'] - a['minx'] + self.width_add
+        height = a['maxy'] - a['miny'] + self.height_add
 
         factorX, factorY = 1, 1
         if width != 0:

@@ -35,25 +35,43 @@ def fetch_data(raw_data_id):
     return data
 
 
-def display_data(raw_data_string, raw_data_id, latest_model):
+def display_data(raw_data_string, raw_data_id, model_folder):
+    PROJECT_ROOT = utils.get_project_root()
+
+    # Get model description
+    model_description_file = os.path.join(model_folder, "info.yml")
+    with open(model_description_file, 'r') as ymlfile:
+        model_description = yaml.load(ymlfile)
+
+    # Get the feature description
+    feature_description_file = os.path.join(
+        PROJECT_ROOT,
+        model_description['data-source'],
+        "info.yml")
+    with open(feature_description_file, 'r') as ymlfile:
+        feature_description = yaml.load(ymlfile)
+
+    # Get the preprocessing description
+    preprocessing_description_file = os.path.join(
+        PROJECT_ROOT,
+        feature_description['data-source'],
+        "info.yml")
+    with open(preprocessing_description_file, 'r') as ymlfile:
+        preprocessing_description = yaml.load(ymlfile)
+
     # Get Handwriting
     a = HandwrittenData(raw_data_string, raw_data_id=raw_data_id)
 
-    # Read the model description file
-    if latest_model is not None:
-        with open(latest_model, 'r') as ymlfile:
-            model_description = yaml.load(ymlfile)
+    # Get the preprocessing queue
+    tmp = preprocessing_description['queue']
+    preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
+    a.preprocessing(preprocessing_queue)
 
-        # Get the preprocessing queue
-        tmp = model_description['preprocessing']
-        preprocessing_queue = preprocessing.get_preprocessing_queue(tmp)
-        a.preprocessing(preprocessing_queue)
-
-        tmp = model_description['features']
-        feature_list = features.get_features(tmp)
-        x = a.feature_extraction(feature_list)
-        t = [round(el, 3) for el in x]
-        print(t)
+    tmp = feature_description['features']
+    feature_list = features.get_features(tmp)
+    x = a.feature_extraction(feature_list)
+    t = [round(el, 3) for el in x]
+    print(t)
     a.show()
 
 if __name__ == '__main__':
@@ -71,12 +89,12 @@ if __name__ == '__main__':
                         help="which RAW_DATA_ID do you want?")
     parser.add_argument("--mysql", dest="mysql", default='mysql_online',
                         help="which mysql configuration should be used?")
-    parser.add_argument("-m", "--model_description_file",
-                        dest="model_description_file",
-                        help="where is the model description YAML file?",
-                        metavar="FILE",
-                        type=lambda x: utils.is_valid_file(parser, x),
-                        default=None)
+    parser.add_argument("-m", "--model",
+                        dest="model",
+                        help="where is the model folder (with a info.yml)?",
+                        metavar="FOLDER",
+                        type=lambda x: utils.is_valid_folder(parser, x),
+                        default=latest_model)
     args = parser.parse_args()
 
     # do something
@@ -84,4 +102,4 @@ if __name__ == '__main__':
     if data is None:
         print("RAW_DATA_ID %i does not exist." % args.id)
     else:
-        display_data(data['data'], data['id'], args.model_description_file)
+        display_data(data['data'], data['id'], args.model)

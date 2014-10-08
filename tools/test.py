@@ -62,7 +62,7 @@ def test_model(model_folder, basename, test_file):
 
 def main(model_folder, run_native=False):
     PROJECT_ROOT = utils.get_project_root()
-     # Get model description
+    # Get model description
     model_description_file = os.path.join(model_folder, "info.yml")
     # Read the model description file
     with open(model_description_file, 'r') as ymlfile:
