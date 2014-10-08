@@ -141,12 +141,13 @@ class Scale_and_shift(object):
         inside of the unit square.
     """
     def __init__(self, center=False, max_width=1., max_height=1.,
-                 width_add=0, height_add=0):
+                 width_add=0, height_add=0, center_other=False):
         self.center = center
         self.max_width = max_width
         self.max_height = max_height
         self.width_add = width_add
         self.height_add = height_add
+        self.center_other = center_other
 
     def __repr__(self):
         return ("Scale_and_shift\n"
@@ -185,12 +186,16 @@ class Scale_and_shift(object):
 
         if self.center:
             # Only one dimension (x or y) has to be centered (the smaller one)
-            add = (1 - (max(factorX, factorY) / factor)) / 2
+            add = -(factor/(2*max(factorX, factorY)))
 
             if factor == factorX:
                 addy = add
+                if self.center_other:
+                    addx = -(width*factor/2.0)
             else:
                 addx = add
+                if self.center_other:
+                    addy = -(height*factor/2.0)
 
         return {"factor": factor, "addx": addx, "addy": addy,
                 "minx": a['minx'], "miny": a['miny'], "mint": a['mint']}
