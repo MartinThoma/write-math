@@ -151,6 +151,42 @@ def analyze_instroke_speed(raw_datasets, filename="instroke_speed.csv"):
     write_file.close()
 
 
+def analyze_distance_betwee_strokes(raw_datasets,
+                                    filename="dist_between_strokes.csv"):
+    """Analyze how much distance in px is between strokes."""
+    # prepare file
+    root = utils.get_project_root()
+    folder = os.path.join(root, "archive/analyzation/")
+    workfilename = os.path.join(folder, filename)
+    open(workfilename, 'w').close()  # Truncate the file
+    write_file = open(workfilename, "a")
+    write_file.write("speed\n")  # heading
+
+    print_data = []
+    start_time = time.time()
+    for i, raw_dataset in enumerate(raw_datasets):
+        if i % 100 == 0 and i > 0:
+            utils.print_status(len(raw_datasets), i, start_time)
+        pointlist = raw_dataset['handwriting'].get_sorted_pointlist()
+
+        for last_stroke, stroke in zip(pointlist, pointlist[1:]):
+            p1 = last_stroke[-1]
+            p2 = stroke[0]
+            space_dist = math.hypot(p1['x'] - p2['x'],
+                                    p1['y'] - p2['y'])
+            print_data.append(space_dist)
+    print("\r100%"+"\033[K\n")
+    # Sort the data by highest value, descending
+    print_data = sorted(print_data, reverse=True)
+    # Write data to file
+    for value in print_data:
+        write_file.write("%0.8f\n" % (value))
+
+    logging.info("dist_between_strokes mean:\t%0.8fpx" % numpy.mean(print_data))
+    logging.info("dist_between_strokes std: \t%0.8fpx" % numpy.std(print_data))
+    write_file.close()
+
+
 def get_aspect_ratio(raw_datasets):
     """For each symbol: sum up the length of all strokes."""
     filename = "aspect_ratios.txt"
@@ -384,6 +420,7 @@ def main(handwriting_datasets_file):
     logging.info("creator...")
     analyze_creator(raw_datasets)
     analyze_instroke_speed(raw_datasets)
+    analyze_distance_betwee_strokes(raw_datasets)
 
 
 if __name__ == '__main__':
