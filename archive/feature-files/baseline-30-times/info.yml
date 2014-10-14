@@ -1,5 +1,5 @@
 data-source: archive/preprocessed/baseline
-data-modification:
+data-multiplication:
   - Multiply:
       - nr: 30
 features:

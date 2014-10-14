@@ -1,5 +1,5 @@
 data-source: archive/preprocessed/baseline-cubic
-data-modification:
+data-multiplication:
   - Multiply:
       - nr: 1
 features:

@@ -1,5 +1,5 @@
 data-source: archive/preprocessed/baseline-no-centering
-data-modification:
+data-multiplication:
   - Multiply:
       - nr: 1
 features:
