@@ -1,0 +1,10 @@
+data-source: archive/preprocessed/baseline-weighted-average
+data-multiplication:
+  - Multiply:
+      - nr: 1
+features:
+  - Constant_Point_Coordinates:
+      - lines: 4
+      - points_per_line: 20
+      - fill_empty_with: 0
+      - pen_down: false
