@@ -1,0 +1,16 @@
+data-source: archive/raw-datasets/2014-08-26-20-14-handwriting_datasets-raw.pickle
+queue:
+  - Remove_duplicate_time: null
+  - Weighted_average_smoothing:
+      - theta: [1, 1, 1]
+  - Scale_and_shift:
+      - max_width: 1.0
+      - max_height: 1.0
+      - center: true
+  - Space_evenly_per_stroke:
+      - kind: linear
+      - number: 20
+  - Scale_and_shift:
+      - max_width: 1.0
+      - max_height: 1.0
+      - center: true
