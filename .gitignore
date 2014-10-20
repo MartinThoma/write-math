@@ -75,24 +75,16 @@ website/raw-data
 *config.php
 *.bak
 *.sublime-workspace
-*.pickle
 
 website/clients/nn-python/experiments/
 private/
-*.pfile
-*.json
 wm_raw_draw_data_*.sql
 detexify-import/done/
 detexify-import/skipped/
 detexify-import/splitted/
-*logs/
-*.csv
 tmp/
-analyzation/
 project.yml
 *.html
 testresult_*
 DO.*
-*.raw
 Makefile
-*.json.gz

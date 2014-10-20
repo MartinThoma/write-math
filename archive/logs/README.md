@@ -1,1 +1,0 @@
-Put all logs of trainings here.

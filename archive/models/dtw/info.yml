@@ -1,4 +1,0 @@
-data-source: archive/feature-files/baseline
-training: 
-model:
-    type: dtw
