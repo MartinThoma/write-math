@@ -18,12 +18,12 @@ if (isset($_GET['heartbeat'])) {
     }
     $A = scale_and_shift($result_path);
 
-    // Get the first 4000 known formulas
+    // Get the first 2000 known formulas
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data`, `accepted_formula_id`, ".
            "`formula_in_latex`, `accepted_formula_id` as `formula_id`".
            "FROM `wm_raw_draw_data` ".
            "JOIN  `wm_formula` ON  `wm_formula`.`id` =  `accepted_formula_id` ".
-           "LIMIT 4000";
+           "LIMIT 2000";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $datasets = $stmt->fetchAll();
