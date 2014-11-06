@@ -28,9 +28,9 @@ def pp_results(results, data, formula_id2latex):
     return s
 
 
-def get_cv_data(PROJECT_ROOT):
+def get_cv_data(project_root):
     """Get latest cv dataset."""
-    cv_folder = os.path.join(PROJECT_ROOT, "archive/cv-datasets")
+    cv_folder = os.path.join(project_root, "cv-datasets")
     latest_cv_dataset = utils.get_latest_in_folder(cv_folder, ".pickle")
     if os.path.isfile(latest_cv_dataset):
         logging.info("Load '%s' ...", latest_cv_dataset)
@@ -39,7 +39,7 @@ def get_cv_data(PROJECT_ROOT):
         formula_id2latex = tmp['formula_id2latex']
         return cv, formula_id2latex
     else:
-        sys.exit("No cv-dataset found in archive/cv-datasets. "
+        sys.exit("No cv-dataset found in cv-datasets. "
                  "You could try make_crossvalidation_dataset.py.")
 
 
@@ -93,10 +93,10 @@ def main(K_FOLD=10, get_new_dataset=False):
         logging.info("make_crossvalidation_dataset ...")
         make_crossvalidation_dataset()
 
-    PROJECT_ROOT = utils.get_project_root()
+    project_root = utils.get_project_root()
 
     # Get name of logfile
-    logging_folder = os.path.join(PROJECT_ROOT, "archive/logs")
+    logging_folder = os.path.join(project_root, "logs")
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     LOGFILE = os.path.join(logging_folder, "%s-DTW.log" % time_prefix)
 
@@ -109,7 +109,7 @@ def main(K_FOLD=10, get_new_dataset=False):
             stmp += ",%i,confused %i" % (i, i)
         f.write(stmp + "\n")
 
-    cv, formula_id2latex = get_cv_data(PROJECT_ROOT)
+    cv, formula_id2latex = get_cv_data(project_root)
 
     # start testing
     logging.info("Start testing")

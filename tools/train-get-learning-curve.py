@@ -12,8 +12,9 @@ import sys
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
-# mine
-import utils
+
+# hwrt modules
+from hwrt import utils
 
 
 def generate_training_command(model_folder):
@@ -24,15 +25,15 @@ def generate_training_command(model_folder):
         model_description = yaml.load(ymlfile)
 
     # Get the data paths (pfiles)
-    PROJECT_ROOT = utils.get_project_root()
+    project_root = utils.get_project_root()
     data = {}
-    data['training'] = os.path.join(PROJECT_ROOT,
+    data['training'] = os.path.join(project_root,
                                     model_description["data-source"],
                                     "traindata.pfile")
-    data['testing'] = os.path.join(PROJECT_ROOT,
+    data['testing'] = os.path.join(project_root,
                                    model_description["data-source"],
                                    "testdata.pfile")
-    data['validating'] = os.path.join(PROJECT_ROOT,
+    data['validating'] = os.path.join(project_root,
                                       model_description["data-source"],
                                       "validdata.pfile")
 
@@ -94,12 +95,6 @@ def main(model_folder):
     train_model(model_folder, model_description, data)
 
 if __name__ == "__main__":
-    PROJECT_ROOT = utils.get_project_root()
-
-    # Get latest model description file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
-    latest_model = utils.get_latest_folder(models_folder)
-
     # Get command line arguments
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
@@ -109,6 +104,6 @@ if __name__ == "__main__":
                         help="where is the model folder (with a info.yml)?",
                         metavar="FOLDER",
                         type=lambda x: utils.is_valid_folder(parser, x),
-                        default=latest_model)
+                        default=utils.default_model())
     args = parser.parse_args()
     main(args.model)

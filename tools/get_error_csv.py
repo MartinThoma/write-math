@@ -8,11 +8,12 @@ import utils
 import test
 
 
-def main(models_folder, prefix="testresult_", output="errors_by_epoch.csv"):
+def main(models_folder, postfix="-recording", output="errors_by_epoch.csv"):
     os.chdir(models_folder)
     # Get all test errors
-    files = natsort.natsorted(os.listdir(models_folder))
-    files = filter(lambda n: n.startswith(prefix), files)
+    #files = natsort.natsorted(os.listdir(models_folder))
+    folders = [x[0] for x in os.walk(models_folder)]
+    folders = filter(lambda n: n.endswith(postfix), folders)
     testerrors = []
     for i, filename in enumerate(files):
         testerrors.append((i+1, test.get_error_from_logfile(filename)))
@@ -38,10 +39,10 @@ def main(models_folder, prefix="testresult_", output="errors_by_epoch.csv"):
             i += 1
 
 if __name__ == "__main__":
-    PROJECT_ROOT = utils.get_project_root()
+    project_root = utils.get_project_root()
 
     # Get latest model folder
-    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
+    models_folder = os.path.join(project_root, "models")
     latest_model = utils.get_latest_folder(models_folder)
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter

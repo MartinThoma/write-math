@@ -7,9 +7,10 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 import stat
-#mine
-import train
-import utils
+
+# hwrt modules
+from hwrt import train
+from hwrt import utils
 
 
 def clean_model_folder(model_folder):
@@ -49,7 +50,7 @@ def add_do_files(model_folder):
 
 def main():
     """Go through each model folder and update them."""
-    folder = os.path.join(utils.get_project_root(), "archive/models")
+    folder = os.path.join(utils.get_project_root(), "models")
     folders = [os.path.join(folder, name) for name in os.listdir(folder)
                if os.path.isdir(os.path.join(folder, name))]
     for model_folder in folders:

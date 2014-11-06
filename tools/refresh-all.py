@@ -20,8 +20,8 @@ def choose_dataset(model_folder):
         md = yaml.load(ymlfile)
 
     # Get the preprocessing information
-    PROJECT_ROOT = utils.get_project_root()
-    preprocessed = os.path.join(PROJECT_ROOT, md['preprocessed'],
+    project_root = utils.get_project_root()
+    preprocessed = os.path.join(project_root, md['preprocessed'],
                                 "info.yml")
 
     # Read the preprocessing info file
@@ -33,7 +33,7 @@ def choose_dataset(model_folder):
 
 def main():
     """Go through each model folder and refresh them."""
-    folder = os.path.join(utils.get_project_root(), "archive/models")
+    folder = os.path.join(utils.get_project_root(), "models")
     folders = [os.path.join(folder, name) for name in os.listdir(folder)
                if os.path.isdir(os.path.join(folder, name))]
     for model_folder in folders:

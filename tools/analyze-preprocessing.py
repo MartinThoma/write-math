@@ -18,14 +18,18 @@ if sys.version_info[0] < 3:
 else:
     import tkinter as Tk
 # Load data
-import cPickle as pickle
+try:  # Python 2
+    import cPickle as pickle
+except ImportError:  # Python 3
+    import pickle
 import os
 # misc
 from copy import deepcopy
-# My modules
-from HandwrittenData import HandwrittenData  # Needed because of pickle
-import preprocessing
-import utils
+
+# hwrt modules
+from hwrt import HandwrittenData  # Needed because of pickle
+from hwrt import preprocessing
+from hwrt import utils
 
 
 class Application(Tk.Frame):
@@ -172,10 +176,10 @@ if __name__ == '__main__':
     # app = Application(a, b)
     # app.mainloop()
 
-    PROJECT_ROOT = utils.get_project_root()
+    project_root = utils.get_project_root()
 
     # Get latest raw dataset
-    DATASET_FOLDER = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
+    DATASET_FOLDER = os.path.join(project_root, "raw-datasets")
     LATEST_DATASET = utils.get_latest_in_folder(DATASET_FOLDER, "raw.pickle")
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter

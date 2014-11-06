@@ -7,10 +7,12 @@ of the data online has the flag `is_in_testset`.
 
 import MySQLdb
 import MySQLdb.cursors
-from HandwrittenData import HandwrittenData
 import random
 import math
-import utils
+
+# hwrt modules
+from hwrt import HandwrittenData
+from hwrt import utils
 
 
 def main(mysql):

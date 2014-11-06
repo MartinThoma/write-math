@@ -21,4 +21,4 @@ echo start training
 
 {{ training }}
 
-if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/archive/"; exit 1; } fi
+if [ $? -ne 0 ]; then { echo "** Training failed, aborting" >> "${ROOT_PATH}/"; exit 1; } fi

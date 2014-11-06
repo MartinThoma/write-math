@@ -19,7 +19,7 @@ def main(MIN_OCCURENCES=100, K_FOLD=10):
 
     # Get latest picke file.
     # If preprocessing is wanted, it should be done there.
-    PREPROCESSED_FOLDER = os.path.join(PROJECT_ROOT, "archive/preprocessed")
+    PREPROCESSED_FOLDER = os.path.join(PROJECT_ROOT, "preprocessed")
     latest_dataset_file = utils.get_latest_folder(PREPROCESSED_FOLDER)
     latest_dataset_file = os.path.join(latest_dataset_file, "data.pickle")
 
@@ -53,7 +53,7 @@ def main(MIN_OCCURENCES=100, K_FOLD=10):
             i = (i + 1) % K_FOLD
 
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    tmp = "archive/cv-datasets/%s.pickle" % time_prefix
+    tmp = "cv-datasets/%s.pickle" % time_prefix
     target_filename = os.path.join(PROJECT_ROOT, tmp)
     logging.info("Write '%s' to disk ..." % target_filename)
     pickle.dump({'cv': cv,

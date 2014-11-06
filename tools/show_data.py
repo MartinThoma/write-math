@@ -10,12 +10,17 @@ import os
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
-import cPickle as pickle
-# mine
-from HandwrittenData import HandwrittenData  # Needed because of pickle
+try:  # Python 2
+    import cPickle as pickle
+except ImportError:  # Python 3
+    import pickle
 from collections import defaultdict
-import utils
-import preprocessing
+
+# mine
+from hwrt import HandwrittenData  # Needed because of pickle
+sys.modules['HandwrittenData'] = HandwrittenData
+from hwrt import utils
+from hwrt import preprocessing
 
 
 def main(picklefile):
@@ -53,7 +58,7 @@ def main(picklefile):
            "dots" not in el['formula_in_latex']:
             recs_with_single_dot += 1
             old_area = el['handwriting'].get_area()
-            tmp = [preprocessing.Remove_points()]
+            tmp = [preprocessing.RemoveDots()]
             el['handwriting'].preprocessing(tmp)
             new_area = el['handwriting'].get_area()
             percentage = float(new_area)/float(old_area)
@@ -117,16 +122,16 @@ def main(picklefile):
 
 
 if __name__ == '__main__':
-    PROJECT_ROOT = utils.get_project_root()
+    project_root = utils.get_project_root()
 
     # Get latest data file
-    DATASET_FOLDER = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
-    LATEST_DATASET = utils.get_latest_in_folder(DATASET_FOLDER, ".pickle")
+    dataset_folder = os.path.join(project_root, "raw-datasets")
+    latest_dataset = utils.get_latest_in_folder(dataset_folder, ".pickle")
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--file", dest="picklefile",
-                        default=LATEST_DATASET,
+                        default=latest_dataset,
                         type=lambda x: utils.is_valid_file(parser, x),
                         help="where is the picklefile", metavar="FILE")
     args = parser.parse_args()

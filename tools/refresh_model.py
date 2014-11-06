@@ -62,7 +62,7 @@ def update_model_description_file(model_description_file, raw_data):
         pd = ordered_load(ymlfile, yaml.SafeLoader)
 
     # Update data source
-    datapath = raw_data.split("/archive/raw-datasets/")[1]
+    datapath = raw_data.split("/raw-datasets/")[1]
     datapath = os.path.join(datapath)
     pd['data-source'] = datapath
 
@@ -179,11 +179,11 @@ if __name__ == '__main__':
     PROJECT_ROOT = utils.get_project_root()
 
     # Get latest model description file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/models")
+    models_folder = os.path.join(PROJECT_ROOT, "models")
     latest_model = utils.get_latest_folder(models_folder)
 
     # Get latest raw data file
-    models_folder = os.path.join(PROJECT_ROOT, "archive/raw-datasets")
+    models_folder = os.path.join(PROJECT_ROOT, "raw-datasets")
     latest_data = utils.get_latest_in_folder(models_folder, "raw.pickle")
 
     # Get command line arguments
