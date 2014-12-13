@@ -10,13 +10,17 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(*) as `counter` FROM ".
            "(SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
-           "`creation_date`, COUNT(`raw_data_id`) as `answers` ".
+           "`creation_date`, ".
+           "COUNT(`wm_raw_data2formula`.`raw_data_id`) as `answers`,  ".
+           "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
            "FROM `wm_raw_draw_data` ".
            "LEFT OUTER JOIN `wm_raw_data2formula`  ".
                 "ON (`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+           "LEFT OUTER JOIN `wm_worker_answers`  ".
+                "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
            "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
            "GROUP BY `wm_raw_draw_data`.`id` ".
-           "HAVING `answers` > 0 ".
+           "HAVING `answers` > 0 OR `answers2` > 0 ".
            "ORDER BY `creation_date` DESC) AS T";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -26,13 +30,17 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     // Get all raw data of this user
     $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
-           "`creation_date`, COUNT(`raw_data_id`) as `answers` ".
+           "`creation_date`, ".
+           "COUNT(`wm_raw_data2formula`.`raw_data_id`) as `answers`,  ".
+           "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
            "FROM `wm_raw_draw_data` ".
            "LEFT OUTER JOIN `wm_raw_data2formula` ".
                 "ON (`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+           "LEFT OUTER JOIN `wm_worker_answers`  ".
+                "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
            "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
            "GROUP BY `wm_raw_draw_data`.`id` ".
-           "HAVING `answers` > 0 ".
+           "HAVING `answers` > 0 OR `answers2` > 0 ".
            "ORDER BY `creation_date` DESC ".
            "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);
@@ -44,13 +52,17 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(*) as `counter` FROM ".
            "(SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
-           "`creation_date`, COUNT(`raw_data_id`) as `answers` ".
+           "`creation_date`, ".
+           "COUNT(`wm_raw_data2formula`.`raw_data_id`) as `answers`,  ".
+           "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
            "FROM `wm_raw_draw_data` ".
            "LEFT OUTER JOIN `wm_raw_data2formula`  ".
-                "ON (`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+                "ON (`wm_raw_data2formula`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+           "LEFT OUTER JOIN `wm_worker_answers`  ".
+                "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
            "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
            "GROUP BY `wm_raw_draw_data`.`id` ".
-           "HAVING `answers` = 0 ".
+           "HAVING `answers` = 0 AND `answers2` = 0 ".
            "ORDER BY `creation_date` DESC) AS T";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -60,13 +72,17 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     // Get all raw data of this user
     $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
-           "`creation_date`, COUNT(`raw_data_id`) as `answers` ".
+           "`creation_date`, ".
+           "COUNT(`wm_raw_data2formula`.`raw_data_id`) as `answers`,  ".
+           "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
            "FROM `wm_raw_draw_data` ".
-           "LEFT OUTER JOIN `wm_raw_data2formula` ".
-                "ON (`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+           "LEFT OUTER JOIN `wm_raw_data2formula`  ".
+                "ON (`wm_raw_data2formula`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
+           "LEFT OUTER JOIN `wm_worker_answers`  ".
+                "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
            "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
            "GROUP BY `wm_raw_draw_data`.`id` ".
-           "HAVING `answers` = 0 ".
+           "HAVING `answers` = 0 AND `answers2` = 0 ".
            "ORDER BY `creation_date` DESC ".
            "LIMIT ".(($currentPage-1)*14).", 14";
     $stmt = $pdo->prepare($sql);

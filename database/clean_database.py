@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Drop all database tables."""
+
 from __future__ import print_function
 import MySQLdb
 import MySQLdb.cursors
