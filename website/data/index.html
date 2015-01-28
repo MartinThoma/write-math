@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Handwritten recordings for on-line handwriting recognition</title>
+</head>
+<body>
+    <h1>The HWRT database of handwritten symbols</h1>
+    <p>The HWRT database of handwritten symbols contains on-line data of
+       handwritten symbols such as all alphanumeric characters, arrows,
+       greek characters and mathematical symbols like the integral symbol.</p>
+
+    <p>The database can be downloaded in form of bzip2-compressed tar files.
+       Each tar file contains:</p>
+    <ul>
+        <li>symbols.csv: A CSV file with the rows symbol_id, latex, training_samples, test_samples. The symbol id is an integer, the row latex contains the latex
+        code of the symbol, the rows training_samples and test_samples contain integers
+        with the number of labeled data.</li>
+        <li>train-data.csv: A CSV file with the rows symbol_id, user_id, user_agent and data.</li>
+        <li>test-data.csv: A CSV file with the rows symbol_id, user_id, user_agent and data.</li>
+    </ul>
+    <p>All CSV files use ";" as delimiter and "'" as quotechar.
+       The data is given in YAML format as a list of lists of dictinaries. Each dictionary
+       has the keys "x", "y" and "time". (x,y) are coordinates and time
+       is the UNIX time.</p>
+
+   <h2>Data example</h2>
+
+   <pre>[[{"x":190,"y":578,"time":1400943241868},
+  {"x":195,"y":554,"time":1400943241973},
+  {"x":205,"y":490,"time":1400943241992},
+  {"x":205,"y":472,"time":1400943242016},
+  {"x":206,"y":455,"time":1400943242026},
+  {"x":206,"y":436,"time":1400943242038},
+  {"x":205,"y":416,"time":1400943242054},
+  {"x":204,"y":398,"time":1400943242070},
+  {"x":202,"y":383,"time":1400943242087}],
+ [{"x":201,"y":370,"time":1400943242104},
+  {"x":200,"y":358,"time":1400943242118},
+  {"x":200,"y":349,"time":1400943242136},
+  {"x":200,"y":339,"time":1400943242152},
+  {"x":200,"y":334,"time":1400943242169},
+  {"x":200,"y":333,"time":1400943242186},
+  {"x":202,"y":332,"time":1400943242203},
+  {"x":203,"y":332,"time":1400943242218},
+  {"x":206,"y":335,"time":1400943242234},
+  {"x":211,"y":339,"time":1400943242251},
+  {"x":218,"y":350,"time":1400943242267},
+  {"x":227,"y":363,"time":1400943242283}]]
+   </pre>
+
+   <h2>Downloads</h2>
+
+<table style="width:50%" border="1">
+    <tr>
+        <th>Date</th>
+        <th>Download</th>
+        <th>Size</th>
+    </tr>
+    <tr>
+        <td style="text-align:center">2015-01-28</td>
+        <td style="text-align:center"><a href="2015-01-28-data.tar">Download</a></td>
+        <td style="text-align:right">134,3 MB</td>
+    </tr>
+</table>
+
+
+<h2>Classifiers</h2>
+
+<p>* If nothing else is mentioned, then the classifier uses scaling, shifting
+     and linear resampling.</p>
+<style>
+abbr {
+    border-bottom: dotted 1px black;
+}
+.testerror {
+    font-size: 11pt;
+    text-align:right;
+    font-family: monospace;
+}
+</style>
+<table border="1">
+    <tr>
+        <th>Classifier</th>
+        <th>Preprocessing*</th>
+        <th>Features</th>
+        <th>Training</th>
+        <th>TOP-3 Test<br/>Error Rate (%)</th>
+        <th>Reference</th>
+    </tr>
+    <tr>
+        <th colspan="6">Neural Networks</th>
+    </tr>
+    <tr>
+        <td>160:500:369 MLP</td>
+        <td></td>
+        <td>Coordinates (4 strokes, 20 points per stroke)</td>
+        <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
+        <td class="testerror">6.80%</td>
+        <td>Thoma, 2014</td>
+    </tr>
+    <tr>
+        <td>160:500:500:369 MLP</td>
+        <td></td>
+        <td>Coordinates (4 strokes, 20 points per stroke)</td>
+        <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
+        <td class="testerror">5.75%</td>
+        <td>Thoma, 2014</td>
+    </tr>
+    <tr>
+        <td>160:500:500:500:369 MLP</td>
+        <td></td>
+        <td>Coordinates (4 strokes, 20 points per stroke)</td>
+        <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
+        <td class="testerror">5.74%</td>
+        <td>Thoma, 2014</td>
+    </tr>
+    <tr>
+        <td>160:500:500:500:500:369 MLP</td>
+        <td></td>
+        <td>Coordinates (4 strokes, 20 points per stroke)</td>
+        <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
+        <td class="testerror">6.12%</td>
+        <td>Thoma, 2014</td>
+    </tr>
+    <tr>
+        <td>167:500:500:369 MLP</td>
+        <td></td>
+        <td>Coordinates (4 strokes, 20 points per stroke);<br/>
+            re-curvature;
+            ink; # of Strokes; aspect ratio</td>
+        <td>Mini-Batch <abbr title="gradient descent">GD</abbr> with <abbr title="Supervised layer-wise pretraining">SLP</abbr> with <abbr title="Learnin rate">&eta;=0.1</abbr> and <abbr title="Momentum">&alpha;=0.1</abbr><br/>
+        The complete MLP was trained again with <abbr title="Learnin rate">&eta;=0.05</abbr> and <abbr title="Momentum">&alpha;=0.1</abbr></td>
+        <td class="testerror">4.04%</td>
+        <td>Thoma, 2014</td>
+    </tr>
+</table>
+</body>
+</html>
