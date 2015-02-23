@@ -2,57 +2,8 @@
 {% import "pagination.twig" as pagination %}
 
 {% block content %}
-
-{% if formula.best_rendering %}
-<img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg"
-    width="150px" style="width:150px;max-height:150px;" />
-{% else %}
-    <div style="width:150px;font-size: 250%;"><p>$${{ formula.formula_in_latex }}$$</p></div>
-{% endif %}
-
-<p><b>Name</b>: {{formula.formula_name|raw}} (<code>{{formula.formula_name}}</code>)</p>
-<p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
-<p><b>Mode</b>: {{ formula.mode }}</p>
-<p><b>Type</b>: {{ formula.formula_type }}</p>
-{% if formula.package != '' %}
-    <p><b>Package</b>: {{ formula.package }}</p>
-{% endif %}
-{% if formula.preamble != '' %}
-    <p><b>Preamble</b>: <code>{{ formula.preamble }}</code></p>
-{% endif %}
-<p><b>Description</b>: {{formula.description}}</p>
-<p><b>Total handdrawn symbols</b>: {{ total }}</p>
-<p><a href="../train/?formula_id={{ formula.id }}">Train this symbol</a></p>
-
-<ul class="nav nav-tabs">
-  <li {% if tab == 'trainingset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}">Trainingset</a></li>
-  <li {% if tab == 'testset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}&tab=testset">Testset</a></li>
-</ul>
-
- <ul class="gallery mw-gallery-traditional">
-  {% for image in images %}
-   <li class="gallerybox" style="width: 155px">
-     <div style="width: 155px">
-       <div class="thumb" style="width: 150px;">
-         <div style="margin:21px auto;">
-           <a href="../view?raw_data_id={{ image.id }}"><img src="../raw-data/{{ image.id }}.svg"
-              width="140px"
-              height="140px"
-              style="width:140px;height:140px;"/></a>
-         </div>
-       </div>
-       <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>
-     </div>
-   </li>
-  {% endfor %}
- </ul>
-
-{{ pagination.pagination(currentPage, '&id=' ~ formula.id ~ '&tab=' ~ tab, total, pages, 5) }}
-
-<hr/>
-
 {% if logged_in and edit_flag %}
-<form role="form" method="post">
+<form role="form" method="post" action="?id={{ formula.id }}">
     <input type="hidden" name="id" value="{{ formula.id }}" />
     <div class="control-group">
         <label class="control-label" for="latex">LaTeX</label>
@@ -70,6 +21,42 @@
                    placeholder="&alpha;"
                    id="formula_name" name="formula_name"
                    value="{{ formula.formula_name }}" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="unicode">Unicode</label>
+        <div class="controls"> 
+            <input type="text" class="form-control"
+                   placeholder="&alpha;"
+                   id="unicode" name="unicode"
+                   value="{{ formula.unicode }}" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="unicode_dec">unicode_dec: &#{{ formula.unicode_dec }};</label>
+        <div class="controls"> 
+            <input type="number" min="0" class="form-control"
+                   placeholder="&alpha;"
+                   id="unicode_dec" name="unicode_dec"
+                   value="{{ formula.unicode_dec }}" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="font">font</label>
+        <div class="controls"> 
+            <input type="text" class="form-control"
+                   placeholder="STIXGeneral"
+                   id="font" name="font"
+                   value="{{ formula.font }}" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="font_style">font_style</label>
+        <div class="controls"> 
+            <input type="text" class="form-control"
+                   placeholder="normal"
+                   id="font_style" name="font_style"
+                   value="{{ formula.font_style }}" />
         </div>
     </div>
     <div class="control-group">
@@ -149,6 +136,67 @@
 <a href="../symbol/?delete={{ formula.id }}">delete</a>
 {% endif %}
 {% endif %}
+
+
+
+<table>
+<tr>
+  <th style="width:150px;text-align:center;">Image</th>
+  <th style="width:150px;text-align:center;">Unicode</th>
+</tr>
+<tr>
+<td>
+{% if formula.best_rendering %}
+<img src="../formulas/{{ formula.id }}-{{ formula.best_rendering }}.svg"
+    width="150px" style="width:150px;max-height:150px;" />
+{% else %}
+    <div style="width:150px;font-size: 250%;"><p>$${{ formula.formula_in_latex }}$$</p></div>
+{% endif %}
+</td>
+<td>
+    <div style="font-family:{{formula.font|raw}};font-style:{{formula.font_style|raw}};font-size:150px;line-height:150px;text-align:center;color:black;">&#{{formula.unicode_dec|raw}};</div>
+</td>
+</table>
+
+<p><b>Name</b>: {{formula.formula_name|raw}} (<code>{{formula.formula_name}}</code>)</p>
+<p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
+<p><b>Mode</b>: {{ formula.mode }}</p>
+<p><b>Type</b>: {{ formula.formula_type }}</p>
+{% if formula.package != '' %}
+    <p><b>Package</b>: {{ formula.package }}</p>
+{% endif %}
+{% if formula.preamble != '' %}
+    <p><b>Preamble</b>: <code>{{ formula.preamble }}</code></p>
+{% endif %}
+<p><b>Description</b>: {{formula.description}}</p>
+<p><b>Total handdrawn symbols</b>: {{ total }}</p>
+<p><a href="../train/?formula_id={{ formula.id }}">Train this symbol</a></p>
+
+<ul class="nav nav-tabs">
+  <li {% if tab == 'trainingset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}">Trainingset</a></li>
+  <li {% if tab == 'testset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}&tab=testset">Testset</a></li>
+</ul>
+
+ <ul class="gallery mw-gallery-traditional">
+  {% for image in images %}
+   <li class="gallerybox" style="width: 155px">
+     <div style="width: 155px">
+       <div class="thumb" style="width: 150px;">
+         <div style="margin:21px auto;">
+           <a href="../view?raw_data_id={{ image.id }}"><img src="../raw-data/{{ image.id }}.svg"
+              width="140px"
+              height="140px"
+              style="width:140px;height:140px;"/></a>
+         </div>
+       </div>
+       <div class="gallerytext"><a href="../view?raw_data_id={{ image.id }}">{{ image.creation_date }}</a></div>
+     </div>
+   </li>
+  {% endfor %}
+ </ul>
+
+{{ pagination.pagination(currentPage, '&id=' ~ formula.id ~ '&tab=' ~ tab, total, pages, 5) }}
+
 
 <!-- MathJax -->
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>

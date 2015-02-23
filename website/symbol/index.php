@@ -9,12 +9,15 @@ if (isset($_GET['edit'])) {
 }
 
 if (isset($_GET['delete']) && is_admin()) {
-    $sql = "DELETE FROM `wm_formula` WHERE `id` = :id LIMIT 1";
+/*    $sql = "DELETE FROM `wm_formula` WHERE `id` = :id LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete'], PDO::PARAM_INT);
     $stmt->execute();
     $msg[] = array("class" => "alert-danger",
-           "text" => "Symbol was deleted.");
+           "text" => "Symbol was deleted.");*/
+    $msg[] = array("class" => "alert-danger",
+           "text" => "This block is too dangerous. You have to uncomment"
+                    ."it in symbol/index.php (line 12-19).");
 }
 
 if (isset($_POST['id']) && is_admin()) {
@@ -67,6 +70,10 @@ if (isset($_POST['id']) && is_admin()) {
     }
 
     $formula_name = trim($_POST['formula_name']);
+    $unicode = trim($_POST['unicode']);
+    $unicode_dec = trim($_POST['unicode_dec']);
+    $font = trim($_POST['font']);
+    $font_style = trim($_POST['font_style']);
     $formula_type = trim($_POST['formula_type']);
     $description = trim($_POST['description']);
     $packages = trim($_POST['packages']);
@@ -74,6 +81,10 @@ if (isset($_POST['id']) && is_admin()) {
 
     $sql = "UPDATE `wm_formula` SET ".
            "`formula_name` = :formula_name, ".
+           "`unicode` = :unicode, ".
+           "`unicode_dec` = :unicode_dec, ".
+           "`font` = :font, ".
+           "`font_style` = :font_style, ".
            "`description` = :description, ".
            "`mode` = :mode, ".
            "`formula_type` = :formula_type, ".
@@ -82,6 +93,10 @@ if (isset($_POST['id']) && is_admin()) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
     $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
+    $stmt->bindParam(':unicode', $unicode, PDO::PARAM_STR);
+    $stmt->bindParam(':unicode_dec', $unicode_dec, PDO::PARAM_INT);
+    $stmt->bindParam(':font', $font, PDO::PARAM_STR);
+    $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
     $stmt->bindParam(':description', $description, PDO::PARAM_STR);
     $stmt->bindParam(':mode', $_POST['mode'], PDO::PARAM_STR);
     $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
@@ -90,7 +105,8 @@ if (isset($_POST['id']) && is_admin()) {
 }
 
 if (isset($_GET['id'])) {
-    $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, ".
+    $sql = "SELECT `wm_formula`.`id`, `formula_name`, `unicode`, ".
+           "`unicode_dec`, `font`, `font_style`, `description`, ".
            "`formula_in_latex`, `preamble`, ".
            "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
            "FROM `wm_formula` ".
