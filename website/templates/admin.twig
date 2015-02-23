@@ -8,6 +8,12 @@
 </ul>
 
 
+<h2>Other</h2>
+<ul>
+    <li><a href="http://www.martin-thoma.de/write-math/stats/">Symbol stats</a></li>
+</ul>
+
+
 {% if flags|length > 0 %}
 <h2>Flags</h2>
 <ul>
@@ -86,6 +92,24 @@
                 <a href="?delete_inactive_user={{ user.id }}"><img src="../icons/cross.png" alt="delete" /></a>
             </td>
             <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
+        </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if without_unicode|length > 0 %}
+<h2>without_unicode ({{ without_unicode|length }})</h2>
+<table class="table table-striped">
+    <tr>
+        <th>id</th>
+        <th>formula_name</th>
+    </tr>
+    {% for symbol in without_unicode %}
+        <tr>
+            <td>{{ loop.index }} 
+                <a href="../symbol/?id={{ symbol.id }}&edit"><img src="../icons/pencil.png" alt="delete" /> &#{{ symbol.unicode_dec }};</a>
+            </td>
+            <td><a href="../symbol/?id={{ symbol.id }}&edit">{{ symbol.formula_name }}</a></td>
         </tr>
     {% endfor %}
 </table>

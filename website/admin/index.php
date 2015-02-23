@@ -54,22 +54,16 @@ if (isset($_GET['delete_inactive_user'])) {
     $stmt->bindParam(':uid', $_GET['delete_inactive_user'], PDO::PARAM_STR);
     $stmt->execute();
 } elseif (isset($_GET['delete_all_inactive_users'])) {
-    $sql = "SELECT  `wm_users`.`id` FROM `wm_users` ".
+    // See http://stackoverflow.com/a/4562797/562769
+    $sql = "DELETE FROM `wm_users` WHERE `id` IN ( ".
+           "SELECT * FROM ( ".
+           "SELECT  `wm_users`.`id` FROM `wm_users`  ".
            "LEFT JOIN `wm_raw_draw_data` ".
            "ON `wm_raw_draw_data`.`user_id` = `wm_users`.`id` ".
            "WHERE `account_type` = 'IP-User' ".
-           "AND `wm_raw_draw_data`.`user_id` IS NULL ";
+           "AND `wm_raw_draw_data`.`user_id` IS NULL ) AS p)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
-    $inactive_users = $stmt->fetchAll();
-    $i = 0;
-    foreach ($inactive_users as $key => $value) {
-        $sql = "DELETE FROM `wm_users` WHERE `id` = :id LIMIT 1;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id', $value['id'], PDO::PARAM_INT);
-        $stmt->execute();
-        $i += 1;
-    }
     $msg[] = array("class" => "alert-success",
                    "text" => "Your have deleted all inactive users ($i).");
 }
@@ -142,6 +136,14 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $inactive_users = $stmt->fetchAll();
 
+// Get symbols without unicode
+$sql = "SELECT id, `formula_name`, `formula_type`, `unicode_dec` FROM `wm_formula` ".
+       "WHERE unicode_dec = 0 ".
+       "AND `is_important` = 1 ORDER BY id ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$without_unicode = $stmt->fetchAll();
+
 echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'file' => "admin",
                                        'logged_in' => is_logged_in(),
@@ -151,7 +153,8 @@ echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'flags' => $flags,
                                        'accountA' => $accountA,
                                        'accountB' => $accountB,
-                                       'inactive_users' => $inactive_users
+                                       'inactive_users' => $inactive_users,
+                                       'without_unicode' => $without_unicode
                                        )
                   );
 
