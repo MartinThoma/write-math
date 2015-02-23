@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Handwritten recordings for on-line handwriting recognition</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <h1>The HWRT database of handwritten symbols</h1>
@@ -49,18 +50,30 @@
   {"x":227,"y":363,"time":1400943242283}]]
    </pre>
 
-   <h2>Downloads</h2>
+<h2>Credits and License</h2>
+<p>About 90% of the data was made available by Daniel Kirsch via
+<a href="https://github.com/kirel/detexify-data">github.com/kirel/detexify-data</a>.
+Thank you very much, Daniel!</p>
 
-<table style="width:50%" border="1">
+<p>The Detexify data was filtered, some labels which were obviously wrong were
+changed, new data was added.</p>
+
+<p>Just like Detexify, this dataset is published under <a
+href="odbl-10.txt">ODbL</a> (ODC Open Database License).</p>
+
+
+<h2>Downloads</h2>
+
+<table id="downloadtable" border="1">
     <tr>
         <th>Date</th>
         <th>Download</th>
         <th>Size</th>
     </tr>
     <tr>
-        <td style="text-align:center">2015-01-28</td>
-        <td style="text-align:center"><a href="2015-01-28-data.tar">Download</a></td>
-        <td style="text-align:right">134,3 MB</td>
+        <td class="centered">2015-01-28</td>
+        <td class="centered"><a href="http://i13pc106.ira.uka.de/~mthoma/hwrt/2015-01-28-data.tar">Download</a></td>
+        <td class="right">134,3 MB</td>
     </tr>
 </table>
 
@@ -69,16 +82,6 @@
 
 <p>* If nothing else is mentioned, then the classifier uses scaling, shifting
      and linear resampling.</p>
-<style>
-abbr {
-    border-bottom: dotted 1px black;
-}
-.testerror {
-    font-size: 11pt;
-    text-align:right;
-    font-family: monospace;
-}
-</style>
 <table border="1">
     <tr>
         <th>Classifier</th>
@@ -97,7 +100,7 @@ abbr {
         <td>Coordinates (4 strokes, 20 points per stroke)</td>
         <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
         <td class="testerror">6.80%</td>
-        <td>Thoma, 2014</td>
+        <td><a href="#thoma2014">Thoma, 2014</a></td>
     </tr>
     <tr>
         <td>160:500:500:369 MLP</td>
@@ -105,7 +108,7 @@ abbr {
         <td>Coordinates (4 strokes, 20 points per stroke)</td>
         <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
         <td class="testerror">5.75%</td>
-        <td>Thoma, 2014</td>
+        <td><a href="#thoma2014">Thoma, 2014</a></td>
     </tr>
     <tr>
         <td>160:500:500:500:369 MLP</td>
@@ -113,7 +116,7 @@ abbr {
         <td>Coordinates (4 strokes, 20 points per stroke)</td>
         <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
         <td class="testerror">5.74%</td>
-        <td>Thoma, 2014</td>
+        <td><a href="#thoma2014">Thoma, 2014</a></td>
     </tr>
     <tr>
         <td>160:500:500:500:500:369 MLP</td>
@@ -121,7 +124,7 @@ abbr {
         <td>Coordinates (4 strokes, 20 points per stroke)</td>
         <td>Mini-Batch gradient descent, <abbr title="Learnin rate">&eta;=0.1</abbr>, <abbr title="Momentum">&alpha;=0.1</abbr></td>
         <td class="testerror">6.12%</td>
-        <td>Thoma, 2014</td>
+        <td><a href="#thoma2014">Thoma, 2014</a></td>
     </tr>
     <tr>
         <td>167:500:500:369 MLP</td>
@@ -132,8 +135,17 @@ abbr {
         <td>Mini-Batch <abbr title="gradient descent">GD</abbr> with <abbr title="Supervised layer-wise pretraining">SLP</abbr> with <abbr title="Learnin rate">&eta;=0.1</abbr> and <abbr title="Momentum">&alpha;=0.1</abbr><br/>
         The complete MLP was trained again with <abbr title="Learnin rate">&eta;=0.05</abbr> and <abbr title="Momentum">&alpha;=0.1</abbr></td>
         <td class="testerror">4.04%</td>
-        <td>Thoma, 2014</td>
+        <td><a href="#thoma2014">Thoma, 2014</a></td>
     </tr>
 </table>
+
+
+<h2>Publications</h2>
+
+<ul>
+    <li><a id="thoma2014"></a>Thoma, 2014: <a href="http://martin-thoma.com/pdf/bsthesis-thoma-2014-11-07.pdf">On-line Recognition of Handwritten Mathematical Symbols</a>. <a href="http://martin-thoma.com/write-math/">Additional material</a>.</li>
+</ul>
+
+
 </body>
 </html>

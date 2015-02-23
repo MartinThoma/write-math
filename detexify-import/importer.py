@@ -4,8 +4,8 @@ import json
 import sys
 sys.path.append("/var/www/write-math/website/clients/python")
 from HandwrittenData import HandwrittenData
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 from dbconfig import mysql
 import os
 
@@ -41,11 +41,11 @@ def parse_detexify_id(detexify_id):
 
 def main(folder):
     # Get IDs from server
-    connection = MySQLdb.connect(host=mysql['host'],
+    connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     sql = "SELECT id, formula_in_latex, package FROM `wm_formula`"
     cursor.execute(sql)
@@ -81,7 +81,7 @@ def main(folder):
                 unknown_symbols[symbol]['counter'] += 1
         else:
             symbol_id = latex2writemathid[symbol]['id']
-            raw_data = MySQLdb.escape_string(json.dumps(raw_data))
+            raw_data = pymysql.escape_string(json.dumps(raw_data))
             sql = ("INSERT INTO `wm_raw_draw_data` ("
                    "`user_id` , `data` , `nr_of_symbols`, "
                    "`md5data` , `creation_date` , `user_agent` , "

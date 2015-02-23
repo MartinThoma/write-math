@@ -1,0 +1,21 @@
+abbr {
+    border-bottom: dotted 1px black;
+}
+
+.testerror {
+    font-size: 11pt;
+    text-align: right;
+    font-family: monospace;
+}
+
+#downloadtable {
+    width: 50%;
+}
+
+td.centered, th.centered {
+    text-align: center;
+}
+
+td.right, th.right {
+    text-align: right;
+}

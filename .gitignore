@@ -37,6 +37,7 @@ nosetests.xml
 
 # Project specific
 papers
+latex-unicode/dbconfig.py
 symbol-generator/dbconfig.py
 symbol-generator/tmp.tex
 symbol-generator/tmp.log
