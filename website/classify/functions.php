@@ -1,5 +1,6 @@
 <?php
 
+# solution for < PHP 5.5.0
 if (!function_exists('json_last_error_msg')) {
     function json_last_error_msg() {
         static $errors = array(
