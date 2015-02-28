@@ -9,12 +9,12 @@ if (isset($_GET['edit'])) {
 }
 
 if (isset($_GET['delete']) && is_admin()) {
-/*    $sql = "DELETE FROM `wm_formula` WHERE `id` = :id LIMIT 1";
+    $sql = "DELETE FROM `wm_formula` WHERE `id` = :id AND :id > 1556 LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete'], PDO::PARAM_INT);
     $stmt->execute();
     $msg[] = array("class" => "alert-danger",
-           "text" => "Symbol was deleted.");*/
+           "text" => "Symbol was deleted.");
     $msg[] = array("class" => "alert-danger",
            "text" => "This block is too dangerous. You have to uncomment"
                     ."it in symbol/index.php (line 12-19).");
@@ -148,6 +148,11 @@ if (isset($_GET['id'])) {
 } else {
     $msg[] = array("class" => "alert-warning",
                    "text" => "Please set an ID (e.g. <a href=\"../symbol/?id=31\">like this</a>)");
+}
+
+if (!$edit_flag) {
+    $Parsedown = new Parsedown();
+    $formula->description = $Parsedown->text($formula->description);
 }
 
 echo $twig->render('symbol.twig', array('heading' => 'Symbol',
