@@ -89,6 +89,7 @@
 
     <div class="container">
       <div class="page-header">
+        {% block headerbuttons %}{% endblock %}
         <h1>{{ heading }}</h1>
       </div>
       {% for m in msg %}
