@@ -1,6 +1,24 @@
 {% extends "base.twig" %}
 {% import "pagination.twig" as pagination %}
 
+{% block header %}
+    <style>
+        @font-face {
+            font-family: 'STIXGeneral';
+            src: 
+            url('../fonts/STIXGeneral.woff') format('woff');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'STIXNonUnicode';
+            src: 
+            url('../fonts/STIXNonUniIta.woff') format('woff');
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+
 {% block content %}
 {% if logged_in and edit_flag %}
 <form role="form" method="post" action="?id={{ formula.id }}">
