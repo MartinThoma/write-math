@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 134.0.30.203:3306
--- Erstellungszeit: 23. Feb 2015 um 22:43
+-- Erstellungszeit: 28. Feb 2015 um 20:20
 -- Server Version: 5.5.28a-MariaDB
 -- PHP-Version: 5.3.19
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula` (
   PRIMARY KEY (`id`),
   KEY `best_rendering` (`best_rendering`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1656 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1661 ;
 
 -- --------------------------------------------------------
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula_svg_missing` (
   UNIQUE KEY `user_id_2` (`user_id`,`formula_id`),
   KEY `user_id` (`user_id`,`formula_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=922 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1000 ;
 
 -- --------------------------------------------------------
 
@@ -168,26 +168,6 @@ CREATE TABLE IF NOT EXISTS `wm_languages` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `wm_models`
---
-
-CREATE TABLE IF NOT EXISTS `wm_models` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `topology` varchar(50) NOT NULL,
-  `parent` int(11) DEFAULT NULL,
-  `testresult` double NOT NULL,
-  `preprocessing` text NOT NULL,
-  `features` text NOT NULL,
-  `training` mediumtext NOT NULL,
-  `details` mediumtext NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `parent` (`parent`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
-
--- --------------------------------------------------------
-
---
 -- Tabellenstruktur für Tabelle `wm_papers`
 --
 
@@ -215,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_data2formula` (
   KEY `raw_data_id` (`raw_data_id`,`formula_id`,`user_id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=22473 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=22735 ;
 
 -- --------------------------------------------------------
 
@@ -226,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_data2formula` (
 CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
+  `secret` char(36) COLLATE utf8_bin NOT NULL DEFAULT '',
   `data` mediumtext COLLATE utf8_bin NOT NULL,
   `nr_of_symbols` int(11) NOT NULL DEFAULT '1',
   `md5data` char(32) COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -245,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   UNIQUE KEY `user_id_2` (`user_id`,`md5data`),
   KEY `user_id` (`user_id`),
   KEY `accepted_formula_id` (`accepted_formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=294507 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=295004 ;
 
 -- --------------------------------------------------------
 
@@ -263,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `wm_renderings` (
   PRIMARY KEY (`id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1537 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1562 ;
 
 -- --------------------------------------------------------
 
@@ -301,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=209774 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=213327 ;
 
 -- --------------------------------------------------------
 
@@ -318,7 +299,7 @@ CREATE TABLE IF NOT EXISTS `wm_user_unknown_formula` (
   UNIQUE KEY `user_id` (`user_id`,`formula_id`),
   KEY `user_id_2` (`user_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1229 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1266 ;
 
 -- --------------------------------------------------------
 
@@ -334,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `wm_votes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uservote` (`user_id`,`raw_data2formula_id`),
   KEY `raw_data2formula_id` (`raw_data2formula_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=14678 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=14763 ;
 
 -- --------------------------------------------------------
 

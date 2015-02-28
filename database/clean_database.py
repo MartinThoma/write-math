@@ -58,7 +58,6 @@ def clean(mysql):
            "`wm_languages`, `wm_papers`, `wm_raw_data2formula`, "
            "`wm_raw_draw_data`, `wm_renderings`, `wm_similarity`, "
            "`wm_users`, `wm_user_unknown_formula`, `wm_votes`, "
-           "`wm_models`,"
            "`wm_workers`, `wm_worker_answers`;SET foreign_key_checks = 1;")
     a = cursor.execute(sql)
     print(a)
