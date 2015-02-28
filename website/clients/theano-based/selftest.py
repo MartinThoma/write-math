@@ -12,8 +12,8 @@ from pybrain.structure.modules import SoftmaxLayer
 
 # Other
 import logging
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 from classification import pointLineList, douglas_peucker, space_evenly, \
     scale_and_shift
 import yaml
@@ -318,11 +318,11 @@ if __name__ == '__main__':
     with open(yamlconfigfile, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
-    connection = MySQLdb.connect(host=cfg['mysql_online']['host'],
+    connection = pymysql.connect(host=cfg['mysql_online']['host'],
                                  user=cfg['mysql_online']['user'],
                                  passwd=cfg['mysql_online']['passwd'],
                                  db=cfg['mysql_online']['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     logging.info("end establishing connection")
 

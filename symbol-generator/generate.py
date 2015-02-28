@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 from dbconfig import mysql  # a dictionary with the connection information
 import yaml
 from itertools import chain
@@ -39,10 +39,10 @@ def get_svg(packages, latex, mode):
 
 def upload_new_symbol(symbol, latex, packages=[], mode='bothmodes'):
     try:
-        connection = MySQLdb.connect(host=mysql['host'], user=mysql['user'],
+        connection = pymysql.connect(host=mysql['host'], user=mysql['user'],
                                      passwd=mysql['pwd'], db=mysql['dbname'],
-                                     cursorclass=MySQLdb.cursors.DictCursor)
-    except MySQLdb.Error, e:
+                                     cursorclass=pymysql.cursors.DictCursor)
+    except pymysql.Error, e:
         logging.error("Could not connect to MySQL-Database.")
         logging.error(e)
         sys.exit(1)

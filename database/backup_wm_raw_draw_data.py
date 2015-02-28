@@ -4,9 +4,9 @@
 """This script can be used for creating a backup of wm_raw_draw_data."""
 
 from __future__ import print_function
-import MySQLdb
+import pymysql
+import pymysql.cursors
 from dbconfig import mysql_online
-import MySQLdb.cursors
 import time
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
@@ -18,11 +18,11 @@ def main(mysql, start):
     """
     pagesize = 2000
     print("Connect to database")
-    connection = MySQLdb.connect(host=mysql['host'],
+    connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     print("Get counter")
     sql = "SELECT COUNT( * ) AS counter FROM  `wm_raw_draw_data`"

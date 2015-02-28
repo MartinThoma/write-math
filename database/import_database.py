@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 import yaml
 import subprocess
 from contextlib import closing
@@ -24,11 +24,11 @@ def main(mysql, folder):
     [folder]/structure/foreign-keys.sql
     [folder]/complete-dump/single-tables/[files with .sql or .sql.gz ending]
     """
-    connection = MySQLdb.connect(host=mysql['host'],
+    connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     with closing(connection.cursor()) as cursor:
         # Import schema
         print("Import schema")

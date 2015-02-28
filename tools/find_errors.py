@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 # Database stuff
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 # Other
 import webbrowser
 # My classes
@@ -26,11 +26,11 @@ import utils
 
 
 def update_data(cfg, a, unaccept=False):
-    connection_local = MySQLdb.connect(host=cfg['mysql_local']['host'],
+    connection_local = pymysql.connect(host=cfg['mysql_local']['host'],
                                        user=cfg['mysql_local']['user'],
                                        passwd=cfg['mysql_local']['passwd'],
                                        db=cfg['mysql_local']['db'],
-                                       cursorclass=MySQLdb.cursors.DictCursor)
+                                       cursorclass=pymysql.cursors.DictCursor)
     cursor_local = connection_local.cursor()
     if unaccept:
         sql = ("UPDATE `wm_raw_draw_data` "
@@ -92,11 +92,11 @@ def update_data(cfg, a, unaccept=False):
     connection_local.commit()
     cursor_local.close()
     connection_local.close()
-    connection_online = MySQLdb.connect(host=cfg['mysql_online']['host'],
+    connection_online = pymysql.connect(host=cfg['mysql_online']['host'],
                                         user=cfg['mysql_online']['user'],
                                         passwd=cfg['mysql_online']['passwd'],
                                         db=cfg['mysql_online']['db'],
-                                        cursorclass=MySQLdb.cursors.DictCursor)
+                                        cursorclass=pymysql.cursors.DictCursor)
     cursor_online = connection_online.cursor()
     cursor_online.execute(sql)
     connection_online.commit()
@@ -213,11 +213,11 @@ class HandwrittenDataM(HandwrittenData):
 
 
 def main(cfg, raw_data_start_id):
-    connection = MySQLdb.connect(host=cfg['mysql_local']['host'],
+    connection = pymysql.connect(host=cfg['mysql_local']['host'],
                                  user=cfg['mysql_local']['user'],
                                  passwd=cfg['mysql_local']['passwd'],
                                  db=cfg['mysql_local']['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
     # Get formulas

@@ -5,8 +5,8 @@
 
 from HandwrittenData import HandwrittenData
 # Database stuff
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 import preprocessing
 from copy import deepcopy
 import utils
@@ -121,11 +121,11 @@ class HandwrittenDataM(HandwrittenData):
 
 
 def main(cfg, raw_data_start_id):
-    connection = MySQLdb.connect(host=cfg['mysql_local']['host'],
+    connection = pymysql.connect(host=cfg['mysql_local']['host'],
                                  user=cfg['mysql_local']['user'],
                                  passwd=cfg['mysql_local']['passwd'],
                                  db=cfg['mysql_local']['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
     # Get formulas

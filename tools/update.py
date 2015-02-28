@@ -15,17 +15,17 @@ logger = logging.getLogger(__name__)
 from HandwrittenData import HandwrittenData
 import preprocessing
 # Database stuff
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 import utils
 
 
 def main(cfg):
-    connection_local = MySQLdb.connect(host=cfg['mysql_online']['host'],
+    connection_local = pymysql.connect(host=cfg['mysql_online']['host'],
                                        user=cfg['mysql_online']['user'],
                                        passwd=cfg['mysql_online']['passwd'],
                                        db=cfg['mysql_online']['db'],
-                                       cursorclass=MySQLdb.cursors.DictCursor)
+                                       cursorclass=pymysql.cursors.DictCursor)
     cursor_local = connection_local.cursor()
     with open("nopendown-2.txt") as f:
         content = f.read()

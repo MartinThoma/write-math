@@ -12,8 +12,8 @@ from pybrain.structure.modules import SoftmaxLayer
 
 # Other
 import logging
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 from classification import pointLineList, douglas_peucker, space_evenly, \
     scale_and_shift
 from dbconfig import mysql
@@ -313,11 +313,11 @@ def crossvalidation(HIDDEN_NEURONS, WEIGHTDECAY, MOMENTUM, POINTS_PER_LINE=20,
 if __name__ == '__main__':
     logging.info("Started selftest of classifier %s." % CLASSIFIER_NAME)
     logging.info("start establishing connection")
-    connection = MySQLdb.connect(host=mysql['host'],
+    connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     logging.info("end establishing connection")
 

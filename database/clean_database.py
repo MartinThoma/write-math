@@ -3,8 +3,8 @@
 """Drop all database tables."""
 
 from __future__ import print_function
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 import sys
 import yaml
 
@@ -44,11 +44,11 @@ def query_yes_no(question, default="yes"):
 
 def clean(mysql):
     """Drop all tables from the database. """
-    connection = MySQLdb.connect(host="localhost",  # mysql['host'],
+    connection = pymysql.connect(host="localhost",  # mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
     sql = ("SET foreign_key_checks = 0;DROP TABLE `wm_challenges`, "

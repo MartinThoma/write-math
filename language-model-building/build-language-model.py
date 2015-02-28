@@ -9,8 +9,8 @@ logging.basicConfig(filename='example.log',
                     format=FORMAT)
 logging.debug("Test")
 import re
-import MySQLdb
-import MySQLdb.cursors
+import pymysql
+import pymysql.cursors
 from dbconfig import mysql
 import os
 from argparse import ArgumentParser
@@ -144,11 +144,11 @@ def get_file_content(filename):
 
 if __name__ == "__main__":
     logging.info("Start establishing connection")
-    connection = MySQLdb.connect(host=mysql['host'],
+    connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
                                  db=mysql['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
+                                 cursorclass=pymysql.cursors.DictCursor)
     logging.info("Got it. Get cursor.")
     cursor = connection.cursor()
     logging.info("connection established")
