@@ -2,6 +2,7 @@
     "require": {
         "monolog/monolog": ">=1.0.0",
         "twig/twig": "1.*",
-        "ircmaxell/password-compat": ">=1.0.3"
+        "ircmaxell/password-compat": ">=1.0.3",
+        "erusev/parsedown": "dev-master"
     }
 }
