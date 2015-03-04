@@ -1,5 +1,11 @@
 {% extends "base.twig" %}
 
+{% block headerbuttons %}
+<div class="btn-toolbar pull-right">
+    <a href="#" class="btn btn-primary invisible visible-xs" id="resultlink"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Results</a>
+</div>
+{% endblock %}
+
 {% block header %}
     <style>
         @font-face {

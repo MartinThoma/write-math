@@ -16,7 +16,7 @@ $formula = null;
 $challenges = null;
 
 if (isset($_POST['formula_id'])) {
-    insert_userdrawing(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
+    insert_recording(get_uid(), $_POST['drawnJSON'], $_POST['formula_id']);
 }
 
 if (isset($_GET['missing_formula_id']) || isset($_GET['wrong_rendering_id'])) {

@@ -65,7 +65,7 @@ if (isset($_GET['delete_inactive_user'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $msg[] = array("class" => "alert-success",
-                   "text" => "Your have deleted all inactive users ($i).");
+                   "text" => "Your have deleted all inactive users.");
 }
 
 if (isset($_GET['many_lines'])) {

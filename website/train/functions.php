@@ -1,6 +1,6 @@
 <?php
 
-function insert_userdrawing($user_id, $data, $formula_id) {
+function insert_recording($user_id, $data, $formula_id) {
     global $pdo, $msg;
 
     if (strpos($data, "[]") === false) {
@@ -45,7 +45,7 @@ function insert_userdrawing($user_id, $data, $formula_id) {
             $msg[] = array("class" => "alert-warning",
                            "text" => "You've already submitted this data. ".
                                      "Please wait 5 seconds. This time is ".
-                                     "needed to compare your drawing with ".
+                                     "needed to compare your recording with ".
                                      "4000 others.");
         }
     } else {

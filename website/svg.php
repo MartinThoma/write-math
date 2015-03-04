@@ -1,6 +1,6 @@
 <?php
-require_once '../preprocessing.php';
-require_once '../classification.php';
+require_once 'preprocessing.php';
+require_once 'classification.php';
 
 function get_dots($data) {
     $dots = array();
@@ -67,7 +67,7 @@ function get_path($data, $epsilon=0) {
         return false;
     }
     if ($epsilon > 0) {
-        $data = apply_douglas_peucker($data, $epsilon);
+        $data = apply_linewise_douglas_peucker($data, $epsilon);
     }
 
     foreach ($data as $line) {

@@ -1,6 +1,12 @@
 {% extends "base.twig" %}
 {% import "pagination.twig" as pagination %}
 
+{% block headerbuttons %}
+<div class="btn-toolbar pull-right">
+    <a href="?logout" class="btn btn-primary"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid well span6">
   <div class="row-fluid">
@@ -8,7 +14,7 @@
           <img src="{{ gravatar }}?s=140&r=g&d=mm" class="img-circle"><br/>
           <a href="http://gravatar.com">Change your image</a>
         </div>
-        
+
         <div class="span8">
             <form action="" method="post" role="form">
               <div class="form-group">
@@ -129,7 +135,6 @@
       </form>
   </div>
 </div>
-<p><a href="?logout">Logout</a></p>
 
 {% if userworkers|length > 0 %}
 <h2>Workers</h2>
@@ -141,29 +146,29 @@
     <th>URL</th>
     <th>Description</th>
     <th>Latest Heartbeat</th>
-    <th>Latest Classification</th>
   </tr>
   {% for worker in userworkers %}
   <tr>
     <td>
-      <a href="?edit={{ worker.id }}"><img src="../icons/pencil.png" alt="edit" /></a>
-      &nbsp;
-      <a href="?delete={{ worker.id }}"><img src="../icons/cross.png" alt="delete" /></a>
-      &nbsp;
-      {% if worker.status == 'active' %}
-      <a href="?deactivate={{ worker.id }}">deactivate</a>
-      {% else %}
-      <a href="?activate={{ worker.id }}">activate</a>
-      {% endif %}
+<div class="btn-group" role="group" aria-label="Worker options">
+  <a href="?edit={{ worker.id }}" class="btn btn-default" aria-label="edit"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+  <a href="?delete={{ worker.id }}" class="btn btn-default" aria-label="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+  {% if worker.status == 'active' %}
+  <a href="?deactivate={{ worker.id }}" class="btn btn-success" aria-label="deactivate"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a>
+  {% else %}
+  <a href="?activate={{ worker.id }}" class="btn btn-default" aria-label="activate"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a>
+  {% endif %}
+</div>
+
+
     </td>
     <td>{{ worker.worker_name }}</td>
-    <td>{{ worker.API_key }}</td>
+    <td><input class="form-control" value="{{ worker.API_key }}" disabled="" style="width:128px;"></td>
     <td>{{ worker.url }}</td>
     <td>{{ worker.description }}</td>
     <td>{% if worker.latest_heartbeat is null %}
           <a href="?request_heartbeat={{ worker.id }}">Request</a>
         {% else %}<a href="?request_heartbeat={{ worker.id }}">{{ worker.latest_heartbeat }}</a>{% endif%}</td>
-    <td>&nbsp;</td>
   </tr>
   {% endfor %}
 </table>

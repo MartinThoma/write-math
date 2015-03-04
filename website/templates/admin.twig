@@ -5,6 +5,7 @@
 <ul>
     <li><a href="?cache-flush=templates">Flush cache templates</a></li>
     <li><a href="?cache-flush=raw">Flush cache raw</a></li>
+    <li><a href="?delete_all_inactive_users">Delete all inactive users</a></li>
 </ul>
 
 
@@ -29,12 +30,12 @@
 <h2>Many lines</h2>
 {% if many_lines|length > 0 %}
 <ul>
-    {% for drawing in many_lines %}
-        <li>Lines: <a href="../view/?raw_data_id={{ drawing.id }}">{{ drawing.lines }}</a></li>
+    {% for recording in many_lines %}
+        <li>Lines: <a href="../view/?raw_data_id={{ recording.id }}">{{ recording.lines }}</a></li>
     {% endfor %}
 </ul>
 {% else %}
-    <p class="bg-danger"><a href="?many_lines">Show all drawings with at least 5 lines.</a></p>
+    <p class="bg-danger"><a href="?many_lines">Show all recordings with at least 5 strokes.</a></p>
 {% endif %}
 
 <h2>Merge Accounts</h2>
