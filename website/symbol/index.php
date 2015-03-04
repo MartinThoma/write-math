@@ -70,7 +70,6 @@ if (isset($_POST['id']) && is_admin()) {
     }
 
     $formula_name = trim($_POST['formula_name']);
-    $unicode = trim($_POST['unicode']);
     $unicode_dec = trim($_POST['unicode_dec']);
     $font = trim($_POST['font']);
     $font_style = trim($_POST['font_style']);
@@ -81,7 +80,6 @@ if (isset($_POST['id']) && is_admin()) {
 
     $sql = "UPDATE `wm_formula` SET ".
            "`formula_name` = :formula_name, ".
-           "`unicode` = :unicode, ".
            "`unicode_dec` = :unicode_dec, ".
            "`font` = :font, ".
            "`font_style` = :font_style, ".
@@ -93,7 +91,6 @@ if (isset($_POST['id']) && is_admin()) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
     $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
-    $stmt->bindParam(':unicode', $unicode, PDO::PARAM_STR);
     $stmt->bindParam(':unicode_dec', $unicode_dec, PDO::PARAM_INT);
     $stmt->bindParam(':font', $font, PDO::PARAM_STR);
     $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
@@ -105,7 +102,7 @@ if (isset($_POST['id']) && is_admin()) {
 }
 
 if (isset($_GET['id'])) {
-    $sql = "SELECT `wm_formula`.`id`, `formula_name`, `unicode`, ".
+    $sql = "SELECT `wm_formula`.`id`, `formula_name`, ".
            "`unicode_dec`, `font`, `font_style`, `description`, ".
            "`formula_in_latex`, `preamble`, ".
            "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
