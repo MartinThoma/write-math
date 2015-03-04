@@ -24,3 +24,13 @@ composer update
 ### Misc
 
 * Create `cache-data` folder.
+
+## Status
+
+The lines of code (countet with `cloc`, excluding blank lines and comments)
+gives an impression how big the project is:
+
+
+| Date       | Total | PHP  | HTML | JS  | CSS | Python | Remarks
+| ---------- | ----- | ---- | ---- | --- | --- | ------ | -------
+| 2015-03-04 | 6633  | 3904 | 2533 | 133 | 42  | 19     | Initial measurement
