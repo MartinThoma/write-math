@@ -3,8 +3,11 @@ require_once '../svg.php';
 require_once '../classification.php';
 require_once '../init.php';
 require_once 'functions.php';
-require_once '../classify/functions.php';
 require_once '../feature_extraction.php';
+
+if (!isset($_GET['raw_data_id'])) {
+    header("Location: ../view/?raw_data_id=295093");
+}
 
 $answers = null;
 $image_data = null;
@@ -25,7 +28,7 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     $stmt->execute();
 }
 
-if (isset($_GET['request_new_classification'])) {
+/*if (isset($_GET['request_new_classification'])) {
     $raw_data_id = intval($_GET['request_new_classification']);
 
     // Get raw data
@@ -35,7 +38,7 @@ if (isset($_GET['request_new_classification'])) {
     $stmt->execute();
     $draw = $stmt->fetchObject()->data;
     classify($raw_data_id, $draw);
-}
+}*/
 
 if (isset($_POST['nr_of_lines'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
@@ -250,7 +253,7 @@ if (isset($_GET['raw_data_id'])) {
         }
     } elseif (isset($_GET['vote'])) {
         // TODO: Check if user has right to vote
-        
+
         $vote = intval($_GET['vote']);
         $id = intval($_GET['raw_data2formula_id']);
         if ($vote == 1 || $vote == -1) {
