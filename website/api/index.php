@@ -75,7 +75,7 @@ if (!isset($_GET['task']) || !in_array($_GET['task'], $tasks)) {
 }
 
 if ($_GET['task'] == "list-unclassified") {
-    $sql = "SELECT `id` FROM `wm_raw_draw_data` WHERE `accepted_formula_id` IS NULL";
+    $sql = "SELECT `id` FROM `wm_raw_draw_data` WHERE `accepted_formula_id` IS NULL ORDER BY `id` DESC LIMIT 256";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $unclassified = $stmt->fetchAll(PDO::FETCH_COLUMN);

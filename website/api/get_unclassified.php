@@ -2,6 +2,10 @@
 include '../init.php';
 include '../svg.php';
 
+if (!is_logged_in()) {
+    header("Location: ../login");
+}
+
 function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
     global $pdo;
     // Delete all answers regarding this raw_data_id from the current
@@ -38,9 +42,9 @@ function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
 
 if (isset($_POST['recording_id'])) {
     $raw_data_id = intval($_POST['recording_id']);
-    $worker_id = 6;  # TODO: Use a key!
+    $uid = get_uid();
     $answer_json = json_decode($_POST['results'], true);
-    insert_worker_answers($worker_id, $raw_data_id, $answer_json);
+    insert_worker_answers($uid, $raw_data_id, $answer_json);
 } else {
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data` as `recording`, ".
            "`creation_date`, COUNT(`raw_data_id`) as `answers` ".
