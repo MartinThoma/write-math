@@ -4,6 +4,10 @@ include '../init.php';
 $edit_flag = false;
 $images = false;
 
+if (!isset($_GET['id'])) {
+    header("Location: ?id=1526");
+}
+
 if (isset($_GET['edit'])) {
     $edit_flag = true;
 }
