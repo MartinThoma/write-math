@@ -16,8 +16,8 @@ if (!is_logged_in()) {
 if (!isset($_GET['A']) || !isset($_GET['B'])) {
     $msg[] = array("class" => "alert-warning",
                    "text" => "Please provide 'A' and 'B' with a raw_data_id. ".
-                             'e.g. <a href="?A=300&B=306">like this</a> or '.
-                             '<a href="?A=300&B=290">like that</a>.');
+                             'e.g. <a href="?A=295101&B=295100">like this</a> or '.
+                             '<a href="?A=295101&B=295095">like that</a>.');
 } else {
     $sql = "SELECT `id`, `data` FROM `wm_raw_draw_data` ".
            "WHERE `id` = :ida OR `id` = :idb";
