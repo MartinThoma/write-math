@@ -50,6 +50,7 @@
         {% if logged_in %}
           <ul class="nav navbar-nav navbar-left">
             <li {% if file == 'classify' %}class="active"{% endif %}><a href="../classify">Classify</a></li>
+            <li {% if file == 'search' %}class="active"{% endif %}  ><a href="../search">Search</a></li>
             <li {% if file == 'train' %}class="active"{% endif %}  ><a href="../train">Train</a></li>
             <li {% if file == 'gallery' %}class="active"{% endif %}><a href="../gallery">Gallery</a></li>
             <li {% if file == 'ranking' %}class="active"{% endif %}><a href="../ranking">Ranking</a></li>
@@ -57,6 +58,7 @@
           </ul>
         {% else %}
           <ul class="nav navbar-nav navbar-left">
+            <li {% if file == 'search' %}class="active"{% endif %}  ><a href="../search">Search</a></li>
             <li {% if file == 'ranking' %}class="active"{% endif %}><a href="../ranking">Ranking</a></li>
             <li {% if file == 'about' %}class="active"{% endif %}  ><a href="../about">About</a></li>
           </ul>

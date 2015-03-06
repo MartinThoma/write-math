@@ -1,0 +1,44 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<form class="form-horizontal" method="get">
+<!-- Search input-->
+<div class="control-group">
+    <div class="input-group">
+      <input id="search" name="search" type="search" class="form-control input-xlarge search-query" placeholder="Search for..." value="{{searchterm}}" />
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+      </span>
+    </div><!-- /input-group -->
+</div>
+</form>
+<br/>
+{% if searchterm != '' %}
+    {% if searchresults|length == 0 %}
+        <div class="alert alert-info" role="alert">No results for '{{searchterm}}'.</div>
+    {% else %}
+        <table class="table">
+            <thead>
+                <th>#</th>
+                <th>Rendering</th>
+                <th>&nbsp;</th>
+                <th>Name</th>
+                <th>LaTeX</th>
+            </thead>
+            {% for r in searchresults %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><img src="../formulas/{{ r.id }}-{{ r.best_rendering }}.svg" alt="Rendering of {{ r.formula_name }}" height="30px" /></td>
+                <td>
+                {% if r.unicode_dec != 0 %}
+<span style="font-family:{{r.font|raw}};font-style:{{r.font_style|raw}};font-size:20px;line-height:20px;text-align:center;color:black;">&#{{r.unicode_dec|raw}};</span>
+{% endif %}
+                </td>
+                <td><a href="../symbol/?id={{ r.id }}">{{ r.formula_name }}</a></td>
+                <td>{{ r.formula_in_latex }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endif %}
+{% endblock %}
