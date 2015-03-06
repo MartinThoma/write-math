@@ -34,3 +34,4 @@ gives an impression how big the project is:
 | Date       | Total | PHP  | HTML | JS  | CSS | Python | Remarks
 | ---------- | ----- | ---- | ---- | --- | --- | ------ | -------
 | 2015-03-04 | 6633  | 3904 | 2533 | 133 | 42  | 19     | Initial measurement
+| 2015-03-06 | 6419  | 3611 | 2612 | 133 | 42  | 19     | Cleanup actions
