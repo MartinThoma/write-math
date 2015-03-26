@@ -4,6 +4,7 @@ require_once '../classification.php';
 require_once '../init.php';
 require_once 'functions.php';
 require_once '../feature_extraction.php';
+require_once '../segmentation.php';
 
 if (!isset($_GET['raw_data_id'])) {
     header("Location: ../view/?raw_data_id=295093");
@@ -11,6 +12,9 @@ if (!isset($_GET['raw_data_id'])) {
 
 $answers = null;
 $image_data = null;
+$force_reload_raw_svg = "";
+$force_reload_raw_svg = isset($_GET['force_reload'])? "?".$_GET['force_reload'] : $force_reload_raw_svg;
+$force_reload_raw_svg = isset($_SESSION['force_reload'])? "?".$_SESSION['force_reload'] : $force_reload_raw_svg;
 
 if (isset($_GET['add_to_testset']) && is_admin()) {
     $sql = "UPDATE `wm_raw_draw_data` ".
@@ -51,6 +55,28 @@ if (isset($_POST['nr_of_lines'])) {
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_POST['raw_id_segmentation'])) {
+    $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
+           "AND (`user_id` = :user_id OR :user_id = 10);";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':raw_id', $_POST['raw_id_segmentation'], PDO::PARAM_INT);
+    $stmt->bindParam(':segmentation', $_POST['segmentation']);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+
+    # Rerender
+    $raw_data_id = intval($_POST['raw_id_segmentation']);
+    if (get_uid() == 10) {
+        $filename = dirname(dirname(__FILE__))."/raw-data/$raw_data_id.svg";
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+    }
+    # Redirect to prevent multiple submission
+    $_SESSION['force_reload'] = uniqid("img");
+    header("Location: ../view/?raw_data_id=".$raw_data_id."&force_reload=".uniqid("img"));
 } elseif (isset($_POST['wild_point_count'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `wild_point_count` = :wild_point_count ".
@@ -103,10 +129,14 @@ if (isset($_POST['nr_of_lines'])) {
             $stmt->execute();
 
             # Remove old rendering
-            unlink("../raw-data/$raw_data_id.svg");
+            $filename = dirname(dirname(__FILE__))."/raw-data/$raw_data_id.svg";
+            if (file_exists($filename)) {
+                unlink($filename);
+            }
 
             # Redirect
-            header("Location: ../view/?raw_data_id=$raw_data_id");
+            $_SESSION['force_reload'] = uniqid("img");
+            header("Location: ../view/?raw_data_id=$raw_data_id&force_reload=".uniqid("img"));
         } else {
             $msg[] = array("class" => "alert-info",
                             "text" => "No need to fix anything.");
@@ -115,8 +145,14 @@ if (isset($_POST['nr_of_lines'])) {
 } elseif (isset($_GET['rerender'])) {
     $raw_data_id = intval($_GET['rerender']);
     if (get_uid() == 10) {
-        unlink("../raw-data/$raw_data_id.svg");
+        $filename = dirname(dirname(__FILE__))."/raw-data/$raw_data_id.svg";
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
     }
+    # Redirect to prevent multiple submission
+    $_SESSION['force_reload'] = uniqid("img");
+    header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']."&force_reload=".uniqid("img"));
 } elseif (isset($_GET['trash'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `accepted_formula_id` = 1 ".
@@ -289,7 +325,7 @@ if (isset($_GET['raw_data_id'])) {
     $sql = "SELECT `user_id`, `display_name`, `data`, ".
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
-           "`has_too_long_line`, `is_in_testset` ".
+           "`has_too_long_line`, `is_in_testset`, `segmentation` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
@@ -299,13 +335,15 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->execute();
     $image_data = $stmt->fetchObject();
 
+    $image_data->segmentation = make_valid_segmentation(json_decode($image_data->data, true), $image_data->segmentation); #TODO
+
     // Get best rendering of this
     $sql = "SELECT `best_rendering` FROM `wm_formula` WHERE `id` = :fid;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $image_data->accepted_formula_id, PDO::PARAM_INT);
     $stmt->execute();
     $image_data_best_rendering = $stmt->fetchObject();
-    if ($image_data_best_rendering) {
+    if (!$image_data_best_rendering) {
         $image_data->accepted_formula_id_best_rendering = "-1";
     } else {
         $image_data->accepted_formula_id_best_rendering = $image_data_best_rendering->best_rendering;
@@ -387,7 +425,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                       'control_points' => $control_points,
                                       'bounding_box' => $bounding_box,
                                       'automatic_answers' => $automatic_answers,
-                                      'time_resolution' => $time_resolution
+                                      'time_resolution' => $time_resolution,
+                                      'force_reload' => $force_reload_raw_svg
                                       )
                   );
 

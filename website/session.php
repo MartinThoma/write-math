@@ -1,6 +1,6 @@
 <?php
 
-include '../user.func.php';
+include dirname(__FILE__).'/user.func.php';
 
 function is_logged_in() {
     global $pdo;

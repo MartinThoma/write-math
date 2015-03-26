@@ -1,6 +1,7 @@
 <?php
 require_once 'preprocessing.php';
 require_once 'classification.php';
+require_once 'segmentation.php';
 
 function get_dots($data) {
     $dots = array();
@@ -13,36 +14,6 @@ function get_dots($data) {
         }
     }
     return $dots;
-}
-
-/**
- * $segmentation should be a string of 0s and 1s
- * of length (number of strokes-1)
- * A 0 means two strokes are connected to one symbol, a 1 menas a new symbol
- * begins
- *
- * If no segmentation data is given, it is assumed that the recording is one
- * symbol.
- *
- * Return the segmentation string
- */
-function make_valid_segmentation($recording_point_list, $segmentation) {
-    $required_chars = count($recording_point_list) - 1;
-    if (is_null($segmentation)) {
-        $segmentation = "";
-        for ($i=0; $i < $required_chars; $i++) { 
-            $segmentation .= "0";
-        }
-    } else {
-        if (strlen($segmentation) > $required_chars) {
-            $segmentation = substr($segmentation, 0, $required_chars);
-        } elseif (strlen($segmentation) < $required_chars) {
-            for ($i=strlen($segmentation); $i < $required_chars; $i++) { 
-                $segmentation .= "0";
-            }
-        }
-    }
-    return $segmentation;
 }
 
 
@@ -85,9 +56,9 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
     $recording_point_list = pointLineList($data);
     $b = get_bounding_box($recording_point_list);
     extract($b);
-    $width_line = 5;
-    $width  = $width_line*3 + $maxx - $minx;
-    $height = $width_line*3 + $maxy - $miny;
+    $width_stroke = 5;
+    $width  = $width_stroke*3 + $maxx - $minx;
+    $height = $width_stroke*3 + $maxy - $miny;
     $dots = "";
 
     $segmentation = make_valid_segmentation($recording_point_list, $segmentation);
@@ -107,10 +78,10 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
                                   "color" => $colors[$color_nr]);
         }
         if (count($stroke) == 1) {
-            $dots .= '<circle cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:'.$colors[$color_nr].';stroke:#ff0000;"/>';
+            $dots .= '<circle id="stroke'.$i.'" cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:'.$colors[$color_nr].';stroke:'.$colors[$color_nr].';"/>';
         }
         $new_list[] = $new_stroke;
-        if ($i < strlen($segmentation) && substr($segmentation, $i, 1) == '1') {
+        if (substr($segmentation, $i, 1) == '1') {
             $color_nr += 1;
         }
         $i += 1;
@@ -146,23 +117,25 @@ function get_path($data, $epsilon=0) {
 
     $first = true;
 
+    $stroke_nr = 0;
     foreach ($data as $line) {
         //if (count($line) > 1) {
             foreach ($line as $i => $point) {
                 if (!$first && $i == 0) {
-                    $path .= '" style="fill:none;stroke:'.$point['color'].';stroke-width:5;stroke-linecap:round;" />';
+                    $path .= '" />'."\n";
                 }
 
                 if ($i == 0) {
                     $first = false;
-                    $path .= "<path d=\"  M ".$point['x']." ".$point['y'];
+                    $path .= "<path id='path".$stroke_nr."' style=\"fill:none;stroke:".$point['color'].";stroke-width:5;stroke-linecap:round;\" d=\"  M ".$point['x']." ".$point['y'];
                 } else {
                     $path .= " L ".$point['x']." ".$point['y'];
                 }
             }
         //}
+        $stroke_nr += 1;
     }
-    $path .= '" style="fill:none;stroke:'.$point['color'].';stroke-width:5;stroke-linecap:round;" />';
+    $path .= '" />'."\n";
 
     return $path;
 }
