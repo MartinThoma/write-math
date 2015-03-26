@@ -3,6 +3,28 @@ Run `composer update` to update all third-party software.
 
 ## Installation
 
+### Apache
+
+For local testing, set `sudo sublime /etc/apache2/apache2.conf`:
+
+```text
+<Directory /var/www/>
+    Options Indexes FollowSymLinks ExecCGI
+    AddHandler cgi-script .py
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+(AllowOverride is important for htaccess files)
+
+Then:
+
+```bash
+$ sudo service apache2 restart
+```
+
+
 ### Composer
 
 This website contains some third party packages. They are administrated via

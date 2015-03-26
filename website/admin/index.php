@@ -70,7 +70,10 @@ if (isset($_GET['delete_inactive_user'])) {
 
 if (isset($_GET['many_lines'])) {
     $sql = "SELECT `id`, `data`, `creation_date` ".
-           "FROM `wm_raw_draw_data`"; # WHERE `formula_type` = 'single symbol'
+           "FROM `wm_raw_draw_data` ".
+           "WHERE `is_image`=0 AND `nr_of_symbols`=1 AND `accepted_formula_id`!=1 ".
+           "LIMIT ".rand (1, 300000).", 500";
+    echo $sql;
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $images = $stmt->fetchAll();
