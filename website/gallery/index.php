@@ -82,7 +82,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
               "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
               "GROUP BY `wm_raw_draw_data`.`id` ".
               "HAVING `answers` = 0 AND `answers2` = 0 ".
-              "ORDER BY `creation_date` DESC ".;
+              "ORDER BY `creation_date` DESC ";
 
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(*) as `counter` FROM ($select) AS T";
