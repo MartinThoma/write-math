@@ -15,34 +15,108 @@ function get_dots($data) {
     return $dots;
 }
 
-function create_raw_data_svg($raw_data_id, $data) {
-    # Move drawing so that the smallest x-value is 0 and the smallest y value
-    # is 0.
-    $pointList = pointLineList($data);
-    $b = get_bounding_box($pointList);
-    extract($b);
-    $linewidth = 5;
-    $width  = $linewidth*3 + $maxx - $minx;
-    $height = $linewidth*3 + $maxy - $miny;
-    $dots = "";
+/**
+ * $segmentation should be a string of 0s and 1s
+ * of length (number of strokes-1)
+ * A 0 means two strokes are connected to one symbol, a 1 menas a new symbol
+ * begins
+ *
+ * If no segmentation data is given, it is assumed that the recording is one
+ * symbol.
+ *
+ * Return the segmentation string
+ */
+function make_valid_segmentation($recording_point_list, $segmentation) {
+    $required_chars = count($recording_point_list) - 1;
+    if (is_null($segmentation)) {
+        $segmentation = "";
+        for ($i=0; $i < $required_chars; $i++) { 
+            $segmentation .= "0";
+        }
+    } else {
+        if (strlen($segmentation) > $required_chars) {
+            $segmentation = substr($segmentation, 0, $required_chars);
+        } elseif (strlen($segmentation) < $required_chars) {
+            for ($i=strlen($segmentation); $i < $required_chars; $i++) { 
+                $segmentation .= "0";
+            }
+        }
+    }
+    return $segmentation;
+}
 
-    $newList = array();
-    foreach ($pointList as $line) {
-        $newLine = array();
-        foreach ($line as $point) {
-            $newx = $linewidth + $point["x"] - $minx;
-            $newy = $linewidth + $point["y"] - $miny;
-            $newLine[] = array("x" => $newx,
-                               "y" => $newy,
-                               "time" => $point["time"]);
-        }
-        if (count($line) == 1) {
-            $dots .= '<circle cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:#ff0000;stroke:#ff0000;"/>';
-        }
-        $newList[] = $newLine;
+
+function get_colors($segmentation) {
+    $symbol_count = substr_count($segmentation, '1') + 1;
+    $num_colors = $symbol_count;
+
+    // See
+    // http://stackoverflow.com/a/20298116/562769
+    $color_array = array(
+        "#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+        "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+        "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+        "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+        "#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+        "#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+        "#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+        "#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C",
+
+        "#34362D", "#B4A8BD", "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
+        "#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00",
+        "#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
+        "#549E79", "#FFF69F", "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
+        "#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C",
+        "#83AB58", "#001C1E", "#D1F7CE", "#004B28", "#C8D0F6", "#A3A489", "#806C66", "#222800",
+        "#BF5650", "#E83000", "#66796D", "#DA007C", "#FF1A59", "#8ADBB4", "#1E0200", "#5B4E51",
+        "#C895C5", "#320033", "#FF6832", "#66E1D3", "#CFCDAC", "#D0AC94", "#7ED379", "#012C58");
+    $newArray = $color_array;
+    while(count($newArray) <= $num_colors){
+        $newArray = array_merge($newArray, $color_array);
     }
 
-    $path = get_path(json_encode($newList));
+    return array_slice($newArray, 0, $num_colors);
+}
+
+
+function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
+    # Move drawing so that the smallest x-value is 0 and the smallest y value
+    # is 0.
+    $recording_point_list = pointLineList($data);
+    $b = get_bounding_box($recording_point_list);
+    extract($b);
+    $width_line = 5;
+    $width  = $width_line*3 + $maxx - $minx;
+    $height = $width_line*3 + $maxy - $miny;
+    $dots = "";
+
+    $segmentation = make_valid_segmentation($recording_point_list, $segmentation);
+    $colors = get_colors($segmentation);
+
+    $new_list = array();
+    $i = 0;
+    $color_nr = 0;
+    foreach ($recording_point_list as $stroke) {
+        $new_stroke = array();
+        foreach ($stroke as $point) {
+            $newx = $width_stroke + $point["x"] - $minx;
+            $newy = $width_stroke + $point["y"] - $miny;
+            $new_stroke[] = array("x" => $newx,
+                                  "y" => $newy,
+                                  "time" => $point["time"],
+                                  "color" => $colors[$color_nr]);
+        }
+        if (count($stroke) == 1) {
+            $dots .= '<circle cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:'.$colors[$color_nr].';stroke:#ff0000;"/>';
+        }
+        $new_list[] = $new_stroke;
+        if ($i < strlen($segmentation) && substr($segmentation, $i, 1) == '1') {
+            $color_nr += 1;
+        }
+        $i += 1;
+    }
+
+    $path = get_path(json_encode($new_list));
 
     # Create SVG and store it for later usage
     $filename = "../classify/svg-template.svg";
@@ -70,17 +144,25 @@ function get_path($data, $epsilon=0) {
         $data = apply_linewise_douglas_peucker($data, $epsilon);
     }
 
+    $first = true;
+
     foreach ($data as $line) {
         //if (count($line) > 1) {
             foreach ($line as $i => $point) {
+                if (!$first && $i == 0) {
+                    $path .= '" style="fill:none;stroke:'.$point['color'].';stroke-width:5;stroke-linecap:round;" />';
+                }
+
                 if ($i == 0) {
-                    $path .= " M ".$point['x']." ".$point['y'];
+                    $first = false;
+                    $path .= "<path d=\"  M ".$point['x']." ".$point['y'];
                 } else {
                     $path .= " L ".$point['x']." ".$point['y'];
                 }
             }
         //}
     }
+    $path .= '" style="fill:none;stroke:'.$point['color'].';stroke-width:5;stroke-linecap:round;" />';
 
     return $path;
 }
