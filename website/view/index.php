@@ -305,7 +305,11 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->bindParam(':fid', $image_data->accepted_formula_id, PDO::PARAM_INT);
     $stmt->execute();
     $image_data_best_rendering = $stmt->fetchObject();
-    $image_data->accepted_formula_id_best_rendering = $image_data_best_rendering->best_rendering;
+    if ($image_data_best_rendering) {
+        $image_data->accepted_formula_id_best_rendering = "-1";
+    } else {
+        $image_data->accepted_formula_id_best_rendering = $image_data_best_rendering->best_rendering;
+    }
 
     // Add a new classification
     if (isset($_POST['latex'])) {

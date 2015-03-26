@@ -2,6 +2,6 @@ Options +Indexes
 IndexOptions +FancyIndexing
 # The following path has to be adjusted. It has to be an absolute path.
 # Testing:
-#ErrorDocument 404 /write-math/website/raw-data/cache-404.php
+#ErrorDocument 404 /website/raw-data/cache-404.php
 # Online:
 ErrorDocument 404 /write-math/raw-data/cache-404.php
