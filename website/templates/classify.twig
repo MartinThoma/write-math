@@ -144,11 +144,25 @@
                                         var unicode_code_point = arr[2];
                                         var font = arr[3];
                                         var font_style = arr[4];
-                                        content += "<tr><td><a href='../symbol/?id="+system_id+"' style='font-family:"+font+";font-style:"+font_style+"'>&#" + unicode_code_point + ";</a></td><td><input class=\"form-control\" value='"+ latex + "' disabled/></td><td style='text-align:right'>" + parseFloat(probability*100).toFixed(2) + "</td><td><div class='btn-group' role='group' aria-label='accept'><button type='button' id='button"+system_id+"' class='btn btn-default' aria-label='Left Align' onclick='accept("+system_id+")'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></button></div></td></tr>";
+                                        content += "<tr><td><a href='../symbol/?id="+system_id+"' style='font-family:"+font+";font-style:"+font_style+"'>&#" + unicode_code_point + ";</a></td><td><input id=\"inptxt"+system_id+"\" class=\"form-control\" value='"+ latex + "' disabled/></td><td style='text-align:right'>" + parseFloat(probability*100).toFixed(2) + "</td><td><div class='btn-group' role='group' aria-label='accept'><button type='button' id='button"+system_id+"' class='btn btn-default' aria-label='Left Align' onclick='accept("+system_id+")' data-clipboard-text='"+ latex + "'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></button></div></td></tr>";
                                     })
                          });
                          content += "</tbody></table>";
                          document.getElementById('classification-results').innerHTML = content;
+
+
+                         $.each(data, function( index, value ) {
+                             $.each(value,
+                                    function(symbolbla, probability) {
+                                        var arr = symbolbla.split(";");
+                                        var system_id = arr[0];
+                                        var latex = arr[1];
+                                        var unicode_code_point = arr[2];
+                                        var font = arr[3];
+                                        var font_style = arr[4];
+                                            var client = new ZeroClipboard(document.getElementById("button"+system_id));
+                                    })
+                         });
                     },
                   dataType: "json",
                   error: function(e) {
@@ -247,4 +261,5 @@
         canvas.width = width;
         canvas.height = height;
     </script>
+    <script src="../vendor/zeroclipboard/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 {% endblock %}

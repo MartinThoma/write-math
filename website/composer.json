@@ -3,6 +3,7 @@
         "monolog/monolog": ">=1.0.0",
         "twig/twig": "1.*",
         "ircmaxell/password-compat": ">=1.0.3",
-        "erusev/parsedown": "dev-master"
+        "erusev/parsedown": "dev-master",
+        "zeroclipboard/zeroclipboard": "~2.2"
     }
 }
