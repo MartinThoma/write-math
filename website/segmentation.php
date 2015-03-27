@@ -115,6 +115,15 @@ function make_valid_segmentation($recording_point_list, $segmentation) {
         }
     }
 
+    // Sort it
+    for ($i=0; $i < count($segmentation); $i++) { 
+        sort($segmentation[$i]);
+    }
+    usort($segmentation, function($a, $b) {
+        return $a[0] > $b[0];
+    });
+    $was_invalid = true; // TODO: Check if sorting changed
+
     if ($was_invalid) {
         // Segmentation was invalid. Update in DB
         $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".

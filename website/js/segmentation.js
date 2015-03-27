@@ -58,13 +58,11 @@ function mouseUpEventHandler(e) {
         endX = e.clientX;
         endY = e.clientY;
         var paths = getContainedPaths();
-        segmentation = re_segment(paths);
-
-        // send new segmentation to server
-        //   TODO
-
-        // apply new colors
-        //   TODO
+        if (paths.length > 0) {
+            segmentation = re_segment(paths);
+            colorBySegmentation()
+            sendSegmentation(recording_id, segmentation);
+        };
     };
     redraw = false;
 }
@@ -118,11 +116,9 @@ function re_segment(selection) {
     };
     new_segmentation.push(selection);
     new_segmentation.sort(function(a, b) {
-        return a[0] > b[0];
+        return a[0]-b[0];
     });
     segmentation = new_segmentation;
-    colorBySegmentation()
-    sendSegmentation(recording_id, segmentation);
     return segmentation;
 }
 
@@ -161,6 +157,7 @@ function colorBySegmentation() {
 
 function sendSegmentation(id, segmentation) {
     console.log(JSON.stringify(segmentation));
+    $('#segmentation').val(JSON.stringify(segmentation));
     $.ajax({
       type: "POST",
       url: "../api/set-segmentation.php",

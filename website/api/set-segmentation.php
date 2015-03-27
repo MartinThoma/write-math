@@ -1,5 +1,7 @@
 <?php
-include '../init.php';
+include_once '../init.php';
+require_once '../classification.php';
+require_once '../svg.php';
 
 if (!is_logged_in()) {
     header("Location: ../login");
@@ -13,6 +15,15 @@ if (isset($_POST['recording_id'])) {
     $segmentation = $_POST['segmentation'];
     $segmentation = str_replace('"', "", $segmentation);
     $segmentation = str_replace("'", "", $segmentation);
+
+    $sql = "SELECT `data` FROM `wm_raw_draw_data` WHERE id=:id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $obj = $stmt->fetchObject();
+    $recording_point_list = pointLineList($obj->data);
+    $segmentation = make_valid_segmentation($recording_point_list, json_decode($segmentation));
+    $segmentation = json_encode($segmentation);
     $response['segmentation'] = $segmentation;
     $response['segmentation_type'] = gettype($segmentation);
 
@@ -29,16 +40,12 @@ if (isset($_POST['recording_id'])) {
     $result = $stmt->execute();
     $response['result'] = $result;
 
-    $sql = "SELECT `segmentation` ".
-           "FROM `wm_raw_draw_data` ".
-           "WHERE `wm_raw_draw_data`.`id` = :id";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $raw_data_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $image_data = $stmt->fetchObject();
-
-    $response['segmentation_in_db'] = $image_data->segmentation;
+    if (get_uid() == 10) {
+        $filename = dirname(dirname(__FILE__))."/raw-data/$raw_data_id.svg";
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+    }
 
 
     echo json_encode($response);
