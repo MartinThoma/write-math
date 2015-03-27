@@ -151,6 +151,9 @@ function colorBySegmentation() {
         for (var stroke_i = 0; stroke_i < symbol.length; stroke_i++) {
             stroke_id = symbol[stroke_i];
             svgDoc.getElementById('stroke'+stroke_id).style.stroke = colors[symbol_i % colors.length];
+            if (svgDoc.getElementById('stroke'+stroke_id).tagName == 'circle') {
+                svgDoc.getElementById('stroke'+stroke_id).style.fill = colors[symbol_i % colors.length];
+            };
         };
     };
 }

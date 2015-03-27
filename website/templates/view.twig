@@ -31,9 +31,9 @@
            class="form-control"
            id="nr_of_lines" name="nr_of_lines"
            placeholder="1"
-           value="{{ image_data.nr_of_symbols }}" />
+           value="{{ image_data.nr_of_symbols }}"
+           onchange="this.form.submit()"/>
   </div>
-  <button type="submit" class="btn btn-default">update</button>
 </form></td>
   {% else %}
     <td>{{ image_data.nr_of_symbols }}</td>
@@ -54,6 +54,24 @@
     <td>{{ image_data.segmentation|json_encode() }}</td>
   {% endif %}
   </tr>
+  {% if image_data.user_id == uid or uid == 10 %}
+  <tr>
+    <th>is stroke segmentable</th>
+    <td>
+        <form class="form-inline" role="form" method="post">
+          <input type="hidden" name="raw_id_stroke_segmentable" value="{{ raw_data_id }}" />
+          <div class="checkbox">
+            <label>
+            {% if image_data.stroke_segmentable %}
+              <input type="checkbox" id="stroke_segmentable" name="stroke_segmentable" onchange="this.form.submit()" checked/>
+            {% else %}
+              <input type="checkbox" id="stroke_segmentable" name="stroke_segmentable" onchange="this.form.submit()"/>
+            {% endif %}
+            </label>
+          </div>
+        </form></td>
+  </tr>
+  {% endif %}
   <tr>
     <th>strokes</th>
     <td>{{ lines_nr }}</td>
