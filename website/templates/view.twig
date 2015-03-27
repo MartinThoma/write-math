@@ -1,13 +1,25 @@
 {% extends "base.twig" %}
 
+{% block header %}
+<script type="text/javascript" src="../js/segmentation.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="row">
-<div class="col-md-6"><img src="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}" style="width:400px;height:400px;border:1px solid black;"/></div>
+<div class="col-md-6">
+<object data="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}"
+        type="image/svg+xml"
+        id="canvas"
+        style="width:400px;height:400px;border:1px solid black;"
+></object>
+<!-- <img src="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}" style="width:400px;height:400px;border:1px solid black;"/> -->
+
+</div>
 <div class="col-md-6">
 <form action="?raw_data_id={{ raw_data_id }}" method="post">
 <table class="table" role="table">
   <tr>
-    <th>Nr of symbols</th>
+    <th>nr of symbols</th>
   {% if image_data.user_id == uid or uid == 10 %}
     <td>
 <form class="form-inline" role="form" method="post">
@@ -34,17 +46,12 @@
 <form class="form-inline" role="form" method="post">
   <input type="hidden" name="raw_id_segmentation" value="{{ raw_data_id }}" />
   <div class="form-group">
-    <input type="text"
-           class="form-control"
-           id="segmentation" name="segmentation"
-           placeholder="010"
-           autocomplete="off"
-           value="{{ image_data.segmentation }}" />
+    <textarea id="segmentation" name="segmentation" class="form-control" rows="4" cols="50">{{ image_data.segmentation|json_encode() }}</textarea>
   </div>
   <button type="submit" class="btn btn-default">update</button>
 </form></td>
   {% else %}
-    <td>{{ image_data.segmentation }}</td>
+    <td>{{ image_data.segmentation|json_encode() }}</td>
   {% endif %}
   </tr>
   <tr>
@@ -75,10 +82,6 @@
     <th>Max. Time Delta</th>
     <td>{% if time_resolution.max_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms{% endif %}</td>
   </tr>
-<!--   <tr>
-    <td><input type="number" id="epsilon" name="epsilon" min="0" max="500" value="{{ epsilon }}" onchange="submit()"/></td>
-    <td><button type="submit" class="btn btn-default">Adjust Epsilon</button></td>
-  </tr> -->
   <tr>
     <th>Creation Date</th>
     <td>{{ image_data.creation_date }}</td>
@@ -361,4 +364,46 @@ MathJax.Hub.Queue(function() {
 });
 // -->
 </script>
+    <script>
+        var recording_id = {{ raw_data_id }};
+        var startX = 0;
+        var startY = 0;
+        var endX = 0;
+        var endY = 0;
+        var redraw = false;
+        var lastClick = new Date().getTime();
+
+        var segmentation = {{ image_data.segmentation|json_encode() }};
+
+        var canvas = document.getElementById("canvas");
+        //it's important to add an load event listener to the object, as it will load the svg doc asynchronously
+        canvas.addEventListener("load",function(){
+            var svgDoc = canvas.contentDocument; //get the inner DOM of .svg
+            var svg = svgDoc.getElementById("svg"); //get the inner element by id
+            svgDoc.addEventListener('mouseup', mouseUpEventHandler);
+            svgDoc.addEventListener('mousemove', mouseMoveEventHandler);
+            svgDoc.addEventListener('mousedown', mouseDownHandler);
+
+            // add rectangleSelection
+            var svgns = "http://www.w3.org/2000/svg";
+            var rect = document.createElementNS(svgns, 'rect');
+            rect.setAttributeNS(null, 'id', 'rectangleSelection');
+            rect.setAttributeNS(null, 'x', startX);
+            rect.setAttributeNS(null, 'y', startY);
+            rect.setAttributeNS(null, 'height', Math.abs(startX-endX));
+            rect.setAttributeNS(null, 'width', Math.abs(startY-endY));
+            rect.setAttributeNS(null, 'fill', '#0000ff');
+            rect.setAttributeNS(null, 'opacity', 0.4);
+            svgDoc.firstChild.appendChild(rect);
+
+            // TODO: get stroke id by checking which paths are (partially)
+            // in the bounding box defined by
+            // (startX, startY) and (endX, endY)
+            //var selectedStroke = svgDoc.getElementById("stroke1");
+            //selectedStroke.style.stroke = "blue";
+
+            colorBySegmentation();
+        }, false);
+
+    </script>
 {% endblock %}

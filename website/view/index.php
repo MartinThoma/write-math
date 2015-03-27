@@ -335,7 +335,7 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->execute();
     $image_data = $stmt->fetchObject();
 
-    $image_data->segmentation = make_valid_segmentation(json_decode($image_data->data, true), $image_data->segmentation); #TODO
+    $image_data->segmentation = make_valid_segmentation(json_decode($image_data->data, true), json_decode($image_data->segmentation)); #TODO
 
     // Get best rendering of this
     $sql = "SELECT `best_rendering` FROM `wm_formula` WHERE `id` = :fid;";
