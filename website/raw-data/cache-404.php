@@ -11,9 +11,14 @@ $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':did', $raw_data_id, PDO::PARAM_INT);
 $stmt->execute();
 $obj = $stmt->fetchObject();
-$data = $obj->data;
-$segmentation = $obj->segmentation;
+if ($obj) {
+    $data = $obj->data;
+    $segmentation = $obj->segmentation;
+    create_raw_data_svg($raw_data_id, $data, json_decode($segmentation));
+    header("Location: ../raw-data/$raw_data_id.svg");
+} else {
+    echo "Error - cache-404 for raw_data_id=".$raw_data_id;
+    var_dump($obj);
+}
 
-create_raw_data_svg($raw_data_id, $data, $segmentation);
-header("Location: ../raw-data/$raw_data_id.svg");
 ?>
