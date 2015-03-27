@@ -18,7 +18,7 @@ function get_dots($data) {
 
 
 function get_colors($segmentation) {
-    $symbol_count = substr_count($segmentation, '1') + 1;
+    $symbol_count = count($segmentation);
     $num_colors = $symbol_count;
 
     // See
@@ -41,6 +41,11 @@ function get_colors($segmentation) {
         "#83AB58", "#001C1E", "#D1F7CE", "#004B28", "#C8D0F6", "#A3A489", "#806C66", "#222800",
         "#BF5650", "#E83000", "#66796D", "#DA007C", "#FF1A59", "#8ADBB4", "#1E0200", "#5B4E51",
         "#C895C5", "#320033", "#FF6832", "#66E1D3", "#CFCDAC", "#D0AC94", "#7ED379", "#012C58");
+
+    // Apply a little trick to make sure we have enough colors, no matter
+    // how many symbols are in one recording.
+    // This simply appends the color array as long as necessary to get enough
+    // colors
     $newArray = $color_array;
     while(count($newArray) <= $num_colors){
         $newArray = array_merge($newArray, $color_array);
@@ -49,8 +54,23 @@ function get_colors($segmentation) {
     return array_slice($newArray, 0, $num_colors);
 }
 
+function search_symbol_nr_by_stroke_id($stroke_id, $segmentation) {
+   foreach ($segmentation as $symbol_nr => $strokes) {
+       foreach ($strokes as $stroke_id_in_symbol) {
+           if ($stroke_id_in_symbol === $stroke_id) {
+               return $symbol_nr;
+           }
+       }
+   }
+   return null;
+}
+
 
 function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
+    assert(is_null($segmentation)||is_array($segmentation),
+           '$segmentation is neither NULL nor array. '.
+           'It is '.gettype($segmentation).".");
+
     # Move drawing so that the smallest x-value is 0 and the smallest y value
     # is 0.
     $recording_point_list = pointLineList($data);
@@ -66,8 +86,8 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
 
     $new_list = array();
     $i = 0;
-    $color_nr = 0;
-    foreach ($recording_point_list as $stroke) {
+    foreach ($recording_point_list as $stroke_id=>$stroke) {
+        $symbol_nr = search_symbol_nr_by_stroke_id($stroke_id, $segmentation);
         $new_stroke = array();
         foreach ($stroke as $point) {
             $newx = $width_stroke + $point["x"] - $minx;
@@ -75,15 +95,12 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
             $new_stroke[] = array("x" => $newx,
                                   "y" => $newy,
                                   "time" => $point["time"],
-                                  "color" => $colors[$color_nr]);
+                                  "color" => $colors[$symbol_nr]);
         }
         if (count($stroke) == 1) {
-            $dots .= '<circle id="stroke'.$i.'" cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:'.$colors[$color_nr].';stroke:'.$colors[$color_nr].';"/>';
+            $dots .= '<circle id="stroke'.$i.'" cx="'.$newx.'" cy="'.$newy.'" r="2" style="fill:'.$colors[$symbol_nr].';stroke:'.$colors[$symbol_nr].';"/>';
         }
         $new_list[] = $new_stroke;
-        if (substr($segmentation, $i, 1) == '1') {
-            $color_nr += 1;
-        }
         $i += 1;
     }
 
@@ -127,7 +144,7 @@ function get_path($data, $epsilon=0) {
 
                 if ($i == 0) {
                     $first = false;
-                    $path .= "<path id='path".$stroke_nr."' style=\"fill:none;stroke:".$point['color'].";stroke-width:5;stroke-linecap:round;\" d=\"  M ".$point['x']." ".$point['y'];
+                    $path .= "<path id='stroke".$stroke_nr."' style=\"fill:none;stroke:".$point['color'].";stroke-width:5;stroke-linecap:round;\" d=\"  M ".$point['x']." ".$point['y'];
                 } else {
                     $path .= " L ".$point['x']." ".$point['y'];
                 }

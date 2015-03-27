@@ -11,20 +11,30 @@ function add_segmentation($recording_id) {
     $stmt->execute();
     $image_data = $stmt->fetchObject();
     $raw_data = $image_data->data;
-    $strokes = count(json_decode($raw_data, true));
 
-    // Assume it is one symbol
-    $segmentation = "";
-    for ($i=0; $i < $strokes-1; $i++) {
-        $segmentation .= "0";
-    }
+    $segmentation = create_initial_segmentation($raw_data);
 
     $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".
            "WHERE `id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $recording_id, PDO::PARAM_INT);
-    $stmt->bindParam(':segmentation', $segmentation);
+    $stmt->bindParam(':segmentation', json_encode($segmentation));
     $stmt->execute();
+}
+
+function array_delete($array, $element) {
+    return array_diff($array, [$element]);
+}
+
+
+function create_initial_segmentation($recording_point_list) {
+    $stroke_count = count($recording_point_list);
+    // Assume it is exactly one symbol in the recording.
+    $segmentation = array(array());
+    for ($i=0; $i < $stroke_count; $i++) {
+        $segmentation[0][] = $i;
+    }
+    return $segmentation;
 }
 
 
@@ -41,32 +51,80 @@ function add_segmentation($recording_id) {
  */
 function make_valid_segmentation($recording_point_list, $segmentation) {
     global $pdo;
-    $required_chars = count($recording_point_list) - 1;
-    if (is_null($segmentation)) {
-        $segmentation = "";
-        for ($i=0; $i < $required_chars; $i++) { 
-            $segmentation .= "0";
-        }
+    assert(is_null($segmentation)||is_array($segmentation),
+           '$segmentation is neither NULL nor array. '.
+           'It is '.gettype($segmentation).".");
+    $was_invalid = false;
+    if (is_null($segmentation) || count($segmentation) == 0) {
+        $segmentation = create_initial_segmentation($recording_point_list);
+        $was_invalid = true;
     } else {
-        if (strlen($segmentation) > $required_chars) {
-            $segmentation = substr($segmentation, 0, $required_chars);
-        } elseif (strlen($segmentation) < $required_chars) {
-            for ($i=strlen($segmentation); $i < $required_chars; $i++) { 
-                $segmentation .= "0";
+        $stroke_count = count($recording_point_list);
+
+        // Get rid of everything not in 0...$stroke_count-1
+        $new_segmentation = array();
+        for ($symbol_i=0; $symbol_i < count($segmentation); $symbol_i++) {
+            $new_symbol = array();
+            $symbol = $segmentation[$symbol_i];
+            for ($stroke_i=0; $stroke_i < count($symbol); $stroke_i++) {
+                $stroke_id = $symbol[$stroke_i];
+                if (0 <= $stroke_id && $stroke_id < $stroke_count) {
+                    $new_symbol[] = $stroke_id;
+                } else {
+                    $was_invalid = true;
+                }
             }
-        } else {
-            // It was already valid
-            return $segmentation;
+            if (count($new_symbol) > 0) {
+                $new_segmentation[] = $new_symbol;
+            } else {
+                $was_invalid = true;
+            }
+        }
+
+        if (count($segmentation) == 0) {
+            $was_invalid = true;
+            $segmentation = create_initial_segmentation($recording_point_list);
+        }
+
+        // Now we know we don't have too much in our segmentation.
+        // Lets make sure we have enough in it.
+        // Make sure that the numbers 0...$stroke_count are in the
+        // segmentation.
+
+        // Get a list of keys 0...$stroke_count which we want to see
+        // in the segmentation
+        $required_keys = array();
+        for ($stroke_i=0; $stroke_i < $stroke_count; $stroke_i++) {
+            $required_keys[] = $stroke_i;
+        }
+
+        for ($symbol_i=0; $symbol_i < count($segmentation); $symbol_i++) {
+            $new_symbol = array();
+            $symbol = $segmentation[$symbol_i];
+            for ($stroke_i=0; $stroke_i < count($symbol); $stroke_i++) {
+                $stroke_id = $symbol[$stroke_i];
+                $required_keys = array_delete($required_keys, $stroke_id);
+            }
+        }
+
+        if (count($required_keys) > 0) {
+            $was_invalid = true;
+            // There are still some stroke keys left. Lets assume they all
+            // belong to one symbol.
+            $segmentation[] = array_values($required_keys);
         }
     }
 
-    // Segmentation was invalid. Update in DB
-    $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".
-           "WHERE `id` = :id;";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $recording_id, PDO::PARAM_INT);
-    $stmt->bindParam(':segmentation', $segmentation);
-    $stmt->execute();
+    if ($was_invalid) {
+        // Segmentation was invalid. Update in DB
+        $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".
+               "WHERE `id` = :id;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $recording_id, PDO::PARAM_INT);
+        $json_segmentation = json_encode($segmentation);
+        $stmt->bindParam(':segmentation', $json_segmentation);
+        $stmt->execute();
+    }
 
     return $segmentation;
 }
