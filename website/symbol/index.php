@@ -166,7 +166,7 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'edit_flag' => $edit_flag,
                                        'images' => $images,
                                        'total' => $total,
-                                       'pages' => floor(($total)/$page_size),
+                                       'pages' => ceil(($total)/$page_size),
                                        'currentPage' => $currentPage,
                                        'tab' => $tab
                                        )

@@ -11,7 +11,7 @@
 
       {% set leftdots = false %}
       {% set rightdots = false %}
-      {% for i in 1..(pages+1) %}
+      {% for i in 1..(pages) %}
         {% if (0<=i-currentPage and i-currentPage <= delta) or (0<= currentPage-i and currentPage-i <= delta) %}
         <li {% if i == currentPage %}class="active"{% endif %}><a href="?page={{ i }}{{ append_information }}">{{ i }}</a></li>
         {% elseif (0 <= currentPage-i) and (leftdots == false)%}

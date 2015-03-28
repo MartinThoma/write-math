@@ -148,7 +148,7 @@ echo $twig->render('gallery.twig', array('heading' => 'Gallery',
                                          'file'=> "gallery",
                                          'userimages' => $userimages,
                                          'total' => $total,
-                                         'pages' => floor(($total)/14),
+                                         'pages' => ceil(($total)/14),
                                          'currentPage' => $currentPage,
                                          'tab' => $tab
                                         )

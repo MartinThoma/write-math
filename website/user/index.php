@@ -49,7 +49,7 @@ if ($user !== false) {
                                           'languages' => $languages,
                                           'userimages' => $userimages,
                                           'total' => $total,
-                                          'pages' => floor(($total)/14),
+                                          'pages' => ceil(($total)/14),
                                           'currentPage' => $currentPage
                                           )
                       );
