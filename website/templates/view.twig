@@ -13,7 +13,20 @@
         style="width:400px;height:400px;border:1px solid black;"
 ></object>
 <!-- <img src="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}" style="width:400px;height:400px;border:1px solid black;"/> -->
+{% if image_data.user_id == uid or uid == 10 %}
+<form class="form-inline" role="form" method="post">
+  <input type="hidden" name="raw_id_description" value="{{ raw_data_id }}" />
+  <div class="form-group">
+    <textarea id="description" name="description" class="form-control" rows="4" cols="50">{{ image_data.description }}</textarea>
+  </div>
+  <button type="submit" class="btn btn-default">update</button>
+</form>
 
+{% else %}
+{% if image_data.description|length > 0 %}
+<p><b>Description</b>: {{ image_data.description }}</p>
+{% endif %}
+{% endif %}
 </div>
 <div class="col-md-6">
 <form action="?raw_data_id={{ raw_data_id }}" method="post">
@@ -206,8 +219,8 @@
                    id="wild_point_count"
                    name="wild_point_count"
                    value="{{ image_data.wild_point_count }}"
-                   accesskey="w" />
-            <button type="submit" class="btn btn-success">Submit</button>
+                   accesskey="w"
+                   onchange="this.form.submit()" />
         </form>
     </td>
   </tr>

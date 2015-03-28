@@ -67,6 +67,19 @@ if (isset($_POST['nr_of_lines'])) {
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_POST['raw_id_description'])) {
+    $sql = "UPDATE `wm_raw_draw_data` SET `description` = :description ".
+           "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
+           "AND (`user_id` = :user_id OR :user_id = 10);";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':raw_id', $_POST['raw_id_description'], PDO::PARAM_INT);
+    $stmt->bindParam(':description', $_POST['description']);
+    $uid = get_uid();
+    $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+
+    # Redirect to prevent multiple submission
+    header("Location: ../view/?raw_data_id=".$_POST['raw_id_description']);
 } elseif (isset($_POST['raw_id_segmentation'])) {
     $sql = "UPDATE `wm_raw_draw_data` SET `segmentation` = :segmentation ".
            "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
@@ -338,7 +351,7 @@ if (isset($_GET['raw_data_id'])) {
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
            "`has_too_long_line`, `is_in_testset`, `segmentation`, ".
-           "`stroke_segmentable` ".
+           "`stroke_segmentable`, `description` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
