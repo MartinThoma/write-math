@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`),
-) ENGINE=InnoDB AUTO_INCREMENT=239259 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=239299 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -331,7 +331,7 @@ CREATE TABLE IF NOT EXISTS `wm_votes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uservote` (`user_id`,`raw_data2formula_id`),
   KEY `raw_data2formula_id` (`raw_data2formula_id`),
-) ENGINE=InnoDB AUTO_INCREMENT=15888 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=15889 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
