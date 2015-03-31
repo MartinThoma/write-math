@@ -18,23 +18,6 @@ CREATE TABLE IF NOT EXISTS `wm_challenges` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `wm_dtw_worker_data`
---
-
-CREATE TABLE IF NOT EXISTS `wm_dtw_worker_data` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `data` text COLLATE utf8_bin NOT NULL,
-  `preprocessed_data` text COLLATE utf8_bin NOT NULL,
-  `nr_of_symbols` int(11) NOT NULL,
-  `accepted_formula_id` int(11) DEFAULT NULL,
-  `nr_of_lines` tinyint(4) NOT NULL,
-  `nr_of_points` tinyint(4) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
 -- Tabellenstruktur für Tabelle `wm_flags`
 --
 

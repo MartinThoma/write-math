@@ -3,12 +3,6 @@
 --
 
 --
--- Constraints der Tabelle `wm_dtw_worker_data`
---
-ALTER TABLE `wm_dtw_worker_data`
-  ADD CONSTRAINT `wm_dtw_worker_data_ibfk_1` FOREIGN KEY (`id`) REFERENCES `wm_raw_draw_data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Constraints der Tabelle `wm_flags`
 --
 ALTER TABLE `wm_flags`
