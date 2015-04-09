@@ -6,9 +6,12 @@
 <div class="container-fluid well span6">
   <div class="row-fluid">
         <div class="span2" >
-          <img src="{{ gravatar }}?s=140&r=g&d=mm" class="img-circle">
+            <div class="row">
+                <div class="col-md-2"><img src="{{ gravatar }}?s=140&r=g&d=mm" class="img-circle"></div>
+                <div class="col-md-8">{{ user.description|raw }}</div>
+            </div>
         </div>
-        
+
         <div class="span8">
             <form action="" method="post" role="form">
               <div class="form-group">
@@ -60,7 +63,7 @@
   {% for image in userimages %}
    <li class="gallerybox" style="width: 155px">
      <div style="width: 155px">
-       <div class="thumb" style="width: 150px;">
+       <div class="thumb" style="width: 150px;{% if image.accepted_formula_id %}background-color:#ddffdd;{% endif %}">
          <div style="margin:21px auto;">
            <a href="../view?raw_data_id={{ image.id }}"><img src="../raw-data/{{ image.id }}.svg"
               width="140px"

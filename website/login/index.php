@@ -52,7 +52,13 @@ function login($email, $upass) {
             merge_accounts($ip_id, $user->id);
         }
 
-        header('Location: ../train');
+        if (isset($_GET['redirect'])) {
+            $redirect = $_GET['redirect'];
+        } else {
+            $redirect = '../classify';
+        }
+
+        header("Location: $redirect");
     } else {
         $_SESSION['is_logged_in'] = false;
         $msg[] = array("class" => "alert-warning",

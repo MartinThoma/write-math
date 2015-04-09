@@ -67,7 +67,7 @@
             <li {% if file == 'profile' %}class="active"{% endif %}><a href="../profile">{{ display_name }}</a></li>
           </ul>
         {% else %}
-          <form class="navbar-form navbar-right" role="form" method="post" action="../login/index.php">
+          <form class="navbar-form navbar-right" role="form" method="post" action="../login/index.php?redirect=../{{file}}">
             <div class="form-group">
               <input type="email" required
                      placeholder="Email"

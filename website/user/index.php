@@ -2,7 +2,8 @@
 require_once '../svg.php';
 include '../init.php';
 
-$sql = "SELECT `id`, `email`, `display_name`, `language`, `handedness` ".
+$sql = "SELECT `id`, `email`, `display_name`, `language`, `handedness`, ".
+       "`description` ".
        "FROM `wm_users` WHERE `id` = :uid";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':uid', $_GET['id'], PDO::PARAM_INT);
@@ -10,8 +11,8 @@ $stmt->execute();
 $user =$stmt->fetchObject();
 
 if ($user !== false) {
-    $sql = "SELECT  `language_code` ,  `english_language_name` 
-    FROM  `wm_languages` 
+    $sql = "SELECT  `language_code` ,  `english_language_name`
+    FROM  `wm_languages`
     ORDER BY  `english_language_name` ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -29,7 +30,8 @@ if ($user !== false) {
 
     // Get all raw data of this user
     $currentPage = isset($_GET['page']) ? intval($_GET['page']) : 1;
-    $sql = "SELECT `id`, `data` as `image`, `creation_date` ".
+    $sql = "SELECT `id`, `data` as `image`, `creation_date`, ".
+           "`accepted_formula_id` ".
            "FROM `wm_raw_draw_data` ".
            "WHERE `user_id` = :uid ".
            "ORDER BY `creation_date` DESC ".
@@ -39,6 +41,9 @@ if ($user !== false) {
     $stmt->bindParam(':uid', $_GET['id'], PDO::PARAM_STR);
     $stmt->execute();
     $userimages = $stmt->fetchAll();
+
+    $Parsedown = new Parsedown();
+    $user->description = $Parsedown->text($user->description);
 
     echo $twig->render('user.twig', array('heading' => 'User \''.$user->display_name.'\'',
                                           'file' => "user",
