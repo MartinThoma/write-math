@@ -351,7 +351,7 @@ if (isset($_GET['raw_data_id'])) {
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
            "`has_too_long_line`, `is_in_testset`, `segmentation`, ".
-           "`stroke_segmentable`, `description` ".
+           "`stroke_segmentable`, `wm_raw_draw_data`.`description` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
