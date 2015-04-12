@@ -114,7 +114,7 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     // Calculate path for fabric.js
-    $image["path"] = get_path($image["data"]);
+    $image["path"] = get_path_pure($image["data"]);
     $dots = get_dots($image["data"]);
 
     // Draw points

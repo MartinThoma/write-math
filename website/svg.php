@@ -120,6 +120,31 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
     file_put_contents ("../raw-data/$raw_data_id.svg", $contents);
 }
 
+function get_path_pure($data, $epsilon=0) {
+    $path = "";
+    $data = pointLineList($data);
+    if (!is_array($data)) {
+        echo "This was not an array!"; // TODO debug message
+        var_dump($data);
+        return false;
+    }
+    if ($epsilon > 0) {
+        $data = apply_linewise_douglas_peucker($data, $epsilon);
+    }
+    foreach ($data as $line) {
+        //if (count($line) > 1) {
+            foreach ($line as $i => $point) {
+                if ($i == 0) {
+                    $path .= " M ".$point['x']." ".$point['y'];
+                } else {
+                    $path .= " L ".$point['x']." ".$point['y'];
+                }
+            }
+        //}
+    }
+    return $path;
+}
+
 function get_path($data, $epsilon=0) {
     $path = "";
     $data = pointLineList($data);
