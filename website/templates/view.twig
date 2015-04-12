@@ -32,6 +32,21 @@
 <form action="?raw_data_id={{ raw_data_id }}" method="post">
 <table class="table" role="table">
   <tr>
+    <th>Accepted formula</th>
+    <td>
+    {% if image_data.accepted_formula_id is null %}
+    None so far
+    {% else %}
+    <a href="../symbol/?id={{ image_data.accepted_formula_id }}"><img 
+              src="../formulas/{{ image_data.accepted_formula_id }}-{{ image_data.accepted_formula_id_best_rendering }}.svg"
+                 width="150" style="width:50px;max-height:50px;" /> ({{ image_data.accepted_formula_id }})</a>
+        {% if image_data.user_id == uid or uid == 10 %}
+            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="u">unaccept</a>
+        {% endif %}
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
     <th>nr of symbols</th>
   {% if image_data.user_id == uid or uid == 10 %}
     <td>
@@ -120,21 +135,6 @@
   <tr>
     <th>User</th>
     <td><a href="../user/?id={{ image_data.user_id }}">{{ image_data.display_name }}</a></td>
-  </tr>
-  <tr>
-    <th>Accepted formula</th>
-    <td>
-    {% if image_data.accepted_formula_id is null %}
-    None so far
-    {% else %}
-    <a href="../symbol/?id={{ image_data.accepted_formula_id }}"><img 
-              src="../formulas/{{ image_data.accepted_formula_id }}-{{ image_data.accepted_formula_id_best_rendering }}.svg"
-                 width="150" style="width:50px;max-height:50px;" /> ({{ image_data.accepted_formula_id }})</a>
-        {% if image_data.user_id == uid or uid == 10 %}
-            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="u">unaccept</a>
-        {% endif %}
-    {% endif %}
-    </td>
   </tr>
   <tr>
     <th>Analyze</th>
