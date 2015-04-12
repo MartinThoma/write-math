@@ -17,7 +17,7 @@ def process_single_symbol(filename):
         f = json.loads(content)
     except Exception, e:
         f = {'doc': content}
-    
+
     if 'data' in f['doc']:
         rawdata, symbol = f['doc']['data'], f['doc']['id']
         for line in rawdata:
@@ -32,6 +32,7 @@ def process_single_symbol(filename):
 
 
 def parse_detexify_id(detexify_id):
+    """Parse an id from Detexify into package, encoding and symbol."""
     splitted = detexify_id.split("-")
     package, encoding, symbol = splitted[0], splitted[1], splitted[2:]
     symbol = "-".join(symbol)
