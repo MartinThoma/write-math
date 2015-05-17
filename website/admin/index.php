@@ -89,6 +89,7 @@ if (isset($_GET['delete_formula'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $_GET['delete_formula'], PDO::PARAM_STR);
     $stmt->execute();
+    header("Location: ../admin");
 }
 
 if (isset($_GET['delete'])) {
@@ -96,6 +97,7 @@ if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete'], PDO::PARAM_STR);
     $stmt->execute();
+    header("Location: ../admin");
 }
 
 if (isset($_GET['delete_inactive_user'])) {
@@ -104,6 +106,7 @@ if (isset($_GET['delete_inactive_user'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $_GET['delete_inactive_user'], PDO::PARAM_STR);
     $stmt->execute();
+    header("Location: ../admin");
 } elseif (isset($_GET['delete_all_inactive_users'])) {
     // See http://stackoverflow.com/a/4562797/562769
     $sql = "DELETE FROM `wm_users` WHERE `id` IN ( ".
