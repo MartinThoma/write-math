@@ -1,12 +1,23 @@
 <?php
 
-function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode", 
+require_once('../latex.php');
+
+function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
                             $packages="") {
     global $pdo;
+    global $msg;
 
     // Very simple spam check (TODO: improve)
     if (strpos($latex,'http://') !== false || strpos($latex,'https://') !== false) {
         return '';
+    }
+
+    // Normalize
+    $latex_new = normalize($latex);
+    if ($latex != $latex_new) {
+        $msg[] = array("class" => "alert-info",
+                        "text" => "LaTex was normalized from '$latex' to '$latex_new'.");
+        $latex = $latex_new;
     }
 
     // Get formula id if it is already in the database
