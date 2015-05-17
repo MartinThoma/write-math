@@ -14,6 +14,48 @@
     <li><a href="http://www.martin-thoma.de/write-math/stats/">Symbol stats</a></li>
 </ul>
 
+{% if without_example|length > 0 %}
+<h2>Formulas without examples</h2>
+<table class="table table-striped">
+    <tr>
+        <th>&nbsp;</th>
+        <th>Name</th>
+        <th>Image</th>
+        <th>User</th>
+        <th>Answers</th>
+    </tr>
+    {% for formula in without_example %}
+    <tr>
+        <td>{{ loop.index }} <a href="?delete_formula={{ formula.id }}"><img src="../icons/cross.png" alt="delete" /></a></td>
+        <td><code>{{ formula.formula_name }}</code> (<a href="../symbol/?id={{ formula.id }}">Formula page</a>)</td>
+        <td>{% if formula.best_rendering != '' %}<img src="../formulas/{{ formula.best_rendering }}" />{% else %}-{% endif %}</td>
+        <td><a href="../user/?id={{ formula.user_id }}">{{ formula.user_id }}</a></td>
+        <td>
+        {% for answer in formula_answers[formula.id] %}
+            <a href="../view/?raw_data_id={{ answer.raw_data_id }}">{{ answer.raw_data_id }}</a>
+        {% endfor %}
+        </td>
+    </tr>
+    {% endfor%}
+</table>
+{% endif %}
+
+
+<h2>Merge Formulas</h2>
+<form role="form" method="get">
+  <div class="form-group">
+    <label for="formulaA">Formula A ID (gets deleted)</label>
+    <input type="number" class="form-control"
+           id="formulaA" name="formulaA" placeholder="91">
+  </div>
+  <div class="form-group">
+    <label for="formulaB">Formula B ID (remains)</label>
+    <input type="number" class="form-control"
+           id="formulaB" name="formulaB" placeholder="10">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
 
 {% if flags|length > 0 %}
 <h2>Flags</h2>

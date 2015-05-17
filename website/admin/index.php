@@ -18,6 +18,50 @@ function endsWith($haystack, $needle) {
     return (substr($haystack, -$length) === $needle);
 }
 
+function merge_formulas($fid_a, $fid_b) {
+    global $pdo;
+    global $msg;
+    // a gets deleted, b remains
+    $sql = "SELECT `id`, `formula_type`, `is_important` ".
+           "FROM `wm_formula` ".
+           "WHERE `id`=:ida OR `id`=:idb AND ".
+           "`is_important`=0 AND ".
+           "(NOT (`formula_type`='single symbol') OR `formula_type` IS NULL)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':ida', $fid_a, PDO::PARAM_INT);
+    $stmt->bindParam(':idb', $fid_b, PDO::PARAM_INT);
+    $stmt->execute();
+    $formulas = $stmt->fetchAll();
+
+    $i = 0;
+    foreach ($formulas as $formula) {
+        $i += 1;
+    }
+
+    if ($i != 2) {
+        $msg[] = array("class" => "alert-warning",
+                       "text" => "Could not be merged. One was not a formula.");
+        return -1;
+    }
+
+    // Adjust accepted ids
+    $sql = "UPDATE `wm_raw_draw_data` SET `accepted_formula_id` = :idb ".
+           "WHERE  `accepted_formula_id` = :ida LIMIT 20;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':ida', $fid_a, PDO::PARAM_INT);
+    $stmt->bindParam(':idb', $fid_b, PDO::PARAM_INT);
+    $stmt->execute();
+
+    // Adjust peoples answers
+    $sql = "UPDATE `wm_raw_data2formula` SET `formula_id` = :ida ".
+           "WHERE  `formula_id` = :idb LIMIT 20;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':ida', $fid_a, PDO::PARAM_INT);
+    $stmt->bindParam(':idb', $fid_b, PDO::PARAM_INT);
+    $stmt->execute();
+    // The normalized answer could already exist. TODO: Deal with it.
+}
+
 if (isset($_GET['cache-flush'])) {
     if ($_GET['cache-flush'] == 'raw') {
         $files = glob('../raw-data/*');
@@ -38,6 +82,13 @@ if (isset($_GET['cache-flush'])) {
             system('/bin/rm -rf ' . escapeshellarg($file));
         }
     }
+}
+
+if (isset($_GET['delete_formula'])) {
+    $sql = "DELETE FROM `wm_formula` WHERE `id` = :fid AND :fid > 1000 LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':fid', $_GET['delete_formula'], PDO::PARAM_STR);
+    $stmt->execute();
 }
 
 if (isset($_GET['delete'])) {
@@ -93,6 +144,23 @@ if (isset($_GET['many_lines'])) {
     usort($many_lines, 'sortByLineNumber');
 }
 
+// Merge formulas
+$formulaA = '';
+$formulaB = '';
+if (isset($_GET['formulaA']) && isset($_GET['formulaB'])) {
+    $a_id = $_GET['formulaA'];
+    $b_id = $_GET['formulaB'];
+    $ret_code = merge_formulas($a_id, $b_id);
+    if ($ret_code != -1) {
+        $msg[] = array("class" => "alert-success",
+                       "text" => "Your have merged formula id $a_id ".
+                                 "to formula id $b_id.");
+        ;
+    }
+}
+
+
+// Merge user accounts
 $accountA = '';
 $accountB = '';
 if (isset($_GET['accountA']) && isset($_GET['accountB'])
@@ -147,6 +215,28 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $without_unicode = $stmt->fetchAll();
 
+// Get symbols/formulas which don't have any example
+$sql = "SELECT * FROM `wm_formula` ".
+       "WHERE `id` NOT IN (".
+       "SELECT DISTINCT `wm_raw_draw_data`.`accepted_formula_id` ".
+       "FROM `wm_raw_draw_data` ".
+       "WHERE `wm_raw_draw_data`.`accepted_formula_id` IS NOT NULL) ".
+       "ORDER BY `user_id` ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$without_example = $stmt->fetchAll();
+
+$formula_answers = array();
+foreach ($without_example as $key => $formula) {
+    $sql = "SELECT `raw_data_id`  FROM `wm_raw_data2formula` ".
+           "WHERE `formula_id` = :fid";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':fid', $formula['id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $answers = $stmt->fetchAll();
+    $formula_answers[$formula['id']] = $answers;
+}
+
 echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'file' => "admin",
                                        'logged_in' => is_logged_in(),
@@ -157,7 +247,9 @@ echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'accountA' => $accountA,
                                        'accountB' => $accountB,
                                        'inactive_users' => $inactive_users,
-                                       'without_unicode' => $without_unicode
+                                       'without_unicode' => $without_unicode,
+                                       'without_example' => $without_example,
+                                       'formula_answers' => $formula_answers
                                        )
                   );
 
