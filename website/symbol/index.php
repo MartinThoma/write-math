@@ -17,11 +17,14 @@ if (isset($_GET['delete']) && is_admin()) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['delete'], PDO::PARAM_INT);
     $stmt->execute();
-    $msg[] = array("class" => "alert-danger",
-           "text" => "Symbol was deleted.");
-    $msg[] = array("class" => "alert-danger",
-           "text" => "This block is too dangerous. You have to uncomment"
-                    ."it in symbol/index.php (line 12-19).");
+    if ($id > $_GET['delete']) {
+        $msg[] = array("class" => "alert-danger",
+               "text" => "Symbol was deleted.");
+    } else {
+        $msg[] = array("class" => "alert-danger",
+               "text" => "This block is too dangerous. You have to uncomment"
+                        ."it for id<=1556 in symbol/index.php (line 12-19).");
+    }
 }
 
 if (isset($_POST['id']) && is_admin()) {
