@@ -4,6 +4,11 @@ function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
                             $packages="") {
     global $pdo;
 
+    // Very simple spam check (TODO: improve)
+    if (strpos($latex,'http://') !== false || strpos($latex,'https://') !== false) {
+        return '';
+    }
+
     // Get formula id if it is already in the database
     $sql = "SELECT `id` FROM `wm_formula` ".
            "WHERE `formula_in_latex` = :latex";
