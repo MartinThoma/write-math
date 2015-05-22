@@ -188,6 +188,16 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':raw_data_id', $_GET['trash'], PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_GET['unclassifiable'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `classifiable` = 0 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['unclassifiable'], PDO::PARAM_INT);
+    $stmt->execute();
 } elseif (isset($_GET['missing_line'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `missing_line` = 1 ".
@@ -211,6 +221,16 @@ if (isset($_POST['nr_of_lines'])) {
 } elseif (isset($_GET['has_too_long_line'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `has_too_long_line` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+} elseif (isset($_GET['no_geometry'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `no_geometry` = 1 ".
            "WHERE `id` = :raw_data_id AND ".
            "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
     $stmt = $pdo->prepare($sql);
@@ -351,7 +371,8 @@ if (isset($_GET['raw_data_id'])) {
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
            "`has_too_long_line`, `is_in_testset`, `segmentation`, ".
-           "`stroke_segmentable`, `wm_raw_draw_data`.`description` ".
+           "`stroke_segmentable`, `wm_raw_draw_data`.`description`, ".
+           "`no_geometry`, `classifiable` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".
            "WHERE `wm_raw_draw_data`.`id` = :id";
@@ -435,6 +456,15 @@ $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
 $stmt->execute();
 $automatic_answers = $stmt->fetchAll();
 
+// Get strokes2symbol data
+$sql = "SELECT * FROM `wm_strokes_to_symbol` ".
+       "JOIN `wm_formula` ON `wm_formula`.`id` = `symbol_id` ".
+       "WHERE `raw_data_id` = :raw_data_id";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+$stmt->execute();
+$strokes2symbol = $stmt->fetchAll();
+
 echo $twig->render('view.twig', array('heading' => 'View',
                                       'logged_in' => is_logged_in(),
                                       'display_name' => $_SESSION['display_name'],
@@ -452,7 +482,8 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                       'bounding_box' => $bounding_box,
                                       'automatic_answers' => $automatic_answers,
                                       'time_resolution' => $time_resolution,
-                                      'force_reload' => $force_reload_raw_svg
+                                      'force_reload' => $force_reload_raw_svg,
+                                      'strokes2symbol' => $strokes2symbol
                                       )
                   );
 

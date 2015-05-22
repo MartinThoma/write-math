@@ -1,10 +1,32 @@
 {% extends "base.twig" %}
 
+{% block headerbuttons %}
+<div class="btn-toolbar pull-right">
+    <img src="../raw-data/{{ raw_data_id }}.svg" style="height:34px; max-width:60px" alt="rendering"/>
+    <a href="#answers" class="btn btn-primary" id="resultlink"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Answers</a>
+</div>
+{% endblock %}
+
 {% block header %}
 <script type="text/javascript" src="../js/segmentation.js"></script>
+<script type="text/javascript" src="../js/symbolstrokes.js"></script>
 {% endblock %}
 
 {% block content %}
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+    <li role="presentation"><a href="#information" aria-controls="information" role="tab" data-toggle="tab">Information</a></li>
+    {% if logged_in and account_type != 'IP-User' %}
+    <li role="presentation"><a href="#operations_pane" aria-controls="operations_pane" role="tab" data-toggle="tab">Operations</a></li>
+    {% endif %}
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="home">
 <div class="row">
 <div class="col-md-6">
 <object data="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}"
@@ -12,12 +34,12 @@
         id="canvas"
         style="width:400px;height:400px;border:1px solid black;"
 ></object>
-<!-- <img src="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}" style="width:400px;height:400px;border:1px solid black;"/> -->
+<!-- <img src="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}" alt="recording" style="width:400px;height:400px;border:1px solid black;"/> -->
 {% if image_data.user_id == uid or uid == 10 %}
 <form class="form-inline" role="form" method="post">
   <input type="hidden" name="raw_id_description" value="{{ raw_data_id }}" />
   <div class="form-group">
-    <textarea id="description" name="description" class="form-control" rows="4" cols="50">{{ image_data.description }}</textarea>
+    <textarea id="description" name="description" class="form-control" rows="1" cols="50">{{ image_data.description }}</textarea>
   </div>
   <button type="submit" class="btn btn-default">update</button>
 </form>
@@ -27,10 +49,9 @@
 <p><b>Description</b>: {{ image_data.description }}</p>
 {% endif %}
 {% endif %}
-</div>
+</div><!-- col-md-6-->
 <div class="col-md-6">
-<form action="?raw_data_id={{ raw_data_id }}" method="post">
-<table class="table" role="table">
+<table class="table">
   <tr>
     <th>Accepted formula</th>
     <td>
@@ -39,9 +60,9 @@
     {% else %}
     <a href="../symbol/?id={{ image_data.accepted_formula_id }}"><img 
               src="../formulas/{{ image_data.accepted_formula_id }}-{{ image_data.accepted_formula_id_best_rendering }}.svg"
-                 width="150" style="width:50px;max-height:50px;" /> ({{ image_data.accepted_formula_id }})</a>
+                 width="150" style="width:50px;max-height:50px;" alt="formula rendering" /> ({{ image_data.accepted_formula_id }})</a>
         {% if image_data.user_id == uid or uid == 10 %}
-            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="u">unaccept</a>
+            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" class="btn btn-warning" accesskey="u">unaccept</a>
         {% endif %}
     {% endif %}
     </td>
@@ -101,109 +122,12 @@
   </tr>
   {% endif %}
   <tr>
-    <th>strokes</th>
-    <td>{{ lines_nr }}</td>
-  </tr>
-  <tr>
-    <th>points</th>
-    <td>{{ points_nr }}</td>
-  </tr>
-  <tr>
-    <th>control points</th>
-    <td>{{ control_points }}</td>
-  </tr>
-  <tr>
-    <th>Bounding box (w &times; h)</th>
-    <td>{{ bounding_box.width }} &times; {{ bounding_box.height }}</td>
-  </tr>
-  <tr>
-    <th>Min. Time Delta</th>
-    <td>{% if time_resolution.min_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.min_time_resolution) }} ms{% endif %}</td>
-  </tr>
-  <tr>
-    <th>Avg. Time Delta</th>
-    <td>{% if time_resolution.average_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.average_time_resolution) }} ms{% endif %}</td>
-  </tr>
-  <tr>
-    <th>Max. Time Delta</th>
-    <td>{% if time_resolution.max_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms{% endif %}</td>
-  </tr>
-  <tr>
-    <th>Creation Date</th>
-    <td>{{ image_data.creation_date }}</td>
-  </tr>
-  <tr>
     <th>User</th>
     <td><a href="../user/?id={{ image_data.user_id }}">{{ image_data.display_name }}</a></td>
   </tr>
   <tr>
     <th>Analyze</th>
     <td><a href="../render/?raw_data_id={{ raw_data_id }}">Preprocessing</a></td>
-  </tr>
-  {% if image_data.user_id == uid or uid == 10 %}
-  <tr>
-    <th rowspan="7">Operations</th>
-    <td>
-        <a href="?delete={{ raw_data_id }}" type="button" class="btn btn-danger">Delete</a>
-        {% if uid == 10 %}
-        <a href="?raw_data_id={{ raw_data_id }}&rerender={{ raw_data_id }}" type="button" class="btn btn-danger">rerender</a>
-        <a href="?raw_data_id={{ raw_data_id }}&fix={{ raw_data_id }}" type="button" class="btn btn-danger">fix it</a>
-        {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.accepted_formula_id == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&trash={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Drawing is trash</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&trash={{ raw_data_id }}" type="button" class="btn btn-warning">Drawing is trash</a>
-    {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.missing_line == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&missing_line={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">One line is missing, but the end dot is visible</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&missing_line={{ raw_data_id }}" type="button" class="btn btn-warning" accesskey="m">One line is missing, but the end dot is visible</a>
-    {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.has_hook == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&has_hook={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Has hook</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&has_hook={{ raw_data_id }}" type="button" class="btn btn-warning">Has hook</a>
-    {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.has_too_long_line == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&has_too_long_line={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">Has much too long line</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&has_too_long_line={{ raw_data_id }}" type="button" class="btn btn-warning">Has much too long line</a>
-    {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.is_image == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning" disabled="true">This is an image, not a formula</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&is_image={{ raw_data_id }}" type="button" class="btn btn-warning">This is an image, not a formula</a>
-    {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td>
-    {% if image_data.is_in_testset == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&remove_from_testset={{ raw_data_id }}" type="button" class="btn btn-primary">Remove from testset</a>
-    {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&add_to_testset={{ raw_data_id }}" type="button" class="btn btn-primary">Add to testset</a>
-    {% endif %}
-    </td>
   </tr>
   <tr>
     <td>Number of <abbr title="Points that appeared by hardware mistakes and which are not connected to any line">wild points</abbr></td>
@@ -224,17 +148,11 @@
         </form>
     </td>
   </tr>
-  {% elseif logged_in and account_type != 'IP-User' %}
-  <tr>
-    <th>Operations</th>
-    <td><a href="?flag={{ raw_data_id }}" type="button" class="btn btn-danger">Flag</a></td>
-  </tr>
-  {% endif %}
 </table>
-</form>
-</div>
-</div>
+</div><!--col-md-6-->
+</div><!--row-->
 
+<a id="answers"></a>
 {% if automatic_answers|length > 0 %}
 <h2>Automatic Classifications</h2>
     {% for answer in automatic_answers %}
@@ -245,9 +163,9 @@
           <td>
             <a href="../symbol/?id={{ answer.formula_id }}"><img 
               src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
-                 width="150" style="width:150px;max-height:150px;" /></a>
+                 width="150" style="width:150px;max-height:150px;" alt="formula rendering" /></a>
           </td>
-          <td width="135px;">
+          <td style="width:135px;">
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
               <p>Mode: {{answer.mode}}</p>
               {% if answer.package != '' %}
@@ -258,9 +176,9 @@
           </td>
           <td>
             {% if answer.formula_id == image_data.accepted_formula_id %}
-              <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" /></a>
+              <a href="?raw_data_id={{ raw_data_id }}&amp;unaccept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" /></a>
             {% else %}
-          <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
+          <a href="?raw_data_id={{ raw_data_id }}&amp;accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
 "src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
             {% endif %}
           </td>
@@ -306,12 +224,12 @@
             {% if answer.formula_id == image_data.accepted_formula_id %}
               <img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" />
             {% else %}
-          <a href="?raw_data_id={{ raw_data_id }}&accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
+          <a href="?raw_data_id={{ raw_data_id }}&amp;accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
 "src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
             {% endif %}
             {% if answer.user_id == uid %}
             <br/>
-            <a href="?raw_data_id={{ raw_data_id }}&delete_answer={{ answer.id }}">Delete answer</a>
+            <a href="?raw_data_id={{ raw_data_id }}&amp;delete_answer={{ answer.id }}">Delete answer</a>
             {% endif %}
           </td>
         </tr>
@@ -320,12 +238,35 @@
     {% endfor %}
 {% endif %}
 
+{% if strokes2symbol|length > 0%}
+   <h2>Strokes to symbol mappings</h2>
+   <table class="table">
+        <tr>
+            <th>Symbol</th>
+            <th>Strokes</th>
+            <th>Image</th>
+        </tr>
+        {% for d in strokes2symbol %}
+        <tr>
+            <td><a href="../symbol/?id={{ d.symbol_id }}">{{ d.formula_in_latex }}</a></td>
+            <td>{{ d.strokes }}</td>
+            <td><object data="../raw-data/{{ raw_data_id }}.svg"
+        type="image/svg+xml"
+        id="rawdatavis_{{ loop.index }}"
+        data-strokes="{{ d.strokes }}"
+        style="width:400px;height:50px;border:1px solid black;"
+></object></td>
+        </tr>
+        {% endfor %}
+   </table>
+{% endif %}
+
    <h2>Add a new answer</h2>
    <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal" role="form">
      <input type="hidden" name="raw_data_id" value="{{ raw_data_id }}" />
      <div class="control-group">
        <label class="control-label" for="latex">LaTeX</label>
-       <div class="controls"> 
+       <div class="controls">
          <textarea name="latex" id="latex" class="form-control" rows="3"></textarea>
        </div>
        <p class="help-block">Please add only the code you would add in the
@@ -334,7 +275,7 @@
      </div>
 <!--       <div class="control-group">
        <label class="control-label" for="mode">Mode</label>
-       <div class="controls"> 
+       <div class="controls">
          <select class="form-control" id="mode" name="mode">
             <option>bothmodes</option>
             <option>mathmode</option>
@@ -370,7 +311,137 @@
      </div> -->
      <button type="submit" class="btn btn-success">Submit</button>
    </form>
+</div><!--tabpanel home-->
 
+<div role="tabpanel" class="tab-pane" id="information">
+    <table class="table table-striped">
+        <tr>
+            <th>strokes</th>
+            <td>{{ lines_nr }}</td>
+        </tr>
+        <tr>
+            <th>points</th>
+            <td>{{ points_nr }}</td>
+        </tr>
+        <tr>
+        <th>control points</th>
+        <td>{{ control_points }}</td>
+        </tr>
+        <tr>
+        <th>Bounding box (w &times; h)</th>
+        <td>{{ bounding_box.width }} &times; {{ bounding_box.height }}</td>
+        </tr>
+        <tr>
+        <th>Min. Time Delta</th>
+        <td>{% if time_resolution.min_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.min_time_resolution) }} ms{% endif %}</td>
+        </tr>
+        <tr>
+        <th>Avg. Time Delta</th>
+        <td>{% if time_resolution.average_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.average_time_resolution) }} ms{% endif %}</td>
+        </tr>
+        <tr>
+        <th>Max. Time Delta</th>
+        <td>{% if time_resolution.max_time_resolution == -1 %}-{% else %}{{ '%02.2f'|format(time_resolution.max_time_resolution) }} ms{% endif %}</td>
+        </tr>
+        <tr>
+        <th>Creation Date</th>
+        <td>{{ image_data.creation_date }}</td>
+        </tr>
+    </table>
+</div>
+
+<div role="tabpanel" class="tab-pane" id="operations_pane">
+    <table class="table">
+  {% if image_data.user_id == uid or uid == 10 %}
+  <tr>
+    <th rowspan="7">Operations</th>
+    <td>
+        <a href="?delete={{ raw_data_id }}" class="btn btn-danger">Delete</a>
+        {% if uid == 10 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;rerender={{ raw_data_id }}" class="btn btn-danger">rerender</a>
+        <a href="?raw_data_id={{ raw_data_id }}&amp;fix={{ raw_data_id }}" class="btn btn-danger">fix it</a>
+        {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <div class="btn-group" role="group" aria-label="...">
+    {% if image_data.accepted_formula_id == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning" disabled="true">Drawing is trash</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning">Drawing is trash</a>
+    {% endif %}
+    {% if image_data.classifiable == 0 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;unclassifiable={{ raw_data_id }}" class="btn btn-warning" disabled="true">not classifiable</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;unclassifiable={{ raw_data_id }}" class="btn btn-warning">not classifiable</a>
+    {% endif %}
+    </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.missing_line == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;missing_line={{ raw_data_id }}" class="btn btn-warning" disabled="true">One line is missing, but the end dot is visible</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;missing_line={{ raw_data_id }}" class="btn btn-warning" accesskey="m">One line is missing, but the end dot is visible</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <div class="btn-group" role="group" aria-label="...">
+    {% if image_data.has_hook == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_hook={{ raw_data_id }}" class="btn btn-warning" disabled="true">Has hook</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_hook={{ raw_data_id }}" class="btn btn-warning">Has hook</a>
+    {% endif %}
+    {% if image_data.has_too_long_line == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_too_long_line={{ raw_data_id }}" class="btn btn-warning" disabled="true">Has much too long line</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_too_long_line={{ raw_data_id }}" class="btn btn-warning">Has much too long line</a>
+    {% endif %}
+    </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.no_geometry == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;no_geometry={{ raw_data_id }}" class="btn btn-warning" disabled="true">No Geometry</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;no_geometry={{ raw_data_id }}" class="btn btn-warning">No Geometry</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.is_image == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning" disabled="true">This is an image, not a formula</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning">This is an image, not a formula</a>
+    {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    {% if image_data.is_in_testset == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;remove_from_testset={{ raw_data_id }}" class="btn btn-primary">Remove from testset</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;add_to_testset={{ raw_data_id }}" class="btn btn-primary">Add to testset</a>
+    {% endif %}
+    </td>
+  </tr>
+  {% elseif logged_in and account_type != 'IP-User' %}
+  <tr>
+    <th>Operations</th>
+    <td><a href="?flag={{ raw_data_id }}" class="btn btn-danger">Flag</a></td>
+  </tr>
+  {% endif %}
+    </table>
+
+</div> <!-- tabpanel-->
+</div> <!-- tab-content-->
+</div> <!-- tabpanel-->
 
 
 <!-- MathJax -->
@@ -437,4 +508,15 @@ MathJax.Hub.Queue(function() {
         }, false);
 
     </script>
+{% endblock %}
+
+{% block footer %}
+<script>
+{% for d in strokes2symbol %}
+    var rawdataobj{{loop.index}} = document.getElementById('rawdatavis_{{loop.index}}');
+    rawdataobj{{loop.index}}.addEventListener("load",function(){
+        visualizeSymbolStrokes(document.getElementById('rawdatavis_{{loop.index}}'));
+    });
+{% endfor %}
+</script>
 {% endblock %}
