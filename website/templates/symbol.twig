@@ -15,13 +15,13 @@
     <style>
         @font-face {
             font-family: 'STIXGeneral';
-            src: 
+            src:
             url('../fonts/STIXGeneral.woff') format('woff');
             font-style: normal;
         }
         @font-face {
             font-family: 'STIXNonUnicode';
-            src: 
+            src:
             url('../fonts/STIXNonUniIta.woff') format('woff');
             font-style: italic;
         }
@@ -45,7 +45,7 @@
     <input type="hidden" name="id" value="{{ formula.id }}" />
     <div class="control-group">
         <label class="control-label" for="latex">LaTeX</label>
-        <div class="controls"> 
+        <div class="controls">
             <input type="text" class="form-control"
                    placeholder="\alpha" disabled
                    id="latex" name="latex"
@@ -54,7 +54,7 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="formula_name">Formula Name</label>
-        <div class="controls"> 
+        <div class="controls">
             <input type="text" class="form-control"
                    placeholder="&alpha;"
                    id="formula_name" name="formula_name"
@@ -62,8 +62,17 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label" for="tags">Tags (always singular, separated by a space)</label>
+        <div class="controls">
+            <input type="text" class="form-control"
+                   placeholder="arrow cyrillic-alphabet"
+                   id="tags" name="tags"
+                   value="{% for tag in tags %}{{ tag.tag_name }} {% endfor %}" />
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label" for="unicode_dec">unicode_dec: &#{{ formula.unicode_dec }};</label>
-        <div class="controls"> 
+        <div class="controls">
             <input type="number" min="0" class="form-control"
                    placeholder="&alpha;"
                    id="unicode_dec" name="unicode_dec"
@@ -72,7 +81,7 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="font">font</label>
-        <div class="controls"> 
+        <div class="controls">
             <input type="text" class="form-control"
                    placeholder="STIXGeneral"
                    id="font" name="font"
@@ -81,7 +90,7 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="font_style">font_style</label>
-        <div class="controls"> 
+        <div class="controls">
             <input type="text" class="form-control"
                    placeholder="normal"
                    id="font_style" name="font_style"
@@ -90,7 +99,7 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="mode">Mode</label>
-        <div class="controls"> 
+        <div class="controls">
             <select class="form-control" id="mode" name="mode">
                 <option {% if formula.mode == 'bothmodes' %}selected{% endif %}>bothmodes</option>
                 <option {% if formula.mode == 'mathmode' %}selected{% endif %}>mathmode</option>
@@ -100,7 +109,7 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="formula_type">Type</label>
-        <div class="controls"> 
+        <div class="controls">
             <select class="form-control" id="formula_type" name="formula_type">
                 {% if formula.formula_type == NULL %}
                   <option selected="selected" value="NULL">Not set</option>
@@ -146,13 +155,13 @@
     </div>
     <div class="control-group">
         <label class="control-label" for="description">Description</label>
-        <div class="controls"> 
+        <div class="controls">
             <textarea class="form-control" rows="7" name="description" id="description">{{ formula.description}}</textarea>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="svg">SVG</label>
-        <div class="controls"> 
+        <div class="controls">
             <textarea class="form-control" rows="20" name="svg" id="svg">{{ formula.svg }}</textarea>
         </div>
     </div>
@@ -198,6 +207,9 @@
 {% endif %}
 
 <p><b>Name</b>: {{ formula.formula_name }}</p>
+{% if tags|length > 0%}
+<p><b>Tags</b>: {% for tag in tags %}<a href="../tags/{{ tag.tag_name }}" class="label label-primary">{{ tag.tag_name }}</a> {% endfor %}</p>
+{% endif %}
 <p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
 <p><b>Mode</b>: {{ formula.mode }}</p>
 <p><b>Type</b>: {{ formula.formula_type }}</p>

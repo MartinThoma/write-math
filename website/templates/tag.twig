@@ -1,0 +1,39 @@
+{% extends "base.twig" %}
+
+{% block header %}
+    <style>
+        @font-face {
+            font-family: 'STIXGeneral';
+            src:
+            url('../fonts/STIXGeneral.woff') format('woff');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'STIXNonUnicode';
+            src:
+            url('../fonts/STIXNonUniIta.woff') format('woff');
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<p>{{ tag_info.description |raw }}</p>
+
+   <ul class="gallery mw-gallery-traditional">
+    {% for symbol in symbols %}
+     <li class="gallerybox" style="width: 155px">
+       <div style="width: 155px">
+         <div class="thumb" style="width: 150px;">
+           <div style="margin:21px auto;">
+             <a href="../symbol/?id={{symbol.symbol_id}}"><img 
+              src="../formulas/{{ symbol.symbol_id }}-{{ symbol.best_rendering }}.svg"
+                 width="150" style="width:140px;height:140px;" alt="formula rendering" /></a>
+           </div>
+         </div>
+         <div class="gallerytext"><a href='../symbol/?id={{symbol.symbol_id}}' style='font-family:{{symbol.font}};font-style:{{symbol.font_style}}'>&#{{symbol.unicode_dec}};</a></div>
+       </div>
+     </li>
+    {% endfor %}
+   </ul>
+{% endblock %}

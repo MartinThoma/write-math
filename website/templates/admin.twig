@@ -161,4 +161,42 @@
     {% endfor %}
 </table>
 {% endif %}
+
+
+<h2>New Tag</h2>
+<form role="form" method="post">
+  <div class="form-group">
+    <label for="tag_name_new">Tag name</label>
+    <input type="text" class="form-control"
+           id="tag_name_new" name="tag_name_new" placeholder="integral">
+  </div>
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea class="form-control"
+              rows="3"
+              id="description"
+              name="description"></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for tag in tags %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ tag.tag_name }}</td>
+        <td>{{ tag.description }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

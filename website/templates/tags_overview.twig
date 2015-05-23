@@ -1,0 +1,37 @@
+{% extends "base.twig" %}
+
+{% block header %}
+    <style>
+        @font-face {
+            font-family: 'STIXGeneral';
+            src:
+            url('../fonts/STIXGeneral.woff') format('woff');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'STIXNonUnicode';
+            src:
+            url('../fonts/STIXNonUniIta.woff') format('woff');
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tag Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tag in tags %}
+        <tr>
+            <td><a href="../tags/{{ tag.tag_name }}">{{ tag.tag_name }}</a></td>
+            <td>{{ tag.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

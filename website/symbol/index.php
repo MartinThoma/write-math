@@ -106,6 +106,36 @@ if (isset($_POST['id']) && is_admin()) {
     $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
     $stmt->bindParam(':packages', $packages, PDO::PARAM_STR);
     $stmt->execute();
+
+    // Take care of the tags
+    // Delete all previous tags
+    $sql = "DELETE FROM `wm_tags2symbols` WHERE `symbol_id` = :symbol_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    // Add new tags
+    $tags_new = array_unique(explode(" ", $_POST['tags']));
+    // Get a list of all tags
+    $sql = "SELECT `id`, `tag_name` FROM  `wm_tags` ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $tag_list_complete = $stmt->fetchAll();
+    $tags_to_id = array();
+    foreach ($tag_list_complete as $tag) {
+        $tags_to_id[$tag['tag_name']] = $tag['id'];
+    }
+
+    foreach ($tags_new as $tag) {
+        if (array_key_exists($tag, $tags_to_id)) {
+            $sql = "INSERT INTO `wm_tags2symbols` (`tag_id` ,`symbol_id`) ".
+                   "VALUES (:tag_id, :symbol_id);";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':tag_id', $tags_to_id[$tag], PDO::PARAM_INT);
+            $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+    }
 }
 
 if (isset($_GET['id'])) {
@@ -149,6 +179,17 @@ if (isset($_GET['id'])) {
     $stmt->bindParam(':is_in_testset', $is_testset);
     $stmt->execute();
     $images = $stmt->fetchAll();
+
+    // Get tags
+    $sql = "SELECT  `tag_id` ,  `wm_tags`.`tag_name` ,  `wm_tags`.`description` ".
+           "FROM  `wm_tags2symbols` ".
+           "JOIN  `wm_tags` ON (  `tag_id` =  `wm_tags`.`id` ) ".
+           "WHERE  `symbol_id` = :symbol_id ".
+           "ORDER BY `tag_name` ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':symbol_id', $_GET['id'], PDO::PARAM_STR);
+    $stmt->execute();
+    $tags = $stmt->fetchAll();
 } else {
     $msg[] = array("class" => "alert-warning",
                    "text" => "Please set an ID (e.g. <a href=\"../symbol/?id=31\">like this</a>)");
@@ -171,7 +212,8 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'total' => $total,
                                        'pages' => ceil(($total)/$page_size),
                                        'currentPage' => $currentPage,
-                                       'tab' => $tab
+                                       'tab' => $tab,
+                                       'tags' => $tags
                                        )
                   );
 

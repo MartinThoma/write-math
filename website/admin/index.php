@@ -240,6 +240,27 @@ foreach ($without_example as $key => $formula) {
     $formula_answers[$formula['id']] = $answers;
 }
 
+// New tag
+if (isset($_POST['tag_name_new'])) {
+    $sql = "INSERT INTO `wm_tags` (`tag_name` ,`description`) ".
+           "VALUES (:tag_name, :tag_description);";
+    $stmt = $pdo->prepare($sql);
+    $tag_name = $_POST['tag_name_new'];
+    $tag_name = strtolower($tag_name);
+    $tag_name = str_replace(" ", "-", $tag_name);
+    $stmt->bindParam(':tag_name', $tag_name, PDO::PARAM_STR);
+    $stmt->bindParam(':tag_description', $_POST['description'], PDO::PARAM_STR);
+    $stmt->execute();
+}
+
+// Get all tags
+$sql = "SELECT `id`, `tag_name`, `description` FROM `wm_tags` ".
+       "ORDER BY `tag_name` ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$tags = $stmt->fetchAll();
+
+
 echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'file' => "admin",
                                        'logged_in' => is_logged_in(),
@@ -252,7 +273,8 @@ echo $twig->render('admin.twig', array('heading' => 'Admin Tools',
                                        'inactive_users' => $inactive_users,
                                        'without_unicode' => $without_unicode,
                                        'without_example' => $without_example,
-                                       'formula_answers' => $formula_answers
+                                       'formula_answers' => $formula_answers,
+                                       'tags' => $tags
                                        )
                   );
 
