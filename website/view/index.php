@@ -449,7 +449,8 @@ if (isset($_GET['raw_data_id'])) {
            "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted` ".
            "FROM `wm_partial_answer` ".
            "LEFT JOIN `wm_formula` ON `wm_partial_answer`.`symbol_id` = `wm_formula`.`id` ".
-           "WHERE recording_id=:id ";
+           "WHERE recording_id=:id ".
+           "ORDER BY `strokes`";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
