@@ -6,10 +6,10 @@ function acceptPartialAnswer(raw_data_id, formula_id, successHandler) {
       success: function(data)
         {
             console.log(data);
-            if (typeof(data.error) == undefined) {
-                successHandler();
+            if (typeof(data.error) !== "undefined") {
+                console.log(data.error);
             } else {
-                
+                successHandler();
             }
         },
       dataType: "json",
