@@ -58,11 +58,11 @@
     {% if image_data.accepted_formula_id is null %}
     None so far
     {% else %}
-    <a href="../symbol/?id={{ image_data.accepted_formula_id }}"><img 
+    <a href="../symbol/?id={{ image_data.accepted_formula_id }}">{% if image_data.accepted_formula_id_best_rendering != '' %}<img
               src="../formulas/{{ image_data.accepted_formula_id }}-{{ image_data.accepted_formula_id_best_rendering }}.svg"
-                 width="150" style="width:50px;max-height:50px;" alt="formula rendering" /> ({{ image_data.accepted_formula_id }})</a>
+                 width="150" style="width:50px;max-height:50px;" alt="formula rendering" />{% endif %} ({{ image_data.accepted_formula_id }})</a>
         {% if image_data.user_id == uid or uid == 10 %}
-            <a href="?raw_data_id={{ raw_data_id }}&unaccept={{ raw_data_id }}" class="btn btn-warning" accesskey="u">unaccept</a>
+            <a href="?raw_data_id={{ raw_data_id }}&amp;unaccept={{ raw_data_id }}" class="btn btn-warning" accesskey="u">unaccept</a>
         {% endif %}
     {% endif %}
     </td>
@@ -161,7 +161,7 @@
       <table>
         <tr>
           <td>
-            <a href="../symbol/?id={{ answer.formula_id }}"><img 
+            <a href="../symbol/?id={{ answer.formula_id }}"><img
               src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
                  width="150" style="width:150px;max-height:150px;" alt="formula rendering" /></a>
           </td>
@@ -191,15 +191,15 @@
 {% endif %}
 
 {% if answers|length > 0 %}
-   <h2>User contributed answers</h2>
+   <h2>User contributed complete answers (old system)</h2>
     {% for answer in answers %}
     <div class="container-fluid">
       <table>
         <tr>
           <td>
-              <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=1">Upvote</a><br/>
+              <a href="?raw_data_id={{ raw_data_id }}&amp;raw_data2formula_id={{ answer.id }}&amp;vote=1">Upvote</a><br/>
               {{ answer.votes }}<br/>
-              <a href="?raw_data_id={{ raw_data_id }}&raw_data2formula_id={{ answer.id }}&vote=-1">Downvote</a>
+              <a href="?raw_data_id={{ raw_data_id }}&amp;raw_data2formula_id={{ answer.id }}&amp;vote=-1">Downvote</a>
           </td>
           <td>
             {% if answer.best_rendering %}
@@ -238,6 +238,36 @@
     {% endfor %}
 {% endif %}
 
+{% if partial_answers|length > 0 %}
+   <h2>User contributed answers</h2>
+   <table class="table">
+       <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Symbol</th>
+                <th>Stroke Number(s)</th>
+                <th>Image (the classified part is red)</th>
+            </tr>
+       </thead>
+       <tbody>
+        {% for d in partial_answers %}
+            <tr>
+                <td><a href="?raw_data_id={{ raw_data_id }}&amp;delete_partial_answer={{ d.id }}" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                    <a href="?raw_data_id={{ raw_data_id }}&amp;{% if d.is_accepted %}un{% endif %}accept_partial_answer={{ d.id }}" class="btn {% if d.is_accepted %}btn-success{% else %}btn-default{% endif %}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a></td>
+                <td><a href="../symbol/?id={{ d.symbol_id }}">{{ d.formula_in_latex }}</a></td>
+                <td>{{ d.strokes }}</td>
+                <td><object data="../raw-data/{{ raw_data_id }}.svg"
+            type="image/svg+xml"
+            id="rawdatavis_{{ loop.index }}"
+            data-strokes="{{ d.strokes }}"
+            style="width:400px;height:50px;border:1px solid black;"
+    ></object></td>
+            </tr>
+        {% endfor %}
+       </tbody>
+   </table>
+{% endif %}
+
 {% if strokes2symbol|length > 0%}
    <h2>Strokes to symbol mappings</h2>
    <table class="table">
@@ -261,63 +291,38 @@
    </table>
 {% endif %}
 
-   <h2>Add a new answer</h2>
-   <form method="post" action="?raw_data_id={{ raw_data_id }}" class="form-horizontal" role="form">
-     <input type="hidden" name="raw_data_id" value="{{ raw_data_id }}" />
-     <div class="control-group">
-       <label class="control-label" for="latex">LaTeX</label>
-       <div class="controls">
-         <textarea name="latex" id="latex" class="form-control" rows="3"></textarea>
-       </div>
+    <h2>Add answer</h2>
+    <form method="post" action="?raw_data_id={{ raw_data_id }}" role="form">
+
+    <div class="form-group">
+        <label class="control-label" for="latex_partial">LaTeX</label>
+        <textarea name="latex_partial" id="latex_partial" class="form-control" rows="3"></textarea>
        <p class="help-block">Please add only the code you would add in the
        document body. All packages / mathmode information will be added
        automatically.</p>
-     </div>
-<!--       <div class="control-group">
-       <label class="control-label" for="mode">Mode</label>
-       <div class="controls">
-         <select class="form-control" id="mode" name="mode">
-            <option>bothmodes</option>
-            <option>mathmode</option>
-            <option>textmode</option>
-          </select>
-       </div>
-     </div>
-     <div class="control-group">
-       <label class="control-label" for="packages">Packages</label>
-       <div class="controls">
-         <datalist id="latex_packages">
-           <option value="amsmath">amsmath</option>
-           <option value="amssymb">amssymb</option>
-           <option value="bbold">bbold</option>
-           <option value="cmll">cmll</option>
-           <option value="dsfont">dsfont</option>
-           <option value="esint">esint</option>
-           <option value="gensymb">gensymb</option>
-           <option value="latexsym">latexsym</option>
-           <option value="marvosym">marvosym</option>
-           <option value="mathdots">mathdots</option>
-           <option value="mathrsfs">mathrsfs</option>
-           <option value="skull">skull</option>
-           <option value="stmaryrd">stmaryrd</option>
-           <option value="textcomp">textcomp</option>
-           <option value="tipa">tipa</option>
-           <option value="upgreek">upgreek</option>
-           <option value="wasysym">wasysym</option>
-         </datalist>
-         <input type="text" class="form-control" placeholder="amsmath" name="packages" id="packages" list="latex_packages"/>
-       </div>
-       <p class="help-block">Separate packages by spaces.</p>
-     </div> -->
-     <button type="submit" class="btn btn-success">Submit</button>
-   </form>
+    </div>
+
+<!--     <object data="../raw-data/{{ raw_data_id }}.svg{{ force_reload }}"
+            type="image/svg+xml"
+            id="canvas_strokes_answer"
+            style="width:400px;height:400px;border:1px solid black;"
+    ></object> -->
+
+    <div class="form-group">
+        <label for="strokes">Strokes you want to classify</label>
+        <input type="text" class="form-control" id="strokes" name="strokes" placeholder="0,1,3,5" value="{% for i in 0..total_strokes-1 %}{{ i }}{%if i<total_strokes-1%}, {%endif%}{% endfor %}">
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+
 </div><!--tabpanel home-->
 
 <div role="tabpanel" class="tab-pane" id="information">
     <table class="table table-striped">
         <tr>
             <th>strokes</th>
-            <td>{{ lines_nr }}</td>
+            <td>{{ total_strokes }}</td>
         </tr>
         <tr>
             <th>points</th>
@@ -367,9 +372,9 @@
     <td>
     <div class="btn-group" role="group" aria-label="...">
     {% if image_data.accepted_formula_id == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning" disabled="true">Drawing is trash</a>
+        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning" disabled="true"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Drawing is trash</a>
     {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning">Drawing is trash</a>
+        <a href="?raw_data_id={{ raw_data_id }}&amp;trash={{ raw_data_id }}" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Drawing is trash</a>
     {% endif %}
     {% if image_data.classifiable == 0 %}
         <a href="?raw_data_id={{ raw_data_id }}&amp;unclassifiable={{ raw_data_id }}" class="btn btn-warning" disabled="true">not classifiable</a>
@@ -416,9 +421,9 @@
   <tr>
     <td>
     {% if image_data.is_image == 1 %}
-        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning" disabled="true">This is an image, not a formula</a>
+        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning" disabled="true"><span class="glyphicon glyphicon-tree-deciduous" aria-hidden="true"></span> This is an image, not a formula</a>
     {% else %}
-        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning">This is an image, not a formula</a>
+        <a href="?raw_data_id={{ raw_data_id }}&amp;is_image={{ raw_data_id }}" class="btn btn-warning"><span class="glyphicon glyphicon-tree-deciduous" aria-hidden="true"></span> This is an image, not a formula</a>
     {% endif %}
     </td>
   </tr>
@@ -512,7 +517,7 @@ MathJax.Hub.Queue(function() {
 
 {% block footer %}
 <script>
-{% for d in strokes2symbol %}
+{% for d in partial_answers %}
     var rawdataobj{{loop.index}} = document.getElementById('rawdatavis_{{loop.index}}');
     rawdataobj{{loop.index}}.addEventListener("load",function(){
         visualizeSymbolStrokes(document.getElementById('rawdatavis_{{loop.index}}'));

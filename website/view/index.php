@@ -55,7 +55,7 @@ if (isset($_POST['nr_of_lines'])) {
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
-} elseif ($_POST['raw_id_stroke_segmentable']) {
+} elseif (isset($_POST['raw_id_stroke_segmentable'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `stroke_segmentable` = :stroke_segmentable ".
            "WHERE `wm_raw_draw_data`.`id` = :raw_id ".
@@ -248,11 +248,11 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':raw_data_id', $_GET['is_image'], PDO::PARAM_INT);
     $stmt->execute();
-} elseif (isset($_GET['delete_answer'])) {
-    $sql = "DELETE FROM `wm_raw_data2formula` ".
+} elseif (isset($_GET['delete_partial_answer'])) {
+    $sql = "DELETE FROM `wm_partial_answer` ".
            "WHERE `id` = :id AND (user_id = :user_id OR :user_id = 10)";  # TODO: Change to admin-group check
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $_GET['delete_answer'], PDO::PARAM_INT);
+    $stmt->bindParam(':id', $_GET['delete_partial_answer'], PDO::PARAM_INT);
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
@@ -364,6 +364,21 @@ if (isset($_GET['raw_data_id'])) {
                 }
             }
         }
+    } elseif (isset($_GET['accept_partial_answer'])) {
+        $raw_data_id = intval($_GET['raw_data_id']);
+        $answer_id = intval($_GET['accept_partial_answer']);
+        $success = accept_partial_answer($raw_data_id, $answer_id);
+        if($success) {
+            # Redirect to prevent multiple submission
+            header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
+        }
+    } elseif (isset($_GET['unaccept_partial_answer'])) {
+        $answer_id = intval($_GET['unaccept_partial_answer']);
+        $success = unaccept_partial_answer($answer_id);
+        if($success) {
+            # Redirect to prevent multiple submission
+           header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
+        }
     }
 
     $raw_data_id = $_GET['raw_data_id'];
@@ -397,16 +412,19 @@ if (isset($_GET['raw_data_id'])) {
     }
 
     // Add a new classification
-    if (isset($_POST['latex'])) {
+    if (isset($_POST['latex_partial'])) {
         $user_id = get_uid();
-        $latex = trim($_POST['latex']);
+        $latex = trim($_POST['latex_partial']);
         $raw_data_id = $_GET['raw_data_id'];
-        $mode = 'bothmodes';
-        //$packages = trim($_POST['packages']);
-        add_classification($user_id, $raw_data_id, $latex, $mode);
+        $total_strokes = count(json_decode($image_data->data));
+        $filtered_strokes = filter_strokes($_POST['strokes'], $total_strokes);
+        if (count($filtered_strokes) > 0) {
+            $strokes = implode(",", $filtered_strokes);
+            add_partial_classification($user_id, $raw_data_id, $latex, $strokes);
+        }
     }
 
-    // Get all probable classifications
+    // Get all probable classifications: TODO merge into partial classifications
     $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
            "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
            "`formula_type`, `best_rendering`, `wm_users`.`id` as `user_id`, ".
@@ -424,6 +442,18 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
     $answers = $stmt->fetchAll();
+
+
+    // Get all partial classifications
+    $sql = "SELECT `wm_partial_answer`.`id`, `wm_partial_answer`.`user_id`, ".
+           "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted` ".
+           "FROM `wm_partial_answer` ".
+           "LEFT JOIN `wm_formula` ON `wm_partial_answer`.`symbol_id` = `wm_formula`.`id` ".
+           "WHERE recording_id=:id ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $partial_answers = $stmt->fetchAll();
 }
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
@@ -431,8 +461,8 @@ $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
 # TODO: Should I remove the epsilon thing?
 # Currently, it is still necessary for the next two lines.
 $path = get_path($image_data->data, $epsilon);
-$lines_nr = substr_count($path, 'M');
-$control_points = substr_count($path, 'L') + $lines_nr;
+$total_strokes = substr_count($path, 'M');
+$control_points = substr_count($path, 'L') + $total_strokes;
 if ($epsilon > 0) {
     $result_path = apply_linewise_douglas_peucker(pointLineList($image_data->data), $epsilon);
 } else {
@@ -440,7 +470,7 @@ if ($epsilon > 0) {
 }
 
 $bounding_box = get_dimensions($result_path);
-$time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $lines_nr);
+$time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $total_strokes);
 
 // Get all automatic classificaitons:
 $sql = "SELECT `formula_id`, `formula_name`, `formula_in_latex`, ".
@@ -473,10 +503,11 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                       'image_data' => $image_data,
                                       'raw_data_id' => $raw_data_id,
                                       'answers' => $answers,
+                                      'partial_answers' => $partial_answers,
                                       'epsilon' => $epsilon,
                                       'msg' => $msg,
                                       'uid' => $_SESSION['uid'],
-                                      'lines_nr' => $lines_nr,
+                                      'total_strokes' => $total_strokes,
                                       'points_nr' => get_point_count(json_decode($image_data->data, true)),
                                       'control_points' => $control_points,
                                       'bounding_box' => $bounding_box,
