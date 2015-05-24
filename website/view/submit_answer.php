@@ -1,15 +1,11 @@
 <?php
-
-require_once('../latex.php');
-
-function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
-                            $packages="") {
+function add_partial_classification($user_id, $raw_data_id, $latex, $strokes) {
     global $pdo;
     global $msg;
 
     // Very simple spam check (TODO: improve)
     if (strpos($latex,'http://') !== false || strpos($latex,'https://') !== false) {
-        return '';
+        return '{"error": "failed spam check"}';
     }
 
     // Normalize
@@ -37,6 +33,7 @@ function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
         $latex = trim($latex);
 
         $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
+        $mode = 'bothmodes';
         $stmt->bindParam(':mode', $mode, PDO::PARAM_STR);
         $stmt->bindParam(':package', $packages, PDO::PARAM_STR);
         $uid = get_uid();
@@ -45,44 +42,45 @@ function add_classification($user_id, $raw_data_id, $latex, $mode="mathmode",
         $formula_id = $pdo->lastInsertId('id');
     }
 
-    $sql = "INSERT INTO `wm_raw_data2formula` (".
-           "`raw_data_id` ,".
-           "`formula_id` ,".
-           "`user_id`".
+    $sql = "INSERT INTO `wm_partial_answer` (".
+           "`user_id` ,".
+           "`recording_id` ,".
+           "`strokes`, ".
+           "`symbol_id`".
            ") VALUES (".
-           ":raw_data_id, :formula_id, :user_id".
+           ":user_id, :raw_data_id, :strokes, :symbol_id".
            ");";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
-    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
-    $stmt->execute();
-}
-
-function remove_usepackage($package) {
-    if (0 === strpos($package, '\usepackage{') && substr($package, -1) == '}') {
-        $package = substr($package, strlen('\usepackage{'));
-        $package = rtrim($package, '}');
+    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->bindParam(':strokes', $strokes, PDO::PARAM_STR);
+    $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
+    try {
+        $stmt->execute();
+    } catch (PDOException $e) {
+        if ($e->errorInfo[1] == 1062) {
+            // duplicate entry, do something else
+            return '{"error": "This classification does already exist."}';
+        } else {
+            return '{"error": ".'.implode(":", $e->errorInfo()).'}';
+        }
     }
-    return $package;
+    return json_encode(1);
 }
 
-function sanitize_packages($packages) {
-    if (strpos($packages, ';') !== false) {
-        $packages = explode(';', $packages);
-    } else {
-        $packages = array($packages);
+function filter_strokes($strokes, $total_strokes) {
+    $strokes = explode(",", $strokes);
+    $filtered_strokes = array();
+    foreach ($strokes as $stroke) {
+        if (is_numeric($stroke)) {
+            $stroke_nr = intval($stroke);
+            if (0 <= $stroke_nr && $stroke_nr < $total_strokes) {
+                $filtered_strokes[] = $stroke_nr;
+            }
+        }
     }
-
-    $packages = array_map(trim, $packages);
-    $packages = array_map(remove_usepackage, $packages);
-
-    return $packages;
-}
-
-function endsWith($haystack, $needle) {
-    return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+    return $filtered_strokes;
 }
 
 ?>

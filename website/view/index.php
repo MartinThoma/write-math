@@ -5,6 +5,7 @@ require_once '../init.php';
 require_once 'functions.php';
 require_once '../feature_extraction.php';
 require_once '../segmentation.php';
+require_once '../view/submit_answer.php';
 
 if (!isset($_GET['raw_data_id'])) {
     header("Location: ../view/?raw_data_id=295093");
@@ -363,14 +364,6 @@ if (isset($_GET['raw_data_id'])) {
                                    "text" => "You've already casted a vote.");
                 }
             }
-        }
-    } elseif (isset($_GET['accept_partial_answer'])) {
-        $raw_data_id = intval($_GET['raw_data_id']);
-        $answer_id = intval($_GET['accept_partial_answer']);
-        $success = accept_partial_answer($raw_data_id, $answer_id);
-        if($success) {
-            # Redirect to prevent multiple submission
-            header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
         }
     } elseif (isset($_GET['unaccept_partial_answer'])) {
         $answer_id = intval($_GET['unaccept_partial_answer']);
