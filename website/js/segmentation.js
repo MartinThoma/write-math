@@ -1,6 +1,18 @@
 function mouseDownHandler(e) {
-    startX = e.clientX;
-    startY = e.clientY;
+    var a = document.getElementById("canvas");
+    var svgDoc = a.contentDocument;
+    var svg = svgDoc.firstChild;
+    var viewBoxString = svgDoc.getElementsByTagName('svg')[0].getAttribute("viewBox").split(" ");
+    var width = parseFloat(viewBoxString[2]);
+    var height = parseFloat(viewBoxString[3]);
+
+    var  pointStart = svg.createSVGPoint();
+    pointStart.x = e.clientX;
+    pointStart.y = e.clientY;
+    pointStart = pointStart.matrixTransform(svg.getScreenCTM().inverse());
+
+    startX = pointStart.x;
+    startY = pointStart.y;
     redraw = true;
     lastClick = new Date().getTime();
 }
@@ -43,20 +55,46 @@ function mouseUpEventHandler(e) {
     if (uptime - lastClick < 90) {
         var a = document.getElementById("canvas");
         var svgDoc = a.contentDocument;
+
+        var svg = svgDoc.firstChild;
+
+        var  pointStart = svg.createSVGPoint();
+        pointStart.x = 0;
+        pointStart.y = 0;
+        pointStart = pointStart.matrixTransform(svg.getScreenCTM().inverse());
+        var  pointEnd = svg.createSVGPoint();
+        pointEnd.x = 0;
+        pointEnd.y = 0;
+        pointEnd = pointEnd.matrixTransform(svg.getScreenCTM().inverse());
+
         var rect = svgDoc.getElementById('rectangleSelection');
 
-        startX = 0;
-        startY = 0;
-        endX = 0;
-        endY = 0;
+        startX = pointStart.x;
+        startY = pointStart.y;
+        endX = pointEnd.x;
+        endY = pointEnd.y;
 
-        rect.setAttributeNS(null, 'x', 0);
-        rect.setAttributeNS(null, 'y', 0);
-        rect.setAttributeNS(null, 'height', 0);
-        rect.setAttributeNS(null, 'width', 0);
+        rect.setAttributeNS(null, 'x', pointStart.x);
+        rect.setAttributeNS(null, 'y', pointStart.y);
+        rect.setAttributeNS(null, 'height', Math.abs(pointStart.y, pointEnd.y));
+        rect.setAttributeNS(null, 'width', Math.abs(pointStart.x, pointEnd.x));
     } else {
-        endX = e.clientX;
-        endY = e.clientY;
+        var a = document.getElementById("canvas");
+        var svgDoc = a.contentDocument;
+
+        var svg = svgDoc.firstChild;
+
+        var  pointStart = svg.createSVGPoint();
+        pointStart.x = 0;
+        pointStart.y = 0;
+        pointStart = pointStart.matrixTransform(svg.getScreenCTM().inverse());
+        var  pointEnd = svg.createSVGPoint();
+        pointEnd.x = e.clientX;
+        pointEnd.y = e.clientY;
+        pointEnd = pointEnd.matrixTransform(svg.getScreenCTM().inverse());
+
+        endX = pointEnd.x;
+        endY = pointEnd.y;
         var paths = getContainedPaths();
         if (paths.length > 0) {
             segmentation = re_segment(paths);
@@ -73,13 +111,24 @@ function mouseMoveEventHandler(e) {
         var svgDoc = a.contentDocument;
         var rect = svgDoc.getElementById('rectangleSelection');
 
-        endX = e.clientX;
-        endY = e.clientY;
+        var svg = svgDoc.firstChild;
+
+        var viewBoxString = svgDoc.getElementsByTagName('svg')[0].getAttribute("viewBox").split(" ");
+        var widthViewBox = parseFloat(viewBoxString[2]);
+        var heightViewBox = parseFloat(viewBoxString[3]);
+
+        var  pointEnd = svg.createSVGPoint();
+        pointEnd.x = e.clientX;
+        pointEnd.y = e.clientY;
+        pointEnd = pointEnd.matrixTransform(svg.getScreenCTM().inverse());
+
+        endX = pointEnd.x;
+        endY = pointEnd.y;
 
         var x = Math.min(startX, endX);
         var y = Math.min(startY, endY);
-        var height = Math.abs(startY-endY)
-        var width = Math.abs(startX-endX);
+        var height = Math.abs(startY-endY);//*(widthViewBox/400);
+        var width = Math.abs(startX-endX);//*(heightViewBox/400);
 
         rect.setAttributeNS(null, 'x', x);
         rect.setAttributeNS(null, 'y', y);
