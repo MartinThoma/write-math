@@ -439,7 +439,8 @@ if (isset($_GET['raw_data_id'])) {
 
     // Get all partial classifications
     $sql = "SELECT `wm_partial_answer`.`id`, `wm_partial_answer`.`user_id`, ".
-           "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted` ".
+           "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted`, ".
+           "`best_rendering` ".
            "FROM `wm_partial_answer` ".
            "LEFT JOIN `wm_formula` ON `wm_partial_answer`.`symbol_id` = `wm_formula`.`id` ".
            "WHERE recording_id=:id ".
