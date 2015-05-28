@@ -224,6 +224,9 @@ $sql = "SELECT * FROM `wm_formula` ".
        "SELECT DISTINCT `wm_raw_draw_data`.`accepted_formula_id` ".
        "FROM `wm_raw_draw_data` ".
        "WHERE `wm_raw_draw_data`.`accepted_formula_id` IS NOT NULL) ".
+       "AND `id` NOT IN (".
+       "SELECT DISTINCT `symbol_id` ".
+       "FROM `wm_partial_answer` WHERE `is_accepted` = 1)".
        "ORDER BY `user_id` ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();

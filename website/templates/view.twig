@@ -98,7 +98,7 @@
 <form class="form-inline" role="form" method="post">
   <input type="hidden" name="raw_id_segmentation" value="{{ raw_data_id }}" />
   <div class="form-group">
-    <textarea id="segmentation" name="segmentation" class="form-control" rows="4" cols="50">{{ image_data.segmentation|json_encode() }}</textarea>
+    <textarea id="segmentation" name="segmentation" class="form-control" rows="1" cols="50">{{ image_data.segmentation|json_encode() }}</textarea>
   </div>
   <button type="submit" class="btn btn-default">update</button>
 </form></td>
@@ -368,11 +368,13 @@
   <tr>
     <th rowspan="7">Operations</th>
     <td>
+        <div class="btn-group" role="group" aria-label="...">
         <a href="?delete={{ raw_data_id }}" class="btn btn-danger">Delete</a>
         {% if uid == 10 %}
         <a href="?raw_data_id={{ raw_data_id }}&amp;rerender={{ raw_data_id }}" class="btn btn-danger">rerender</a>
         <a href="?raw_data_id={{ raw_data_id }}&amp;fix={{ raw_data_id }}" class="btn btn-danger">fix it</a>
         {% endif %}
+        </div>
     </td>
   </tr>
   <tr>
