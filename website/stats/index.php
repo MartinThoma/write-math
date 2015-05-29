@@ -23,6 +23,27 @@ if (isset($_GET['is_not_important'])) {
     $stmt->execute();
 }
 
+// tags
+$sql = "SELECT `id`, `tag_name` ".
+       "FROM `wm_tags` ";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$tags = $stmt->fetchAll();
+$tagid2name = array();
+foreach ($tags as $value) {
+    $tagid2name[$value['id']] = $value['tag_name'];
+}
+
+$sql = "SELECT `tag_id`, `symbol_id` ".
+       "FROM `wm_tags2symbols` ";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$tags2symbol_fetched = $stmt->fetchAll();
+$symbol2tags = array();
+foreach ($tags2symbol_fetched as $value) {
+    $symbol2tags[$value['symbol_id']][] = $value['tag_id'];
+}
+
 
 $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
        "`is_important`, `best_rendering`, ".
@@ -60,6 +81,8 @@ echo $twig->render('stats.twig', array('heading' => 'Stats',
                                        'symbol_training_data_count' => $symbol_training_data_count,
                                        'sum' => $sum,
                                        'important_count' => $important_count,
-                                       'important_count_raw' => $important_count_raw
+                                       'important_count_raw' => $important_count_raw,
+                                       'symbol2tags' => $symbol2tags,
+                                       'tagid2name' => $tagid2name
                                        )
                   );

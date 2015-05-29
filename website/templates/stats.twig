@@ -27,11 +27,19 @@ tr {
                  width="30" style="width:30px;max-height:30px;" /></th>
         {% if s.is_important %}
             <td style="background-color:green;">{{ loop.index }}</td>
-            <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
+            <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
+            {% for tagid in symbol2tags[s.id] %}
+            <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
+            {% endfor %}
+            </td>
             <td style="background-color:green;">{{s.counter}}</td>
         {% else %}
             <td>{{ loop.index }}</td>
-            <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a></td>
+            <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
+            {% for tagid in symbol2tags[s.id] %}
+            <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
+            {% endfor %}
+            </td>
             <td>{{s.counter}}</td>
         {% endif %}
     {% if user_id == 10 %}
