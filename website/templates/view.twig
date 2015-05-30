@@ -156,8 +156,18 @@
 </div><!--row-->
 
 <a id="answers"></a>
-{% if automatic_answers|length > 0 %}
+{% if (automatic_answers|length > 0) and (uid == 10) %}
+<div class="page-header">
+    <div class="btn-toolbar pull-right">
+    <a href="?raw_data_id={{raw_data_id}}&amp;delete_automatic_classification={{raw_data_id}}" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete</a>
+    </div>
+    <h2>Automatic Classifications</h2>
+</div>
+{% elseif (automatic_answers|length > 0) %}
 <h2>Automatic Classifications</h2>
+{% endif %}
+
+{% if automatic_answers|length > 0 %}
     {% for answer in automatic_answers %}
     {% if answer.probability > 1 %}
     <div class="pull-left" style="height:200px;">

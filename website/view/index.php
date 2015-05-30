@@ -31,6 +31,13 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':rid', $_GET['remove_from_testset'], PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_GET['delete_automatic_classification']) && is_admin()) {
+    $sql = "DELETE FROM `wm_worker_answers` ".
+           "WHERE `raw_data_id` = :rid LIMIT 10;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':rid', $_GET['delete_automatic_classification'], PDO::PARAM_INT);
+    $stmt->execute();
+    header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
 }
 
 /*if (isset($_GET['request_new_classification'])) {
