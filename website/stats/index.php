@@ -1,7 +1,7 @@
 <?php
 include '../init.php';
 
-if (isset($_GET['is_important'])) {
+if (isset($_GET['is_important']) && is_admin()) {
     $fid = intval($_GET['is_important']);
     $sql = "UPDATE `wm_formula` SET  `is_important` =  '1' ".
            "WHERE  `wm_formula`.`id` = :fid AND :uid = 10;";
@@ -12,7 +12,7 @@ if (isset($_GET['is_important'])) {
     $stmt->execute();
 }
 
-if (isset($_GET['is_not_important'])) {
+if (isset($_GET['is_not_important']) && is_admin()) {
     $fid = intval($_GET['is_not_important']);
     $sql = "UPDATE `wm_formula` SET  `is_important` =  '0' ".
            "WHERE  `wm_formula`.`id` = :fid AND :uid = 10;";
@@ -50,7 +50,8 @@ $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
        "COUNT(`wm_formula`.`id`) AS `counter` ".
        "FROM `wm_raw_draw_data` ".
        "JOIN `wm_formula` ON `wm_formula`.`id` = `accepted_formula_id` ".
-       "WHERE `formula_type` = 'single symbol' ".
+       "WHERE (`formula_type` = 'single symbol' OR ".
+       "`formula_type` = 'drawing' OR `formula_type` = 'nesting symbol') ".
        "GROUP BY  `accepted_formula_id` ".
        "ORDER BY counter DESC";
 $stmt = $pdo->prepare($sql);
