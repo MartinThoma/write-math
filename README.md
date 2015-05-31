@@ -10,7 +10,7 @@ On-line recognition of mathematical formulae.
 Client-Side:
 * HTML
 * CSS
-* JavaScript 
+* JavaScript
   * fabric.js (see [example](http://fabricjs.com/freedrawing/), [tutorial](http://fabricjs.com/fabric-intro-part-4/))
   * [mathjax](http://www.mathjax.org/) for rendering LaTeX
 
