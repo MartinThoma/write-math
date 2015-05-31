@@ -1,5 +1,6 @@
 <?php
 include '../init.php';
+require_once 'symbol.functions.php';
 
 $edit_flag = false;
 $images = false;
@@ -8,7 +9,7 @@ if (!isset($_GET['id'])) {
     header("Location: ?id=1526");
 }
 
-if (isset($_GET['edit'])) {
+if (isset($_GET['edit'])  && !is_ip_user()) {
     $edit_flag = true;
 }
 
@@ -27,114 +28,38 @@ if (isset($_GET['delete']) && is_admin()) {
     }
 }
 
-if (isset($_POST['id']) && is_admin()) {
+if (isset($_POST['id']) && !is_ip_user()) {
     $formula_id = $_POST['id'];
-    $sql = "SELECT `wm_renderings`.`svg` ".
-           "FROM `wm_formula` ".
-           "JOIN `wm_renderings` ON `best_rendering` = `wm_renderings`.`id` ".
-           "WHERE `wm_formula`.`id` = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $formula_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $svg_db = $stmt->fetchObject()->svg;
-    $svg_new = trim($_POST['svg']);
-    if ($svg_new != $svg_db) {
-        # TODO: Check validity of SVG
-        # Insert svg to wm_renderings
-        $sql = "INSERT INTO `wm_renderings` (".
-               "`formula_id` ,".
-               "`user_id` ,".
-               "`creation_time` ,".
-               "`svg` ".
-               ") ".
-               "VALUES (:fid, :uid, CURRENT_TIMESTAMP , :svg)";
+    update_symbol_description($formula_id, $_POST['description']);
+    if (is_admin()) {
+        update_rendering($formula_id, $_POST['svg']);
+        update_tags($formula_id, $_POST['tags']);
+        $formula_name = trim($_POST['formula_name']);
+        $unicode_dec = trim($_POST['unicode_dec']);
+        $font = trim($_POST['font']);
+        $font_style = trim($_POST['font_style']);
+        $formula_type = trim($_POST['formula_type']);
+        $packages = trim($_POST['packages']);
+        $svg = trim($_POST['svg']);
+        $sql = "UPDATE `wm_formula` SET ".
+               "`formula_name` = :formula_name, ".
+               "`unicode_dec` = :unicode_dec, ".
+               "`font` = :font, ".
+               "`font_style` = :font_style, ".
+               "`mode` = :mode, ".
+               "`formula_type` = :formula_type, ".
+               "`package` = :packages ".
+               "WHERE `id` = :id;";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
-        $uid = get_uid();
-        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-        $stmt->bindParam(':svg', $svg_new, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
+        $stmt->bindParam(':unicode_dec', $unicode_dec, PDO::PARAM_INT);
+        $stmt->bindParam(':font', $font, PDO::PARAM_STR);
+        $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
+        $stmt->bindParam(':mode', $_POST['mode'], PDO::PARAM_STR);
+        $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
+        $stmt->bindParam(':packages', $packages, PDO::PARAM_STR);
         $stmt->execute();
-        $rendering_id = $pdo->lastInsertId('id');
-        # create svg file
-        $return = file_put_contents ("../formulas/$formula_id-$rendering_id.svg", $svg_new);
-
-        if ($return === false) {
-            $msg[] = array("class" => "alert-danger",
-                   "text" => "Writing was not successful.");
-        } else {
-            $msg[] = array("class" => "alert-success",
-                   "text" => "../formulas/$formula_id-$rendering_id.svg was ".
-                             "written successfully");
-        }
-
-        # adjust best rendering id
-        $sql = "UPDATE `wm_formula` ".
-               "SET  `best_rendering` = :rid WHERE `wm_formula`.`id` = :fid;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
-        $stmt->bindParam(':rid', $rendering_id, PDO::PARAM_INT);
-        $stmt->execute();
-    }
-
-    $formula_name = trim($_POST['formula_name']);
-    $unicode_dec = trim($_POST['unicode_dec']);
-    $font = trim($_POST['font']);
-    $font_style = trim($_POST['font_style']);
-    $formula_type = trim($_POST['formula_type']);
-    $description = trim($_POST['description']);
-    $packages = trim($_POST['packages']);
-    $svg = trim($_POST['svg']);
-
-    $sql = "UPDATE `wm_formula` SET ".
-           "`formula_name` = :formula_name, ".
-           "`unicode_dec` = :unicode_dec, ".
-           "`font` = :font, ".
-           "`font_style` = :font_style, ".
-           "`description` = :description, ".
-           "`mode` = :mode, ".
-           "`formula_type` = :formula_type, ".
-           "`package` = :packages ".
-           "WHERE `id` = :id;";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
-    $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
-    $stmt->bindParam(':unicode_dec', $unicode_dec, PDO::PARAM_INT);
-    $stmt->bindParam(':font', $font, PDO::PARAM_STR);
-    $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
-    $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-    $stmt->bindParam(':mode', $_POST['mode'], PDO::PARAM_STR);
-    $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
-    $stmt->bindParam(':packages', $packages, PDO::PARAM_STR);
-    $stmt->execute();
-
-    // Take care of the tags
-    // Delete all previous tags
-    $sql = "DELETE FROM `wm_tags2symbols` WHERE `symbol_id` = :symbol_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
-    $stmt->execute();
-
-    // Add new tags
-    $tags_new = array_unique(explode(" ", $_POST['tags']));
-    // Get a list of all tags
-    $sql = "SELECT `id`, `tag_name` FROM  `wm_tags` ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $tag_list_complete = $stmt->fetchAll();
-    $tags_to_id = array();
-    foreach ($tag_list_complete as $tag) {
-        $tags_to_id[$tag['tag_name']] = $tag['id'];
-    }
-
-    foreach ($tags_new as $tag) {
-        if (array_key_exists($tag, $tags_to_id)) {
-            $sql = "INSERT INTO `wm_tags2symbols` (`tag_id` ,`symbol_id`) ".
-                   "VALUES (:tag_id, :symbol_id);";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':tag_id', $tags_to_id[$tag], PDO::PARAM_INT);
-            $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
-            $stmt->execute();
-        }
     }
 }
 

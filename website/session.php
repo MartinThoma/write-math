@@ -119,6 +119,20 @@ function get_handedness() {
     return $row->handedness;
 }
 
+function is_ip_user() {
+    global $pdo;
+    $sql = "SELECT `account_type` FROM `wm_users` WHERE `id` = :uid";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+    $row =$stmt->fetchObject();
+    if ($row->account_type == 'IP-User') {
+        return true;
+    }
+    return false;
+}
+
 function is_admin() {
     global $pdo;
     $sql = "SELECT `account_type` FROM `wm_users` WHERE `id` = :uid";
