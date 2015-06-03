@@ -30,16 +30,20 @@ function insert_recording($user_id, $data, $formula_id) {
             $stmt->execute();
             $raw_data_id = $pdo->lastInsertId('id');
 
-            $sql = "INSERT INTO `wm_raw_data2formula` (".
-                           "`raw_data_id` ,".
-                           "`formula_id` ,".
-                           "`user_id`".
+            $sql = "INSERT INTO `wm_partial_answer` (".
+                           "`recording_id` ,".
+                           "`symbol_id` ,".
+                           "`user_id`, ".
+                           "`strokes` ".
                            ") VALUES (".
-                           ":raw_data_id, :formula_id, :uid);";
+                           ":raw_data_id, :formula_id, :uid, :strokes);";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
             $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
             $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+            $total_strokes = count(json_decode($data));
+            $strokes = implode(',', range(0, $total_strokes-1));
+            $stmt->bindParam(':strokes', $strokes, PDO::PARAM_INT);
             $stmt->execute();
         } else {
             $msg[] = array("class" => "alert-warning",

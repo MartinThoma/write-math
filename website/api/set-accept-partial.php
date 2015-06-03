@@ -1,5 +1,7 @@
 <?php
 include '../init.php';
+require_once 'api.functions.php';
+require_once '../view/submit_answer.php';
 
 if (!is_logged_in()) {
     header("Location: ../login");
@@ -12,6 +14,11 @@ if (!is_logged_in()) {
 function accept_partial_answer($raw_data_id, $answer_id) {
     global $pdo;
     global $msg;
+
+    $total_strokes = get_stroke_count($raw_data_id);
+    $strokes = implode(',', range(0, $total_strokes-1));
+    $user_id = get_uid();
+    add_partial_classification_pure($user_id, $raw_data_id, $answer_id, $strokes);
 
     // Check if this answer conflicts with other partial answers
     $sql = "SELECT `wm_partial_answer`.`id`, `formula_name`, `strokes`, ".
@@ -27,6 +34,7 @@ function accept_partial_answer($raw_data_id, $answer_id) {
     $stmt->execute();
     $partial_answers = $stmt->fetchAll();
 
+    // Check if there are colliding previous answers
     $new_answer = null;
     $aa_strokes = array();
     $aa_symbols = array();
@@ -41,7 +49,6 @@ function accept_partial_answer($raw_data_id, $answer_id) {
             $aa_strokes = array_unique($aa_strokes);
         }
     }
-
     foreach ($new_answer as $stroke_nr) {
         if (in_array($stroke_nr, $aa_strokes)) {
             // There is an collision
@@ -53,50 +60,44 @@ function accept_partial_answer($raw_data_id, $answer_id) {
 
     $sql = "UPDATE `wm_partial_answer` ".
            "SET `is_accepted` = 1 ".
-           "WHERE `id` = :answer_id ".
+           "WHERE `symbol_id` = :answer_id ".
+           "AND `recording_id` = :recording_id ".
            "AND (`user_id` = :user_id OR :user_id = 10) ";  # TODO: Change to admin-group check
            "LIMIT 1;";
     $stmt = $pdo->prepare($sql);
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':answer_id', $answer_id, PDO::PARAM_INT);
+    $stmt->bindParam(':recording_id', $raw_data_id, PDO::PARAM_INT);
     $stmt->execute();
 
     if ($stmt->rowCount() != 1) {
-        return '{"error": "'.$stmt->rowCount().'.'.$uid.'.'.$answer_id.': You could not accept that answer. '.
+        return '{"error": "'.$stmt->rowCount().'.'.$uid.'.'.$answer_id.'.'.$raw_data_id.': You could not accept that answer. '.
                "This happens when you try to accept ".
                "a classification of a formula you ".
                "did not write. ".
                "Or multiple form submission: $sql.\"}";
     }
-
     // Check if this answer classified the whole recording. If that is the case
     // then write the answer in wm_raw_draw_data.accepted_formula_id
 
-    // Get total number of strokes
-    $sql = "SELECT `data` ".
-           "FROM `wm_raw_draw_data` ".
-           "WHERE `wm_raw_draw_data`.`id` = :recording_id";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':recording_id', $raw_data_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $image_data = $stmt->fetchObject();
-    $total_strokes = count(json_decode($image_data->data));
-
     if (count($aa_strokes) + count($new_answer) == $total_strokes) {
         // All strokes were classified and accepted as some symbol
-
         // Check if there is more then one accepted formula / symbol
         // (excluding WILDPOINT)
         // If there are more, then we are still missing the geometry
         // information
         $other = 0;
         $last_formula_id = 0;
-        foreach ($aa_symbols as $symbol) {
-            if ($symbol['name'] != 'WILDPOINT' && $symbol['name'] != 'TRASH') {
-                $other += 1;
-                $last_formula_id = $symbol['id'];
+        if (count($aa_strokes) + count($new_answer) == 0) {
+            $other = 1;
+            $last_formula_id = $answer_id;
+        } else {
+            foreach ($aa_symbols as $symbol) {
+                if ($symbol['name'] != 'WILDPOINT' && $symbol['name'] != 'TRASH') {
+                    $other += 1;
+                    $last_formula_id = $symbol['id'];
+                }
             }
         }
 
@@ -118,8 +119,7 @@ function accept_partial_answer($raw_data_id, $answer_id) {
 
 if (isset($_POST['raw_data_id'])) {
     $raw_data_id = intval($_POST['raw_data_id']);
-    $answer_id = intval($_POST['partial_answer_id']);
-
+    $answer_id = intval($_POST['symbol_id']);
     $return = accept_partial_answer($raw_data_id, $answer_id);
     if ($return == '') {
         echo json_encode(1);
@@ -129,5 +129,4 @@ if (isset($_POST['raw_data_id'])) {
 } else {
     echo json_encode('{"error": "Not POSTed raw_data_id"}');
 }
-
 ?>

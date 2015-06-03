@@ -203,54 +203,6 @@
     <br style="clear:both;" />
 {% endif %}
 
-{% if answers|length > 0 %}
-   <h2>User contributed complete answers (old system)</h2>
-    {% for answer in answers %}
-    <div class="container-fluid">
-      <table>
-        <tr>
-          <td>
-              <a href="?raw_data_id={{ raw_data_id }}&amp;raw_data2formula_id={{ answer.id }}&amp;vote=1">Upvote</a><br/>
-              {{ answer.votes }}<br/>
-              <a href="?raw_data_id={{ raw_data_id }}&amp;raw_data2formula_id={{ answer.id }}&amp;vote=-1">Downvote</a>
-          </td>
-          <td>
-            {% if answer.best_rendering %}
-            <a href="../symbol/?id={{ answer.formula_id }}"><img
-                src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
-                width="150px" style="width:150px;max-height:150px;" /></a>
-            {% else %}
-                <div style="min-width:200px;font-size: 250%;"><p>$${{ answer.formula_in_latex }}$$</p>
-                </div>
-                <a href="../symbol/?id={{ answer.formula_id }}">Go to symbol page</a>
-            {% endif %}
-          </td>
-          <td>
-              <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
-              <p>Mode: {{answer.mode}}</p>
-              {% if answer.package != '' %}
-              <p>Package: {{answer.package}}</p>
-              {% endif %}
-              <p><a href="../user/?id={{ answer.user_id }}">{{ answer.display_name }}</a></p>
-          </td>
-          <td>
-            {% if answer.formula_id == image_data.accepted_formula_id %}
-              <img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" />
-            {% else %}
-          <a href="?raw_data_id={{ raw_data_id }}&amp;accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
-"src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
-            {% endif %}
-            {% if answer.user_id == uid %}
-            <br/>
-            <a href="?raw_data_id={{ raw_data_id }}&amp;delete_answer={{ answer.id }}">Delete answer</a>
-            {% endif %}
-          </td>
-        </tr>
-      </table>
-    </div><br/>
-    {% endfor %}
-{% endif %}
-
 {% if partial_answers|length > 0 %}
    <h2>User contributed answers</h2>
    <table class="table" id="user_contrib_answers">

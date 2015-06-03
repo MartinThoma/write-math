@@ -161,7 +161,7 @@ function merge_accounts($ip_id, $regular_id) {
 
     // This approach might fail due to uniqueness constraints
     $tables = array('wm_flags', 'wm_formula_svg_missing',
-                    'wm_raw_data2formula', 'wm_raw_draw_data', 'wm_renderings',
+                    'wm_partial_answer', 'wm_raw_draw_data', 'wm_renderings',
                     'wm_user_unknown_formula', 'wm_votes', 'wm_workers');
     foreach ($tables as $table) {
         $sql = "UPDATE `$table` ".
@@ -172,7 +172,7 @@ function merge_accounts($ip_id, $regular_id) {
     // Take a look at every dataset, try to change it and delete it if changing
     // wasn't successfull
     $tables = array('wm_flags', 'wm_formula_svg_missing',
-                    'wm_raw_data2formula', 'wm_raw_draw_data', 'wm_renderings',
+                    'wm_partial_answer', 'wm_raw_draw_data', 'wm_renderings',
                     'wm_user_unknown_formula', 'wm_votes', 'wm_workers');
     foreach ($tables as $table) {
         $sql = "SELECT `id` FROM `$table` WHERE `user_id` = $ip_id;";

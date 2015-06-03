@@ -51,7 +51,7 @@ def get_old_datasets(mysql):
            "FROM `wm_raw_data2formula` "
            "JOIN `wm_raw_draw_data` ON "
            "(`wm_raw_data2formula`.`raw_data_id` = `wm_raw_draw_data`.`id`) "
-           "ORDER BY `wm_raw_data2formula`.`id` DESC LIMIT 10000")
+           "ORDER BY `wm_raw_data2formula`.`id` ASC LIMIT 10000")
     cursor.execute(sql)
     datasets = cursor.fetchall()
     for d in datasets:

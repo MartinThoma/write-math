@@ -42,7 +42,7 @@
         $("#button"+id).addClass('btn-success');
         $.ajax({
           type: "POST",
-          url: "../api/set-accept.php",
+          url: "../api/set-accept-partial.php",
           data: {'symbol_id': id, 'raw_data_id': record_id},
           success: function(data)
             {

@@ -31,6 +31,13 @@ ALTER TABLE `wm_formula_in_paper`
   ADD CONSTRAINT `wm_formula_in_paper_ibfk_2` FOREIGN KEY (`paper_id`) REFERENCES `wm_papers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints der Tabelle `wm_formula_old`
+--
+ALTER TABLE `wm_formula_old`
+  ADD CONSTRAINT `wm_formula_old_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `wm_formula_old_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints der Tabelle `wm_formula_svg_missing`
 --
 ALTER TABLE `wm_formula_svg_missing`

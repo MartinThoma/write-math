@@ -11,7 +11,6 @@ if (!isset($_GET['raw_data_id'])) {
     header("Location: ../view/?raw_data_id=295093");
 }
 
-$answers = null;
 $image_data = null;
 $force_reload_raw_svg = "";
 $force_reload_raw_svg = isset($_GET['force_reload'])? "?".$_GET['force_reload'] : $force_reload_raw_svg;
@@ -346,7 +345,7 @@ if (isset($_GET['raw_data_id'])) {
         $vote = intval($_GET['vote']);
         $id = intval($_GET['raw_data2formula_id']);
         if ($vote == 1 || $vote == -1) {
-            $sql = "SELECT `user_id` FROM `wm_raw_data2formula` ".
+            $sql = "SELECT `user_id` FROM `wm_partial_answer` ".
                    "WHERE `id` = :id";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -424,25 +423,6 @@ if (isset($_GET['raw_data_id'])) {
         }
     }
 
-    // Get all probable classifications: TODO merge into partial classifications
-    $sql = "SELECT `wm_raw_data2formula`.`id`, `display_name`, ".
-           "`formula_in_latex`, `package`, `mode`, `formula_id`, ".
-           "`formula_type`, `best_rendering`, `wm_users`.`id` as `user_id`, ".
-           "COALESCE(sum(`vote`), 0) as `votes` ".
-           "FROM `wm_raw_data2formula` ".
-           "LEFT JOIN `wm_votes` ".
-              "ON `wm_votes`.`raw_data2formula_id` = `wm_raw_data2formula`.`id` ".
-           "LEFT JOIN `wm_raw_draw_data` ".
-              "ON `wm_raw_draw_data`.`id` = `wm_raw_data2formula`.`raw_data_id` ".
-          "LEFT JOIN `wm_users` ON `wm_raw_data2formula`.`user_id` = `wm_users`.`id` ".
-          "LEFT JOIN `wm_formula` ON `wm_raw_data2formula`.`formula_id` = `wm_formula`.`id` ".
-          "WHERE raw_data_id=:id ".
-          "GROUP BY `formula_id`";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
-    $stmt->execute();
-    $answers = $stmt->fetchAll();
-
 
     // Get all partial classifications
     $sql = "SELECT `wm_partial_answer`.`id`, `wm_partial_answer`.`user_id`, ".
@@ -504,7 +484,6 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                       'path' => $path,
                                       'image_data' => $image_data,
                                       'raw_data_id' => $raw_data_id,
-                                      'answers' => $answers,
                                       'partial_answers' => $partial_answers,
                                       'epsilon' => $epsilon,
                                       'msg' => $msg,

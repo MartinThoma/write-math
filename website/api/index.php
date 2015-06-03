@@ -40,16 +40,21 @@ function invalid_latex_request($latex) {
 function add_classification($formula_id, $raw_data_id) {
     global $pdo;
 
-    $sql = "INSERT INTO `wm_raw_data2formula` (".
-           "`raw_data_id`, ".
-           "`formula_id` , ".
-           "`user_id` ".
+    $total_strokes = get_stroke_count($raw_data_id);
+    $strokes = implode(',', range(0, $total_strokes-1));
+
+    $sql = "INSERT INTO `wm_partial_answer` (".
+           "`recording_id`, ".
+           "`symbol_id`, , ".
+           "`user_id`, ".
+           "`strokes` ".
            ") VALUES (".
-           ":raw_data_id, :formula_id, :uid);";
+           ":recording_id, :formula_id, :uid, :strokes);";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', get_uid(), PDO::PARAM_INT);
-    $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
-    $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
+    $stmt->bindParam(':recording_id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
+    $stmt->bindParam(':strokes', $strokes, PDO::PARAM_STR);
 
     // TODO: Catch duplicate classification as upvote
     try {
@@ -211,7 +216,7 @@ if ($_GET['task'] == "list-unclassified") {
         }
     }
 } elseif ($_GET['task'] == "export") {
-    $tables = array('wm_formula', 'wm_raw_draw_data', 'wm_raw_data2formula');
+    $tables = array('wm_formula');
     if (!isset($_GET['table']) || !in_array($_GET['table'], $tables)) {
         echo "You have to specify a 'table':";
         echo "<ul>";
@@ -226,20 +231,6 @@ if ($_GET['task'] == "list-unclassified") {
     if ($_GET['table'] == 'wm_formula') {
         $sql = "SELECT `id`, `formula_name`, `description`, `formula_in_latex` ".
                "FROM `wm_formula`";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($data);
-    } elseif ($_GET['table'] == 'wm_raw_draw_data') {
-        $sql = "SELECT `id`, `data`, `accepted_formula_id` ".
-               "FROM `wm_raw_draw_data`";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($data);
-    } elseif ($_GET['table'] == 'wm_raw_data2formula') {
-        $sql = "SELECT `id`, `raw_data_id`, `formula_id` ".
-               "FROM `wm_raw_data2formula`";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

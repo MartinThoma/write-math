@@ -84,8 +84,8 @@ if (isset($_GET['rand'])) {
     $sql = "SELECT `id`, `formula_name`, `description`, `mode`, `best_rendering` ".
            "FROM  `wm_formula` ".
            "WHERE `id` NOT IN ( ".
-               "SELECT `formula_id` ".
-               "FROM  `wm_raw_data2formula` ".
+               "SELECT `symbol_id` ".
+               "FROM  `wm_partial_answer` ".
                "WHERE `user_id` = :uid".
            ") AND `id` NOT IN ( ".
                 "SELECT `wm_formula`.`id` ".
@@ -129,10 +129,10 @@ if (isset($_GET['rand'])) {
     $formula_id = $_GET['formula_id'];
     $sql = "SELECT `wm_formula`.`id`, `formula_name`, `description`, ".
            "`mode`, `best_rendering`,".
-           "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
+           "COUNT(`wm_partial_answer`.`id`) as `counter` ".
            "FROM `wm_formula` ".
-           "LEFT JOIN `wm_raw_data2formula` ".
-           "ON `formula_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
+           "LEFT JOIN `wm_partial_answer` ".
+           "ON `symbol_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
            "WHERE `wm_formula`.`id` = :id;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['formula_id'], PDO::PARAM_INT);
@@ -167,8 +167,8 @@ if (isset($_GET['rand'])) {
         }
 
         // Has the user already written this symbol?
-        $sql = "SELECT `raw_data_id` FROM `wm_raw_data2formula` ".
-               "WHERE `formula_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
+        $sql = "SELECT `recording_id` FROM `wm_partial_answer` ".
+               "WHERE `symbol_id` = :fid AND `user_id` = :uid LIMIT 0, 1";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':fid', $formula_id, PDO::PARAM_INT);
         $user_id = get_uid();
@@ -194,12 +194,12 @@ if (isset($_GET['rand'])) {
 } else {
     $uid = get_uid();
     $sql = "SELECT `wm_formula`.`id` ,  `formula_name`, ".
-           "COUNT(`wm_raw_data2formula`.`id`) as `counter` ".
+           "COUNT(`wm_partial_answer`.`id`) as `counter` ".
            "FROM `wm_formula` ".
-           "LEFT JOIN `wm_raw_data2formula` ".
-           "ON `formula_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
+           "LEFT JOIN `wm_partial_answer` ".
+           "ON `symbol_id` = `wm_formula`.`id` AND `wm_formula`.`user_id` = :uid ".
            "WHERE `formula_type` = 'single symbol' ".
-           "GROUP BY formula_name ".
+           "GROUP BY `formula_name` ".
            "ORDER BY `wm_formula`.`id` ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
@@ -207,13 +207,13 @@ if (isset($_GET['rand'])) {
     $formula_ids = $stmt->fetchAll();
 
     $sql = "SELECT `wm_challenges`.`id` , `challenge_name`, ".
-           "sum(case when `raw_data_id` is null then 1 else 0 end) as `missing`, ".
-           "sum(case when `raw_data_id` is null then 1 else 1 end) as `total` ".
+           "sum(case when `recording_id` is null then 1 else 0 end) as `missing`, ".
+           "sum(case when `recording_id` is null then 1 else 1 end) as `total` ".
            "FROM `wm_challenges` ".
            "JOIN `wm_formula2challenge` ".
            "ON `challenge_id` = `wm_challenges`.`id` ".
-           "LEFT JOIN `wm_raw_data2formula` ".
-           "ON `wm_raw_data2formula`.`formula_id` = `wm_formula2challenge`.`formula_id` ".
+           "LEFT JOIN `wm_partial_answer` ".
+           "ON `wm_partial_answer`.`symbol_id` = `wm_formula2challenge`.`formula_id` ".
            "AND `user_id` = :uid ".
            "GROUP BY `challenge_name` ".
            "ORDER BY `challenge_name` ASC";

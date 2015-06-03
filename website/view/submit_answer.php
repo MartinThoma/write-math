@@ -41,6 +41,12 @@ function add_partial_classification($user_id, $raw_data_id, $latex, $strokes) {
         $stmt->execute();
         $formula_id = $pdo->lastInsertId('id');
     }
+    add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $strokes);
+}
+
+function add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $strokes) {
+    global $pdo;
+    global $msg;
 
     $sql = "INSERT INTO `wm_partial_answer` (".
            "`user_id` ,".

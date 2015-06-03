@@ -31,7 +31,7 @@
         <td><a href="../user/?id={{ formula.user_id }}">{{ formula.user_id }}</a></td>
         <td>
         {% for answer in formula_answers[formula.id] %}
-            <a href="../view/?raw_data_id={{ answer.raw_data_id }}">{{ answer.raw_data_id }}</a>
+            <a href="../view/?raw_data_id={{ answer.recording_id }}">{{ answer.recording_id }}</a>
         {% endfor %}
         </td>
     </tr>

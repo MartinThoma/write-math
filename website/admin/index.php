@@ -53,8 +53,8 @@ function merge_formulas($fid_a, $fid_b) {
     $stmt->execute();
 
     // Adjust peoples answers
-    $sql = "UPDATE `wm_raw_data2formula` SET `formula_id` = :ida ".
-           "WHERE  `formula_id` = :idb LIMIT 20;";
+    $sql = "UPDATE `wm_partial_answer` SET `symbol_id` = :ida ".
+           "WHERE  `symbol_id` = :idb LIMIT 20;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':ida', $fid_a, PDO::PARAM_INT);
     $stmt->bindParam(':idb', $fid_b, PDO::PARAM_INT);
@@ -234,8 +234,8 @@ $without_example = $stmt->fetchAll();
 
 $formula_answers = array();
 foreach ($without_example as $key => $formula) {
-    $sql = "SELECT `raw_data_id`  FROM `wm_raw_data2formula` ".
-           "WHERE `formula_id` = :fid";
+    $sql = "SELECT `recording_id`  FROM `wm_partial_answer` ".
+           "WHERE `symbol_id` = :fid";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':fid', $formula['id'], PDO::PARAM_INT);
     $stmt->execute();
