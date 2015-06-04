@@ -41,7 +41,9 @@ function add_partial_classification($user_id, $raw_data_id, $latex, $strokes) {
         $stmt->execute();
         $formula_id = $pdo->lastInsertId('id');
     }
-    add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $strokes);
+    $ret = add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $strokes);
+    return '{"add_partial_classification_pure": "'.$ret.'",'.
+            '"formula_id": "'.$formula_id.'"}';
 }
 
 function add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $strokes) {
