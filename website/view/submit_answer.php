@@ -69,7 +69,7 @@ function add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $s
             // duplicate entry, do something else
             return '{"error": "This classification does already exist."}';
         } else {
-            return '{"error": ".'.implode(":", $e->errorInfo()).'}';
+            return '{"error": ".'.implode(":", $pdo->errorInfo()).'}';
         }
     }
     return json_encode(1);
