@@ -43,7 +43,7 @@
         $.ajax({
           type: "POST",
           url: "../api/set-accept-partial.php",
-          data: {'symbol_id': id, 'raw_data_id': record_id},
+          data: {'symbol_id': id, 'raw_data_id': record_id, 'strokes': 'ALL'},
           success: function(data)
             {
                 console.log(data);
@@ -60,8 +60,8 @@
         $("#button"+id).removeClass('btn-success');
         $.ajax({
           type: "POST",
-          url: "../api/set-unaccept.php",
-          data: {'symbol_id': id, 'raw_data_id': record_id},
+          url: "../api/set-unaccept-partial.php",
+          data: {'symbol_id': id, 'raw_data_id': record_id, 'strokes': 'ALL'},
           success: function(data)
             {
                 console.log(data);

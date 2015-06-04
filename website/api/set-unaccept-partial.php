@@ -1,5 +1,6 @@
 <?php
 include '../init.php';
+require_once 'api.functions.php';
 
 if (!is_logged_in()) {
     header("Location: ../login");
@@ -42,6 +43,14 @@ function unaccept_partial_answer($answer_id) {
 if (isset($_POST['partial_answer_id'])) {
     $answer_id = intval($_POST['partial_answer_id']);
 
+    $success = unaccept_partial_answer($answer_id);
+    if ($success) {
+        echo json_encode(1);
+    } else {
+        echo json_encode(0);
+    }
+} elseif (isset($_POST['symbol_id']) && isset($_POST['raw_data_id']) && isset($_POST['strokes'])) {
+    $answer_id = get_answer_id($_POST['raw_data_id'], $_POST['symbol_id'], $_POST['strokes']);
     $success = unaccept_partial_answer($answer_id);
     if ($success) {
         echo json_encode(1);

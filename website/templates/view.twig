@@ -218,7 +218,7 @@
         {% for d in partial_answers %}
             <tr>
                 <td><a href="?raw_data_id={{ raw_data_id }}&amp;delete_partial_answer={{ d.id }}" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                    <button onclick="{% if d.is_accepted %}unacceptPartialAnswerView({{ raw_data_id }}, {{ d.id }}){% else %}acceptPartialAnswerView({{ raw_data_id }}, {{ d.id }}){% endif %}" class="btn {% if d.is_accepted %}btn-success{% else %}btn-default{% endif %}" id="partialAnswer{{ d.id }}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button></td>
+                    <button onclick="{% if d.is_accepted %}unacceptPartialAnswerView({{ raw_data_id }}, {{ d.id }}){% else %}acceptPartialAnswerView({{ raw_data_id }}, {{ d.symbol_id }}){% endif %}" class="btn {% if d.is_accepted %}btn-success{% else %}btn-default{% endif %}" id="partialAnswer{{ d.id }}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button></td>
                 <td>{% if d.best_rendering != '' %}<img
               src="../formulas/{{ d.symbol_id }}-{{ d.best_rendering }}.svg"
                  width="150" style="width:50px;max-height:50px;" alt="formula rendering" />{% endif %}<a href="../symbol/?id={{ d.symbol_id }}">{{ d.formula_in_latex }}</a></td>

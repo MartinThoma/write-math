@@ -7,6 +7,12 @@ if (!is_logged_in()) {
     header("Location: ../login");
 }
 
+// Parameters
+// -----------
+// raw_data_id : int
+//     Identifier of the recording
+// answer : identifier of the partial answer
+//
 // Returns
 // -------
 // boolean :
@@ -18,7 +24,6 @@ function accept_partial_answer($raw_data_id, $answer_id) {
     $total_strokes = get_stroke_count($raw_data_id);
     $strokes = implode(',', range(0, $total_strokes-1));
     $user_id = get_uid();
-    add_partial_classification_pure($user_id, $raw_data_id, $answer_id, $strokes);
 
     // Check if this answer conflicts with other partial answers
     $sql = "SELECT `wm_partial_answer`.`id`, `formula_name`, `strokes`, ".
@@ -60,7 +65,7 @@ function accept_partial_answer($raw_data_id, $answer_id) {
 
     $sql = "UPDATE `wm_partial_answer` ".
            "SET `is_accepted` = 1 ".
-           "WHERE `symbol_id` = :answer_id ".
+           "WHERE `id` = :answer_id ".
            "AND `recording_id` = :recording_id ".
            "AND (`user_id` = :user_id OR :user_id = 10) ";  # TODO: Change to admin-group check
            "LIMIT 1;";
@@ -119,7 +124,15 @@ function accept_partial_answer($raw_data_id, $answer_id) {
 
 if (isset($_POST['raw_data_id'])) {
     $raw_data_id = intval($_POST['raw_data_id']);
-    $answer_id = intval($_POST['symbol_id']);
+    if(isset($_POST['answer_id'])) {
+        $answer_id = intval($_POST['answer_id']);
+    } elseif (isset($_POST['symbol_id'])) {
+        $symbol_id = intval($_POST['symbol_id']);
+        $strokes = intval($_POST['strokes']);
+        $answer_id = get_answer_id($raw_data_id, $symbol_id, $strokes);
+    } else {
+        echo '{"error": "neither \'symbol_id\' nor \'answer_id\' was set."}';
+    }
     $return = accept_partial_answer($raw_data_id, $answer_id);
     if ($return == '') {
         echo json_encode(1);

@@ -1,8 +1,8 @@
-function acceptPartialAnswer(raw_data_id, formula_id, successHandler) {
+function acceptPartialAnswer(raw_data_id, answer_id, successHandler) {
     $.ajax({
       type: "POST",
       url: "../api/set-accept-partial.php",
-      data: {'raw_data_id': raw_data_id, 'partial_answer_id': formula_id},
+      data: {'raw_data_id': raw_data_id, 'answer_id': answer_id},
       success: function(data)
         {
             console.log(data);
