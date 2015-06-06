@@ -98,7 +98,10 @@
 <form class="form-inline" role="form" method="post">
   <input type="hidden" name="raw_id_segmentation" value="{{ raw_data_id }}" />
   <div class="form-group">
-    <textarea id="segmentation" name="segmentation" class="form-control" rows="1" cols="50">{{ image_data.segmentation|json_encode() }}</textarea>
+    <input type="text"
+           id="segmentation" name="segmentation"
+           class="form-control"
+           value="{{ image_data.segmentation|json_encode() }}" />
   </div>
   <button type="submit" class="btn btn-default">update</button>
 </form></td>
