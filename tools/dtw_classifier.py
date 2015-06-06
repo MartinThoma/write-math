@@ -18,8 +18,10 @@ class dtw_classifier(object):
 
     def learn(self, trainingdata):
         """
-        @param trainingdata: Dictionaries with 'handwriting' elements and
-                             'formula_id', 'id', 'formula_in_latex'
+        Parameters
+        ----------
+        trainingdata: dict
+            has keys 'handwriting', 'formula_id', 'id', 'formula_in_latex'
         """
         assert type(trainingdata) is list
         for data in trainingdata:
@@ -36,9 +38,16 @@ class dtw_classifier(object):
     def classify(self, A):
         """
         Classify A with data from datasets and smoothing of EPSILON.
-        @param  list A   List of points
-        @return list     List of possible classifications, ordered DESC by
-                           likelines
+
+        Parameters
+        ----------
+        A : list
+            List of points
+
+        Returns
+        -------
+        list :
+            List of possible classifications, ordered DESC by likelines
         """
 
         assert type(A) is HandwrittenData.HandwrittenData

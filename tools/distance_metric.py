@@ -1,14 +1,23 @@
 #!/usr/bin/env python
 
-import HandwrittenData
+from hwrt import HandwrittenData
 import math
 import numpy
 
 
 def softmax(w, t=1.0):
     """Calculate the softmax of a list of numbers w.
-    @param w: list of numbers
-    @return a list of the same length as w of non-negative numbers
+
+    Parameters
+    ----------
+    w : list of numbers
+
+    Returns
+    -------
+    a list of the same length as w of non-negative numbers
+
+    Examples
+    --------
     >>> softmax([0.1, 0.2])
     array([ 0.47502081,  0.52497919])
     >>> softmax([-0.1, 0.2])
@@ -25,10 +34,18 @@ def softmax(w, t=1.0):
 
 def point_distance(p1, p2, squared=False):
     """ Calculate the squared eucliden distance of two points.
-    @param  associative array $p1 first point
-    @param  associative array $p2 second point
-    @return float
 
+    Parameters
+    ----------
+    p1 : associative array $p1 first point
+    p2 : associative array $p2 second point
+
+    Returns
+    -------
+    float
+
+    Examples
+    --------
     >>> point_distance({'x': 0, 'y': 0}, {'x': 3, 'y': 4})
     5.0
     >>> '%.2f' % point_distance({'x': 0, 'y': 0}, {'x': 1, 'y': 22})
@@ -52,11 +69,19 @@ def handwritten_data_greedy_matching_distance(a, b):
 
     def sequence_greedy_distance(A, B, distance_func=point_distance):
         """Calculate the distance between pointlist A and pointlist B.
-        @param A list of points; this list gets modified, so you should copy it
-                                 if you want to use it later
-        @param B list of points; this list gets modified, so you should copy it
-                                 if you want to use it later
-        @return non-negative float
+
+        Parameters
+        ----------
+        A : list of points
+            this list gets modified, so you should copy it if you want to use
+            it later
+        B : list of points
+            this list gets modified, so you should copy it if you want to use
+            it later
+
+        Returns
+        -------
+        non-negative float
         """
         assert isinstance(A, list), \
             "A is not of type list, but of %r" % type(A)
@@ -105,8 +130,8 @@ def handwritten_data_greedy_matching_distance(a, b):
                 d += distance_func(b2, p)
         return d
 
-    a_pointlist = a.get_pointlist()
-    b_pointlist = b.get_pointlist()
+    a_pointlist = [[item for sublist in a.get_pointlist() for item in sublist]]
+    b_pointlist = [[item for sublist in b.get_pointlist() for item in sublist]]
 
     distance_sum = 0.0
     if len(a_pointlist) != len(b_pointlist):
