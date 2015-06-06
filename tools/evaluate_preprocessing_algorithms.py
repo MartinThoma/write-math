@@ -3,13 +3,12 @@
 
 """Find outliers in the dataset."""
 
-from HandwrittenData import HandwrittenData
-# Database stuff
-import pymysql
 import pymysql.cursors
-import preprocessing
 from copy import deepcopy
-import utils
+
+from hwrt.HandwrittenData import HandwrittenData
+from hwrt import preprocessing
+from hwrt import utils
 
 
 class HandwrittenDataM(HandwrittenData):
@@ -121,23 +120,25 @@ class HandwrittenDataM(HandwrittenData):
 
 
 def main(cfg, raw_data_start_id):
-    connection = pymysql.connect(host=cfg['mysql_local']['host'],
-                                 user=cfg['mysql_local']['user'],
-                                 passwd=cfg['mysql_local']['passwd'],
-                                 db=cfg['mysql_local']['db'],
+    cfg = utils.get_database_configuration()
+    mysql = cfg['mysql_online']
+    connection = pymysql.connect(host=mysql['host'],
+                                 user=mysql['user'],
+                                 passwd=mysql['passwd'],
+                                 db=mysql['db'],
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
     # Get formulas
     print("Get formulas")
-    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula`")
-    cursor.execute(sql)
+    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` WHERE `id` > %s")
+    cursor.execute(sql, (raw_data_start_id, ))
     formulas = cursor.fetchall()
     formulaid2latex = {}
     for el in formulas:
         formulaid2latex[el['id']] = el['formula_in_latex']
 
-    preprocessing_queue = [preprocessing.Scale_and_shift(),
+    preprocessing_queue = [preprocessing.ScaleAndShift(),
                            # preprocessing.Douglas_peucker(EPSILON=0.2),
                            # preprocessing.Space_evenly(number=100,
                            #                            kind='cubic')
@@ -169,7 +170,7 @@ def main(cfg, raw_data_start_id):
         checked_formulas += 1
         if len(raw_datasets) < 100:
             continue
-        As = []
+
         for i, data in enumerate(raw_datasets):
             if data['data'] == "[]":
                 continue
@@ -186,7 +187,7 @@ def main(cfg, raw_data_start_id):
                                  formulaid2latex[formula_id])
             B.preprocessing(preprocessing_queue)
             Bs = deepcopy(B)
-            Bs.preprocessing([preprocessing.Dot_reduction(0.01)])
+            Bs.preprocessing([preprocessing.DotReduction(0.01)])
             if B != Bs:
                 before_pointcount = sum([len(line)
                                          for line in B.get_pointlist()])

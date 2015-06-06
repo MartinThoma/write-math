@@ -18,18 +18,20 @@ import pymysql
 import pymysql.cursors
 # Other
 import webbrowser
+
 # My classes
-from HandwrittenData import HandwrittenData
+from hwrt.HandwrittenData import HandwrittenData
 from distance_metric import handwritten_data_greedy_matching_distance as dtw
-import preprocessing
-import utils
+from hwrt import preprocessing
+from hwrt import utils
 
 
 def update_data(cfg, a, unaccept=False):
-    connection_local = pymysql.connect(host=cfg['mysql_local']['host'],
-                                       user=cfg['mysql_local']['user'],
-                                       passwd=cfg['mysql_local']['passwd'],
-                                       db=cfg['mysql_local']['db'],
+    mysql = cfg['mysql_online']
+    connection_local = pymysql.connect(host=mysql['host'],
+                                       user=mysql['user'],
+                                       passwd=mysql['passwd'],
+                                       db=mysql['db'],
                                        cursorclass=pymysql.cursors.DictCursor)
     cursor_local = connection_local.cursor()
     if unaccept:
@@ -92,10 +94,10 @@ def update_data(cfg, a, unaccept=False):
     connection_local.commit()
     cursor_local.close()
     connection_local.close()
-    connection_online = pymysql.connect(host=cfg['mysql_online']['host'],
-                                        user=cfg['mysql_online']['user'],
-                                        passwd=cfg['mysql_online']['passwd'],
-                                        db=cfg['mysql_online']['db'],
+    connection_online = pymysql.connect(host=mysql['host'],
+                                        user=mysql['user'],
+                                        passwd=mysql['passwd'],
+                                        db=mysql['db'],
                                         cursorclass=pymysql.cursors.DictCursor)
     cursor_online = connection_online.cursor()
     cursor_online.execute(sql)
@@ -213,24 +215,26 @@ class HandwrittenDataM(HandwrittenData):
 
 
 def main(cfg, raw_data_start_id):
-    connection = pymysql.connect(host=cfg['mysql_local']['host'],
-                                 user=cfg['mysql_local']['user'],
-                                 passwd=cfg['mysql_local']['passwd'],
-                                 db=cfg['mysql_local']['db'],
+    mysql = cfg['mysql_online']
+    connection = pymysql.connect(host=mysql['host'],
+                                 user=mysql['user'],
+                                 passwd=mysql['passwd'],
+                                 db=mysql['db'],
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
     # Get formulas
     logger.info("Get formulas")
     print("get formulas")
-    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula`")
-    cursor.execute(sql)
+    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
+           "WHERE `id` > %s ORDER BY `id`")
+    cursor.execute(sql, (raw_data_start_id, ))
     formulas = cursor.fetchall()
     formulaid2latex = {}
     for el in formulas:
         formulaid2latex[el['id']] = el['formula_in_latex']
 
-    preprocessing_queue = [preprocessing.Scale_and_shift(),
+    preprocessing_queue = [preprocessing.ScaleAndShift(),
                            # preprocessing.Douglas_peucker(EPSILON=0.2),
                            # preprocessing.Space_evenly(number=100,
                            #                            kind='cubic')
