@@ -34,6 +34,16 @@ import hwrt.utils as utils
 def input_string(question=""):
     """A function that works for both, Python 2.x and Python 3.x.
        It asks the user for input and returns it as a string.
+
+    Parameters
+    ----------
+    question : string
+        The question displayed to the user asking for input.
+
+    Returns
+    -------
+    string :
+        The user input
     """
     if sys.version_info[0] == 2:
         return raw_input(question)
@@ -149,30 +159,20 @@ def sync_directory(directory):
     return True
 
 
-def main(destination=os.path.join(utils.get_project_root(),
-                                  "raw-datasets"),
-         small_dataset=False,
-         tiny_dataset=False,
-         renderings=False):
-    """Main part of the backup script."""
-    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    if small_dataset:
-        filename = "%s-handwriting_datasets-small-raw.pickle" % time_prefix
-    elif tiny_dataset:
-        filename = "%s-handwriting_datasets-tiny-raw.pickle" % time_prefix
-    else:
-        filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
-    destination_path = os.path.join(destination, filename)
-    logging.info("Data will be written to '%s'", destination_path)
-    cfg = utils.get_database_configuration()
-    mysql = cfg['mysql_online']
-    connection = pymysql.connect(host=mysql['host'],
-                                 user=mysql['user'],
-                                 passwd=mysql['passwd'],
-                                 db=mysql['db'],
-                                 cursorclass=pymysql.cursors.DictCursor)
-    cursor = connection.cursor()
+def get_formulas(cursor, small_dataset, tiny_dataset):
+    """Get a list of formulas.
 
+    Parameters
+    ----------
+    cursor : a database cursor
+    small_dataset : bool
+    tiny_dataset : bool
+
+    Returns
+    -------
+    list :
+        A list of formulas
+    """
     # Get all formulas that should get examined
     if small_dataset:
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
@@ -197,7 +197,35 @@ def main(destination=os.path.join(utils.get_project_root(),
                "ORDER BY `id` ASC")
     cursor.execute(sql)
     formulas = cursor.fetchall()
+    return formulas
 
+
+def main(destination=os.path.join(utils.get_project_root(),
+                                  "raw-datasets"),
+         small_dataset=False,
+         tiny_dataset=False,
+         renderings=False):
+    """Main part of the backup script."""
+    time_prefix = time.strftime("%Y-%m-%d-%H-%M")
+    if small_dataset:
+        filename = "%s-handwriting_datasets-small-raw.pickle" % time_prefix
+    elif tiny_dataset:
+        filename = "%s-handwriting_datasets-tiny-raw.pickle" % time_prefix
+    else:
+        filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
+    destination_path = os.path.join(destination, filename)
+    logging.info("Data will be written to '%s'", destination_path)
+
+    cfg = utils.get_database_configuration()
+    mysql = cfg['mysql_online']
+    connection = pymysql.connect(host=mysql['host'],
+                                 user=mysql['user'],
+                                 passwd=mysql['passwd'],
+                                 db=mysql['db'],
+                                 cursorclass=pymysql.cursors.DictCursor)
+    cursor = connection.cursor()
+
+    formulas = get_formulas(cursor, tiny_dataset, small_dataset)
     handwriting_datasets = []
     formula_id2latex = {}
 
