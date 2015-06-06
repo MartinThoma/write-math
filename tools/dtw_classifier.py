@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Classify data with a greedy algorithm that is simmilar to DTW (but not DTW!).

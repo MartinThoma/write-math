@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Normalize the data in `wm_formula`.`formula_in_latex`

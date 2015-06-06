@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Move answers from old `wm_raw_data2formula` to new `wm_partial_answer`
 

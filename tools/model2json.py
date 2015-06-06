@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Convert a model.json file with numpy arrays to a normal json file."""
 

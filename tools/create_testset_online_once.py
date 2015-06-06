@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Add `is_in_testset` to raw_datasets in MySQL database, so that at least 10%

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Print which symbols are contained in a crossvalidation datasets.pickle file.
 """
