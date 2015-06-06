@@ -468,15 +468,6 @@ $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
 $stmt->execute();
 $automatic_answers = $stmt->fetchAll();
 
-// Get strokes2symbol data
-$sql = "SELECT * FROM `wm_strokes_to_symbol` ".
-       "JOIN `wm_formula` ON `wm_formula`.`id` = `symbol_id` ".
-       "WHERE `raw_data_id` = :raw_data_id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
-$stmt->execute();
-$strokes2symbol = $stmt->fetchAll();
-
 echo $twig->render('view.twig', array('heading' => 'View',
                                       'logged_in' => is_logged_in(),
                                       'display_name' => $_SESSION['display_name'],
@@ -494,8 +485,7 @@ echo $twig->render('view.twig', array('heading' => 'View',
                                       'bounding_box' => $bounding_box,
                                       'automatic_answers' => $automatic_answers,
                                       'time_resolution' => $time_resolution,
-                                      'force_reload' => $force_reload_raw_svg,
-                                      'strokes2symbol' => $strokes2symbol
+                                      'force_reload' => $force_reload_raw_svg
                                       )
                   );
 

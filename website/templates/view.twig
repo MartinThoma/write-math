@@ -238,29 +238,6 @@
    </table>
 {% endif %}
 
-{% if strokes2symbol|length > 0%}
-   <h2>Strokes to symbol mappings</h2>
-   <table class="table">
-        <tr>
-            <th>Symbol</th>
-            <th>Strokes</th>
-            <th>Image</th>
-        </tr>
-        {% for d in strokes2symbol %}
-        <tr>
-            <td><a href="../symbol/?id={{ d.symbol_id }}">{{ d.formula_in_latex }}</a></td>
-            <td>{{ d.strokes }}</td>
-            <td><object data="../raw-data/{{ raw_data_id }}.svg"
-        type="image/svg+xml"
-        id="rawdatavis_{{ loop.index }}"
-        data-strokes="{{ d.strokes }}"
-        style="width:400px;height:50px;border:1px solid black;"
-></object></td>
-        </tr>
-        {% endfor %}
-   </table>
-{% endif %}
-
     <h2>Add answer</h2>
     <form method="post" action="?raw_data_id={{ raw_data_id }}" role="form">
 
