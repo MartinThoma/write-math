@@ -104,7 +104,7 @@ function create_raw_data_svg($raw_data_id, $data, $segmentation=NULL) {
         $i += 1;
     }
 
-    $path = get_path(json_encode($new_list));
+    $path = get_path(json_encode($new_list), 0, $height);
 
     # Create SVG and store it for later usage
     $filename = "../classify/svg-template.svg";
@@ -145,7 +145,7 @@ function get_path_pure($data, $epsilon=0) {
     return $path;
 }
 
-function get_path($data, $epsilon=0) {
+function get_path($data, $epsilon=0, $height=1000) {
     $path = "";
     $data = pointLineList($data);
     if (!is_array($data)) {
@@ -169,7 +169,11 @@ function get_path($data, $epsilon=0) {
 
                 if ($i == 0) {
                     $first = false;
-                    $path .= "<path id='stroke".$stroke_nr."' style=\"fill:none;stroke:".$point['color'].";stroke-width:5;stroke-linecap:round;\" d=\"  M ".$point['x']." ".$point['y'];
+                    $stroke_width = 5;
+                    if ($height > 1000) {
+                        $stroke_width = $height / 50.0;
+                    }
+                    $path .= "<path id='stroke".$stroke_nr."' style=\"fill:none;stroke:".$point['color'].";stroke-width:$stroke_width;stroke-linecap:round;\" d=\"  M ".$point['x']." ".$point['y'];
                 } else {
                     $path .= " L ".$point['x']." ".$point['y'];
                 }
