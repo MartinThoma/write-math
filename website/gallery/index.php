@@ -49,7 +49,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
                    "ON (`recording_id` = `wm_raw_draw_data`.`id`) ".
               "LEFT OUTER JOIN `wm_worker_answers`  ".
                    "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
-              "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
+              "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 AND `classifiable`=1 ".
               "AND `nr_of_symbols` > 1 ".
               "GROUP BY `wm_raw_draw_data`.`id` ".
               "HAVING `answers` > 0 OR `answers2` > 0 ".
@@ -79,7 +79,7 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
                    "ON (`wm_partial_answer`.`recording_id` = `wm_raw_draw_data`.`id`) ".
               "LEFT OUTER JOIN `wm_worker_answers`  ".
                    "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
-              "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
+              "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 AND `classifiable`=1 ".
               "GROUP BY `wm_raw_draw_data`.`id` ".
               "HAVING `answers` = 0 AND `answers2` = 0 ".
               "ORDER BY `creation_date` DESC ";
