@@ -57,7 +57,7 @@ def clean(mysql):
            "`wm_formula_svg_missing`, `wm_invalid_formula_requests`, "
            "`wm_languages`, `wm_papers`, "
            "`wm_raw_draw_data`, `wm_renderings`, `wm_similarity`, "
-           "`wm_users`, `wm_user_unknown_formula`, `wm_votes`, "
+           "`wm_users`, `wm_user_unknown_formula`, "
            "`wm_workers`, `wm_worker_answers`;SET foreign_key_checks = 1;")
     a = cursor.execute(sql)
     print(a)

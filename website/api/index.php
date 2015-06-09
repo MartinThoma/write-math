@@ -56,7 +56,6 @@ function add_classification($formula_id, $raw_data_id) {
     $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
     $stmt->bindParam(':strokes', $strokes, PDO::PARAM_STR);
 
-    // TODO: Catch duplicate classification as upvote
     try {
         $result = $stmt->execute();
     } catch (Exception $e) {

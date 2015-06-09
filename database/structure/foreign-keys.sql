@@ -53,14 +53,6 @@ ALTER TABLE `wm_partial_answer`
   ADD CONSTRAINT `wm_partial_answer_ibfk_3` FOREIGN KEY (`symbol_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `wm_raw_data2formula`
---
-ALTER TABLE `wm_raw_data2formula`
-  ADD CONSTRAINT `wm_raw_data2formula_ibfk_1` FOREIGN KEY (`raw_data_id`) REFERENCES `wm_raw_draw_data` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `wm_raw_data2formula_ibfk_2` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `wm_raw_data2formula_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE;
-
---
 -- Constraints der Tabelle `wm_raw_draw_data`
 --
 ALTER TABLE `wm_raw_draw_data`
@@ -82,14 +74,6 @@ ALTER TABLE `wm_similarity`
   ADD CONSTRAINT `wm_similarity_ibfk_2` FOREIGN KEY (`similar_symbol`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `wm_strokes_to_symbol`
---
-ALTER TABLE `wm_strokes_to_symbol`
-  ADD CONSTRAINT `wm_strokes_to_symbol_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `wm_workers` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `wm_strokes_to_symbol_ibfk_1` FOREIGN KEY (`raw_data_id`) REFERENCES `wm_raw_draw_data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `wm_strokes_to_symbol_ibfk_2` FOREIGN KEY (`symbol_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Constraints der Tabelle `wm_tags2symbols`
 --
 ALTER TABLE `wm_tags2symbols`
@@ -107,13 +91,6 @@ ALTER TABLE `wm_user_unknown_formula`
 --
 ALTER TABLE `wm_users`
   ADD CONSTRAINT `wm_users_ibfk_1` FOREIGN KEY (`language`) REFERENCES `wm_languages` (`language_code`);
-
---
--- Constraints der Tabelle `wm_votes`
---
-ALTER TABLE `wm_votes`
-  ADD CONSTRAINT `uservote_rawdata2formula_id` FOREIGN KEY (`raw_data2formula_id`) REFERENCES `wm_raw_data2formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `uservote_userid` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `wm_worker_answers`

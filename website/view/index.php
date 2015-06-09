@@ -339,38 +339,6 @@ if (isset($_GET['raw_data_id'])) {
             # Redirect to prevent multiple submission
             header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
         }
-    } elseif (isset($_GET['vote'])) {
-        // TODO: Check if user has right to vote
-
-        $vote = intval($_GET['vote']);
-        $id = intval($_GET['raw_data2formula_id']);
-        if ($vote == 1 || $vote == -1) {
-            $sql = "SELECT `user_id` FROM `wm_partial_answer` ".
-                   "WHERE `id` = :id";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-            $row = $stmt->fetchObject();
-            if ($row->user_id == get_uid()) {
-                $msg[] = array("class" => "alert-warning",
-                               "text" => "You can't upvote your own answer.");
-            } else {
-                try {
-                    $sql = "INSERT INTO `wm_votes` ".
-                            "(`user_id`, `raw_data2formula_id`, `vote`)".
-                            "VALUES (:uid,  :raw_data2formula_id, :vote);";
-                    $stmt = $pdo->prepare($sql);
-                    $uid = get_uid();
-                    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-                    $stmt->bindParam(':raw_data2formula_id', $id, PDO::PARAM_INT);
-                    $stmt->bindParam(':vote', $vote, PDO::PARAM_INT);
-                    $stmt->execute();
-                } catch (Exception $e) {
-                    $msg[] = array("class" => "alert-warning",
-                                   "text" => "You've already casted a vote.");
-                }
-            }
-        }
     } elseif (isset($_GET['unaccept_partial_answer'])) {
         $answer_id = intval($_GET['unaccept_partial_answer']);
         $success = unaccept_partial_answer($answer_id);

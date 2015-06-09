@@ -162,7 +162,7 @@ function merge_accounts($ip_id, $regular_id) {
     // This approach might fail due to uniqueness constraints
     $tables = array('wm_flags', 'wm_formula_svg_missing',
                     'wm_partial_answer', 'wm_raw_draw_data', 'wm_renderings',
-                    'wm_user_unknown_formula', 'wm_votes', 'wm_workers');
+                    'wm_user_unknown_formula', 'wm_workers');
     foreach ($tables as $table) {
         $sql = "UPDATE `$table` ".
                "SET `user_id` =  '$regular_id' WHERE `user_id` =$ip_id;";
@@ -173,7 +173,7 @@ function merge_accounts($ip_id, $regular_id) {
     // wasn't successfull
     $tables = array('wm_flags', 'wm_formula_svg_missing',
                     'wm_partial_answer', 'wm_raw_draw_data', 'wm_renderings',
-                    'wm_user_unknown_formula', 'wm_votes', 'wm_workers');
+                    'wm_user_unknown_formula', 'wm_workers');
     foreach ($tables as $table) {
         $sql = "SELECT `id` FROM `$table` WHERE `user_id` = $ip_id;";
         $stmt = $pdo->prepare($sql);
