@@ -17,13 +17,6 @@ ALTER TABLE `wm_formula`
   ADD CONSTRAINT `wm_formula_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `wm_formula2challenge`
---
-ALTER TABLE `wm_formula2challenge`
-  ADD CONSTRAINT `wm_formula2challenge_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `wm_formula2challenge_ibfk_2` FOREIGN KEY (`challenge_id`) REFERENCES `wm_challenges` (`id`) ON DELETE CASCADE;
-
---
 -- Constraints der Tabelle `wm_formula_in_paper`
 --
 ALTER TABLE `wm_formula_in_paper`

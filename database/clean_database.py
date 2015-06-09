@@ -51,7 +51,7 @@ def clean(mysql):
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
-    sql = ("SET foreign_key_checks = 0;DROP TABLE `wm_challenges`, "
+    sql = ("SET foreign_key_checks = 0;DROP TABLE "
            "`wm_dtw_worker_data`, `wm_flags`, `wm_formula`, "
            "`wm_formula2challenge`, `wm_formula_in_paper`, "
            "`wm_formula_svg_missing`, `wm_invalid_formula_requests`, "

@@ -11,8 +11,6 @@ Adding all data from the sql textfiles to the MySQL database takes much longer:
 ```bash
 $ time ./import_database.py
 Import schema
-Import Table 'wm_challenges.sql'... done in 0.29 s
-Import Table 'wm_formula2challenge.sql'... done in 0.07 s
 Import Table 'wm_formula.sql'... done in 0.33 s
 Import Table 'wm_formula_svg_missing.sql'... done in 0.11 s
 Import Table 'wm_invalid_formula_requests.sql'... done in 0.08 s

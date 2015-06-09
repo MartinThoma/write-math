@@ -146,11 +146,11 @@ if (isset($_GET['rand'])) {
 
     # TODO: Fix this shit
     while (true) {
-        $sql = "SELECT `formula_id` FROM `wm_formula2challenge` ".
-               "WHERE `challenge_id` = :challenge_id ".
-               "ORDER BY `formula_id` LIMIT $i, 1";
+        $sql = "SELECT `symbol_id` as `formula_id` FROM `wm_tags2symbols` ".
+               "WHERE `tag_id` = :tag_id ".
+               "ORDER BY `symbol_id` LIMIT $i, 1";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':challenge_id', $challenge_id, PDO::PARAM_INT);
+        $stmt->bindParam(':tag_id', $challenge_id, PDO::PARAM_INT);
         $stmt->execute();
         $formula_id = $stmt->fetchObject();
 
@@ -206,17 +206,17 @@ if (isset($_GET['rand'])) {
     $stmt->execute();
     $formula_ids = $stmt->fetchAll();
 
-    $sql = "SELECT `wm_challenges`.`id` , `challenge_name`, ".
+    $sql = "SELECT `wm_tags`.`id` , `tag_name`, ".
            "sum(case when `recording_id` is null then 1 else 0 end) as `missing`, ".
            "sum(case when `recording_id` is null then 1 else 1 end) as `total` ".
-           "FROM `wm_challenges` ".
-           "JOIN `wm_formula2challenge` ".
-           "ON `challenge_id` = `wm_challenges`.`id` ".
+           "FROM `wm_tags` ".
+           "JOIN `wm_tags2symbols` ".
+           "ON `wm_tags`.`id` = `wm_tags2symbols`.`tag_id` ".
            "LEFT JOIN `wm_partial_answer` ".
-           "ON `wm_partial_answer`.`symbol_id` = `wm_formula2challenge`.`formula_id` ".
+           "ON `wm_partial_answer`.`symbol_id` = `wm_tags2symbols`.`symbol_id` ".
            "AND `user_id` = :uid ".
-           "GROUP BY `challenge_name` ".
-           "ORDER BY `challenge_name` ASC";
+           "GROUP BY `tag_name` ".
+           "ORDER BY `tag_name` ASC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);

@@ -113,7 +113,7 @@
     <h2>Challenges</h2>
     <ul>
     {% for challenge in challenges %}
-        <li><a href="?challenge_id={{ challenge['id'] }}&i=0">{{ challenge['challenge_name'] | raw }}</a>
+        <li><a href="?challenge_id={{ challenge['id'] }}&i=0">{{ challenge['tag_name'] | raw }}</a>
         {% if challenge['missing'] == 0 %}
             <img src="../icons/accept.png" alt="challenge done" />
         {% else %}
