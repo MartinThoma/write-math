@@ -427,9 +427,10 @@ if (isset($_GET['raw_data_id'])) {
     // Get all partial classifications
     $sql = "SELECT `wm_partial_answer`.`id`, `wm_partial_answer`.`user_id`, ".
            "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted`, ".
-           "`best_rendering` ".
+           "`best_rendering`, `display_name` ".
            "FROM `wm_partial_answer` ".
            "LEFT JOIN `wm_formula` ON `wm_partial_answer`.`symbol_id` = `wm_formula`.`id` ".
+           "LEFT JOIN `wm_users` ON `wm_partial_answer`.`user_id` = `wm_users`.`id` ".
            "WHERE recording_id=:id ".
            "ORDER BY `strokes`";
     $stmt = $pdo->prepare($sql);

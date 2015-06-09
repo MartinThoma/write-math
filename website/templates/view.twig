@@ -213,7 +213,7 @@
             <tr>
                 <th>&nbsp;</th>
                 <th>Symbol</th>
-                <th>Stroke Number(s)</th>
+                <th>Stroke Number(s)<br/>and Author</th>
                 <th>Image (the classified part is red)</th>
             </tr>
        </thead>
@@ -224,8 +224,8 @@
                     <button onclick="{% if d.is_accepted %}unacceptPartialAnswerView({{ raw_data_id }}, {{ d.id }}){% else %}acceptPartialAnswerView({{ raw_data_id }}, {{ d.id }}){% endif %}" class="btn {% if d.is_accepted %}btn-success{% else %}btn-default{% endif %}" id="partialAnswer{{ d.id }}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button></td>
                 <td>{% if d.best_rendering != '' %}<img
               src="../formulas/{{ d.symbol_id }}-{{ d.best_rendering }}.svg"
-                 width="150" style="width:50px;max-height:50px;" alt="formula rendering" />{% endif %}<a href="../symbol/?id={{ d.symbol_id }}">{{ d.formula_in_latex }}</a></td>
-                <td>{{ d.strokes }}</td>
+                 width="150" style="width:50px;max-height:50px;" alt="formula rendering" />{% endif %}<a href="../symbol/?id={{ d.symbol_id }}"><code>{{ d.formula_in_latex }}</code></a></td>
+                <td>{{ d.strokes }}<br/><a href="../user/?id={{ d.user_id }}">{{ d.display_name }}</a></td>
                 <td><object data="../raw-data/{{ raw_data_id }}.svg"
             type="image/svg+xml"
             id="rawdatavis_{{ loop.index }}"
