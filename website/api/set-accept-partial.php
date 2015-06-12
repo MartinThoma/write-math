@@ -21,9 +21,22 @@ function accept_partial_answer($raw_data_id, $answer_id) {
     global $pdo;
     global $msg;
 
+    $user_id = get_uid();
+
+    // Check if this is either an admin or the creator of the recording
+    $sql = "SELECT `user_id` ".
+           "FROM `wm_raw_draw_data` ".
+           "WHERE `id` = :recording_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':recording_id', $raw_data_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $obj = $stmt->fetchObject();
+    if ($obj->user_id != $user_id && $user_id != 10) {  // TODO: Admin group check
+        return '{"error": "You may not accept an answer."}';
+    }
+
     $total_strokes = get_stroke_count($raw_data_id);
     $strokes = implode(',', range(0, $total_strokes-1));
-    $user_id = get_uid();
 
     // Check if this answer conflicts with other partial answers
     $sql = "SELECT `wm_partial_answer`.`id`, `formula_name`, `strokes`, ".
@@ -107,16 +120,17 @@ function accept_partial_answer($raw_data_id, $answer_id) {
         }
 
         if ($other == 1) {
+            // accept
             $sql = "UPDATE `wm_raw_draw_data` ".
                    "SET `accepted_formula_id` = :fid ".
-                   "WHERE `id` = :raw_data_id AND ".
-                   "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+                   "WHERE `id` = :raw_data_id ".
+                   "LIMIT 1;";  # TODO: Change to admin-group check
             $stmt = $pdo->prepare($sql);
             $uid = get_uid();
-            $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
             $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
             $stmt->bindParam(':fid', $last_formula_id, PDO::PARAM_INT);
             $stmt->execute();
+            return true;
         }
     }
     return true;
@@ -133,12 +147,7 @@ if (isset($_POST['raw_data_id'])) {
     } else {
         echo '{"error": "neither \'symbol_id\' nor \'answer_id\' was set."}';
     }
-    $return = accept_partial_answer($raw_data_id, $answer_id);
-    if ($return == '') {
-        echo json_encode(1);
-    } else {
-        echo $return;
-    }
+    echo accept_partial_answer($raw_data_id, $answer_id);
 } else {
     echo json_encode('{"error": "Not POSTed raw_data_id"}');
 }
