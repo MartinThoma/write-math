@@ -54,3 +54,12 @@ how can I get equidistant points on a curve
 * http://saskatoon.cs.rit.edu/inkml_viewer/
 * http://www.isical.ac.in/~crohme/CROHME_data.html
 * http://www.isical.ac.in/~crohme/data2.html
+
+
+## Regular Cleanup / updates
+
+To make sure that the user experience is good, execute the following scripts
+on a regular basis:
+
+* `tools/create_testset_online_once.py`: It adds new recordings to the test set
+  - make sure that they are correct!
