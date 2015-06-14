@@ -1,5 +1,6 @@
 <?php
 include '../init.php';
+require_once '../api/api.functions.php';
 
 $tasks = array("list-unclassified", "view-raw-data", "view-formula", "delete",
                "classify", "export");

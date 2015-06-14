@@ -172,7 +172,6 @@
 
 {% if automatic_answers|length > 0 %}
     {% for answer in automatic_answers %}
-    {% if answer.probability > 1 %}
     <div class="pull-left" style="height:200px;">
       <table>
         <tr>
@@ -201,7 +200,6 @@
         </tr>
       </table>
     </div>
-    {% endif %}
     {% endfor %}
     <br style="clear:both;" />
 {% endif %}

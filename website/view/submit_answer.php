@@ -1,4 +1,7 @@
 <?php
+
+require_once '../api/api.functions.php';
+
 function add_partial_classification($user_id, $raw_data_id, $latex, $strokes) {
     global $pdo;
     global $msg;
@@ -66,6 +69,7 @@ function add_partial_classification_pure($user_id, $raw_data_id, $formula_id, $s
     $stmt->bindParam(':symbol_id', $formula_id, PDO::PARAM_INT);
     try {
         $stmt->execute();
+        adjust_user_answer_count($raw_data_id, 1);
     } catch (PDOException $e) {
         if ($e->errorInfo[1] == 1062) {
             // duplicate entry, do something else

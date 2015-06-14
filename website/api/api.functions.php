@@ -82,9 +82,7 @@ function adjust_automatic_answer_count($raw_data_id, $delta) {
 function set_zero_worker_answers($raw_data_id) {
     global $pdo;
     global $msg;
-    if (!is_int($delta)) {
-        return false;
-    }
+
     $sql = "UPDATE `wm_raw_draw_data` SET ".
            "`automated_answers_count` = 0 ".
            "WHERE `id` = :rid LIMIT 1;";

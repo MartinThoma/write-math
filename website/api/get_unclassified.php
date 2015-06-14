@@ -1,6 +1,7 @@
 <?php
 include '../init.php';
 include '../svg.php';
+require_once 'api.functions.php';
 
 function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
     global $pdo;
@@ -16,7 +17,6 @@ function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
     adjust_automatic_answer_count($raw_data_id, $delta);
     // Insert new data
     foreach ($answer_json as $key => $object) {
-        var_dump($object);
         $formula_id = array_keys($object)[0];
         $probability = $object[$formula_id];
         $sql = "INSERT INTO `wm_worker_answers` (".
@@ -52,6 +52,7 @@ if (isset($_POST['recording_id'])) {
         $raw_data_id = intval($_POST['recording_id']);
         $answer_json = json_decode($_POST['results'], true);
         insert_worker_answers($worker_id, $raw_data_id, $answer_json);
+        echo '{"success": "true"}';
     } else {
         echo '{"error": "api_key \''.$_POST['api_key'].'\' does not exist"}';
     }
