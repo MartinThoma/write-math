@@ -12,19 +12,14 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $tab = "unclassified";
     $select = "SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
               "`creation_date`, ".
-              "COUNT(`wm_partial_answer`.`recording_id`) as `answers`,  ".
-              "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
+              "`user_answers_count` as `answers`,  ".
+              "`automated_answers_count` as `answers2` ".
               "FROM `wm_raw_draw_data` ".
-              "LEFT OUTER JOIN `wm_partial_answer` ".
-                   "ON (`recording_id` = `wm_raw_draw_data`.`id`) ".
-              "LEFT OUTER JOIN `wm_worker_answers`  ".
-                   "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
               "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 AND ".
               "`classifiable`=1 AND `stroke_segmentable`=1 ".
-              "AND `nr_of_symbols` = 1 ".
-              "GROUP BY `wm_raw_draw_data`.`id` ".
-              "HAVING `answers` > 0 OR `answers2` > 0 ".
-              "ORDER BY `probability` DESC ";
+              "AND `nr_of_symbols` = 1 AND ".
+              "(`user_answers_count` > 0 OR `automated_answers_count` > 0)";
+              # "ORDER BY `probability` DESC "
 
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(*) as `counter` FROM ($select) AS T";
@@ -43,18 +38,13 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $tab = "unclassified_multiple";
     $select = "SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
               "`creation_date`, ".
-              "COUNT(`wm_partial_answer`.`recording_id`) as `answers`,  ".
-              "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
+              "`user_answers_count` as `answers`,  ".
+              "`automated_answers_count` as `answers2` ".
               "FROM `wm_raw_draw_data` ".
-              "LEFT OUTER JOIN `wm_partial_answer` ".
-                   "ON (`recording_id` = `wm_raw_draw_data`.`id`) ".
-              "LEFT OUTER JOIN `wm_worker_answers`  ".
-                   "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
               "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
               "AND `classifiable`=1 AND `stroke_segmentable`=1 ".
               "AND `nr_of_symbols` > 1 ".
-              "GROUP BY `wm_raw_draw_data`.`id` ".
-              "HAVING `answers` > 0 OR `answers2` > 0 ".
+              "AND (`user_answers_count` > 0 OR `automated_answers_count` > 0) ".
               "ORDER BY `creation_date` DESC ";
 
     // Get total number of elements for pagination
@@ -74,17 +64,12 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
     $tab = "unanswered";
     $select = "SELECT `wm_raw_draw_data`.`id`, `data` as `image`, ".
               "`creation_date`, ".
-              "COUNT(`wm_partial_answer`.`recording_id`) as `answers`,  ".
-              "COUNT(`wm_worker_answers`.`raw_data_id`) as `answers2` ".
+              "`user_answers_count` as `answers`,  ".
+              "`automated_answers_count` as `answers2` ".
               "FROM `wm_raw_draw_data` ".
-              "LEFT OUTER JOIN `wm_partial_answer`  ".
-                   "ON (`wm_partial_answer`.`recording_id` = `wm_raw_draw_data`.`id`) ".
-              "LEFT OUTER JOIN `wm_worker_answers`  ".
-                   "ON (`wm_worker_answers`.`raw_data_id` = `wm_raw_draw_data`.`id`) ".
               "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 AND ".
               "`classifiable`=1 AND `stroke_segmentable`=1 ".
-              "GROUP BY `wm_raw_draw_data`.`id` ".
-              "HAVING `answers` = 0 AND `answers2` = 0 ".
+              "AND (`user_answers_count` = 0 AND `automated_answers_count` = 0) ".
               "ORDER BY `creation_date` DESC ";
 
     // Get total number of elements for pagination

@@ -63,6 +63,7 @@ function add_classification($formula_id, $raw_data_id) {
     }
     if ($result) {
         echo "Insert was successful.";
+        adjust_user_answer_count($raw_data_id, 1);
     } else {
         echo "Insert failed.";
     }

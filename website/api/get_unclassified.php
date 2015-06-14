@@ -12,6 +12,8 @@ function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
     $stmt->bindParam(':wid', $worker_id, PDO::PARAM_INT);
     $stmt->bindParam(':raw_data_id', $raw_data_id, PDO::PARAM_INT);
     $stmt->execute();
+    $delta = -$stmt->rowCount();
+    adjust_automatic_answer_count($raw_data_id, $delta);
     // Insert new data
     foreach ($answer_json as $key => $object) {
         var_dump($object);
@@ -29,9 +31,10 @@ function insert_worker_answers($worker_id, $raw_data_id, $answer_json) {
         $stmt->bindParam(':formula_id', $formula_id, PDO::PARAM_INT);
         $stmt->bindParam(':probability', $probability, PDO::PARAM_STR);
         try {
-          $stmt->execute();
+            $stmt->execute();
+            adjust_automatic_answer_count($raw_data_id, 1);
         } catch (Exception $e) {
-          var_dump($e);
+            var_dump($e);
         }
     }
 }
@@ -50,7 +53,7 @@ if (isset($_POST['recording_id'])) {
         $answer_json = json_decode($_POST['results'], true);
         insert_worker_answers($worker_id, $raw_data_id, $answer_json);
     } else {
-        echo "api_key '".$_POST['api_key']."' does not exist";
+        echo '{"error": "api_key \''.$_POST['api_key'].'\' does not exist"}';
     }
 } else {
     $sql = "SELECT `wm_raw_draw_data`.`id`, `data` as `recording`, ".

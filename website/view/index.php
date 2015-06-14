@@ -6,6 +6,7 @@ require_once 'functions.php';
 require_once '../feature_extraction.php';
 require_once '../segmentation.php';
 require_once '../view/submit_answer.php';
+require_once '../api/api.functions.php';
 
 if (!isset($_GET['raw_data_id'])) {
     header("Location: ../view/?raw_data_id=295093");
@@ -36,6 +37,7 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':rid', $_GET['delete_automatic_classification'], PDO::PARAM_INT);
     $stmt->execute();
+    set_zero_worker_answers($_GET['delete_automatic_classification']);
     header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
 }
 
@@ -263,6 +265,8 @@ if (isset($_POST['nr_of_lines'])) {
     $uid = get_uid();
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
+    $delta = -$stmt->rowCount();
+    adjust_user_answer_count($_GET['delete_partial_answer'], $delta);
     $msg[] = array("class" => "alert-info",
                     "text" => "Your answer was deleted.");
 } elseif (isset($_GET['flag']) && $_SESSION['account_type'] != 'IP-User') {
