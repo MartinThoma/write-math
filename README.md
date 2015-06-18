@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/MartinThoma/write-math.svg?branch=master)](https://travis-ci.org/MartinThoma/write-math)
 [![Coverage Status](https://coveralls.io/repos/MartinThoma/write-math/badge.png)](https://coveralls.io/r/MartinThoma/write-math)
+[![Code Issues](http://www.quantifiedcode.com/api/v1/project/dee640dc587341a9ad8a05e6ae4471e1/badge.svg)](http://www.quantifiedcode.com/app/project/dee640dc587341a9ad8a05e6ae4471e1)
 
 write-math
 ==========
