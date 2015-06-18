@@ -46,7 +46,7 @@ foreach ($tags2symbol_fetched as $value) {
 
 
 $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
-       "`is_important`, `best_rendering`, ".
+       "`is_important`, `best_rendering`, `variant_of`, ".
        "COUNT(`wm_formula`.`id`) AS `counter` ".
        "FROM `wm_raw_draw_data` ".
        "JOIN `wm_formula` ON `wm_formula`.`id` = `accepted_formula_id` ".

@@ -74,6 +74,15 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label" for="variant_of">variant of</label>
+        <div class="controls">
+            <input type="text" class="form-control"
+                   placeholder="123"
+                   id="variant_of" name="variant_of"
+                   value="{{ formula.variant_of }}" />
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label" for="unicode_dec">unicode_dec: &#{{ formula.unicode_dec }};</label>
         <div class="controls">
             <input type="number" min="0" class="form-control"
@@ -217,6 +226,7 @@
 <p><b>Tags</b>: {% for tag in tags %}<a href="../tags/{{ tag.tag_name }}" class="label label-primary">{{ tag.tag_name }}</a> {% endfor %}</p>
 {% endif %}
 <p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
+<p><b>Variant of</b>: <a href="../symbol/?id={{ formula.variant_of }}">{{ formula.variant_of }}</a></p>
 <p><b>Mode</b>: {{ formula.mode }}</p>
 <p><b>Type</b>: {{ formula.formula_type }}</p>
 {% if formula.package != '' %}

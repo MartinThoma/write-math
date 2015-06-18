@@ -35,6 +35,10 @@ if (isset($_POST['id']) && !is_ip_user()) {
         update_rendering($formula_id, $_POST['svg']);
         update_tags($formula_id, $_POST['tags']);
         $formula_name = trim($_POST['formula_name']);
+        $variant_of = trim($_POST['variant_of']);
+        if (strlen($variant_of) == 0) {
+            $variant_of = NULL;
+        }
         $unicode_dec = trim($_POST['unicode_dec']);
         $font = trim($_POST['font']);
         $font_style = trim($_POST['font_style']);
@@ -43,6 +47,7 @@ if (isset($_POST['id']) && !is_ip_user()) {
         $svg = trim($_POST['svg']);
         $sql = "UPDATE `wm_formula` SET ".
                "`formula_name` = :formula_name, ".
+               "`variant_of` = :variant_of, ".
                "`unicode_dec` = :unicode_dec, ".
                "`font` = :font, ".
                "`font_style` = :font_style, ".
@@ -53,6 +58,7 @@ if (isset($_POST['id']) && !is_ip_user()) {
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
         $stmt->bindParam(':formula_name', $formula_name, PDO::PARAM_STR);
+        $stmt->bindParam(':variant_of', $variant_of, PDO::PARAM_INT);
         $stmt->bindParam(':unicode_dec', $unicode_dec, PDO::PARAM_INT);
         $stmt->bindParam(':font', $font, PDO::PARAM_STR);
         $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
@@ -65,7 +71,7 @@ if (isset($_POST['id']) && !is_ip_user()) {
 
 if (isset($_GET['id'])) {
     $sql = "SELECT `wm_formula`.`id`, `formula_name`, ".
-           "`unicode_dec`, `font`, `font_style`, `description`, ".
+           "`variant_of`, `unicode_dec`, `font`, `font_style`, `description`, ".
            "`formula_in_latex`, `preamble`, ".
            "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
            "FROM `wm_formula` ".

@@ -16,6 +16,7 @@ tr {
         <td></td>
         <th>#</th>
         <th>Formula in LaTeX</th>
+        <th>Var</th>
         <th>Instances in database</th>
         {% if user_id == 10 %}
         <th>is important<th>
@@ -32,6 +33,7 @@ tr {
             <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
             {% endfor %}
             </td>
+            <td style="background-color:green;">{{s.variant_of}}</td>
             <td style="background-color:green;">{{s.counter}}</td>
         {% else %}
             <td>{{ loop.index }}</td>
@@ -40,6 +42,7 @@ tr {
             <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
             {% endfor %}
             </td>
+            <td>{{s.variant_of}}</td>
             <td>{{s.counter}}</td>
         {% endif %}
     {% if user_id == 10 %}
