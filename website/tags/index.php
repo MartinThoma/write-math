@@ -27,7 +27,8 @@ if (strlen($tag_name) > 0) {
     $sql = "SELECT * ".
            "FROM `wm_tags2symbols` ".
            "JOIN `wm_formula` ON `wm_formula`.`id` = `symbol_id` ".
-           "WHERE `tag_id`=:tag_id";
+           "WHERE `tag_id`=:tag_id ".
+           "ORDER BY `unicode_dec`, `variant_of`, `wm_formula`.`id` ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':tag_id', $tag_info['id'], PDO::PARAM_STR);
     $stmt->execute();
