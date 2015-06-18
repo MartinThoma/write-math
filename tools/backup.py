@@ -159,14 +159,13 @@ def sync_directory(directory):
     return True
 
 
-def get_formulas(cursor, small_dataset, tiny_dataset):
+def get_formulas(cursor, dataset_type='all'):
     """Get a list of formulas.
 
     Parameters
     ----------
     cursor : a database cursor
-    small_dataset : bool
-    tiny_dataset : bool
+    dataset_type : string, {'tiny', 'small', 'all'}
 
     Returns
     -------
@@ -174,14 +173,14 @@ def get_formulas(cursor, small_dataset, tiny_dataset):
         A list of formulas
     """
     # Get all formulas that should get examined
-    if small_dataset:
+    if dataset_type == 'small':
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
                # only use the important symbol subset
                "WHERE `is_important` = 1 "
                "AND id != 1 "  # exclude trash class
                "AND id <= 81 "
                "ORDER BY `id` ASC")
-    elif tiny_dataset:
+    elif dataset_type == 'tiny':
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
                # only use the important symbol subset
                "WHERE `is_important` = 1 "
@@ -189,12 +188,18 @@ def get_formulas(cursor, small_dataset, tiny_dataset):
                "AND id <= 40 "
                "ORDER BY `id` ASC "
                "LIMIT 2")
-    else:
+    elif dataset_type == 'important':  # was default for quite a while
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
                # only use the important symbol subset
                "WHERE `is_important` = 1 "
                "AND id != 1 "  # exclude trash class
                "ORDER BY `id` ASC")
+    elif dataset_type == 'all':
+        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
+               "ORDER BY `id` ASC")
+    else:
+        logging.error("Dataset type '%s' unknown.", dataset_type)
+        sys.exit(-1)
     cursor.execute(sql)
     formulas = cursor.fetchall()
     return formulas
@@ -202,17 +207,12 @@ def get_formulas(cursor, small_dataset, tiny_dataset):
 
 def main(destination=os.path.join(utils.get_project_root(),
                                   "raw-datasets"),
-         small_dataset=False,
-         tiny_dataset=False,
+         dataset_type='all',
          renderings=False):
     """Main part of the backup script."""
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
-    if small_dataset:
-        filename = "%s-handwriting_datasets-small-raw.pickle" % time_prefix
-    elif tiny_dataset:
-        filename = "%s-handwriting_datasets-tiny-raw.pickle" % time_prefix
-    else:
-        filename = "%s-handwriting_datasets-raw.pickle" % time_prefix
+    filename = ("%s-handwriting_datasets-%s-raw.pickle" %
+                (time_prefix, dataset_type))
     destination_path = os.path.join(destination, filename)
     logging.info("Data will be written to '%s'", destination_path)
 
@@ -225,7 +225,7 @@ def main(destination=os.path.join(utils.get_project_root(),
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
-    formulas = get_formulas(cursor, tiny_dataset, small_dataset)
+    formulas = get_formulas(cursor, dataset_type)
     handwriting_datasets = []
     formula_id2latex = {}
 
@@ -301,17 +301,13 @@ def get_parser():
                         help="where do write the handwriting_dataset.pickle",
                         type=lambda x: utils.is_valid_file(parser, x),
                         metavar="FOLDER")
-    parser.add_argument("-s", "--small", dest="small",
-                        action="store_true", default=False,
-                        help=("should only a small dataset (with all capital "
-                              "letters) be created?"))
+    parser.add_argument("--datasettype", dest="dataset_type",
+                        default='all',
+                        choices=['tiny', 'small', 'all', 'important'],
+                        help=("type of dataset you want to create"))
     parser.add_argument("-r", "--renderings", dest="renderings",
                         action="store_true", default=False,
                         help=("should the svg renderings be downloaded?"))
-    parser.add_argument("--tiny", dest="tiny",
-                        action="store_true", default=False,
-                        help=("should only a tiny dataset for unit-testing "
-                              "be created?"))
     parser.add_argument("-o", "--onlydropbox", dest="onlydropbox",
                         action="store_true", default=False,
                         help=("don't download new files; only upload to "
@@ -329,7 +325,7 @@ if __name__ == '__main__':
                       "Please check your '~/.hwrtrc' file.")
     else:
         if not args.onlydropbox:
-            main(args.destination, args.small, args.tiny, args.renderings)
+            main(args.destination, args.dataset_type, args.renderings)
         if sync_directory("raw-datasets"):
             logging.info("Successfully uploaded files to Dropbox.")
         else:

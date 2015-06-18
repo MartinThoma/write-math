@@ -30,7 +30,9 @@ def get_known_symbols():
     return known_symbols
 
 
-def extract_by_deleting(fn, known_symbols={}):
+def extract_by_deleting(fn, known_symbols=None):
+    if known_symbols is None:
+        known_symbols = {}
     basepath = os.path.dirname(fn) + "/"
 
     with open(fn, "rb") as f:

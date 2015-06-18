@@ -19,7 +19,7 @@ def get_svg(packages, latex, mode):
     with open('symbol.tex') as f:
         tmp = f.read()
     with open('tmp.tex', "w") as f:
-        if mode == 'mathmode' or mode == 'bothmodes':
+        if mode in ['mathmode', 'bothmodes']:
             tmp = tmp.replace("{{ content }}", '$' + latex + '$')
         else:
             tmp = tmp.replace("{{ content }}", latex)
@@ -37,7 +37,9 @@ def get_svg(packages, latex, mode):
     return svg
 
 
-def upload_new_symbol(symbol, latex, packages=[], mode='bothmodes'):
+def upload_new_symbol(symbol, latex, packages=None, mode='bothmodes'):
+    if packages is None:
+        packages = []
     try:
         connection = pymysql.connect(host=mysql['host'], user=mysql['user'],
                                      passwd=mysql['pwd'], db=mysql['dbname'],
