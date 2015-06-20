@@ -18,8 +18,8 @@ if (isset($_GET['tab']) && $_GET['tab'] == 'unclassified') {
               "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 AND ".
               "`classifiable`=1 AND `stroke_segmentable`=1 ".
               "AND `nr_of_symbols` = 1 AND ".
-              "(`user_answers_count` > 0 OR `automated_answers_count` > 0)";
-              # "ORDER BY `probability` DESC "
+              "(`user_answers_count` > 0 OR `automated_answers_count` > 0)".
+              "ORDER BY `description` ASC ";
 
     // Get total number of elements for pagination
     $sql = "SELECT COUNT(*) as `counter` FROM ($select) AS T";
