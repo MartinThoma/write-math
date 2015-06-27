@@ -213,12 +213,16 @@ def main(destination=os.path.join(utils.get_project_root(),
     # Go through each formula and download every raw_data instance
     for formula in formulas:
         formula_id2latex[formula['id']] = formula['formula_in_latex']
-        sql = ("SELECT `wm_raw_draw_data`.`id`, `data`, `is_in_testset`, "
-               "`wild_point_count`, `missing_line`, `user_id`, `display_name` "
-               "FROM `wm_raw_draw_data` "
-               "JOIN `wm_users` ON "
-               "(`wm_users`.`id` = `wm_raw_draw_data`.`user_id`) "
-               "WHERE `accepted_formula_id` = %s" % str(formula['id']))
+        sql = (("SELECT `wm_raw_draw_data`.`id`, `data`, `is_in_testset`, "
+                "`wild_point_count`, `missing_line`, `user_id`, "
+                "`display_name` "
+                "FROM `wm_raw_draw_data` "
+                "JOIN `wm_users` ON "
+                "(`wm_users`.`id` = `wm_raw_draw_data`.`user_id`) "
+                "WHERE `accepted_formula_id` = %s "
+                # "AND `display_name` LIKE 'MfrDB::%%'"
+                ) %
+               str(formula['id']))
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
         logging.info("%s (%i)", formula['formula_in_latex'], len(raw_datasets))
