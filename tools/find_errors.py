@@ -19,7 +19,7 @@ import pymysql.cursors
 # Other
 import webbrowser
 
-# My classes
+# My modules
 from hwrt.HandwrittenData import HandwrittenData
 from distance_metric import handwritten_data_greedy_matching_distance as dtw
 from hwrt import preprocessing
