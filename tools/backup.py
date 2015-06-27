@@ -28,7 +28,8 @@ import tarfile
 
 # hwrt modules
 from hwrt.HandwrittenData import HandwrittenData
-import hwrt.utils as utils
+from hwrt import filter_dataset
+from hwrt import utils
 
 
 def input_string(question=""):
@@ -159,60 +160,39 @@ def sync_directory(directory):
     return True
 
 
-def get_formulas(cursor, dataset_type='all'):
+def get_formulas(cursor, dataset='all'):
     """Get a list of formulas.
 
     Parameters
     ----------
     cursor : a database cursor
-    dataset_type : string, {'tiny', 'small', 'all'}
+    dataset : string
+        Either 'all' or a path to a yaml symbol file.
 
     Returns
     -------
     list :
         A list of formulas
     """
-    # Get all formulas that should get examined
-    if dataset_type == 'small':
-        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-               # only use the important symbol subset
-               "WHERE `is_important` = 1 "
-               "AND id != 1 "  # exclude trash class
-               "AND id <= 81 "
-               "ORDER BY `id` ASC")
-    elif dataset_type == 'tiny':
-        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-               # only use the important symbol subset
-               "WHERE `is_important` = 1 "
-               "AND id != 1 "  # exclude trash class
-               "AND id <= 40 "
-               "ORDER BY `id` ASC "
-               "LIMIT 2")
-    elif dataset_type == 'important':  # was default for quite a while
-        sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-               # only use the important symbol subset
-               "WHERE `is_important` = 1 "
-               "AND id != 1 "  # exclude trash class
-               "ORDER BY `id` ASC")
-    elif dataset_type == 'all':
+    if dataset == 'all':
         sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
                "ORDER BY `id` ASC")
+        cursor.execute(sql)
+        formulas = cursor.fetchall()
     else:
-        logging.error("Dataset type '%s' unknown.", dataset_type)
-        sys.exit(-1)
-    cursor.execute(sql)
-    formulas = cursor.fetchall()
+        formulas = filter_dataset.get_symbol_ids(dataset,
+                                                 filter_dataset.get_metadata())
     return formulas
 
 
 def main(destination=os.path.join(utils.get_project_root(),
                                   "raw-datasets"),
-         dataset_type='all',
+         dataset='all',
          renderings=False):
     """Main part of the backup script."""
     time_prefix = time.strftime("%Y-%m-%d-%H-%M")
     filename = ("%s-handwriting_datasets-%s-raw.pickle" %
-                (time_prefix, dataset_type))
+                (time_prefix, dataset.replace('/', '-')))
     destination_path = os.path.join(destination, filename)
     logging.info("Data will be written to '%s'", destination_path)
 
@@ -225,7 +205,8 @@ def main(destination=os.path.join(utils.get_project_root(),
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
-    formulas = get_formulas(cursor, dataset_type)
+    formulas = get_formulas(cursor, dataset)
+    logging.info('Received %i formulas.', len(formulas))
     handwriting_datasets = []
     formula_id2latex = {}
 
@@ -301,13 +282,12 @@ def get_parser():
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-d", "--destination", dest="destination",
                         default=archive_path,
-                        help="where do write the handwriting_dataset.pickle",
-                        type=lambda x: utils.is_valid_file(parser, x),
+                        help="where to write the handwriting_dataset.pickle",
+                        type=lambda x: utils.is_valid_folder(parser, x),
                         metavar="FOLDER")
-    parser.add_argument("--datasettype", dest="dataset_type",
+    parser.add_argument("--dataset", dest="dataset",
                         default='all',
-                        choices=['tiny', 'small', 'all', 'important'],
-                        help=("type of dataset you want to create"))
+                        help=("of which symbols do you want the recordings?"))
     parser.add_argument("-r", "--renderings", dest="renderings",
                         action="store_true", default=False,
                         help=("should the svg renderings be downloaded?"))
@@ -326,7 +306,7 @@ if __name__ == '__main__':
         logging.error("Dropbox login data was not correct. "
                       "Please check your '~/.hwrtrc' file.")
     else:
-        main(args.destination, args.dataset_type, args.renderings)
+        main(args.destination, args.dataset, args.renderings)
         if args.dropbox:
             return_value = sync_directory("raw-datasets")
             logging.info(("Successfully uploaded files to Dropbox. "
