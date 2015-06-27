@@ -232,9 +232,11 @@ def main(destination=os.path.join(utils.get_project_root(),
     # Go through each formula and download every raw_data instance
     for formula in formulas:
         formula_id2latex[formula['id']] = formula['formula_in_latex']
-        sql = ("SELECT `id`, `data`, `is_in_testset`, `wild_point_count`, "
-               "`missing_line`, `user_id` "
+        sql = ("SELECT `wm_raw_draw_data`.`id`, `data`, `is_in_testset`, "
+               "`wild_point_count`, `missing_line`, `user_id`, `display_name` "
                "FROM `wm_raw_draw_data` "
+               "JOIN `wm_users` ON "
+               "(`wm_users`.`id` = `wm_raw_draw_data`.`user_id`) "
                "WHERE `accepted_formula_id` = %s" % str(formula['id']))
         cursor.execute(sql)
         raw_datasets = cursor.fetchall()
@@ -247,7 +249,8 @@ def main(destination=os.path.join(utils.get_project_root(),
                                               formula['formula_in_latex'],
                                               raw_data['wild_point_count'],
                                               raw_data['missing_line'],
-                                              raw_data['user_id'])
+                                              raw_data['user_id'],
+                                              user_name=raw_data['display_name'])
                 handwriting_datasets.append({'handwriting': handwriting,
                                              'id': raw_data['id'],
                                              'formula_id': formula['id'],
@@ -308,10 +311,9 @@ def get_parser():
     parser.add_argument("-r", "--renderings", dest="renderings",
                         action="store_true", default=False,
                         help=("should the svg renderings be downloaded?"))
-    parser.add_argument("-o", "--onlydropbox", dest="onlydropbox",
+    parser.add_argument("--dropbox", dest="dropbox",
                         action="store_true", default=False,
-                        help=("don't download new files; only upload to "
-                              "DropBox"))
+                        help=("upload to new files to DropBox"))
     return parser
 
 
@@ -324,9 +326,11 @@ if __name__ == '__main__':
         logging.error("Dropbox login data was not correct. "
                       "Please check your '~/.hwrtrc' file.")
     else:
-        if not args.onlydropbox:
-            main(args.destination, args.dataset_type, args.renderings)
-        if sync_directory("raw-datasets"):
-            logging.info("Successfully uploaded files to Dropbox.")
+        main(args.destination, args.dataset_type, args.renderings)
+        if args.dropbox:
+            return_value = sync_directory("raw-datasets")
+            logging.info(("Successfully uploaded files to Dropbox. "
+                          "Return value: %s"),
+                         return_value)
         else:
-            logging.info("Uploading files to Dropbox failed.")
+            logging.info("Files were NOT uploaded to dropbox.")
