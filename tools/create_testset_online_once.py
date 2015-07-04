@@ -12,7 +12,7 @@ import random
 import math
 
 # hwrt modules
-from hwrt.HandwrittenData import HandwrittenData
+from hwrt.handwritten_data import HandwrittenData
 import hwrt.utils as utils
 
 

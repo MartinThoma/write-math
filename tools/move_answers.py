@@ -25,7 +25,7 @@ import logging
 import sys
 
 import hwrt.utils
-import hwrt.HandwrittenData
+import hwrt.handwritten_data
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -56,7 +56,7 @@ def get_old_datasets(mysql):
     cursor.execute(sql)
     datasets = cursor.fetchall()
     for d in datasets:
-        stroke_count = len(hwrt.HandwrittenData.HandwrittenData(d['data']).get_pointlist())
+        stroke_count = len(hwrt.handwritten_data.HandwrittenData(d['data']).get_pointlist())
         d['strokes'] = ','.join([str(el) for el in range(stroke_count)])
         del d['data']
     return datasets

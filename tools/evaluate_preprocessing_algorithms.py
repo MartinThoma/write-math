@@ -6,7 +6,7 @@
 import pymysql.cursors
 from copy import deepcopy
 
-from hwrt.HandwrittenData import HandwrittenData
+from hwrt.handwritten_data import HandwrittenData
 from hwrt import preprocessing
 from hwrt import utils
 

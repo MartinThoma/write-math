@@ -15,7 +15,7 @@ import numpy
 from distance_metric import handwritten_data_greedy_matching_distance as dtw
 
 import hwrt.utils
-from hwrt.HandwrittenData import HandwrittenData
+from hwrt.handwritten_data import HandwrittenData
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -43,10 +43,10 @@ def main(symbol_id=None):
                      formula_name)
         recordings = get_recordings(mysql, symbol_id)
         logging.info("Got %i recordings.", len(recordings))
-        #logging.info("Start calculating features...")
+        # logging.info("Start calculating features...")
         recordings = get_features(recordings, preprocessing_queue)
         recordings = append_dtw(recordings)
-        #logging.info("Start finding outliers...")
+        # logging.info("Start finding outliers...")
         outliers = get_outliers(recordings)
         min_dtw = numpy.percentile([el['score'] for el in outliers], 90)
         if numpy.percentile([el['score'] for el in outliers], 70)*2 < min_dtw:

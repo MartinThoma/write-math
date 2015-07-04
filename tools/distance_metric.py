@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from hwrt import HandwrittenData
+from hwrt import handwritten_data
 import math
 import numpy
 
@@ -61,10 +61,10 @@ def point_distance(p1, p2, squared=False):
 
 
 def handwritten_data_greedy_matching_distance(a, b):
-    assert isinstance(a, HandwrittenData.HandwrittenData), \
+    assert isinstance(a, handwritten_data.HandwrittenData), \
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(a)
-    assert isinstance(b, HandwrittenData.HandwrittenData), \
+    assert isinstance(b, handwritten_data.HandwrittenData), \
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(b)
 

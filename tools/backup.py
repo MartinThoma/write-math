@@ -27,7 +27,7 @@ import tempfile
 import tarfile
 
 # hwrt modules
-from hwrt.HandwrittenData import HandwrittenData
+from hwrt.handwritten_data import HandwrittenData
 from hwrt import filter_dataset
 from hwrt import utils
 
