@@ -266,9 +266,8 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':user_id', $uid, PDO::PARAM_INT);
     $stmt->execute();
     $delta = -$stmt->rowCount();
-    adjust_user_answer_count($_GET['delete_partial_answer'], $delta);
-    $msg[] = array("class" => "alert-info",
-                    "text" => "Your answer was deleted.");
+    adjust_user_answer_count($_GET['raw_data_id'], $delta);
+    header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
 } elseif (isset($_GET['flag']) && $_SESSION['account_type'] != 'IP-User') {
     $sql = "INSERT INTO `wm_flags` (`user_id`, `raw_data_id`)".
            "VALUES (:uid,  :raw_data_id);";
