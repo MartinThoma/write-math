@@ -82,6 +82,9 @@ if (isset($_GET['cache-flush'])) {
             system('/bin/rm -rf ' . escapeshellarg($file));
         }
     }
+} elseif (isset($_GET['delete_phraselist'])) {
+    unlink('../cache-data/phraselist.js');
+    header("Location: ../admin");
 }
 
 if (isset($_GET['delete_formula'])) {

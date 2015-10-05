@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block header %}
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" src="../js/segmentation.js"></script>
 <script type="text/javascript" src="../js/accept_partial.js"></script>
 <script type="text/javascript" src="../js/unaccept_partial.js"></script>
@@ -529,7 +530,85 @@ MathJax.Hub.Queue(function() {
 {% endblock %}
 
 {% block footer %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src=""></script>
 <script>
+    //var json = require('../cache-data/phraselist.js'); //with path
+    var phraselist = (function () {
+        var json = null;
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': '../cache-data/phraselist.js',
+            'dataType': "json",
+            'success': function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })(); 
+    phraselist.sort();
+    console.log(phraselist);
+    function escapeRegExp(str) {
+      return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+      $(document).ready(function() {
+          monkeyPatchAutocomplete();
+
+          $("#latex_partial").autocomplete({
+              // The source option can be an array of terms.  In this case, if
+              // the typed characters appear in any position in a term, then the
+              // term is included in the autocomplete list.
+              // The source option can also be a function that performs the search,
+              // and calls a response function with the matched entries.
+              source: function(req, responseFn) {
+                  addMessage("search on: '" + req.term + "'<br/>");
+                  var re = $.ui.autocomplete.escapeRegex(req.term);
+                  var matcher = new RegExp("" + re, "i" );
+                  var a = $.grep( phraselist, function(item,index){
+                      //addMessage("&nbsp;&nbsp;sniffing: '" + item + "'<br/>");
+                      return matcher.test(escapeRegExp(item));
+                  });
+                  addMessage("Result: " + a.length + " items<br/>");
+                  responseFn( a );
+              },
+
+              select: function(value, data){
+                  var s = ""
+                  if (typeof data == "undefined") {
+                    s = value;
+                  }else {
+                    s = data.item.value;
+                  }
+                  if (s.length > 30) { s = s.substring(0,30) + "..."; }
+                  addMessage('You selected: ' + s + "<br/>");
+              }
+          });
+      });
+
+      // This patches the autocomplete render so that
+      // matching items have the match portion highlighted.
+      function monkeyPatchAutocomplete() {
+
+          // Don't really need to save the old fn,
+          // but I could chain if I wanted to
+          var oldFn = $.ui.autocomplete.prototype._renderItem;
+
+          $.ui.autocomplete.prototype._renderItem = function( ul, item) {
+              var re = new RegExp("" + this.term, "i") ;
+              var t = item.label.replace(re,"<span style='font-weight:bold;color:Blue;'>" + this.term + "</span>");
+              return $( "<li></li>" )
+                  .data( "item.autocomplete", item )
+                  .append( "<a>" + t + "</a>" )
+                  .appendTo( ul );
+          };
+      }
+
+    function addMessage(msg){
+        $('#msgs').append(msg+"<br/>");
+    }
+
+
 {% for d in partial_answers %}
     var rawdataobj{{loop.index}} = document.getElementById('rawdatavis_{{loop.index}}');
     rawdataobj{{loop.index}}.addEventListener("load",function(){
