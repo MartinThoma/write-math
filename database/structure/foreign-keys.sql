@@ -13,6 +13,7 @@ ALTER TABLE `wm_flags`
 -- Constraints der Tabelle `wm_formula`
 --
 ALTER TABLE `wm_formula`
+  ADD CONSTRAINT `wm_formula_ibfk_5` FOREIGN KEY (`variant_of`) REFERENCES `wm_formula` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   ADD CONSTRAINT `wm_formula_ibfk_1` FOREIGN KEY (`best_rendering`) REFERENCES `wm_renderings` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `wm_formula_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -27,8 +28,8 @@ ALTER TABLE `wm_formula_in_paper`
 -- Constraints der Tabelle `wm_formula_old`
 --
 ALTER TABLE `wm_formula_old`
-  ADD CONSTRAINT `wm_formula_old_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `wm_formula_old_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `wm_formula_old_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `wm_formula` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `wm_formula_old_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `wm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `wm_formula_svg_missing`
