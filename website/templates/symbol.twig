@@ -42,6 +42,18 @@
 
 
 {% block content %}
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Info</a></li>
+    <li role="presentation"><a href="#latextab" aria-controls="latex" role="tab" data-toggle="tab">LaTeX</a></li>
+    <li role="presentation"><a href="#references" aria-controls="references" role="tab" data-toggle="tab">References</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="info">
 {% if logged_in and edit_flag %}
 <form role="form" method="post" action="?id={{ formula.id }}">
     <input type="hidden" name="id" value="{{ formula.id }}" />
@@ -221,22 +233,81 @@
 </table>
 {% endif %}
 
-<p><b>Name</b>: {{ formula.formula_name }}</p>
-{% if tags|length > 0%}
-<p><b>Tags</b>: {% for tag in tags %}<a href="../tags/{{ tag.tag_name }}" class="label label-primary">{{ tag.tag_name }}</a> {% endfor %}</p>
-{% endif %}
+<table class="table">
+    <tbody>
+        <tr>
+            <th>Name</th>
+            <td>{{ formula.formula_name }} {% if formula.variant_of|length > 0%}(Variant of <a href="../symbol/?id={{ formula.variant_of }}">{{ formula.variant_of }}</a>){% endif %}</td>
+        </tr>
+        {% if tags|length > 0%}
+        <tr>
+            <td colspan="2">{% for tag in tags %}<a href="../tags/{{ tag.tag_name }}" class="label label-primary">{{ tag.tag_name }}</a>{% endfor %}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td colspan="2">{{formula.description|raw}}</td>
+        </tr>
+        <tr>
+            <th>Type</th>
+            <td>{{ formula.formula_type }}</td>
+        </tr>
+        <tr>
+            <th>Total handdrawn symbols</th>
+            <td>{{ total }}</td>
+        </tr>
+    </tbody>
+</table>
+
+</div><!--tabpanel info-->
+
+<div role="tabpanel" class="tab-pane" id="latextab">
+<h2>LaTeX</h2>
 <p><b>LaTeX</b>: <code>{{ formula.formula_in_latex }}</code></p>
-<p><b>Variant of</b>: <a href="../symbol/?id={{ formula.variant_of }}">{{ formula.variant_of }}</a></p>
 <p><b>Mode</b>: {{ formula.mode }}</p>
-<p><b>Type</b>: {{ formula.formula_type }}</p>
 {% if formula.package != '' %}
     <p><b>Package</b>: {{ formula.package }}</p>
 {% endif %}
 {% if formula.preamble != '' %}
     <p><b>Preamble</b>: <code>{{ formula.preamble }}</code></p>
 {% endif %}
-<p><b>Total handdrawn symbols</b>: {{ total }}</p>
-<p><b>Description</b>: {{formula.description|raw}}</p>
+
+</div><!--tabpanel latex-->
+
+<div role="tabpanel" class="tab-pane" id="references">
+<h2>Used by</h2>
+<ul>
+{% for reference in references %}
+<li>{{ reference.paper }} - {{ reference.meaning}}</li>
+{% endfor %}
+</ul>
+
+{% if account_type != 'IP-User' %}
+<h2>Add Reference</h2>
+
+<form role="form" method="post" action="?id={{ formula.id }}">
+    <input type="hidden" name="id" value="{{ formula.id }}" />
+    <div class="control-group">
+        <label class="control-label" for="used_by">This symbol is used by ...</label>
+        <div class="controls">
+            <input type="text" class="form-control"
+                   placeholder="http://arxiv.org/abs/1510.00385"
+                   id="used_by" name="used_by"
+                   value="" />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="meaning">Meaning in this context:</label>
+        <div class="controls">
+            <input type="text" class="form-control"
+                   placeholder="an index variable"
+                   id="meaning" name="meaning"
+                   value="" />
+        </div>
+    </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form><br/><br/>
+{% endif %}
+</div>
 
 <ul class="nav nav-tabs">
   <li {% if tab == 'trainingset' %}class="active"{% endif %}><a href="../symbol?id={{ formula.id }}">Trainingset</a></li>

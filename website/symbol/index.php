@@ -28,7 +28,7 @@ if (isset($_GET['delete']) && is_admin()) {
     }
 }
 
-if (isset($_POST['id']) && !is_ip_user()) {
+if (isset($_POST['id']) && isset($_POST['description']) && !is_ip_user()) {
     $formula_id = $_POST['id'];
     update_symbol_description($formula_id, $_POST['description']);
     if (is_admin()) {
@@ -67,6 +67,18 @@ if (isset($_POST['id']) && !is_ip_user()) {
         $stmt->bindParam(':packages', $packages, PDO::PARAM_STR);
         $stmt->execute();
     }
+} elseif (isset($_POST['used_by']) && !is_ip_user()) {
+    $sql = "INSERT INTO `wm_formula_in_paper` ".
+           "(`symbol_id`, `paper`, `inserted_by`, `meaning`) VALUES ".
+           "(:sid, :used_by, :uid, :meaning);";
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':sid', $_POST['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':used_by', $_POST['used_by'], PDO::PARAM_STR);
+    $stmt->bindParam(':meaning', $_POST['meaning'], PDO::PARAM_STR);
+    $result = $stmt->execute();
+    header("Location: ?id=".$_POST['id']);
 }
 
 if (isset($_GET['id'])) {
@@ -81,6 +93,15 @@ if (isset($_GET['id'])) {
     $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
     $stmt->execute();
     $formula = $stmt->fetchObject();
+
+    // Get references
+    $sql = "SELECT `paper`, `meaning` ".
+           "FROM `wm_formula_in_paper` ".
+           "WHERE `symbol_id` = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $references = $stmt->fetchAll();
 
     $tab = isset($_GET['tab']) ? $_GET['tab'] : "trainingset";
     $is_testset = $tab == "testset";
@@ -144,7 +165,8 @@ echo $twig->render('symbol.twig', array('heading' => 'Symbol',
                                        'pages' => ceil(($total)/$page_size),
                                        'currentPage' => $currentPage,
                                        'tab' => $tab,
-                                       'tags' => $tags
+                                       'tags' => $tags,
+                                       'references' => $references
                                        )
                   );
 
