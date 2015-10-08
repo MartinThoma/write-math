@@ -38,14 +38,14 @@ nosetests.xml
 # Project specific
 papers
 latex-unicode/dbconfig.py
-symbol-generator/dbconfig.py
-symbol-generator/tmp.tex
-symbol-generator/tmp.log
-symbol-generator/tmp.aux
-symbol-generator/*.pdf
-symbol-generator/*.svg
-symbol-generator/manual/*.pdf
-symbol-generator/manual/*.svg
+tools/symbol-generator/dbconfig.py
+tools/symbol-generator/tmp.tex
+tools/symbol-generator/tmp.log
+tools/symbol-generator/tmp.aux
+tools/symbol-generator/*.pdf
+tools/symbol-generator/*.svg
+tools/symbol-generator/manual/*.pdf
+tools/symbol-generator/manual/*.svg
 website/config.php
 website/cache/*
 website/composer.lock
