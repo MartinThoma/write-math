@@ -48,16 +48,17 @@ def main(mysql):
             else:
                 raw_candidate_ids.append(raw_data['id'])
         testset_ratio = 0.1
-        testset_total = int(math.ceil(len(raw_datasets)*testset_ratio))
+        testset_total = int(math.ceil(len(raw_datasets) * testset_ratio))
         remaining = testset_total - is_in_testset
 
         if remaining > 0:
-            print("%i in testset. Add remaining %i datasets to testset..." %
+            print(("\t%i in testset. "
+                   "Add remaining %i datasets to testset...") %
                   (is_in_testset, remaining))
             add_new = random.sample(raw_candidate_ids, remaining)
             if len(add_new) < 20:
                 for el in add_new:
-                    print("http://write-math.com/view/?raw_data_id=%i" % el)
+                    print("\thttp://write-math.com/view/?raw_data_id=%i" % el)
             for rid in add_new:
                 sql = ("UPDATE `wm_raw_draw_data` SET `is_in_testset`=1 "
                        "WHERE `id` = %i LIMIT 1") % rid
