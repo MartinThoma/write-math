@@ -58,11 +58,25 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $symbol_training_data_count = $stmt->fetchAll();
 
+$sql = "SELECT `wm_formula`.`id`, COUNT(`symbol_id`) as `paper_count` ".
+       "FROM `wm_formula` ".
+       "JOIN `wm_formula_in_paper` ON `wm_formula`.`id` = `symbol_id` ".
+       "WHERE (`formula_type` = 'single symbol' OR ".
+       "`formula_type` = 'drawing' OR `formula_type` = 'nesting symbol') ".
+       "GROUP BY  `symbol_id` ";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$paper_count = $stmt->fetchAll();
+$formulaid2count = array();
+foreach ($paper_count as $key => $value) {
+    $formulaid2count[$value['id']] = $value['paper_count'];
+}
+
 $sum = 0;
 $important_count = 0;
 $important_count_raw = 0;
 $tmp = array();
-foreach ($symbol_training_data_count as $s) {
+foreach ($symbol_training_data_count as $key=>$s) {
     $sum += $s['counter'];
     if ($s['is_important']) {
         $important_count += 1;
@@ -70,6 +84,11 @@ foreach ($symbol_training_data_count as $s) {
         if ($s['formula_in_latex'] != "") {
             $tmp[] = $s['formula_in_latex'];
         }
+    }
+    if (array_key_exists($s['id'], $formulaid2count)) {
+        $symbol_training_data_count[$key]['used_by_counter'] = $formulaid2count[$s['id']];
+    } else {
+        $symbol_training_data_count[$key]['used_by_counter'] = 0;
     }
 }
 

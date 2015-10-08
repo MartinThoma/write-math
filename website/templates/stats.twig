@@ -1,6 +1,8 @@
 {% extends "base.twig" %}
 
 {% block content %}
+Green background means it is part of the current classifier and can - in
+principle - be recognized.
 
 <!-- Fix line height to make loading more convenient -->
 <style type="text/css">
@@ -16,8 +18,9 @@ tr {
         <td></td>
         <th>#</th>
         <th>Formula in LaTeX</th>
-        <th>Var</th>
+        <th><abbr title="'base variant version' of this symbol">var</abbr></th>
         <th>Instances in database</th>
+        <th><abbr title="References of this symbol in literature">ref</abbr></th>
         {% if user_id == 10 %}
         <th>is important<th>
         {% endif %}
@@ -33,8 +36,9 @@ tr {
             <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
             {% endfor %}
             </td>
-            <td style="background-color:green;">{{s.variant_of}}</td>
+            <td style="background-color:green;">{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
             <td style="background-color:green;">{{s.counter}}</td>
+            <td style="background-color:green;">{{s.used_by_counter}}</td>
         {% else %}
             <td>{{ loop.index }}</td>
             <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
@@ -42,8 +46,9 @@ tr {
             <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
             {% endfor %}
             </td>
-            <td>{{s.variant_of}}</td>
+            <td>{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
             <td>{{s.counter}}</td>
+            <td>{{s.used_by_counter}}</td>
         {% endif %}
     {% if user_id == 10 %}
         {% if s.is_important %}
