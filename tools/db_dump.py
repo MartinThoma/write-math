@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Create a complete strucutre dump of the database."""
+"""Create a complete structure dump of the database."""
 
 from __future__ import unicode_literals
 import logging
@@ -93,13 +93,15 @@ def dump_structure(mysql_cfg,
         data += "-- Datenbank: `%s`\n" % mysql_cfg['db']
         data += "--\n\n"
         for table_name in tables:
-            data += "-- " + "-"*56 + "\n\n"
+            data += "-- " + ("-" * 56) + "\n\n"
             data += "--\n"
             data += u"-- Tabellenstruktur für Tabelle `%s`\n" % table_name
             data += "--\n"
             cursor.execute("SHOW CREATE TABLE `%s`" % table_name)
             table_structure = cursor.fetchone()[1]
-            table_structure = table_structure.replace("CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ")
+            table_structure = table_structure.replace("CREATE TABLE ",
+                                                      ("CREATE TABLE "
+                                                       "IF NOT EXISTS "))
 
             constraint_data += get_constraind_str(table_structure, table_name)
 
@@ -159,9 +161,11 @@ def db_dump_table(mysql_cfg, table_name, filename):
         chunking_threshold = 957
         for counter, row in enumerate(datasets):
             if rows is None:
-                rows = "(`%s`)" % "`, `".join([r[0] for r in cursor.description])
+                rows = "(`%s`)" % "`, `".join([r[0]
+                                               for r in cursor.description])
             if counter % chunking_threshold == 0:
-                data += "\nINSERT INTO `%s` %s VALUES\n" % (table_name, str(rows))
+                data += ("\nINSERT INTO `%s` %s VALUES\n" %
+                         (table_name, str(rows)))
             data += "("
             first = True
             for i, field in enumerate(row):
@@ -174,6 +178,7 @@ def db_dump_table(mysql_cfg, table_name, filename):
                         data += "0x%s" % binascii.hexlify(field)
                     except Exception as inst:
                         data += u"'{0}'".format(field)
+                        logging.warning(inst)
                 else:
                     # print(type(field))
                     # print(field)
@@ -201,13 +206,18 @@ def main():
     dir_s = "/home/moose/GitHub/write-math"
     tables = dump_structure(mysql,
                             prefix='wm_',
-                            filename_strucutre="%s/database/structure/write-math.sql" % dir_s,
-                            filename_constraints="%s/database/structure/foreign-keys.sql" % dir_s)
+                            filename_strucutre=(("%s/database/structure/"
+                                                 "write-math.sql") % dir_s),
+                            filename_constraints=(("%s/database/structure/"
+                                                   "foreign-keys.sql") % dir_s))
+    logging.info(tables)
     # for table_name in tables:
     #     if "raw_draw_data" not in table_name:
     #         #if "wm_languages" == table_name:
     #         logging.info("Dump table '%s'...", table_name)
-    #         path = os.path.join("%s/database/complete-dump/single_tables_1/%s.sql" % (dir_s, table_name))
+    #         path = os.path.join(("%s/database/complete-dump/"
+    #                              "single_tables_1/%s.sql") %
+    #                             (dir_s, table_name))
     #         db_dump_table(mysql, table_name, path)
 
 if __name__ == '__main__':
