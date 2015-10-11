@@ -84,7 +84,7 @@ if (isset($_GET['search'])) {
                "FROM  `wm_formula` ";
         $sql .= "WHERE (`description` COLLATE UTF8_GENERAL_CI LIKE :searchstring ".
                 "OR `unicodexml_description` COLLATE UTF8_GENERAL_CI LIKE :searchstring) ";
-        $sql .= "ORDER BY `formula_name` ASC";
+        $sql .= "ORDER BY `unicode_dec`, `formula_name` ASC";
         $stmt = $pdo->prepare($sql);
         $searchstring_words = trim(implode(" ", $parsed_search['words']));
         $stmt->execute(array(':searchstring' => '%'.$searchstring_words.'%'));
