@@ -1,0 +1,1 @@
+Thank you David Carlisle for https://github.com/w3c/xml-entities

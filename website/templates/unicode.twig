@@ -1,0 +1,109 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<!-- Fix line height to make loading more convenient -->
+<style type="text/css">
+tr {
+   line-height: 45px;
+   min-height: 45px;
+   height: 45px;
+}
+.y {
+    background-color: yellow;
+}
+
+.r {
+    background-color: red;
+}
+</style>
+
+<p class="text-info">Red background means there is no entry in the write-math database.
+Yellow entry means there are multiple ones.</p>
+
+<p class="text-info">Blocks:
+<a href="?min=33&max=126">ASCII</a>
+<a href="?min=1024&max=1279">Cyrillic</a>
+<a href="?min=8592&max=8703">arrows</a>
+<a href="?min=10224&max=10239">Supplemental Arrows-A</a>
+<a href="?min=10496&max=10623">Supplemental Arrows-B</a>
+<a href="?min=129024&max=129197">Supplemental Arrows-C</a>
+<a href="?min=11008&max=11217">Miscellaneous Symbols and Arrows</a>
+<a href="?min=119808&max=120483">Mathematical Latin Letters</a>
+<a href="?min=120488&max=120779">Mathematical Greek Letters</a>
+<a href="?min=120782&max=120831">Mathematical Digits</a>
+and <a href="https://en.wikipedia.org/wiki/Unicode_block">many more</a>.
+</p>
+
+<form class="form-horizontal" method="get">
+  <div class="form-group">
+    <label for="min" class="col-sm-2 control-label">min unicode (dec)</label>
+    <div class="col-sm-10">
+      <input type="number"
+             class="form-control"
+             id="min" name="min"
+             placeholder="31" value="{{min_unicode}}"
+             min="1" step="1">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="max" class="col-sm-2 control-label">max unicode (dec)</label>
+    <div class="col-sm-10">
+      <input type="number"
+             class="form-control"
+             id="max" name="max"
+             placeholder="61" value="{{max_unicode}}"
+             min="2" step="1">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+    </div>
+  </div>
+</form>
+
+<br/>
+{% if searchresults|length>0 %}
+    <table class="table">
+        <thead>
+            <th>#</th>
+            <th>Rendering</th>
+            <th>&nbsp;</th>
+            <th>Name</th>
+            <th>LaTeX</th>
+            <th>Link</th>
+        </thead>
+        {% for unicode, ru in searchresults %}
+        {% for unicode, r in ru %}
+            {% if r.best_rendering %}
+            <tr>
+                <td {% if loop.index > 1 %}class="y"{%endif%}>{{ r.unicode_dec }}</td>
+                <td><img src="../formulas/{{ r.id }}-{{ r.best_rendering }}.svg" alt="Rendering of {{ r.formula_name }}" height="30px" /></td>
+                <td>
+                {% if r.unicode_dec != 0 %}
+    <span style="font-family:{{r.font|raw}};font-style:{{r.font_style|raw}};font-size:20px;line-height:20px;text-align:center;color:black;">&#{{r.unicode_dec|raw}};</span>
+    {% endif %}
+                </td>
+                <td><a href="../symbol/?id={{ r.id }}">{{ r.formula_name }}</a></td>
+                <td><code>{{ r.formula_in_latex }}</code></td>
+                <td><a href="http://www.fileformat.info/info/unicode/char/{{ r.base16 }}/index.htm">Link</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="r">{{ r.unicode_dec }}</td>
+                <td class="r">&nbsp;</td>
+                <td class="r">
+                {% if r.unicode_dec != 0 %}
+    <span style="font-family:{{r.font|raw}};font-style:{{r.font_style|raw}};font-size:20px;line-height:20px;text-align:center;color:black;">&#{{r.unicode_dec|raw}};</span>
+    {% endif %}
+                </td>
+                <td class="r">{{ r.formula_name }}</td>
+                <td class="r">&nbsp;</td>
+                <td class="r"><a href="http://www.fileformat.info/info/unicode/char/{{ r.base16 }}/index.htm">Link</a></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}
