@@ -1,4 +1,7 @@
 {% macro pagination(currentPage, append_information, total, pages, delta) %}
+    {% if total==0%}
+        <p>No items</p>
+    {% else %}
     <ul class="pagination">
       {% if pages >= 2*delta %}
           <li><a href="?page=1{{ append_information }}">1</a></li>
@@ -32,4 +35,5 @@
         <li><a href="?page={{ (pages+1) }}{{ append_information }}">{{ (pages+1) }}</a></li>
       {% endif %}
     </ul>
+    {% endif %}
 {% endmacro %}
