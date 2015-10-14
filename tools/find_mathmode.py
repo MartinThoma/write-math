@@ -28,7 +28,7 @@ def get_math_mode(filename):
     """
     with open(filename) as f:
         lines = f.read()
-    p1 = re.compile('\$(.+?)\$')
+    p1 = re.compile('\$(.*?)\$', re.DOTALL)
     p2 = re.compile('\\[(.+?)\\\]')
     matches = p1.findall(lines)
     matches += p2.findall(lines)
