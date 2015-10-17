@@ -5,6 +5,7 @@
 
 import os
 import re
+import codecs
 
 
 def main(filename):
@@ -26,8 +27,18 @@ def get_math_mode(filename):
     -------
     list of math mode contents
     """
-    with open(filename) as f:
+    with codecs.open(filename, 'r', 'utf-8') as f:
         lines = f.read()
+
+    # strip comment lines
+    lines = lines.split("\n")
+    new_lines = []
+    for line in lines:
+        if not line.strip().startswith("%"):
+            new_lines.append(line)
+    lines = "\n".join(new_lines)
+
+    # match mathmode
     p1 = re.compile('\$(.*?)\$', re.DOTALL)
     p2 = re.compile('\\[(.+?)\\\]')
     matches = p1.findall(lines)
@@ -57,6 +68,7 @@ def get_parser():
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-f", "--file",
                         dest="filename",
+                        required=True,
                         type=lambda x: is_valid_file(parser, x),
                         help="write report to FILE",
                         metavar="FILE")
