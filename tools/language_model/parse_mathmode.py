@@ -1,14 +1,33 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
 import sys
 import logging
 import string
+import collections
+
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    str = str
+    unicode = str
+    bytes = bytes
+    basestring = (str, bytes)
+else:
+    # 'unicode' exists, must be Python 2
+    str = str
+    unicode = unicode
+    bytes = str
+    basestring = basestring
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
+
+# TODO: \text{$x$}
+#       \hbox{$x$}
 
 
 class TokenStream(object):
@@ -23,7 +42,26 @@ class TokenStream(object):
 
     def append(self, token):
         if token not in self.skip_chars:
-            self.tokens.append(token)
+            token = token.strip()
+            replace_dict = {'\\cal': '\\mathcal',  # TODO: Language model config file
+                            '\\rm': '\\mathrm',
+                            '\\bf': '\\mathbf',
+                            '*': '\\ast',
+                            '\\ge': '\\geq',
+                            '\\le': '\\leq',
+                            '\\ne': '\\neq'}
+            multi_replace = {'\\max': ['m', 'a', 'x'],
+                             '\\min': ['m', 'i', 'n'],
+                             '\\tanh': ['t', 'a', 'n', 'h'],
+                             '\\sinh': ['s', 'i', 'n', 'h'],
+                             '\\cosh': ['c', 'o', 's', 'h']}
+            if token in replace_dict:
+                token = replace_dict[token]
+            if token in multi_replace:
+                for t in multi_replace[token]:
+                    self.tokens.append(Token(t))
+            else:
+                self.tokens.append(Token(token))
 
     def __len__(self):
         return self.tokens.__len__()
@@ -31,6 +69,8 @@ class TokenStream(object):
     def postprocessing(self):
         self.postprocessing_env()
         self.postprocessing_block()
+        self.postprocessing_block_consumers()
+        self.unblocking()
 
     def postprocessing_env(self):
         """deal with environments"""
@@ -81,10 +121,12 @@ class TokenStream(object):
                     continue
                 elif sbuffer != "" and token == "{":
                     raise SyntaxError(('Opening curly brace directy after '
-                                       'end of environment: %s') % self.orig)
+                                       'end of environment in file %s') %
+                                      self.filename)
                 elif sbuffer == "" and token == "}":
                     raise SyntaxError(('closing curly brace directy after '
-                                       'end of environment: %s') % self.orig)
+                                       'end of environment in file %s') %
+                                      self.filename)
                 elif sbuffer != "" and token == "}":
                     # Valid end of an environment
                     if sbuffer != environments[-1].name:
@@ -121,7 +163,7 @@ class TokenStream(object):
                 if len(blocks) == 0:
                     raise Exception("More closing braces than opening "
                                     "braces: %s in file '%s'" %
-                                    (self.orig, self.filename))
+                                    (self.orig[:80], self.filename))
                 blocks.pop()
             else:
                 if len(blocks) > 0:
@@ -130,11 +172,76 @@ class TokenStream(object):
                     new_tokens.append(token)
         self.tokens = new_tokens
 
+    def postprocessing_block_consumers(self):
+        consumers = {r"\cal": True, r"\mathcal": True,
+                     r"\bb": True, r"\mathbb": True,
+                     r"\bf": True, r"\mathbf": True,
+                     r"\rm": True, r"\mathrm": True,
+                     r"\\frak": True,
+                     r"\\boldmath": True,
+                     r"^": False,  # r"_": False,
+                     r"\label": False, r"\ref": False,  # TODO: Consume one token, but then skip
+                     # r"\sqrt": False, r"\bar": False,
+                     # r"\vec": False, r"\overline": False,
+                     # r"\tilde": False
+                     }
+        multi_consumers = {r"\over", r"\frac"}
+        current_consumer = None
+        new_tokens = []
+        for token in self.tokens:
+            if isinstance(token, Token):
+                if token in consumers:
+                    current_consumer = Consumer(token,
+                                                splitting=consumers[token])
+                elif token in multi_consumers:
+                    current_consumer = MultiConsumer(token)
+                elif current_consumer is not None:
+                    current_consumer.consume(token)
+                    if current_consumer.is_saturated():
+                        new_tokens.append(current_consumer)
+                        current_consumer = None
+                else:
+                    new_tokens.append(token)
+            else:
+                if current_consumer is not None:
+                    current_consumer.consume(token)
+                    if current_consumer.is_saturated():
+                        for t in current_consumer.tokenize():
+                            new_tokens.append(t)
+                        current_consumer = None
+                else:
+                    new_tokens.append(token)
+        self.tokens = new_tokens
+
+    def unblocking(self):
+        """Remove blocks."""
+        new_tokens = []
+        for token in self.tokens:
+            if isinstance(token, Block) or \
+               isinstance(token, Consumer) or \
+               isinstance(token, MultiConsumer):
+                for el in token.tokenize():
+                    new_tokens.append(el)
+            else:
+                new_tokens.append(token)
+        self.tokens = new_tokens
+
     def __repr__(self):
         return self.tokens.__repr__()
 
     def __iter__(self):
         return self.tokens.__iter__()
+
+
+class Token(unicode):
+    def __init__(self, name):
+        self.name = name
+
+    def tokenize(self):
+        return [self.name]
+
+    def __repr__(self):
+        return self.name.__repr__()
 
 
 class Environment(object):
@@ -160,13 +267,101 @@ class Block(object):
         self.tokens = []
 
     def append(self, token):
-        self.tokens.append(token)
+        if isinstance(token, collections.Iterable):
+            self.tokens.append(token)
+            # for element in token:
+            #    self.tokens.append(element)
+        else:
+            self.tokens.append(token)
+
+    def tokenize(self):
+        if len(self.tokens) == 1:
+            return self.tokens
+        else:
+            return ['{'] + self.tokens + ['}']
 
     def __repr__(self):
-        return "BLOCK{{%s}}" % (self.tokens.__repr__())
+        if len(self.tokens) == 1:
+            return "%s" % self.tokens[0]
+        else:
+            return "BLOCK{{%s}}" % (self.tokens.__repr__())
 
     def __iter__(self):
         return self.tokens.__iter__()
+
+
+class Consumer(object):
+    def __init__(self, name, splitting=True):
+        self.name = name
+        self.splitting = splitting
+        self.consumed = Block()
+        self.is_saturated_state = False
+
+    def consume(self, token):
+        self.consumed.append(token)
+        self.is_saturated_state = True
+
+    def is_saturated(self):
+        return self.is_saturated_state
+
+    def tokenize(self):
+        """
+        Returns
+        -------
+        list
+            List of Tokens
+        """
+        if isinstance(self.consumed, Block):
+            if self.splitting:
+                tokens = []
+                for el in self.consumed:
+                    tokens.append("%s{%s}" % (self.name, el))
+            else:
+                tokens = [self.name] + self.consumed.tokenize()
+            return tokens
+        else:
+            return ["%s{%s}" % (self.name, self.consumed)]
+
+    def __repr__(self):
+        return "%s%s" % (self.name, self.consumed)
+
+
+class MultiConsumer(object):
+    def __init__(self, name):
+        self.name = name
+        self.consumed = []
+        self.is_saturated_state = False
+
+    def consume(self, token):
+        block = Block()
+        block.append(token)
+        self.consumed.append(block)
+        if len(self.consumed) == 2:
+            self.is_saturated_state = True
+
+    def is_saturated(self):
+        return self.is_saturated_state
+
+    def tokenize(self):
+        """
+        Returns
+        -------
+        list
+            List of Tokens
+        """
+        if self.name == r'\frac':
+            # TODO: That last [0]
+            numerator = self.consumed[0].tokenize()[0].tokenize()
+            if numerator[0] == '{' and numerator[-1] == '}':
+                numerator = numerator[1:-1]
+            return (['<n>'] + numerator +
+                    ['</n><d>'] + self.consumed[1].tokenize() + ['</d>'])
+        else:
+            print("Not implemented")
+            raise NotImplemented  # TODO
+
+    def __repr__(self):
+        return "MultiConsumer%s%s" % (self.name, self.consumed)
 
 
 def tokenize(text, filename=""):
@@ -185,27 +380,35 @@ def tokenize(text, filename=""):
 
     Examples
     --------
-    >>> tokenize(r"\sum_{i=0}^\infty i^2")
+    >>> tokenize(r"\sum_{i=0}^\infty i^2")[1:-1]
     ['\\\sum', '_', '{', 'i', '=', '0', '}', '^', '\\\infty', 'i', '^', '2']
 
     >>> tokenize(r"A = \{1,2\}")
-    ['A', '=', '\\\{', '1', ',', '2', '\\\}']
+    ['<s>', 'A', '=', '\\\{', '1', ',', '2', '\\\}', '</s>']
 
     >>> tokenize(r"A=\{1,2\}")
-    ['A', '=', '\\\{', '1', ',', '2', '\\\}']
+    ['<s>', 'A', '=', '\\\{', '1', ',', '2', '\\\}', '</s>']
 
     >>> tokenize(r"ABCDEFG")
-    ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    ['<s>', 'A', 'B', 'C', 'D', 'E', 'F', 'G', '</s>']
 
     >>> tokenize("\\\\rho")
-    ['\\\\rho']
+    ['<s>', '\\\\rho', '</s>']
+
+    >>> tokenize(r"A \in \mathcal{P}(A)")
+    ['<s>', 'A', '\\\in', '\\\mathcal{P}', '(', 'A', ')', '</s>']
+
+    >>> tokenize(r"a \cdot \\frac{x^2 + 1}{2}")[1:-1]
+    ['a', '\\\cdot', '<n>', 'x', '^', '2', '+', '1', '</n><d>', '2', '</d>']
     """
     text = text.strip()
-    tokens = TokenStream(skip_chars=[" "], orig=text, filename=filename)
+    tokens = TokenStream(skip_chars=[" ", "\t", "\r",  # TODO: language model config file
+                                     "\\!", "\\;", "\\,", "~", "\\:",
+                                     "\\quad", "\\qquad",
+                                     "\\Hspace", "\\big"],
+                         orig=text,
+                         filename=filename)
     next_token = ""
-    # stopchars = [" ", "\t", "\r", "\n", "~",
-    #              "=", "\\", "^", "_", "{", "}", ",", ";", "+", "-", "(", ")",
-    #              ".", "/", "|", "'", "<", ">"]
     single_tokens = ["=", "{", "}", ",", "^", "_"]
     escape = False
     last_was_escape = False
@@ -223,7 +426,7 @@ def tokenize(text, filename=""):
                 last_was_escape = True
         else:
             if escape:
-                if char not in list(string.digits+string.letters):
+                if char not in list(string.digits+string.ascii_letters):
                     if last_was_escape:
                         next_token += char
                         tokens.append(next_token)
@@ -249,17 +452,16 @@ def tokenize(text, filename=""):
     try:
         tokens.postprocessing()
     except Exception as inst:
-        logging.debug(inst)
-        logging.debug(text)
-    return tokens
+        logging.debug("TokenStream.postprocessing failed: %s", inst)
+    return ["<s>"] + tokens.tokens + ["</s>"]
 
 
 def main(filename):
     import find_mathmode
     math_mode = find_mathmode.get_math_mode(filename)
-    for el in math_mode:
+    for i, el in enumerate(math_mode, start=1):
         tokens = tokenize(el)
-        print(tokens)
+        print("%i.\t%s" % (i, tokens))
 
 
 def is_valid_file(parser, arg):
@@ -289,5 +491,5 @@ def get_parser():
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    args = get_parser().parse_args()
-    main(args.filename)
+    # args = get_parser().parse_args()
+    # main(args.filename)

@@ -6,12 +6,13 @@
 import os
 import re
 import codecs
+import logging
 
 
 def main(filename):
     math_mode = get_math_mode(filename)
-    for el in math_mode:
-        print(el)
+    for i, el in enumerate(math_mode):
+        print("%i.\t%s" % (i, el.replace('\n', '\\n')))
 
 
 def get_math_mode(filename):
@@ -30,6 +31,15 @@ def get_math_mode(filename):
     with codecs.open(filename, 'r', 'utf-8') as f:
         lines = f.read()
 
+    lines = extract_document_body(lines)
+    if len(lines) == 0:
+        return []
+    elif len(lines) > 1:
+        logging.debug("File '%s' has %i document environments" %
+                      (filename, len(lines)))
+    else:
+        lines = lines[0]
+
     # strip comment lines
     lines = lines.split("\n")
     new_lines = []
@@ -44,6 +54,32 @@ def get_math_mode(filename):
     matches = p1.findall(lines)
     matches += p2.findall(lines)
     return matches
+
+
+def extract_environments(env, text):
+    """
+    Get the content of all environments 'environment' as a list.
+
+    Parameters
+    ----------
+    env : string
+        Name of the environment
+    text : string
+        Text to parse for environment
+
+    Returns
+    -------
+    list
+        List of matches
+    """
+    document = re.compile('\\\\begin{%s}(.*?)\\\\end{%s}' % (env, env),
+                          re.MULTILINE | re.DOTALL)
+    a = document.findall(text)
+    return a
+
+
+def extract_document_body(text):
+    return extract_environments('document', text)
 
 
 def unfold_math(expression):
