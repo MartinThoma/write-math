@@ -35,7 +35,8 @@ def main():
                                  charset='utf8')
     cursor = connection.cursor()
     sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-           "WHERE `formula_type` = 'single symbol' "
+           # "WHERE `formula_type` = 'single symbol' "
+           "WHERE `is_important` = 1 OR `formula_type` = 'nesting symbol' "
            "ORDER BY `formula_in_latex` ASC")
     cursor.execute(sql)
     symbols = cursor.fetchall()

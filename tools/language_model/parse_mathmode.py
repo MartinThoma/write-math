@@ -49,7 +49,10 @@ class TokenStream(object):
                             '*': '\\ast',
                             '\\ge': '\\geq',
                             '\\le': '\\leq',
-                            '\\ne': '\\neq'}
+                            '\\ne': '\\neq',
+                            '\\to': '\\rightarrow',
+                            '\\mathds': '\\mathbb'
+                            }
             multi_replace = {'\\max': ['m', 'a', 'x'],
                              '\\min': ['m', 'i', 'n'],
                              '\\tanh': ['t', 'a', 'n', 'h'],
@@ -185,7 +188,7 @@ class TokenStream(object):
                      # r"\vec": False, r"\overline": False,
                      # r"\tilde": False
                      }
-        multi_consumers = {r"\over", r"\frac"}
+        multi_consumers = {r"\frac"}  # r"\over", 
         current_consumer = None
         new_tokens = []
         for token in self.tokens:
@@ -357,8 +360,8 @@ class MultiConsumer(object):
             return (['<n>'] + numerator +
                     ['</n><d>'] + self.consumed[1].tokenize() + ['</d>'])
         else:
-            print("Not implemented")
-            raise NotImplemented  # TODO
+            print("Not import")
+            raise NotImplemented
 
     def __repr__(self):
         return "MultiConsumer%s%s" % (self.name, self.consumed)
@@ -405,7 +408,9 @@ def tokenize(text, filename=""):
     tokens = TokenStream(skip_chars=[" ", "\t", "\r",  # TODO: language model config file
                                      "\\!", "\\;", "\\,", "~", "\\:",
                                      "\\quad", "\\qquad",
-                                     "\\Hspace", "\\big"],
+                                     "\\Hspace", "\\big",
+                                     "^", "_"  # TODO: really?
+                                     ],
                          orig=text,
                          filename=filename)
     next_token = ""
@@ -453,7 +458,33 @@ def tokenize(text, filename=""):
         tokens.postprocessing()
     except Exception as inst:
         logging.debug("TokenStream.postprocessing failed: %s", inst)
-    return ["<s>"] + tokens.tokens + ["</s>"]
+
+    # Simplify for segmentation
+    tokens = tokens.tokens
+    return_tokens = []
+    for token in ["<s>"] + tokens + ["</s>"]:
+        if token == "</n><d>":
+            return_tokens.append("\\frac")
+        elif token in ["<n>", "</d>", "{", "}", "\\left", "\\right"]:
+            continue
+        elif isinstance(token, Block):
+            change = True
+            for t in token.tokenize():
+                return_tokens.append(token)
+        elif isinstance(token, Consumer):
+            change = True
+            for t in token.tokenize():
+                return_tokens.append(token)
+        elif isinstance(token, MultiConsumer):
+            change = True
+            for t in token.tokenize():
+                return_tokens.append(token)
+        elif isinstance(token, Environment):
+            continue
+        else:
+            return_tokens.append(token)
+        tokens = return_tokens
+    return return_tokens
 
 
 def main(filename):

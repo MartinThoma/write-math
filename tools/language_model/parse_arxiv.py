@@ -22,7 +22,9 @@ import gzip
 import string
 import time
 import math
+import pickle
 
+# My modules
 from find_mathmode import get_math_mode
 import parse_mathmode
 
@@ -101,12 +103,15 @@ def update_ngrams(ngrams, filename, token_stream):
         List of tokens. Each token should either be in the vocabulary, or be
         '<s>', '<n>', '</n><d>', '</d>', '</s>', '<unk>'
     """
+
+    all_ignore = ['_', '^', '{', '}', '\\right', '\\left',  # TODO: Language model config file
+                  '\\mathrm', '\\mathcal', '\\mathbf', '\\mbox',
+                  '&', '%', '<n>', '</n><d>', '</d>', '<unk>']
+
+    # Update unigrams
     ts = []
     for token in token_stream:
-        single_ignore = ['<s>', '</s>', '<n>', '</n><d>', '</d>', '<unk>',  # TODO: Language model config file
-                         '_', '^', '{', '}', '\\right', '\\left',
-                         '\\mathrm', '\\mathcal', '\\mathbf', '\\mbox',
-                         '&', '%']
+        single_ignore = ['<s>', '</s>'] + all_ignore  # TODO: Language model config file
         if token in single_ignore:
             continue
         if not isinstance(token, basestring):
@@ -125,6 +130,8 @@ def update_ngrams(ngrams, filename, token_stream):
                 ngrams['unknown'][token].append(filename)
             else:
                 ngrams['unknown'][token] = [filename]
+
+    ts = ["<s>"] + ts + ["</s>"]
 
     for t1, t2 in zip(ts, ts[1:]):
         if t1 in ngrams['bigrams']:
@@ -148,53 +155,153 @@ def update_ngrams(ngrams, filename, token_stream):
             ngrams['trigrams'][t1] = {t2: {t3: 1}}
 
 
-def main(directory):
+def main(directory, refresh):
     vocabulary = get_vocabulary()
-    ngrams = {'unknown': {},
-              'unigrams': {},
-              'bigrams': {},
-              'trigrams': {},
-              'bigrams': {},
-              'trigrams': {}
-              }
-    unknown_extensions = {}
+    ngrams_g = {'unknown': {},
+                'unigrams': {},
+                'bigrams': {},
+                'trigrams': {}
+                }
+    unknown_extensions_g = {}
     for word in vocabulary:
-        ngrams['unigrams'][word] = {}
+        ngrams_g['unigrams'][word] = {}
 
     onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f))]
     tarfiles = sorted([os.path.join(directory, f)
                        for f in onlyfiles if f.endswith('.tar')])
     for tarfiles_done, tar_filename in enumerate(tarfiles, start=1):
-        files_by_project = get_data(directory, tar_filename)
-        for project in files_by_project:
-            for filename in project:
-                extensions = []
-                digits = string.digits
-                if any([filename.lower().endswith(e) for e in extensions]):
-                    continue
-                elif any([filename.lower().endswith(e) for e in digits]):
-                    continue
-                elif not filename.lower().endswith('.tex'):
-                    _, file_extension = os.path.splitext(filename)
-                    file_extension = file_extension.lower()
-                    if file_extension in unknown_extensions:
-                        unknown_extensions[file_extension].append(filename)
-                    else:
-                        unknown_extensions[file_extension] = [filename]
-                    continue
-                try:
-                    mathmode_contents = get_math_mode(filename)
-                except:
-                    logging.debug("get_math_mode error with %s.", filename)
-                for mcontent in mathmode_contents:
-                    token_stream = parse_mathmode.tokenize(mcontent,
-                                                           filename=filename)
-                    update_ngrams(ngrams, filename, token_stream)
+        # check if this file was already analyzed
+        summary_file = os.path.join(directory,
+                                    "%s.summary.pickle" % tar_filename)
+        if not os.path.isfile(summary_file) or refresh:
+            # Initialize
+            ngrams_t = {'unknown': {},
+                        'unigrams': {},
+                        'bigrams': {},
+                        'trigrams': {}
+                        }
+            unknown_extensions_t = {}
+            for word in vocabulary:
+                ngrams_t['unigrams'][word] = {}
 
+            # Start work
+            files_by_project = get_data(directory, tar_filename)
+            for project in files_by_project:
+                for filename in project:
+                    extensions = []
+                    digits = string.digits
+                    if any([filename.lower().endswith(e) for e in extensions]):
+                        continue
+                    elif any([filename.lower().endswith(e) for e in digits]):
+                        continue
+                    elif not filename.lower().endswith('.tex'):
+                        _, file_extension = os.path.splitext(filename)
+                        file_extension = file_extension.lower()
+                        if file_extension in unknown_extensions_t:
+                            unknown_extensions_t[file_extension].append(filename)
+                        else:
+                            unknown_extensions_t[file_extension] = [filename]
+                        continue
+                    try:
+                        mathmode_contents = get_math_mode(filename)
+                    except:
+                        logging.debug("get_math_mode error with %s.", filename)
+                    for mcontent in mathmode_contents:
+                        token_stream = parse_mathmode.tokenize(mcontent,
+                                                               filename=filename)
+
+                        # Skip empty streams
+                        if token_stream == ["<s>", "</s>"]:
+                            continue
+
+                        # Writing this slows execution VERY much down!
+                        # with codecs.open("complete-tokens.txt",
+                        #                  'a+', 'utf-8') as f:
+                        #     try:
+                        #         f.write("%s\n" % json.dumps(token_stream))
+                        #     except:
+                        #         pass
+                        update_ngrams(ngrams_t, filename, token_stream)
+            # Serialize data
+            with open(summary_file, 'wb') as handle:
+                pickle.dump({'ngrams': ngrams_t,
+                             'unknown_extensions': unknown_extensions_t},
+                            handle,
+                            protocol=pickle.HIGHEST_PROTOCOL)
+        else:
+            logging.info("%s found.", summary_file)
+        # Deserialize data
+        update_data(ngrams_g, unknown_extensions_g, summary_file)
         store_data_lm("lm-data-%s-%i.md" % (time.strftime("%H-%M"),
                                             tarfiles_done),
-                      ngrams,
-                      unknown_extensions)
+                      ngrams_g,
+                      unknown_extensions_g)
+
+
+def update_data(ngrams, unknown_extensions, summary_file):
+    """
+    Update the ngrams datastructure as well as the list of unknown extensions
+    with data from the summary file.
+    """
+    with open(summary_file, 'rb') as handle:
+        data = pickle.load(handle)
+
+    for key in ['unknown']:
+        if key in ngrams:
+            for gram, value in data['ngrams'][key].items():
+                if gram in ngrams[key]:
+                    for filename in data['ngrams'][key][gram]:
+                        if filename not in ngrams[key][gram]:
+                            ngrams[key][gram].append(filename)
+                else:
+                    ngrams[key][gram] = value
+        else:
+            ngrams[key] = data['ngrams'][key]
+
+    for key in ['unigrams']:
+        if key in ngrams:
+            for gram, value in data['ngrams'][key].items():
+                if gram in ngrams[key]:
+                    for filename, count in data['ngrams'][key][gram].items():
+                        if filename in ngrams[key][gram]:
+                            ngrams[key][gram][filename] += count
+                        else:
+                            ngrams[key][gram][filename] = count
+                else:
+                    ngrams[key][gram] = value
+        else:
+            ngrams[key] = data['ngrams'][key]
+
+    for w1, v1 in data['ngrams']['bigrams'].items():
+        if w1 in ngrams['bigrams']:
+            for w2, count in v1.items():
+                if w2 in ngrams['bigrams'][w1]:
+                    ngrams['bigrams'][w1][w2] += count
+                else:
+                    ngrams['bigrams'][w1][w2] = count
+        else:
+            ngrams['bigrams'][w1] = v1
+
+    for w1, v1 in data['ngrams']['trigrams'].items():
+        if w1 in ngrams['trigrams']:
+            for w2, v2 in v1.items():
+                if w2 in ngrams['trigrams'][w1]:
+                    for w3, count in v2.items():
+                        if w3 in ngrams['trigrams'][w1][w2]:
+                            ngrams['trigrams'][w1][w2][w3] += count
+                        else:
+                            ngrams['trigrams'][w1][w2][w3] = count
+                else:
+                    ngrams['trigrams'][w1][w2] = v2
+        else:
+            ngrams['trigrams'][w1] = v1
+
+    # update unknown extensions
+    for ext, count in data['unknown_extensions'].items():
+        if ext in unknown_extensions:
+            unknown_extensions[ext] += count
+        else:
+            unknown_extensions[ext] = count
 
 
 def store_data_lm(filename, ngrams, unknown_extensions):
@@ -265,8 +372,8 @@ def write_ngrams(ngrams, filename):
     with codecs.open(filename, 'w', 'utf-8') as f:
         f.write("\\data\\\n")
         f.write("ngram 1=%i\n" % len(ngrams['unigrams']))
-        f.write("ngram 2=%i\n" % len(ngrams['bigrams']))  # TODO: richtig?
-        f.write("ngram 3=%i\n" % len(ngrams['trigrams']))  # TODO: richtig?
+        f.write("ngram 2=%i\n" % len(ngrams['bigrams']))
+        f.write("ngram 3=%i\n" % len(ngrams['trigrams']))
 
         k = 1  # Laplace smoothing / add-k estimation
 
@@ -321,8 +428,6 @@ def write_ngrams(ngrams, filename):
         f.write("\n\\3-grams:\n")
         discount = k * vocabulary_size**2
         write_list = []
-
-        # Now do the writing
         for w1, t1 in ngrams['trigrams'].items():
             for w2, t2 in t1.items():
                 # total number of trigrams starting with w1 and ending with w3
@@ -332,8 +437,6 @@ def write_ngrams(ngrams, filename):
                 for w3, count in t2.items():
                     prob = math.log10(count) - total
                     word = u"%s\t%s\t%s" % (w1, w2, w3)
-                    f.write(u"{prob}\t{word}\n".format(prob=prob,
-                                                       word=word))
                     write_list.append((word, prob))
         write_list = sorted(write_list,
                             key=lambda n: (n[1], n[0]),
@@ -360,6 +463,8 @@ def get_data(directory, tar_filename):
     ----------
     directory : string
         The path to a directory which contains .gz files of the arXiv.
+    tar_filename : string
+        The name of the file which should get analyzed
 
     Returns
     -------
@@ -421,9 +526,14 @@ def get_parser():
                         help="look in this DIR for arXiv .tar files",
                         metavar="DIR",
                         required=True)
+    parser.add_argument("-r", "--refresh",
+                        dest="refresh",
+                        help="don't use intermediate results",
+                        default=False,
+                        action="store_true")
     return parser
 
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-    main(args.directory)
+    main(args.directory, args.refresh)
