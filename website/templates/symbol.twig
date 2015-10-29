@@ -277,7 +277,9 @@
 <h2>Used by</h2>
 <ul>
 {% for reference in references %}
-<li>{{ reference.paper }} - {{ reference.meaning}}</li>
+<li>{{ reference.paper }} - {{ reference.meaning}} {% if uid == 10 %} <a href="?id={{ formula.id }}&amp;delete_reference={{reference.id}}" type="button" class="btn btn-danger" aria-label="Left Align">
+  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+</a>{% endif %}</li>
 {% endfor %}
 </ul>
 

@@ -9,6 +9,15 @@ if (!isset($_GET['id'])) {
     header("Location: ?id=1526");
 }
 
+if (isset($_GET['delete_reference']) && is_admin()) {
+    $sql = "DELETE FROM `wm_formula_in_paper` WHERE `id` = :id LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $_GET['delete_reference'], PDO::PARAM_INT);
+    $stmt->execute();
+    $id = intval($_GET['id']);
+    header("Location: ?id=".$id);
+}
+
 if (isset($_GET['edit'])  && !is_ip_user()) {
     $edit_flag = true;
 }
@@ -95,7 +104,7 @@ if (isset($_GET['id'])) {
     $formula = $stmt->fetchObject();
 
     // Get references
-    $sql = "SELECT `paper`, `meaning` ".
+    $sql = "SELECT `id`, `paper`, `meaning` ".
            "FROM `wm_formula_in_paper` ".
            "WHERE `symbol_id` = :id";
     $stmt = $pdo->prepare($sql);
