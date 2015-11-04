@@ -51,13 +51,23 @@ class TokenStream(object):
                             '\\le': '\\leq',
                             '\\ne': '\\neq',
                             '\\to': '\\rightarrow',
-                            '\\mathds': '\\mathbb'
+                            '\\mathds': '\\mathbb',
                             }
             multi_replace = {'\\max': ['m', 'a', 'x'],
                              '\\min': ['m', 'i', 'n'],
+                             '\\sin': ['s', 'i', 'n'],
+                             '\\cos': ['c', 'o', 's'],
+                             '\\tan': ['t', 'a', 'n'],
+                             '\\ln': ['l', 'n'],
+                             '\\lim': ['l', 'i', 'm'],
+                             '\\log': ['l', 'o', 'g'],
+                             '\\det': ['d', 'e', 't'],
+                             '\\arcsec': ['a', 'r', 'c', 's', 'e', 'c'],
                              '\\tanh': ['t', 'a', 'n', 'h'],
                              '\\sinh': ['s', 'i', 'n', 'h'],
-                             '\\cosh': ['c', 'o', 's', 'h']}
+                             '\\cosh': ['c', 'o', 's', 'h'],
+                             '\\ll': ['<', '<'],
+                             '\\gg': ['>', '>']}
             if token in replace_dict:
                 token = replace_dict[token]
             if token in multi_replace:
@@ -188,7 +198,7 @@ class TokenStream(object):
                      # r"\vec": False, r"\overline": False,
                      # r"\tilde": False
                      }
-        multi_consumers = {r"\frac"}  # r"\over", 
+        multi_consumers = {r"\frac"}  # r"\over",
         current_consumer = None
         new_tokens = []
         for token in self.tokens:
@@ -468,15 +478,12 @@ def tokenize(text, filename=""):
         elif token in ["<n>", "</d>", "{", "}", "\\left", "\\right"]:
             continue
         elif isinstance(token, Block):
-            change = True
             for t in token.tokenize():
                 return_tokens.append(token)
         elif isinstance(token, Consumer):
-            change = True
             for t in token.tokenize():
                 return_tokens.append(token)
         elif isinstance(token, MultiConsumer):
-            change = True
             for t in token.tokenize():
                 return_tokens.append(token)
         elif isinstance(token, Environment):
