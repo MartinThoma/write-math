@@ -202,6 +202,7 @@ def main(directory, refresh):
                         else:
                             unknown_extensions_t[file_extension] = [filename]
                         continue
+                    mathmode_contents = []
                     try:
                         mathmode_contents = get_math_mode(filename)
                     except:
@@ -372,8 +373,11 @@ def write_ngrams(ngrams, filename):
     with codecs.open(filename, 'w', 'utf-8') as f:
         f.write("\\data\\\n")
         f.write("ngram 1=%i\n" % len(ngrams['unigrams']))
-        f.write("ngram 2=%i\n" % len(ngrams['bigrams']))
-        f.write("ngram 3=%i\n" % len(ngrams['trigrams']))
+        f.write("ngram 2=%i\n" % len([1 for w1 in ngrams['bigrams']
+                                      for w2 in ngrams['bigrams'][w1]]))
+        f.write("ngram 3=%i\n" % len([1 for w1 in ngrams['trigrams']
+                                      for w2 in ngrams['trigrams'][w1]
+                                      for w3 in ngrams['trigrams'][w1][w2]]))
 
         k = 1  # Laplace smoothing / add-k estimation
 
