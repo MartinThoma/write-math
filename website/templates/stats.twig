@@ -38,7 +38,7 @@ tr {
             </td>
             <td style="background-color:green;">{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
             <td style="background-color:green;">{{s.counter}}</td>
-            <td style="background-color:green;">{{s.used_by_counter}}</td>
+            <td style="background-color:{% if s.used_by_counter >= 3%}green{%elseif s.used_by_counter > 0%}yellow{% else %}red{%endif%};">{{s.used_by_counter}}</td>
         {% else %}
             <td>{{ loop.index }}</td>
             <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
