@@ -1,0 +1,265 @@
+{% extends "base.twig" %}
+
+{% block headerbuttons %}
+<div class="btn-toolbar pull-right">
+    <a href="#" class="btn btn-primary invisible visible-xs" id="resultlink"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Results</a>
+</div>
+{% endblock %}
+
+{% block header %}
+    <style>
+        @font-face {
+            font-family: 'STIXGeneral';
+            src:
+            url('../fonts/STIXGeneral.woff') format('woff');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'STIXNonUnicode';
+            src:
+            url('../fonts/STIXNonUniIta.woff') format('woff');
+            font-style: italic;
+        }
+    </style>
+        <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
+<script type='text/javascript'>
+    var lines = [];
+    var secret = get_secret();
+    var record_id = 0;
+
+    function get_secret() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 32; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+    function accept(id) {
+        $("#button"+id).attr("onclick", "unaccept("+id+");");
+        $("#button"+id).addClass('btn-success');
+        $.ajax({
+          type: "POST",
+          url: "../api/set-accept-partial.php",
+          data: {'symbol_id': id, 'raw_data_id': record_id, 'strokes': 'ALL'},
+          success: function(data)
+            {
+                console.log(data);
+            },
+          dataType: "json",
+          error: function(e) {
+            console.log(e);
+          }
+        });
+    }
+
+    function unaccept(id) {
+        $("#button"+id).attr("onclick", "accept("+id+");");
+        $("#button"+id).removeClass('btn-success');
+        $.ajax({
+          type: "POST",
+          url: "../api/set-unaccept-partial.php",
+          data: {'symbol_id': id, 'raw_data_id': record_id, 'strokes': 'ALL'},
+          success: function(data)
+            {
+                console.log(data);
+            },
+          dataType: "json",
+          error: function(e) {
+            console.log(e);
+          }
+        });
+    }
+
+    window.onload = function() {
+        var canvas = new fabric.Canvas('sheet');
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.width = 5;
+        canvas.freeDrawingBrush.color = "#ff0000";
+        canvas.on('mouse:down', startRecording);
+
+        function startRecording(event) {
+            // directly add first point
+            var x = event.e.x;
+            var y = event.e.y;
+            var time = new Date().getTime();
+            if (typeof(x) != 'number') {
+                console.log(event);
+                x = event.e.screenX;
+                y = event.e.screenY;
+            }
+            if (typeof(x) != 'number') {
+                x = event.e.touches[0].clientX;
+                y = event.e.touches[0].clientY;
+            }
+            var line = [];
+            line.push({
+                x: x,
+                y: y,
+                time: time
+            });
+            canvas.on("mouse:move", recordMoment);
+            canvas.on("mouse:up", stopRecording);
+
+            function recordMoment(event) {
+                var x = event.e.x;
+                var y = event.e.y;
+                var time = new Date().getTime();
+                if (typeof(x) != 'number') {
+                    x = event.e.screenX;
+                    y = event.e.screenY;
+                }
+                if (typeof(x) != 'number') {
+                    x = event.e.touches[0].clientX;
+                    y = event.e.touches[0].clientY;
+                }
+                line.push({
+                    x: x,
+                    y: y,
+                    time: time
+                });
+            }
+
+            function stopRecording() {
+                lines.push(line);
+                canvas.off("mouse:move", recordMoment);
+                canvas.off("mouse:up", stopRecording);
+                $.ajax({
+                  type: "POST",
+                  url: "http://i13pc106.ira.uka.de/~mthoma/cgi-bin/test.php",
+                  data: {'classify': JSON.stringify(lines)},
+                  success: function(data)
+                    {
+                        $('#resultlink').removeClass('invisible');
+                         var content = "<table class='table' role='table' name='resulttable' id='resulttable'>";
+                         content += "<thead><tr><th>&alpha;</th><th>LaTeX</th><th>%</th><th>accept</th></tr></thead><tbody>";
+                         $.each(data, function( index, value ) {
+                             $.each(value,
+                                    function(symbolbla, probability) {
+                                        var arr = symbolbla.split(";");
+                                        var system_id = arr[0];
+                                        var latex = arr[1];
+                                        var unicode_code_point = arr[2];
+                                        var font = arr[3];
+                                        var font_style = arr[4];
+                                        content += "<tr><td><a href='../symbol/?id="+system_id+"' style='font-family:"+font+";font-style:"+font_style+"'>&#" + unicode_code_point + ";</a></td><td><input id=\"inptxt"+system_id+"\" class=\"form-control\" value='"+ latex + "' disabled/></td><td style='text-align:right'>" + parseFloat(probability*100).toFixed(2) + "</td><td><div class='btn-group' role='group' aria-label='accept'><button type='button' id='button"+system_id+"' class='btn btn-default' aria-label='Left Align' onclick='accept("+system_id+")' data-clipboard-text='"+ latex + "'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></button></div></td></tr>";
+                                    })
+                         });
+                         content += "</tbody></table>";
+                         document.getElementById('classification-results').innerHTML = content;
+
+
+                         $.each(data, function( index, value ) {
+                             $.each(value,
+                                    function(symbolbla, probability) {
+                                        var arr = symbolbla.split(";");
+                                        var system_id = arr[0];
+                                        var latex = arr[1];
+                                        var unicode_code_point = arr[2];
+                                        var font = arr[3];
+                                        var font_style = arr[4];
+                                            var client = new ZeroClipboard(document.getElementById("button"+system_id));
+                                    })
+                         });
+                    },
+                  dataType: "json",
+                  error: function(e) {
+                    console.log(e);
+                  }
+                });
+
+
+                // Save data
+                $.ajax({
+                  type: "POST",
+                  url: "../api/save-data.php",
+                  data: {'data': JSON.stringify(lines),
+                         'record_id': record_id,
+                         'secret': secret}, // user-agent? other information?
+                  success: function(data)
+                    {
+                        console.log("received data:");  // record_id
+                        console.log(data);
+                        record_id = data;
+                        $('#drawing_info_page').removeAttr('disabled');
+                        $('#download_png_link').removeAttr('disabled');
+                        if ($('#drawing_info_page').hasClass('btn-disabled')) {
+                            $('#drawing_info_page').removeClass('btn-disabled');
+                            $('#drawing_info_page').attr('href', '../view/?raw_data_id='+record_id);
+                        }
+                        if ($('#download_png_link').hasClass('btn-disabled')) {
+                            $('#download_png_link').removeClass('btn-disabled');
+                        }
+                    },
+                  dataType: "json",
+                  error: function(e) {
+                    console.log(e);
+                  }
+                });
+            }
+        }
+
+        $("#resultlink").click(function() {
+            $('html, body').animate({
+                scrollTop: $("#resulttable").offset().top - 100
+            }, 600);
+        });
+    }
+
+
+    function addCanvas() {
+        var drawnJSON = document.getElementById('drawnJSON');
+        drawnJSON.value = JSON.stringify(lines);
+        return true;
+    }
+
+    function get_png() {
+        var canvas = document.getElementById("sheet");
+        var img    = canvas.toDataURL("image/png");
+        var adownload = document.getElementById("download_png_link");
+        adownload.href=img;
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" onsubmit="$('button').prop('disabled', true);return addCanvas();" id="form">
+            <input type="hidden" id="drawnJSON" name="drawnJSON" value="" />
+            <canvas id="sheet" width="400" height="400" style="border:1px solid black;width:400px;height:400px;"></canvas>
+            <div class="btn-group" role="group" aria-label="...">
+<!--                 <button type="submit" class="btn btn-success">Submit</button> -->
+                <a class="btn btn-default btn-disabled" onclick="get_png()" download="symbol.png" id="download_png_link" disabled><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Get PNG</a>
+                <a class="btn btn-default btn-disabled" id="drawing_info_page" disabled><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Drawing</a>
+                <a href="?formula_id=" class="btn btn-danger">Clear</a>
+            </div>
+            </form>
+        </div>
+        <div class="col-md-6" id="classification-results"></div>
+    </div>
+    </div>
+
+    <script type='text/javascript'>
+        var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+
+        width *= 0.8;
+        height *= 0.8;
+
+        if (width > 400) {
+            width = 400;
+        }
+
+        if (height > 400) {
+            height = 400;
+        }
+
+        var canvas = document.getElementById("sheet");
+        canvas.width = width;
+        canvas.height = height;
+    </script>
+    <script src="../vendor/zeroclipboard/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+{% endblock %}

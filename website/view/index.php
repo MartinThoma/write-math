@@ -41,6 +41,11 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
 }
 
+if (isset($_GET['action']) and $_GET['action'] == 'annotate_wp') {
+    annotate_wildpoints($_GET['raw_data_id']);
+    header("Location: ../view/?raw_data_id=".$_GET['raw_data_id']);
+}
+
 /*if (isset($_GET['request_new_classification'])) {
     $raw_data_id = intval($_GET['request_new_classification']);
 
