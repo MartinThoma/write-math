@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Check single symbol recordings for multiple symbols."""
+"""
+Check single symbol recordings for multiple symbols.
 
-from hwrt import segmentation
+This tool tries to find recordings which have a segmentation online which
+says the most likely hypothesis is only one symbol, but actually - with the
+current model - the most likely hypothesis has multiple symbols.
+"""
+
+from hwrt import segmentation as se
 from hwrt import utils
 
 # import json
@@ -17,11 +23,6 @@ import os
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
-
-nn = segmentation.get_nn_classifier(None, None)
-stroke_segmented_classifier = lambda X: nn(X)[0][1]
-single_stroke_clf = None  # single_symbol_stroke_classifier()
-single_clf = segmentation.single_classifier()
 
 
 def main(raw_pickle):
@@ -39,19 +40,21 @@ def main(raw_pickle):
 
 
 def check_single(raw_dataset):
-    pointlist = raw_dataset['handwriting'].get_pointlist()
-    if len(pointlist) > 8:
+    strokelist = raw_dataset['handwriting'].get_sorted_pointlist()
+    if len(strokelist) > 8:
         logging.warning('%i strokes in %s',
-                        len(pointlist),
+                        len(strokelist),
                         raw_dataset['handwriting'])
-    seg_predict = segmentation.get_segmentation(pointlist,
-                                                single_clf,
-                                                single_stroke_clf,
-                                                stroke_segmented_classifier)
-    if len(seg_predict[0][0]) != 1:
-        logging.info('http://write-math.com/view/?raw_data_id=%i : %s',
+    beam = se.Beam()
+    for stroke in strokelist:
+        beam.add_stroke({'data': [stroke], 'id': 42})  # TODO
+    seg_predict = beam.get_results()
+    if seg_predict[0]['symbol count'] != 1:
+        logging.info(('http://write-math.com/view/?raw_data_id=%i : '
+                      '%s symbols (%s)'),
                      raw_dataset['handwriting'].raw_data_id,
-                     seg_predict[0][0])
+                     seg_predict[0]['symbol count'],
+                     seg_predict[0]['semantics'].split(';')[1])
         return (raw_dataset, seg_predict)
     return -1
 
