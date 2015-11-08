@@ -296,6 +296,8 @@ if (isset($_POST['nr_of_lines'])) {
     }
 }
 
+$tagsById = getPackageTags();
+
 if (isset($_GET['raw_data_id'])) {
     if (isset($_GET['accept'])) {
         $sql = "UPDATE `wm_raw_draw_data` ".
@@ -408,6 +410,7 @@ if (isset($_GET['raw_data_id'])) {
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
     $partial_answers = $stmt->fetchAll();
+    $partial_answers = addTagIds($partial_answers, $tagsById);
 }
 
 $epsilon = isset($_POST['epsilon']) ? $_POST['epsilon'] : 0;
@@ -427,8 +430,9 @@ $bounding_box = get_dimensions($result_path);
 $time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $total_strokes);
 
 // Get all automatic classificaitons:
-$sql = "SELECT `formula_id`, `formula_name`, `formula_in_latex`, ".
-       "`mode`, `package`, ROUND(`probability`*100, 2) as `probability`, ".
+$sql = "SELECT `formula_id`, `formula_id` as `symbol_id`, ".
+       "`formula_name`, `formula_in_latex`, ".
+       "`mode`, ROUND(`probability`*100, 2) as `probability`, ".
        "`worker_id`, `worker_name`, `best_rendering` ".
        "FROM `wm_worker_answers`  ".
        "JOIN `wm_workers` ON `wm_workers`.`id` = `worker_id` ".
@@ -439,6 +443,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
 $stmt->execute();
 $automatic_answers = $stmt->fetchAll();
+$automatic_answers = addTagIds($automatic_answers, $tagsById);
 
 echo $twig->render('view.twig', array('heading' => 'View',
                                       'logged_in' => is_logged_in(),

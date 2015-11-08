@@ -52,7 +52,6 @@ if (isset($_POST['id']) && isset($_POST['description']) && !is_ip_user()) {
         $font = trim($_POST['font']);
         $font_style = trim($_POST['font_style']);
         $formula_type = trim($_POST['formula_type']);
-        $packages = trim($_POST['packages']);
         $svg = trim($_POST['svg']);
         $sql = "UPDATE `wm_formula` SET ".
                "`formula_name` = :formula_name, ".
@@ -62,7 +61,6 @@ if (isset($_POST['id']) && isset($_POST['description']) && !is_ip_user()) {
                "`font_style` = :font_style, ".
                "`mode` = :mode, ".
                "`formula_type` = :formula_type, ".
-               "`package` = :packages ".
                "WHERE `id` = :id;";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
@@ -73,7 +71,6 @@ if (isset($_POST['id']) && isset($_POST['description']) && !is_ip_user()) {
         $stmt->bindParam(':font_style', $font_style, PDO::PARAM_STR);
         $stmt->bindParam(':mode', $_POST['mode'], PDO::PARAM_STR);
         $stmt->bindParam(':formula_type', $formula_type, PDO::PARAM_STR);
-        $stmt->bindParam(':packages', $packages, PDO::PARAM_STR);
         $stmt->execute();
     }
 } elseif (isset($_POST['used_by']) && !is_ip_user()) {
@@ -94,7 +91,7 @@ if (isset($_GET['id'])) {
     $sql = "SELECT `wm_formula`.`id`, `formula_name`, ".
            "`variant_of`, `unicode_dec`, `font`, `font_style`, `description`, ".
            "`formula_in_latex`, `preamble`, ".
-           "`mode`, `package`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
+           "`mode`, `formula_type`, `best_rendering`, `wm_renderings`.`svg` ".
            "FROM `wm_formula` ".
            "LEFT JOIN `wm_renderings` ON `wm_renderings`.`id`=`best_rendering` ".
            "WHERE `wm_formula`.`id` = :id";

@@ -30,15 +30,14 @@ function add_partial_classification($user_id, $raw_data_id, $latex, $strokes) {
     if($formula_id == 0 || $formula_id == null) {
         // it was not in the database. Add it.
         $sql = "INSERT INTO `wm_formula` (".
-               "`formula_name`, `formula_in_latex`, `mode`, `package`, `user_id` ".
-               ") VALUES (:latex, :latex, :mode, :package, :uid);";
+               "`formula_name`, `formula_in_latex`, `mode`, `user_id` ".
+               ") VALUES (:latex, :latex, :mode, :uid);";
         $stmt = $pdo->prepare($sql);
         $latex = trim($latex);
 
         $stmt->bindParam(':latex', $latex, PDO::PARAM_STR);
         $mode = 'bothmodes';
         $stmt->bindParam(':mode', $mode, PDO::PARAM_STR);
-        $stmt->bindParam(':package', $packages, PDO::PARAM_STR);
         $uid = get_uid();
         $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
         $stmt->execute();

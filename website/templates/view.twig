@@ -184,8 +184,12 @@
           <td style="width:135px;">
               <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
               <p>Mode: {{answer.mode}}</p>
-              {% if answer.package != '' %}
-              <p>Package: {{answer.package}}</p>
+              {% if answer.packages|length > 0 %}
+              <p>{% if answer.packages|length == 1 %}Package{% else %}Packages{% endif%}:
+              {% for package in answer.packages %}
+                <a href="http://write-math.com/tags/{{package}}" class="label label-primary">{{package}}</a>
+              {% endfor %}
+              </p>
               {% endif %}
               <p><a href="../worker?id={{ answer.worker_id }}">{{ answer.worker_name }}</a></p>
               <p>Probability: {{ answer.probability }}%</p>
