@@ -227,6 +227,16 @@ if (isset($_POST['nr_of_lines'])) {
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
+} elseif (isset($_GET['has_correction'])) {
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET `has_correction` = 1 ".
+           "WHERE `id` = :raw_data_id AND ".
+           "(`user_id` = :uid OR :uid = 10) LIMIT 1;";  # TODO: Change to admin-group check
+    $stmt = $pdo->prepare($sql);
+    $uid = get_uid();
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+    $stmt->execute();
 } elseif (isset($_GET['has_too_long_line'])) {
     $sql = "UPDATE `wm_raw_draw_data` ".
            "SET `has_too_long_line` = 1 ".
@@ -357,8 +367,9 @@ if (isset($_GET['raw_data_id'])) {
     $sql = "SELECT `user_id`, `display_name`, `data`, ".
            "`creation_date`, `accepted_formula_id`, `nr_of_symbols`, ".
            "`wild_point_count`, `missing_line`, `is_image`, `has_hook`, ".
-           "`has_too_long_line`, `is_in_testset`, `segmentation`, ".
-           "`stroke_segmentable`, `wm_raw_draw_data`.`description`, ".
+           "`has_correction`, `has_too_long_line`, `is_in_testset`, ".
+           "`segmentation`, `stroke_segmentable`, ".
+           "`wm_raw_draw_data`.`description`, ".
            "`no_geometry`, `classifiable` ".
            "FROM `wm_raw_draw_data` ".
            "JOIN `wm_users` ON `wm_users`.`id` = `user_id`".

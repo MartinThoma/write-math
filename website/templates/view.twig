@@ -370,6 +370,11 @@
     {% else %}
         <a href="?raw_data_id={{ raw_data_id }}&amp;no_geometry={{ raw_data_id }}" class="btn btn-warning">No Geometry</a>
     {% endif %}
+    {% if image_data.has_correction == 1 %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_correction={{ raw_data_id }}" class="btn btn-warning" disabled="true">has correction</a>
+    {% else %}
+        <a href="?raw_data_id={{ raw_data_id }}&amp;has_correction={{ raw_data_id }}" class="btn btn-warning">has correction</a>
+    {% endif %}
     </td>
   </tr>
   <tr>

@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `wm_partial_answer` (
   KEY `user_id` (`user_id`,`recording_id`,`symbol_id`),
   KEY `recording_id` (`recording_id`),
   KEY `symbol_id` (`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27240 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=27241 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -195,6 +195,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   `has_hook` tinyint(1) NOT NULL DEFAULT '0',
   `has_too_long_line` tinyint(1) NOT NULL DEFAULT '0',
   `has_interrupted_line` tinyint(1) NOT NULL DEFAULT '0',
+  `has_correction` tinyint(1) NOT NULL DEFAULT '0',
   `is_image` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is an image, not a formula',
   `other_problem` tinyint(1) NOT NULL DEFAULT '0',
   `administrator_edit` timestamp NULL DEFAULT NULL,
@@ -206,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   UNIQUE KEY `user_id_2` (`user_id`,`md5data`),
   KEY `user_id` (`user_id`),
   KEY `accepted_formula_id` (`accepted_formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=329761 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=329762 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -309,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB AUTO_INCREMENT=599843 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=599936 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
