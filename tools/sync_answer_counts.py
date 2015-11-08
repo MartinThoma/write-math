@@ -165,7 +165,8 @@ def get_worker_answers(mysql, min_recording_id, max_recording_id):
 
 
 def update(mysql, raw_data_ids, user_answers, worker_answers):
-    """Update `wm_raw_draw_data`.`user_answers_count` and
+    """
+    Update `wm_raw_draw_data`.`user_answers_count` and
    `wm_raw_draw_data`.`automated_answers_count` with the actual counts
 
     Parameters

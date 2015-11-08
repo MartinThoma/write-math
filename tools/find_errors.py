@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Find raw_datasets which are not accepted by the administrator and look
-   different than other known datasets with the same accepted_formula_id.
+"""
+Find raw_datasets which are not accepted by the administrator and look
+different than other known datasets with the same accepted_formula_id.
 
-   (So: Find outliers)
+(So: Find outliers)
 """
 import sys
 import logging

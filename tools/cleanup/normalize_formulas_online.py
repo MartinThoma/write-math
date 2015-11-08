@@ -11,7 +11,6 @@ import pymysql
 import pymysql.cursors
 
 # hwrt modules
-from hwrt.HandwrittenData import HandwrittenData
 import hwrt.latex as latex
 import hwrt.utils as utils
 

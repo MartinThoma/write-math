@@ -94,25 +94,36 @@ def adjust_tags(mysql, tags, symbols_to_tags):
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     for symbol in symbols_to_tags:
-        if symbol['package'] != '':
-            if symbol['package'] not in tags:
-                logging.info("Package '%s' not found (symbol: '%s').",
-                             symbol['package'],
-                             symbol['formula_in_latex'])
-                continue
-            sql = ("INSERT INTO `wm_tags2symbols` "
-                   "(`tag_id`, `symbol_id`) VALUES (%s, %s)")
-            try:
-                cursor.execute(sql, (tags[symbol['package']], symbol['id']))
-                logging.info("%s (id: %s) gets the tag %s.",
-                             symbol['formula_in_latex'],
-                             symbol['id'],
-                             symbol['package'])
-            except pymysql.err.IntegrityError:
-                pass
-            # connection is not autocommit by default. So you must commit to save
-            # your changes.
-            connection.commit()
+        if symbol['package'] != '' and symbol['package'] is not None:
+            symbol['package'] = symbol['package'].split(' ')
+            for package in symbol['package']:
+                key = None
+                if package in tags:
+                    key = package
+                elif package.lower() in tags:
+                    key = package.lower()
+                if key is None:
+                    logging.info("Package '%s' not found (symbol: '%s').",
+                                 package,
+                                 symbol['formula_in_latex'])
+                    continue
+                sql = ("INSERT INTO `wm_tags2symbols` "
+                       "(`tag_id`, `symbol_id`) VALUES (%s, %s)")
+                try:
+                    cursor.execute(sql, (tags[key], symbol['id']))
+                    logging.info("%s (id: %s) gets the tag %s.",
+                                 symbol['formula_in_latex'],
+                                 symbol['id'],
+                                 package)
+                except pymysql.err.IntegrityError:
+                    pass
+                # connection is not autocommit by default. So you must commit
+                # to save your changes.
+                connection.commit()
+        else:
+            pass
+            # Too many messages by multi-symbol formulas:
+            # logging.info("No package: '%s'", symbol['formula_in_latex'])
 
 
 def main():
