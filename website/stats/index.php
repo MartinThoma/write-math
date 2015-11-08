@@ -24,14 +24,15 @@ if (isset($_GET['is_not_important']) && is_admin()) {
 }
 
 // tags
-$sql = "SELECT `id`, `tag_name` ".
+$sql = "SELECT `id`, `tag_name`, `is_package` ".
        "FROM `wm_tags` ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $tags = $stmt->fetchAll();
-$tagid2name = array();
+$tag_data = array();
 foreach ($tags as $value) {
-    $tagid2name[$value['id']] = $value['tag_name'];
+    $tag_data[$value['id']] = array('tag_name' => $value['tag_name'],
+                                    'is_package' => $value['is_package']);
 }
 
 $sql = "SELECT `tag_id`, `symbol_id` ".
@@ -103,6 +104,6 @@ echo $twig->render('stats.twig', array('heading' => 'Stats',
                                        'important_count' => $important_count,
                                        'important_count_raw' => $important_count_raw,
                                        'symbol2tags' => $symbol2tags,
-                                       'tagid2name' => $tagid2name
+                                       'tag_data' => $tag_data
                                        )
                   );

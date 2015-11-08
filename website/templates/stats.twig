@@ -33,7 +33,7 @@ tr {
             <td style="background-color:green;">{{ loop.index }}</td>
             <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
             {% for tagid in symbol2tags[s.id] %}
-            <a href="../tags/{{tagid2name[tagid]}}" class="label label-primary">{{tagid2name[tagid]}}</a>
+            <a href="../tags/{{tag_data[tagid]['tag_name']}}" class="label {% if tag_data[tagid]['is_package'] %}label-warning{% else %}label-primary{% endif %}">{{tag_data[tagid]['tag_name']}}</a>
             {% endfor %}
             </td>
             <td style="background-color:green;">{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
