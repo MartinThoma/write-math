@@ -85,6 +85,15 @@ if (isset($_GET['cache-flush'])) {
 } elseif (isset($_GET['delete_phraselist'])) {
     unlink('../cache-data/phraselist.js');
     header("Location: ../admin");
+} elseif (isset($_GET['remove_worker_answers'])) {
+    $sql = "DELETE FROM `wm_partial_answer` WHERE `is_worker_answer` = 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $sql = "UPDATE `wm_raw_draw_data` ".
+           "SET  `automated_answers_count` =  '0';";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    header("Location: ../admin");
 }
 
 if (isset($_GET['delete_formula'])) {
