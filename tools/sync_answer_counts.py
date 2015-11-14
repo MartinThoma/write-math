@@ -151,8 +151,9 @@ def get_worker_answers(mysql, min_recording_id, max_recording_id):
     try:
         cursor = connection.cursor()
         sql = ("SELECT `raw_data_id`, COUNT(`raw_data_id`) as `count` "
-               "FROM  `wm_worker_answers` "
+               "FROM  `wm_partial_answer` "
                "WHERE %s <= `raw_data_id`  AND `raw_data_id` <= %s "
+               "AND `is_worker_answer`=1 "
                "GROUP BY `raw_data_id` ")
         cursor.execute(sql, (min_recording_id, max_recording_id))
         result = cursor.fetchall()

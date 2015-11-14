@@ -158,13 +158,15 @@ CREATE TABLE IF NOT EXISTS `wm_partial_answer` (
   `strokes` varchar(255) COLLATE utf8_bin NOT NULL,
   `symbol_id` int(11) NOT NULL,
   `is_accepted` tinyint(1) NOT NULL DEFAULT '0',
+  `probability` double unsigned NOT NULL DEFAULT '1',
   `creation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_worker_answer` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `recording_id_2` (`recording_id`,`symbol_id`,`strokes`),
   KEY `user_id` (`user_id`,`recording_id`,`symbol_id`),
   KEY `recording_id` (`recording_id`),
   KEY `symbol_id` (`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27613 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=27632 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -287,7 +289,7 @@ CREATE TABLE IF NOT EXISTS `wm_user_unknown_formula` (
   UNIQUE KEY `user_id` (`user_id`,`formula_id`),
   KEY `user_id_2` (`user_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10209 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=10210 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -300,17 +302,18 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   `display_name` varchar(30) COLLATE utf8_bin NOT NULL,
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `password` char(60) COLLATE utf8_bin NOT NULL,
-  `account_type` enum('IP-User','Regular User','Admin') COLLATE utf8_bin NOT NULL DEFAULT 'Regular User',
+  `account_type` enum('IP-User','Regular User','Admin','Worker') COLLATE utf8_bin NOT NULL DEFAULT 'Regular User',
   `confirmation_code` char(32) COLLATE utf8_bin NOT NULL,
   `status` enum('activated','deactivated') COLLATE utf8_bin NOT NULL,
   `language` char(2) COLLATE utf8_bin DEFAULT NULL,
   `handedness` enum('l','r') COLLATE utf8_bin DEFAULT NULL,
   `description` text COLLATE utf8_bin NOT NULL,
+  `latest_heartbeat` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB AUTO_INCREMENT=606694 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=606753 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -323,33 +326,13 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`20080912003-1`@`%` SQL SECURITY DEFINER VIEW
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `wm_worker_answers`
---
-
-CREATE TABLE IF NOT EXISTS `wm_worker_answers` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `worker_id` int(11) NOT NULL,
-  `raw_data_id` int(11) NOT NULL,
-  `strokes` varchar(255) COLLATE utf8_bin NOT NULL,
-  `formula_id` int(11) NOT NULL,
-  `probability` double unsigned NOT NULL,
-  `answer_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `worker_id_2` (`worker_id`,`raw_data_id`,`strokes`,`formula_id`),
-  KEY `formula_id` (`formula_id`),
-  KEY `raw_data_id` (`raw_data_id`),
-  KEY `worker_id` (`worker_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
 -- Tabellenstruktur für Tabelle `wm_workers`
 --
 
 CREATE TABLE IF NOT EXISTS `wm_workers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
+  `has_user_id` int(11) NOT NULL,
   `API_key` varchar(32) COLLATE utf8_bin NOT NULL,
   `display_name` varchar(255) COLLATE utf8_bin NOT NULL,
   `description` text COLLATE utf8_bin NOT NULL,
@@ -360,6 +343,7 @@ CREATE TABLE IF NOT EXISTS `wm_workers` (
   UNIQUE KEY `worker_name` (`display_name`),
   UNIQUE KEY `API_key` (`API_key`),
   UNIQUE KEY `url` (`url`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  KEY `has_user_id` (`has_user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

@@ -32,8 +32,8 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     $stmt->bindParam(':rid', $_GET['remove_from_testset'], PDO::PARAM_INT);
     $stmt->execute();
 } elseif (isset($_GET['delete_automatic_classification']) && is_admin()) {
-    $sql = "DELETE FROM `wm_worker_answers` ".
-           "WHERE `raw_data_id` = :rid LIMIT 10;";
+    $sql = "DELETE FROM `wm_partial_answer` ".
+           "WHERE `raw_data_id` = :rid AND is_worker_answer=1 LIMIT 10;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':rid', $_GET['delete_automatic_classification'], PDO::PARAM_INT);
     $stmt->execute();
@@ -441,17 +441,18 @@ $bounding_box = get_dimensions($result_path);
 $time_resolution = get_time_resolution(list_of_pointlists2pointlist($result_path), $total_strokes);
 
 // Get all automatic classificaitons:
-$sql = "SELECT `formula_id`, `formula_id` as `symbol_id`, ".
+$sql = "SELECT `symbol_id`, ".
        "`formula_name`, `formula_in_latex`, ".
        "`mode`, ROUND(`probability`*100, 2) as `probability`, ".
-       "`worker_id`, `worker_name`, `best_rendering` ".
-       "FROM `wm_worker_answers`  ".
-       "JOIN `wm_workers` ON `wm_workers`.`id` = `worker_id` ".
-       "JOIN `wm_formula` ON `wm_formula`.`id` = `formula_id` ".
-       "WHERE `raw_data_id` = :raw_data_id ".
+       "`wm_partial_answer`.`user_id`, `display_name`, `best_rendering`, ".
+       "`strokes` ".
+       "FROM `wm_partial_answer`  ".
+       "JOIN `wm_users` ON `wm_users`.`id` = `wm_partial_answer`.`user_id` ".
+       "JOIN `wm_formula` ON `wm_formula`.`id` = `symbol_id` ".
+       "WHERE `recording_id` = :recording_id AND `is_worker_answer`=1 ".
        "ORDER BY `probability` DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->bindParam(':raw_data_id', $_GET['raw_data_id'], PDO::PARAM_INT);
+$stmt->bindParam(':recording_id', $_GET['raw_data_id'], PDO::PARAM_INT);
 $stmt->execute();
 $automatic_answers = $stmt->fetchAll();
 $automatic_answers = addTagIds($automatic_answers, $tagsById);
