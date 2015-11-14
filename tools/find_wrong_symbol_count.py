@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Find recordings where the symbol count does not match the segmentation."""
 
