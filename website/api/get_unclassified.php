@@ -109,6 +109,7 @@ if (isset($_POST['recording_id'])) { // Add a new classification
            "LEFT OUTER JOIN `wm_partial_answer` ".
                 "ON (`recording_id` = `wm_raw_draw_data`.`id`) ".
            "WHERE `accepted_formula_id` IS NULL AND `is_image`=0 ".
+           "AND `classifiable`=1 ".
            "GROUP BY `wm_raw_draw_data`.`id` ".
            "HAVING `answers` = 0 ".
            "ORDER BY `creation_date` DESC ".
