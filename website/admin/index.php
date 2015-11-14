@@ -86,7 +86,8 @@ if (isset($_GET['cache-flush'])) {
     unlink('../cache-data/phraselist.js');
     header("Location: ../admin");
 } elseif (isset($_GET['remove_worker_answers'])) {
-    $sql = "DELETE FROM `wm_partial_answer` WHERE `is_worker_answer` = 1";
+    $sql = "DELETE FROM `wm_partial_answer` WHERE `is_worker_answer` = 1 ".
+           "AND `is_accepted`=0 ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $sql = "UPDATE `wm_raw_draw_data` ".
