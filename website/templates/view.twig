@@ -160,62 +160,23 @@
 </div><!--row-->
 
 <a id="answers"></a>
+{% if partial_answers|length > 0 %}
 {% if (automatic_answers|length > 0) and (uid == 10) %}
 <div class="page-header">
     <div class="btn-toolbar pull-right">
     <a href="?raw_data_id={{raw_data_id}}&amp;delete_automatic_classification={{raw_data_id}}" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete</a>
     </div>
-    <h2>Automatic Classifications</h2>
+    <h2>Answers</h2>
 </div>
-{% elseif (automatic_answers|length > 0) %}
-<h2>Automatic Classifications</h2>
+{% else %}
+<h2>Answers</h2>
 {% endif %}
-
-{% if automatic_answers|length > 0 %}
-    {% for answer in automatic_answers %}
-    <div class="pull-left" style="height:200px;">
-      <table>
-        <tr>
-          <td>
-            <a href="../symbol/?id={{ answer.formula_id }}"><img
-              src="../formulas/{{ answer.formula_id }}-{{ answer.best_rendering }}.svg"
-                 width="150" style="width:150px;max-height:150px;" alt="formula rendering" /></a>
-          </td>
-          <td style="width:135px;">
-              <pre class="prettyprint linenums languague-css">{{ answer.formula_in_latex }}</pre><br/>
-              <p>Mode: {{answer.mode}}</p>
-              {% if answer.packages|length > 0 %}
-              <p>{% if answer.packages|length == 1 %}Package{% else %}Packages{% endif%}:
-              {% for package in answer.packages %}
-                <a href="http://write-math.com/tags/{{package}}" class="label label-primary">{{package}}</a>
-              {% endfor %}
-              </p>
-              {% endif %}
-              <p><a href="../worker?id={{ answer.worker_id }}">{{ answer.worker_name }}</a></p>
-              <p>Probability: {{ answer.probability }}%</p>
-          </td>
-          <td>
-            {% if answer.formula_id == image_data.accepted_formula_id %}
-              <a href="?raw_data_id={{ raw_data_id }}&amp;unaccept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply.png" alt="Accepted" /></a>
-            {% else %}
-          <a href="?raw_data_id={{ raw_data_id }}&amp;accept={{ answer.formula_id }}"><img src="../icons/Crystal_Clear_action_apply-gray.png" alt="Accept" onmouseover=
-"src='../icons/Crystal_Clear_action_apply.png'" onmouseout="src='../icons/Crystal_Clear_action_apply-gray.png'" /></a>
-            {% endif %}
-          </td>
-        </tr>
-      </table>
-    </div>
-    {% endfor %}
-    <br style="clear:both;" />
-{% endif %}
-
-{% if partial_answers|length > 0 %}
-   <h2>User contributed answers</h2>
    <table class="table" id="user_contrib_answers">
        <thead>
             <tr>
                 <th>&nbsp;</th>
                 <th>Symbol</th>
+                <th>Score</th>
                 <th>Stroke Number(s)<br/>and Author</th>
                 <th>Image (the classified part is red)</th>
             </tr>
@@ -228,6 +189,7 @@
                 <td>{% if d.best_rendering != '' %}<img
               src="../formulas/{{ d.symbol_id }}-{{ d.best_rendering }}.svg"
                  width="150" style="width:50px;max-height:50px;" alt="formula rendering" />{% endif %}<a href="../symbol/?id={{ d.symbol_id }}"><code>{{ d.formula_in_latex }}</code></a></td>
+                <td class="text-right">{{ (d.probability*100)|round(2) }}%</td>
                 <td>{{ d.strokes }}<br/><a href="../user/?id={{ d.user_id }}">{{ d.display_name }}</a></td>
                 <td><object data="../raw-data/{{ raw_data_id }}.svg"
             type="image/svg+xml"
@@ -622,6 +584,13 @@ MathJax.Hub.Queue(function() {
     var rawdataobj{{loop.index}} = document.getElementById('rawdatavis_{{loop.index}}');
     rawdataobj{{loop.index}}.addEventListener("load",function(){
         visualizeSymbolStrokes(document.getElementById('rawdatavis_{{loop.index}}'));
+    });
+{% endfor %}
+
+{% for d in automatic_answers %}
+    var rawdataobj{{loop.index}} = document.getElementById('rawdatavis_a{{loop.index}}');
+    rawdataobj{{loop.index}}.addEventListener("load",function(){
+        visualizeSymbolStrokes(document.getElementById('rawdatavis_a{{loop.index}}'));
     });
 {% endfor %}
 

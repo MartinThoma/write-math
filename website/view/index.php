@@ -33,7 +33,7 @@ if (isset($_GET['add_to_testset']) && is_admin()) {
     $stmt->execute();
 } elseif (isset($_GET['delete_automatic_classification']) && is_admin()) {
     $sql = "DELETE FROM `wm_partial_answer` ".
-           "WHERE `raw_data_id` = :rid AND is_worker_answer=1 LIMIT 10;";
+           "WHERE `recording_id` = :rid AND is_worker_answer=1 LIMIT 10;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':rid', $_GET['delete_automatic_classification'], PDO::PARAM_INT);
     $stmt->execute();
@@ -411,12 +411,12 @@ if (isset($_GET['raw_data_id'])) {
     // Get all partial classifications
     $sql = "SELECT `wm_partial_answer`.`id`, `wm_partial_answer`.`user_id`, ".
            "`strokes`, `symbol_id`, `formula_in_latex`, `is_accepted`, ".
-           "`best_rendering`, `display_name` ".
+           "`best_rendering`, `display_name`, `probability` ".
            "FROM `wm_partial_answer` ".
            "LEFT JOIN `wm_formula` ON `wm_partial_answer`.`symbol_id` = `wm_formula`.`id` ".
            "LEFT JOIN `wm_users` ON `wm_partial_answer`.`user_id` = `wm_users`.`id` ".
            "WHERE recording_id=:id ".
-           "ORDER BY `strokes`";
+           "ORDER BY `probability` DESC, `strokes` ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id', $_GET['raw_data_id'], PDO::PARAM_INT);
     $stmt->execute();
