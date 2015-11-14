@@ -25,12 +25,12 @@ function insert_worker_answers($user_id, $raw_data_id, $answer_json) {
         //    }
         if (count($object['segmentation']) == 0) {
             echo '{"error": "No valid segmentation given."}';
-            return;
+            return false;
         }
         if (count($object['segmentation']) != count($object['symbols'])) {
             echo '{"error": "The number of symbols does not match the '.
                  'segmentation."}';
-            return;
+            return false;
         }
 
         for ($i=0; $i < count($object['segmentation']); $i++) {
@@ -56,11 +56,18 @@ function insert_worker_answers($user_id, $raw_data_id, $answer_json) {
             try {
                 $stmt->execute();
                 adjust_automatic_answer_count($raw_data_id, 1);
-            } catch (Exception $e) {
-                var_dump($e);
+            } catch (PDOException $e) {
+                if ($e->errorInfo[1] == 1062) {
+                  // duplicate entry: That's fine, as multiple hypothesis
+                  // might have multiple times the same symbol
+                } else {
+                    var_dump($e);
+                    return false;
+                }
             }
         }
     }
+    return true;
 }
 
 
@@ -86,8 +93,12 @@ if (isset($_POST['recording_id'])) { // Add a new classification
     if ($user_id != 0) {
         $raw_data_id = intval($_POST['recording_id']);
         $answer_json = json_decode($_POST['results'], true);
-        insert_worker_answers($user_id, $raw_data_id, $answer_json);
-        echo '{"success": "true"}';
+        $success = insert_worker_answers($user_id, $raw_data_id, $answer_json);
+        if ($success) {
+            echo '{"success": "true"}';
+        } else {
+            exit (-1);
+        }
     } else {
         echo '{"error": "api_key \''.$_POST['api_key'].'\' does not exist"}';
     }
