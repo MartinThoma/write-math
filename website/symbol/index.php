@@ -60,7 +60,7 @@ if (isset($_POST['id']) && isset($_POST['description']) && !is_ip_user()) {
                "`font` = :font, ".
                "`font_style` = :font_style, ".
                "`mode` = :mode, ".
-               "`formula_type` = :formula_type, ".
+               "`formula_type` = :formula_type ".
                "WHERE `id` = :id;";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
