@@ -4,7 +4,8 @@ include '../init.php';
 
 if (isset($_GET['id'])) {
     $sql = "SELECT `wm_workers`.`id` as `woker_id`, `user_id`, ".
-           "`worker_name`, `description`, `url`, `latest_heartbeat`, ".
+           "`worker_name`, `wm_workers`.`description`, `url`, ".
+           "`latest_heartbeat`, ".
            "`display_name` ".
            "FROM `wm_workers` ".
            "JOIN `wm_users` ON `user_id` = `wm_users`.`id`".
