@@ -54,7 +54,8 @@ def main(symbol_id=None):
                 if i > 20:
                     break
                 if outlier['score'] > min_dtw:
-                    print("%i: %0.4f:\thttp://write-math.com/view/?raw_data_id=%s" %
+                    print(("%i: %0.4f:\thttp://write-math.com/view/"
+                           "?raw_data_id=%s") %
                           (i,
                            outlier['score'],
                            outlier['HandwrittenData'].raw_data_id))
@@ -87,8 +88,8 @@ def get_symbols(mysql):
            "FROM `wm_raw_draw_data` "
            "JOIN `wm_formula` ON `wm_formula`.`id` = `accepted_formula_id` "
            "WHERE (`formula_type` = 'single symbol' OR "
-           "`formula_type` = 'drawing' OR `formula_type` = 'nesting symbol') AND "
-           "`is_important` = 0 "
+           "`formula_type` = 'drawing' OR "
+           "`formula_type` = 'nesting symbol') AND "
            "GROUP BY  `accepted_formula_id` "
            "ORDER BY counter DESC")
     cursor.execute(sql)
@@ -222,7 +223,7 @@ def get_outliers(recordings):
         mean += numpy.array(recording['features'])
     mean /= len(recordings)
     for recording in recordings:
-        #score = sum((mean - recording['features'])**2
+        # score = sum((mean - recording['features'])**2
         scored.append({'score': recording['dtw_median'],
                        'HandwrittenData': recording['HandwrittenData']})
     scored = sorted(scored, key=lambda n: n['score'], reverse=True)

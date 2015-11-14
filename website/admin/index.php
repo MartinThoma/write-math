@@ -22,10 +22,10 @@ function merge_formulas($fid_a, $fid_b) {
     global $pdo;
     global $msg;
     // a gets deleted, b remains
-    $sql = "SELECT `id`, `formula_type`, `is_important` ".
+    $sql = "SELECT `id`, `formula_type` ".
            "FROM `wm_formula` ".
            "WHERE `id`=:ida OR `id`=:idb AND ".
-           "`is_important`=0 AND ".
+           "`id` > 4000 AND ".  // prevent accidential deletion of important
            "(NOT (`formula_type`='single symbol') OR `formula_type` IS NULL)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':ida', $fid_a, PDO::PARAM_INT);
@@ -138,7 +138,7 @@ if (isset($_GET['delete_inactive_user'])) {
 if (isset($_GET['many_lines'])) {
     $sql = "SELECT `id`, `data`, `creation_date` ".
            "FROM `wm_raw_draw_data` ".
-           "WHERE `is_image`=0 AND `nr_of_symbols`=1 AND `accepted_formula_id`!=1 ".
+           "WHERE AND `nr_of_symbols`=1 AND `accepted_formula_id`!=1 ".
            "LIMIT ".rand (1, 300000).", 500";
     echo $sql;
     $stmt = $pdo->prepare($sql);
@@ -224,9 +224,10 @@ $stmt->execute();
 $inactive_users = $stmt->fetchAll();
 
 // Get symbols without unicode
-$sql = "SELECT id, `formula_name`, `formula_type`, `unicode_dec` FROM `wm_formula` ".
+$sql = "SELECT id, `formula_name`, `formula_type`, `unicode_dec` ".
+       "FROM `wm_formula` ".
        "WHERE unicode_dec = 0 ".
-       "AND `is_important` = 1 ORDER BY id ASC";
+       "AND `formula_type` = 'single symbol' ORDER BY id ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $without_unicode = $stmt->fetchAll();

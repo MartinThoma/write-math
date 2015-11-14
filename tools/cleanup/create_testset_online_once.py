@@ -14,9 +14,10 @@ import math
 # hwrt modules
 from hwrt.handwritten_data import HandwrittenData
 import hwrt.utils as utils
+import hwrt.filter_dataset as filter_dataset
 
 
-def main(mysql):
+def main(mysql, symbol_yml_file):
     """Add testset flag to recordings in MySQL database."""
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
@@ -25,11 +26,9 @@ def main(mysql):
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
 
-    # Download all datasets
-    sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
-           "WHERE `is_important` = 1 ORDER BY `id` ASC")
-    cursor.execute(sql)
-    datasets = cursor.fetchall()
+    # Get IDs of symbols we want to create testset for
+    metadata = filter_dataset.get_metadata()
+    datasets = filter_dataset.get_symbol_ids(symbol_yml_file, metadata)
 
     for i, data in enumerate(datasets):
         fid, formula_in_latex = data['id'], data['formula_in_latex']
@@ -71,6 +70,12 @@ def get_parser():
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-s", "--symbol",
+                        dest="symbol_filename",
+                        type=lambda x: utils.is_valid_file(parser, x),
+                        required=True,
+                        help="symbol yml file",
+                        metavar="FILE")
     return parser
 
 
@@ -78,6 +83,6 @@ if __name__ == '__main__':
     args = get_parser().parse_args()
     cfg = utils.get_database_configuration()
     if 'mysql_online' in cfg:
-        main(cfg['mysql_online'])
+        main(cfg['mysql_online'], args.symbol_filename)
     if 'mysql_local' in cfg:
-        main(cfg['mysql_local'])
+        main(cfg['mysql_local'], args.symbol_filename)

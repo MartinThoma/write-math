@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS `wm_formula` (
   `preamble` text COLLATE utf8_bin NOT NULL,
   `best_rendering` int(11) DEFAULT NULL,
   `formula_type` enum('single symbol','formula','drawing','nesting symbol') COLLATE utf8_bin DEFAULT NULL,
-  `is_important` tinyint(1) NOT NULL DEFAULT '0',
   `variant_of` int(11) DEFAULT NULL,
   `for_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last edit',
   PRIMARY KEY (`id`),
@@ -46,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula` (
   KEY `best_rendering` (`best_rendering`),
   KEY `user_id` (`user_id`),
   KEY `variant_of` (`variant_of`)
-) ENGINE=InnoDB AUTO_INCREMENT=4928 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=4943 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -82,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula_old` (
   PRIMARY KEY (`id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1014 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='This is not an outdated table, but version control';
+) ENGINE=InnoDB AUTO_INCREMENT=1025 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='This is not an outdated table, but version control';
 
 -- --------------------------------------------------------
 
@@ -101,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula_svg_missing` (
   UNIQUE KEY `user_id_2` (`user_id`,`formula_id`),
   KEY `user_id` (`user_id`,`formula_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18865 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=18868 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -166,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `wm_partial_answer` (
   KEY `user_id` (`user_id`,`recording_id`,`symbol_id`),
   KEY `recording_id` (`recording_id`),
   KEY `symbol_id` (`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27632 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=49371 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -227,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `wm_renderings` (
   PRIMARY KEY (`id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2234 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=2237 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -272,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `wm_tags2symbols` (
   `symbol_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `max_one_tag_per_symb` (`tag_id`,`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9504 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9517 DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -289,7 +288,7 @@ CREATE TABLE IF NOT EXISTS `wm_user_unknown_formula` (
   UNIQUE KEY `user_id` (`user_id`,`formula_id`),
   KEY `user_id_2` (`user_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10210 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=10214 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -313,7 +312,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB AUTO_INCREMENT=606753 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=608525 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -345,5 +344,5 @@ CREATE TABLE IF NOT EXISTS `wm_workers` (
   UNIQUE KEY `url` (`url`),
   KEY `user_id` (`user_id`),
   KEY `has_user_id` (`has_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

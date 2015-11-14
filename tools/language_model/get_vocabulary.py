@@ -12,7 +12,8 @@ from hwrt import utils
 
 
 def main():
-    """Get a list of formulas.
+    """
+    Get a list of formulas.
 
     Parameters
     ----------
@@ -36,7 +37,7 @@ def main():
     cursor = connection.cursor()
     sql = ("SELECT `id`, `formula_in_latex` FROM `wm_formula` "
            # "WHERE `formula_type` = 'single symbol' "
-           "WHERE `is_important` = 1 OR `formula_type` = 'nesting symbol' "
+           "WHERE `formula_type` = 'nesting symbol' "
            "ORDER BY `formula_in_latex` ASC")
     cursor.execute(sql)
     symbols = cursor.fetchall()
@@ -53,6 +54,12 @@ def get_parser():
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-s", "--symbol",
+                        dest="symbol_filename",
+                        type=lambda x: utils.is_valid_file(parser, x),
+                        required=True,
+                        help="symbol yml file",
+                        metavar="FILE")
     return parser
 
 

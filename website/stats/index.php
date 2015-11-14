@@ -1,28 +1,6 @@
 <?php
 include '../init.php';
 
-if (isset($_GET['is_important']) && is_admin()) {
-    $fid = intval($_GET['is_important']);
-    $sql = "UPDATE `wm_formula` SET  `is_important` =  '1' ".
-           "WHERE  `wm_formula`.`id` = :fid AND :uid = 10;";
-    $stmt = $pdo->prepare($sql);
-    $uid = get_uid();
-    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-    $stmt->bindParam(':fid', $fid, PDO::PARAM_INT);
-    $stmt->execute();
-}
-
-if (isset($_GET['is_not_important']) && is_admin()) {
-    $fid = intval($_GET['is_not_important']);
-    $sql = "UPDATE `wm_formula` SET  `is_important` =  '0' ".
-           "WHERE  `wm_formula`.`id` = :fid AND :uid = 10;";
-    $stmt = $pdo->prepare($sql);
-    $uid = get_uid();
-    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-    $stmt->bindParam(':fid', $fid, PDO::PARAM_INT);
-    $stmt->execute();
-}
-
 // tags
 $sql = "SELECT `id`, `tag_name`, `is_package` ".
        "FROM `wm_tags` ";
@@ -47,7 +25,7 @@ foreach ($tags2symbol_fetched as $value) {
 
 
 $sql = "SELECT `wm_formula`.`id`, `formula_in_latex`, `formula_name`, ".
-       "`is_important`, `best_rendering`, `variant_of`, ".
+       "`best_rendering`, `variant_of`, ".
        "COUNT(`wm_formula`.`id`) AS `counter` ".
        "FROM `wm_raw_draw_data` ".
        "JOIN `wm_formula` ON `wm_formula`.`id` = `accepted_formula_id` ".
@@ -74,23 +52,18 @@ foreach ($paper_count as $key => $value) {
 }
 
 $sum = 0;
+$total_references = 0;
 $important_count = 0;
 $important_count_raw = 0;
 $tmp = array();
 foreach ($symbol_training_data_count as $key=>$s) {
     $sum += $s['counter'];
-    if ($s['is_important']) {
-        $important_count += 1;
-        $important_count_raw += $s['counter'];
-        if ($s['formula_in_latex'] != "") {
-            $tmp[] = $s['formula_in_latex'];
-        }
-    }
     if (array_key_exists($s['id'], $formulaid2count)) {
         $symbol_training_data_count[$key]['used_by_counter'] = $formulaid2count[$s['id']];
     } else {
         $symbol_training_data_count[$key]['used_by_counter'] = 0;
     }
+    $total_references += $symbol_training_data_count[$key]['used_by_counter'];
 }
 
 echo $twig->render('stats.twig', array('heading' => 'Stats',
@@ -101,8 +74,7 @@ echo $twig->render('stats.twig', array('heading' => 'Stats',
                                        'msg' => $msg,
                                        'symbol_training_data_count' => $symbol_training_data_count,
                                        'sum' => $sum,
-                                       'important_count' => $important_count,
-                                       'important_count_raw' => $important_count_raw,
+                                       'total_references' => $total_references,
                                        'symbol2tags' => $symbol2tags,
                                        'tag_data' => $tag_data
                                        )

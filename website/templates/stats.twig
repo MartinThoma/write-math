@@ -1,8 +1,12 @@
 {% extends "base.twig" %}
 
 {% block content %}
-Green background means it is part of the current classifier and can - in
-principle - be recognized.
+Not all of the following symbols can be recognized by the current system. An
+important subset of almost 400 mathematical symbols was chosen. The other
+symbols were either used in another context or had to little training data to
+guarantee good recognition results. A list of the recognizable symbols can
+be found at
+<a href="https://github.com/MartinThoma/hwrt/blob/master/hwrt/misc/symbols.yml"><code>hwrt/misc/symbols.yml</code></a>.
 
 <!-- Fix line height to make loading more convenient -->
 <style type="text/css">
@@ -21,25 +25,11 @@ tr {
         <th><abbr title="'base variant version' of this symbol">var</abbr></th>
         <th>Instances in database</th>
         <th><abbr title="References of this symbol in literature">ref</abbr></th>
-        {% if user_id == 10 %}
-        <th>is important<th>
-        {% endif %}
     </tr>
   {% for s in symbol_training_data_count %}
     <tr>
             <th><img  src="../formulas/{{ s.id }}-{{ s.best_rendering }}.svg"
                  width="30" style="width:30px;max-height:30px;" /></th>
-        {% if s.is_important %}
-            <td style="background-color:green;">{{ loop.index }}</td>
-            <td style="background-color:green;"><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
-            {% for tagid in symbol2tags[s.id] %}
-            <a href="../tags/{{tag_data[tagid]['tag_name']}}" class="label {% if tag_data[tagid]['is_package'] %}label-warning{% else %}label-primary{% endif %}">{{tag_data[tagid]['tag_name']}}</a>
-            {% endfor %}
-            </td>
-            <td style="background-color:green;">{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
-            <td style="background-color:green;">{{s.counter}}</td>
-            <td style="background-color:{% if s.used_by_counter >= 3%}green{%elseif s.used_by_counter > 0%}yellow{% else %}red{%endif%};">{{s.used_by_counter}}</td>
-        {% else %}
             <td>{{ loop.index }}</td>
             <td><a href="../symbol/?id={{s.id}}">{{s.formula_in_latex}}</a>
             {% for tagid in symbol2tags[s.id] %}
@@ -49,25 +39,15 @@ tr {
             <td>{% if s.variant_of|length>0%}<a href="../symbol/?id={{s.variant_of}}">{{s.variant_of}}</a>{% endif %}</td>
             <td>{{s.counter}}</td>
             <td>{{s.used_by_counter}}</td>
-        {% endif %}
-    {% if user_id == 10 %}
-        {% if s.is_important %}
-            <td><a href="?is_not_important={{ s.id }}">is not important</a></td>
-        {% else %}
-            <td><a href="?is_important={{ s.id }}">is important</a></td>
-        {% endif %}
-    {% endif %}
     </tr>
   {% endfor %}
     <tr>
-       <td>&nbsp;</td>
        <td>&sum;</td>
        <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
        <td>{{ sum }}</td>
-       <td>{{ important_count }} ({{ important_count_raw }} raw)</td>
-        {% if user_id == 10 %}
-            <td>&nbsp;</td>
-        {% endif %}
+       <td>{{ total_references }}</td>
     </tr>
 </table>
 {% endblock %}

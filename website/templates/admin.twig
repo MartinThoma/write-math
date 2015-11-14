@@ -62,8 +62,8 @@
 <h2>Flags</h2>
 <ul>
     {% for flag in flags %}
-        <li><a href="?delete={{ flag.id }}"><img src="../icons/cross.png" alt="delete" /></a> - 
-          <a href="../view/?raw_data_id={{ flag.raw_data_id }}">{{ flag.raw_data_id }}</a> 
+        <li><a href="?delete={{ flag.id }}"><img src="../icons/cross.png" alt="delete" /></a> -
+          <a href="../view/?raw_data_id={{ flag.raw_data_id }}">{{ flag.raw_data_id }}</a>
             by <a href="../user/?id={{ flag.user_id }}">{{ flag.display_name }}</a>
         </li>
     {% endfor %}
@@ -137,7 +137,7 @@
     </tr>
     {% for user in inactive_users %}
         <tr>
-            <td>{{ loop.index }} 
+            <td>{{ loop.index }}
                 <a href="?delete_inactive_user={{ user.id }}"><img src="../icons/cross.png" alt="delete" /></a>
             </td>
             <td><a href="../user/?id={{ user.id }}">{{ user.display_name }}</a></td>
@@ -155,7 +155,7 @@
     </tr>
     {% for symbol in without_unicode %}
         <tr>
-            <td>{{ loop.index }} 
+            <td>{{ loop.index }}
                 <a href="../symbol/?id={{ symbol.id }}&edit"><img src="../icons/pencil.png" alt="delete" /> &#{{ symbol.unicode_dec }};</a>
             </td>
             <td><a href="../symbol/?id={{ symbol.id }}&edit">{{ symbol.formula_name }}</a></td>
