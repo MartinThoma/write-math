@@ -120,7 +120,7 @@ if (isset($_POST['language'])) {
 
 if (isset($_POST['worker_id'])) {
     $sql = "UPDATE `wm_workers` SET ".
-           "`worker_name` = :name, ".
+           "`display_name` = :name, ".
            "`description` = :description, ".
            "`url` = :url ".
            "WHERE `id` = :id AND user_id = :uid;";
@@ -128,7 +128,7 @@ if (isset($_POST['worker_id'])) {
     $uid = get_uid();
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $stmt->bindParam(':id', $_POST['worker_id'], PDO::PARAM_INT);
-    $name = trim($_POST['worker_name']);
+    $name = trim($_POST['display_name']);
     $stmt->bindParam(':name', $name, PDO::PARAM_STR);
     $description = trim($_POST['description']);
     $stmt->bindParam(':description', $description, PDO::PARAM_STR);
@@ -141,21 +141,21 @@ if (isset($_POST['worker_id'])) {
         $msg[] = array("class" => "alert-danger",
                        "text" => "Your client could not be edited.");
     }
-} elseif (isset($_POST['worker_name'])) {
+} elseif (isset($_POST['display_name'])) {
     # Insert a new worker
     $sql = "INSERT INTO `wm_workers` ( ".
            "`user_id`, ".
            "`API_key`, ".
-           "`worker_name`, ".
+           "`display_name`, ".
            "`description`, ".
            "`url` ".
-           ") VALUES (:uid, :api_key, :worker_name, :description, :url);";
+           ") VALUES (:uid, :api_key, :display_name, :description, :url);";
     $stmt = $pdo->prepare($sql);
     $uid = get_uid();
     $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
     $uid = uniqid();
     $stmt->bindParam(':api_key', $uid, PDO::PARAM_STR);
-    $stmt->bindParam(':worker_name', $_POST['worker_name'], PDO::PARAM_STR);
+    $stmt->bindParam(':display_name', $_POST['display_name'], PDO::PARAM_STR);
     $stmt->bindParam(':description', $_POST['description'], PDO::PARAM_STR);
     $stmt->bindParam(':url', $_POST['url'], PDO::PARAM_STR);
     if ($stmt->execute()) {
@@ -208,7 +208,7 @@ if (isset($_POST['worker_id'])) {
                        "text" => "The heartbeat was successful." );
     }
 } elseif (isset($_GET['edit'])) {
-    $sql = "SELECT `id`, `worker_name`, `url`, `description` FROM `wm_workers` ".
+    $sql = "SELECT `id`, `display_name`, `url`, `description` FROM `wm_workers` ".
            "WHERE `user_id` = :uid AND `id` = :id";
     $stmt = $pdo->prepare($sql);
     $uid = get_uid();
@@ -243,7 +243,7 @@ if (isset($_POST['worker_id'])) {
 }
 
 // Get all workers of this user
-$sql = "SELECT `id`, `API_key`, `worker_name`, `description`, `url`, ".
+$sql = "SELECT `id`, `API_key`, `display_name`, `description`, `url`, ".
        "`latest_heartbeat`, `status` ".
        "FROM `wm_workers` WHERE `user_id` = :uid";
 $stmt = $pdo->prepare($sql);

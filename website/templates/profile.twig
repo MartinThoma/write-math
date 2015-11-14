@@ -162,7 +162,7 @@
 
 
     </td>
-    <td>{{ worker.worker_name }}</td>
+    <td>{{ worker.display_name }}</td>
     <td><input class="form-control" value="{{ worker.API_key }}" disabled="" style="width:128px;"></td>
     <td>{{ worker.url }}</td>
     <td>{{ worker.description }}</td>
@@ -176,7 +176,7 @@
 
 
 {% if edit_id > 0 %}
-    <h2>Edit worker '{{worker.worker_name}}'</h2>
+    <h2>Edit worker '{{worker.display_name}}'</h2>
 {% else %}
     <h2>Create a new Worker</h2>
 {% endif %}
@@ -187,11 +187,11 @@
         <input type="hidden" name="worker_id" value="{{ edit_id }}"/>
     {% endif%}
     <div class="form-group">
-      <label for="worker_name">Name</label>
+      <label for="display_name">Name</label>
       <input type="text" class="form-control" required
-             id="worker_name" name="worker_name"
+             id="display_name" name="display_name"
              placeholder="Neural Netter"
-             {% if edit_id > 0 %}value="{{ worker.worker_name}}"{% endif %} />
+             {% if edit_id > 0 %}value="{{ worker.display_name}}"{% endif %} />
     </div>
     <div class="form-group">
       <label for="url">API URL</label>

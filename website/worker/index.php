@@ -4,9 +4,10 @@ include '../init.php';
 
 if (isset($_GET['id'])) {
     $sql = "SELECT `wm_workers`.`id` as `woker_id`, `user_id`, ".
-           "`worker_name`, `wm_workers`.`description`, `url`, ".
+           "`wm_workers`.`display_name` as `worker_name`, ".
+           "`wm_workers`.`description`, `url`, ".
            "`latest_heartbeat`, ".
-           "`display_name` ".
+           "`wm_users`.`display_name` ".
            "FROM `wm_workers` ".
            "JOIN `wm_users` ON `user_id` = `wm_users`.`id`".
            "WHERE `wm_workers`.`id` = :wid";

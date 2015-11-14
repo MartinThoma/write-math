@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula` (
   KEY `best_rendering` (`best_rendering`),
   KEY `user_id` (`user_id`),
   KEY `variant_of` (`variant_of`)
-) ENGINE=InnoDB AUTO_INCREMENT=4927 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=4928 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula_old` (
   PRIMARY KEY (`id`),
   KEY `formula_id` (`formula_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1012 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='This is not an outdated table, but version control';
+) ENGINE=InnoDB AUTO_INCREMENT=1014 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='This is not an outdated table, but version control';
 
 -- --------------------------------------------------------
 
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `wm_formula_svg_missing` (
   UNIQUE KEY `user_id_2` (`user_id`,`formula_id`),
   KEY `user_id` (`user_id`,`formula_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17776 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=18865 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `wm_partial_answer` (
   KEY `user_id` (`user_id`,`recording_id`,`symbol_id`),
   KEY `recording_id` (`recording_id`),
   KEY `symbol_id` (`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27241 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=27613 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `wm_raw_draw_data` (
   UNIQUE KEY `user_id_2` (`user_id`,`md5data`),
   KEY `user_id` (`user_id`),
   KEY `accepted_formula_id` (`accepted_formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=329762 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=330235 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `wm_tags2symbols` (
   `symbol_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `max_one_tag_per_symb` (`tag_id`,`symbol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9502 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9504 DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS `wm_user_unknown_formula` (
   UNIQUE KEY `user_id` (`user_id`,`formula_id`),
   KEY `user_id_2` (`user_id`),
   KEY `formula_id` (`formula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9655 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=10209 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -310,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `wm_users` (
   UNIQUE KEY `display_name` (`display_name`),
   UNIQUE KEY `email` (`email`),
   KEY `language` (`language`)
-) ENGINE=InnoDB AUTO_INCREMENT=599936 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=606694 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -330,14 +330,16 @@ CREATE TABLE IF NOT EXISTS `wm_worker_answers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `worker_id` int(11) NOT NULL,
   `raw_data_id` int(11) NOT NULL,
+  `strokes` varchar(255) COLLATE utf8_bin NOT NULL,
   `formula_id` int(11) NOT NULL,
   `probability` double unsigned NOT NULL,
   `answer_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `worker_id_2` (`worker_id`,`raw_data_id`,`strokes`,`formula_id`),
   KEY `formula_id` (`formula_id`),
   KEY `raw_data_id` (`raw_data_id`),
   KEY `worker_id` (`worker_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23928 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -349,13 +351,13 @@ CREATE TABLE IF NOT EXISTS `wm_workers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `API_key` varchar(32) COLLATE utf8_bin NOT NULL,
-  `worker_name` varchar(255) COLLATE utf8_bin NOT NULL,
+  `display_name` varchar(255) COLLATE utf8_bin NOT NULL,
   `description` text COLLATE utf8_bin NOT NULL,
   `url` varchar(255) COLLATE utf8_bin NOT NULL,
   `latest_heartbeat` timestamp NULL DEFAULT NULL,
   `status` enum('active','deactivated') COLLATE utf8_bin NOT NULL DEFAULT 'active',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `worker_name` (`worker_name`),
+  UNIQUE KEY `worker_name` (`display_name`),
   UNIQUE KEY `API_key` (`API_key`),
   UNIQUE KEY `url` (`url`),
   KEY `user_id` (`user_id`)
