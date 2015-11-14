@@ -20,7 +20,7 @@ function validate_display_name($name) {
 }
 
 function url_get_contents($Url) {
-    if (!function_exists('curl_init')){ 
+    if (!function_exists('curl_init')){
         die('CURL is not installed!');
     }
 
@@ -37,12 +37,12 @@ function url_get_contents($Url) {
     $body = substr($response, $header_size);
     $error = curl_error($ch);
     curl_close($ch);
-    return array("response"=>$response, "header"=>$header, 
+    return array("response"=>$response, "header"=>$header,
                  "body"=>$body, "error" => $error);
 }
 
-$sql = "SELECT  `language_code` ,  `english_language_name` 
-FROM  `wm_languages` 
+$sql = "SELECT  `language_code` ,  `english_language_name`
+FROM  `wm_languages`
 ORDER BY  `english_language_name` ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
@@ -141,30 +141,54 @@ if (isset($_POST['worker_id'])) {
         $msg[] = array("class" => "alert-danger",
                        "text" => "Your client could not be edited.");
     }
-} elseif (isset($_POST['display_name'])) {
-    # Insert a new worker
-    $sql = "INSERT INTO `wm_workers` ( ".
-           "`user_id`, ".
-           "`API_key`, ".
-           "`display_name`, ".
-           "`description`, ".
-           "`url` ".
-           ") VALUES (:uid, :api_key, :display_name, :description, :url);";
-    $stmt = $pdo->prepare($sql);
-    $uid = get_uid();
-    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+} elseif (isset($_POST['url'])) {
     $uid = uniqid();
-    $stmt->bindParam(':api_key', $uid, PDO::PARAM_STR);
+
+    # Create a dummy user for the worker
+    $sql = "INSERT INTO `wm_users` ( ".
+           "`display_name` , ".
+           "`account_type` , ".
+           "`status` , ".
+           "`description` , ".
+           "`password` ".
+           ") ".
+           "VALUES (:display_name, 'Worker', 'activated', 'A dummy worker', ".
+           ":password);";
+    $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':display_name', $_POST['display_name'], PDO::PARAM_STR);
-    $stmt->bindParam(':description', $_POST['description'], PDO::PARAM_STR);
-    $stmt->bindParam(':url', $_POST['url'], PDO::PARAM_STR);
+    $stmt->bindParam(':password', $uid, PDO::PARAM_STR);
     if ($stmt->execute()) {
-        $msg[] = array("class" => "alert-success",
-                       "text" => "Your client was successfully inserted.");
+        $has_user_id = $pdo->lastInsertId();
+
+        # Insert a new worker
+        $sql = "INSERT INTO `wm_workers` ( ".
+               "`user_id`, ".
+               "`API_key`, ".
+               "`display_name`, ".
+               "`description`, ".
+               "`url`, ".
+               "`has_user_id`".
+               ") VALUES (:uid, :api_key, :display_name, :description, :url, ".
+               ":has_user_id);";
+        $stmt = $pdo->prepare($sql);
+        $uid = get_uid();
+        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+        $stmt->bindParam(':api_key', $uid, PDO::PARAM_STR);
+        $stmt->bindParam(':display_name', $_POST['display_name'], PDO::PARAM_STR);
+        $stmt->bindParam(':description', $_POST['description'], PDO::PARAM_STR);
+        $stmt->bindParam(':url', $_POST['url'], PDO::PARAM_STR);
+        $stmt->bindParam(':has_user_id', $has_user_id, PDO::PARAM_INT);
+        if ($stmt->execute()) {
+            $msg[] = array("class" => "alert-success",
+                           "text" => "Your client was successfully inserted.");
+        } else {
+            $msg[] = array("class" => "alert-danger",
+                           "text" => "Your client could not be inserted. ".
+                                     "Probably the name was already taken?");
+        }
     } else {
-        $msg[] = array("class" => "alert-danger",
-                       "text" => "Your client could not be inserted. ".
-                                 "Probably the name was already taken?");
+            $msg[] = array("class" => "alert-danger",
+                           "text" => "Dummy user could not be created.");
     }
 } elseif (isset($_GET['request_heartbeat'])) {
     # Make a heartbeat
