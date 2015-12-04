@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 try:
+    # If it is Python 2, then I want the Python 3 open function
     from future.builtins import open
 except:
+    # If it is Python 3, then everything is fine
     pass
 
 import csv
@@ -23,5 +25,5 @@ with open('complete.csv', 'rt', newline='') as csvfile:
     for symbol_id, counter in sorted(id_counter.items(),
                                      key=lambda n: n[1],
                                      reverse=True):
-        #print("%s: %i" % (symbol_id, counter))
+        # print("%s: %i" % (symbol_id, counter))
         print(counter)

@@ -12,6 +12,7 @@ from hwrt import utils
 
 
 class HandwrittenDataM(HandwrittenData):
+    """A modified version of HandwrittenData which has some GUI elements."""
     def __init__(self,
                  raw_data_json,
                  formula_id,

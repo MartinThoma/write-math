@@ -11,6 +11,9 @@ from collections import defaultdict
 
 
 class DtwClassifier(object):
+    """
+    A classifier which makes use of dynamic time warping.
+    """
     def __init__(self, threshold=1000000):
         self.datasets = []
         # Maximum distance a symbol may have

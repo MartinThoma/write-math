@@ -32,6 +32,10 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 class TokenStream(object):
+    """
+    A stream of tokens. This is basically a fancy list which allows parsing of
+    texts.
+    """
     def __init__(self, skip_chars=None, orig=None, filename=""):
         self.tokens = []
         self.orig = orig

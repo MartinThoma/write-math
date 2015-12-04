@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-"""Create a json file which maps unicode decimal codepoints to descriptions.
+"""
+Create a json file which maps unicode decimal codepoints to descriptions.
 
 https://github.com/w3c/xml-entities is used for that.
 """
@@ -22,6 +23,7 @@ for atype in e.findall('charlist'):
             # print("%s: - %s" % (dec, desc))
             data[dec] = desc
         except:
+            # Just ignore errors
             pass
 
 with open('unicode.json', 'w') as outfile:

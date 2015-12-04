@@ -148,10 +148,9 @@ def get_dist(stroke_count, modes):
     return dist
 
 
-def get_modes(empiric_distribution, at_least_total=10, at_least_rel=0.1):
+def get_modes(empiric_distribution, at_least_total=10):
     """
-    Get all values which make at least a relative number of at_least_rel of
-    the data given in empiric_distribution, but also at least at_least_total
+    Get all values which are at least at_least_total
     times in the data.
 
     The most common value does not have to have at_least_total apearences in
@@ -162,8 +161,6 @@ def get_modes(empiric_distribution, at_least_total=10, at_least_rel=0.1):
     empiric_distribution : list
         List of integers
     at_least_total : int
-    at_least_rel : float
-        Value in (0.0, 1.0)
     """
     modes = []
     s = sorted(Counter(empiric_distribution).items(),

@@ -6,6 +6,7 @@ import sys
 
 
 class Tree(object):
+    """A tree class."""
     def __init__(self, name, parent):
         self.name = name
         self.nodes = []
@@ -162,7 +163,7 @@ class Parser:
         if self._current_node.is_mathmode:
             if self._strbuffer == "\\":
                 # Finished math mode
-                #self._ascend
+                # self._ascend
                 pass
             else:
                 self._strbuffer += "]"
@@ -215,7 +216,7 @@ class Parser:
             else:
                 self._append_command()
                 self._strbuffer = ""
-                #self._ascend()
+                # self._ascend()
         elif self._environment_name_started:
             self._environment_name_started = False
             self._append_command()
@@ -238,7 +239,7 @@ class Parser:
 
     def _handle_newline(self):
         if self._current_node.is_comment:
-            #self._ascend
+            # self._ascend
             pass
 
     def parse(self):

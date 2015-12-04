@@ -23,7 +23,7 @@ def simplify_latex(latex):
 
 
 def read():
-    latex2unicodeDec = {}
+    latex2unicode_dec = {}
 
     xmldoc = minidom.parse('unicode.xml')
     itemlist = xmldoc.getElementsByTagName('character')
@@ -43,8 +43,8 @@ def read():
                 if len(t) > 1:
                     logging.info("multiple (mathmode): '%s'", latex)
                 try:
-                    latex2unicodeDec[latex] = {'dec': int(dec),
-                                               'desc': desc}
+                    latex2unicode_dec[latex] = {'dec': int(dec),
+                                                'desc': desc}
                 except:
                     logging.debug("%s did not work", dec)
         if len(tn) >= 1:
@@ -54,8 +54,8 @@ def read():
                 if len(t) > 1:
                     logging.info("multiple (not mathmode): '%s'", latex)
                 try:
-                    latex2unicodeDec[latex] = {'dec': int(dec),
-                                               'desc': desc}
+                    latex2unicode_dec[latex] = {'dec': int(dec),
+                                                'desc': desc}
                 except:
                     logging.debug("%s did not work", dec)
         # else:
@@ -68,7 +68,7 @@ def read():
         # else:
         #     char_id = s.attributes['id'].value
         #     logging.info("Charid'%s' has no latex and no desc.", char_id)
-    return latex2unicodeDec
+    return latex2unicode_dec
 
 
 def get_formula_datasets():
@@ -78,7 +78,8 @@ def get_formula_datasets():
                                  db=mysql['db'],
                                  cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
-    sql = "SELECT id, formula_in_latex FROM `wm_formula` WHERE formula_type = 'single symbol'"
+    sql = ("SELECT id, formula_in_latex FROM `wm_formula` "
+           "WHERE formula_type = 'single symbol'")
     cursor.execute(sql)
     datasets = cursor.fetchall()
     formula_datasets = {}
@@ -101,6 +102,7 @@ def update(latex2unicode, formula_datasets):
             sql = ("UPDATE `wm_formula` "
                    "SET `unicode_dec` = '%i', `unicodexml_description` = '%s' "
                    "WHERE `id`= %i LIMIT 1;") % (unicode_dec, desc, mysql_id)
+            # Commented out to prevent accidents
             # try:
             #     print(sql)
             #     cursor.execute(sql)
