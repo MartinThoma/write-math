@@ -89,14 +89,14 @@ class HandwrittenDataM(HandwrittenData):
                               self.is_image))
         check.on_clicked(handle_checkboxes)
 
-        def ok_function(a):
+        def ok_function(_):
             self.ok = True
             plt.close()
         okpos = plt.axes([0.7, 0.05, 0.1, 0.075])
         ok_button = Button(okpos, 'OK')
         ok_button.on_clicked(ok_function)
 
-        def unaccept_function(a):
+        def unaccept_function(_):
             self.unaccept = True
             print("unaccept raw_data_id %i" % self.raw_data_id)
             plt.close()
@@ -175,7 +175,7 @@ def main(cfg, raw_data_start_id):
         for i, data in enumerate(raw_datasets):
             if data['data'] == "[]":
                 continue
-            B = HandwrittenDataM(data['data'],
+            b = HandwrittenDataM(data['data'],
                                  data['accepted_formula_id'],
                                  data['wild_point_count'],
                                  data['missing_line'],
@@ -186,21 +186,21 @@ def main(cfg, raw_data_start_id):
                                  data['has_interrupted_line'],
                                  data['id'],
                                  formulaid2latex[formula_id])
-            B.preprocessing(preprocessing_queue)
-            Bs = deepcopy(B)
-            Bs.preprocessing([preprocessing.DotReduction(0.01)])
-            if B != Bs:
+            b.preprocessing(preprocessing_queue)
+            bs = deepcopy(b)
+            bs.preprocessing([preprocessing.DotReduction(0.01)])
+            if b != bs:
                 before_pointcount = sum([len(line)
-                                         for line in B.get_pointlist()])
+                                         for line in b.get_pointlist()])
                 after_pointcount = sum([len(line)
-                                        for line in Bs.get_pointlist()])
+                                        for line in bs.get_pointlist()])
                 print("Reduced %i lines to %i lines." %
-                      (len(B.get_pointlist()), len(Bs.get_pointlist())))
+                      (len(b.get_pointlist()), len(bs.get_pointlist())))
                 print("Reduced %i points to %i points." %
                       (before_pointcount, after_pointcount))
                 if before_pointcount - after_pointcount > 2:
-                    B.show()
-                    Bs.show()
+                    b.show()
+                    bs.show()
 
         print("[Status] Checked formulas: %i of %i" % (checked_formulas,
                                                        len(formulaid2latex)))

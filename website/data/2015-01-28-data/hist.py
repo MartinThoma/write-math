@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
-try:
+import sys
+if sys.version_info < (3, 0):
     # If it is Python 2, then I want the Python 3 open function
     from future.builtins import open
-except:
-    # If it is Python 3, then everything is fine
-    pass
 
 import csv
 id_counter = {}

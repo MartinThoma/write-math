@@ -50,7 +50,7 @@ class Tree(object):
         return out.strip()
 
 
-class Parser:
+class Parser(object):
     def __init__(self, content):
         self.content = content
         self.symbol_table = {}
