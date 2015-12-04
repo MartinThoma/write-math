@@ -9,8 +9,9 @@ import collections
 
 try:
     unicode = unicode
-except NameError:
+except NameError as e:
     # 'unicode' is undefined, must be Python 3
+    logging.info("Python 3 detected")
     str = str
     unicode = str
     bytes = bytes
@@ -43,7 +44,8 @@ class TokenStream(object):
     def append(self, token):
         if token not in self.skip_chars:
             token = token.strip()
-            replace_dict = {'\\cal': '\\mathcal',  # TODO: Language model config file
+            # TODO: Language model config file
+            replace_dict = {'\\cal': '\\mathcal',
                             '\\rm': '\\mathrm',
                             '\\bf': '\\mathbf',
                             '*': '\\ast',
@@ -230,9 +232,7 @@ class TokenStream(object):
         """Remove blocks."""
         new_tokens = []
         for token in self.tokens:
-            if isinstance(token, Block) or \
-               isinstance(token, Consumer) or \
-               isinstance(token, MultiConsumer):
+            if isinstance(token, (Block, Consumer, MultiConsumer)):
                 for el in token.tokenize():
                     new_tokens.append(el)
             else:

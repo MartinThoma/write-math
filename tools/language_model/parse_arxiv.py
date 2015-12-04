@@ -30,8 +30,9 @@ import parse_mathmode
 
 try:
     unicode = unicode
-except NameError:
+except NameError as e:
     # 'unicode' is undefined, must be Python 3
+    logging.info("Python 3 detected")
     str = str
     unicode = str
     bytes = bytes
@@ -104,14 +105,16 @@ def update_ngrams(ngrams, filename, token_stream):
         '<s>', '<n>', '</n><d>', '</d>', '</s>', '<unk>'
     """
 
-    all_ignore = ['_', '^', '{', '}', '\\right', '\\left',  # TODO: Language model config file
+    # TODO: Language model config file
+    all_ignore = ['_', '^', '{', '}', '\\right', '\\left',
                   '\\mathrm', '\\mathcal', '\\mathbf', '\\mbox',
                   '&', '%', '<n>', '</n><d>', '</d>', '<unk>']
 
     # Update unigrams
     ts = []
     for token in token_stream:
-        single_ignore = ['<s>', '</s>'] + all_ignore  # TODO: Language model config file
+        # TODO: Language model config file
+        single_ignore = ['<s>', '</s>'] + all_ignore
         if token in single_ignore:
             continue
         if not isinstance(token, basestring):

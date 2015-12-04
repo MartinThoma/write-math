@@ -10,11 +10,11 @@ import distance_metric
 from collections import defaultdict
 
 
-class dtw_classifier(object):
-    def __init__(self, THRESHOLD=1000000):
+class DtwClassifier(object):
+    def __init__(self, threshold=1000000):
         self.datasets = []
         # Maximum distance a symbol may have
-        self.THRESHOLD = THRESHOLD
+        self.threshold = threshold
         self.datasets_counter = defaultdict(int)  # count data by symbol_id
 
     def learn(self, trainingdata):
@@ -36,13 +36,13 @@ class dtw_classifier(object):
                 self.datasets_counter[data['handwriting'].formula_id] += 1
                 self.datasets.append(data)
 
-    def classify(self, A):
+    def classify(self, a):
         """
-        Classify A with data from datasets and smoothing of EPSILON.
+        Classify a with data from datasets and smoothing of EPSILON.
 
         Parameters
         ----------
-        A : list
+        a : list
             List of points
 
         Returns
@@ -51,28 +51,28 @@ class dtw_classifier(object):
             List of possible classifications, ordered DESC by likelines
         """
 
-        assert type(A) is HandwrittenData.HandwrittenData
+        assert type(a) is HandwrittenData.HandwrittenData
 
         # key: formula_id, value: (dtw, Handwriting) (lowest prefered)
         best_by_symbol = {}
 
         for dataset in self.datasets:
-            B = dataset['handwriting']
-            d = distance_metric.handwritten_data_greedy_matching_distance(A, B)
-            if d < self.THRESHOLD:
-                if B.formula_id in best_by_symbol:
-                    if d < best_by_symbol[B.formula_id]:
-                        best_by_symbol[B.formula_id] = (d, B)
+            b = dataset['handwriting']
+            d = distance_metric.handwritten_data_greedy_matching_distance(a, b)
+            if d < self.threshold:
+                if b.formula_id in best_by_symbol:
+                    if d < best_by_symbol[b.formula_id]:
+                        best_by_symbol[b.formula_id] = (d, b)
                 else:
-                    best_by_symbol[B.formula_id] = (d, B)
+                    best_by_symbol[b.formula_id] = (d, b)
 
         results = []
         for _, tmp in best_by_symbol.items():
-            d, B = tmp
+            d, b = tmp
             results.append({'p': -1,
                             'dtw': d,
-                            'formula_id': B.formula_id,
-                            'handwriting': B})
+                            'formula_id': b.formula_id,
+                            'handwriting': b})
         results = sorted(results, key=lambda k: k['dtw'])[:10]
 
         def get_probability_from_distance(results):
