@@ -46,6 +46,13 @@ class TokenStream(object):
             self.skip_chars = skip_chars
 
     def append(self, token):
+        """
+        Append a token to the TokenStream.
+
+        Parameters
+        ----------
+        token : str
+        """
         if token not in self.skip_chars:
             token = token.strip()
             # TODO: Language model config file
@@ -199,7 +206,8 @@ class TokenStream(object):
                      r"\\frak": True,
                      r"\\boldmath": True,
                      r"^": False,  # r"_": False,
-                     r"\label": False, r"\ref": False,  # TODO: Consume one token, but then skip
+                     # TODO: Consume one token, but then skip:
+                     r"\label": False, r"\ref": False,
                      # r"\sqrt": False, r"\bar": False,
                      # r"\vec": False, r"\overline": False,
                      # r"\tilde": False
@@ -419,7 +427,8 @@ def tokenize(text, filename=""):
     ['a', '\\\cdot', '<n>', 'x', '^', '2', '+', '1', '</n><d>', '2', '</d>']
     """
     text = text.strip()
-    tokens = TokenStream(skip_chars=[" ", "\t", "\r",  # TODO: language model config file
+    # TODO: language model config file:
+    tokens = TokenStream(skip_chars=[" ", "\t", "\r",
                                      "\\!", "\\;", "\\,", "~", "\\:",
                                      "\\quad", "\\qquad",
                                      "\\Hspace", "\\big",

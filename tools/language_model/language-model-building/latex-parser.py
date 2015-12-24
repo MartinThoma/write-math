@@ -22,6 +22,12 @@ class Tree(object):
         self.is_comment = False
 
     def append(self, new_node):
+        """
+        Parameters
+        ----------
+        new_node : Node
+            Append it to the list of nodes of the tree.
+        """
         assert isinstance(new_node, Tree)
         self.nodes.append(new_node)
 
@@ -51,6 +57,14 @@ class Tree(object):
 
 
 class Parser(object):
+    """
+    A parser which reads LaTeX text and gets the structure.
+
+    Parameters
+    ----------
+    content : str
+        LaTeX formatted string
+    """
     def __init__(self, content):
         self.content = content
         self.symbol_table = {}
@@ -243,6 +257,14 @@ class Parser(object):
             pass
 
     def parse(self):
+        """
+        Go through self.conetent and get the structure of it.
+
+        Returns
+        -------
+        tuple
+            (symbol table, root) - TODO - give an example
+        """
         for i, char in enumerate(self.content):
             self._readchar = i
             if char == "\\":  # This is an escaped single slash
@@ -269,6 +291,19 @@ class Parser(object):
 
 
 def parse(filename):
+    """
+    Read a file and LaTeX formatted text file and return its structure.
+
+    Parameters
+    ----------
+    filename : str
+        Path to a file
+
+    Returns
+    -------
+    tuple
+        (symbol table, root) - TODO - give an example
+    """
     with open(filename) as f:
         content = f.read().strip()
     p = Parser(content[:150])

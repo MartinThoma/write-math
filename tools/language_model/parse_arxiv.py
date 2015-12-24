@@ -26,7 +26,7 @@ import pickle
 
 # My modules
 from find_mathmode import get_math_mode
-import parse_mathmode
+import parse_mathmode as pm
 
 try:
     unicode = unicode
@@ -118,8 +118,8 @@ def update_ngrams(ngrams, filename, token_stream):
         if token in single_ignore:
             continue
         if not isinstance(token, basestring):
-            # parse_mathmode.Environment  # TODO - how to deal with that?
-            # parse_mathmode.Block
+            # pm.Environment  # TODO - how to deal with that?
+            # pm.Block
             pass
         elif token in ngrams['unigrams']:
             ts.append(token)
@@ -183,7 +183,7 @@ def main(directory, refresh):
                         'bigrams': {},
                         'trigrams': {}
                         }
-            unknown_extensions_t = {}
+            unknown_exts_t = {}
             for word in vocabulary:
                 ngrams_t['unigrams'][word] = {}
 
@@ -193,17 +193,17 @@ def main(directory, refresh):
                 for filename in project:
                     extensions = []
                     digits = string.digits
-                    if any([filename.lower().endswith(e) for e in extensions]):
+                    if any(filename.lower().endswith(e) for e in extensions):
                         continue
-                    elif any([filename.lower().endswith(e) for e in digits]):
+                    elif any(filename.lower().endswith(e) for e in digits):
                         continue
                     elif not filename.lower().endswith('.tex'):
                         _, file_extension = os.path.splitext(filename)
                         file_extension = file_extension.lower()
-                        if file_extension in unknown_extensions_t:
-                            unknown_extensions_t[file_extension].append(filename)
+                        if file_extension in unknown_exts_t:
+                            unknown_exts_t[file_extension].append(filename)
                         else:
-                            unknown_extensions_t[file_extension] = [filename]
+                            unknown_exts_t[file_extension] = [filename]
                         continue
                     mathmode_contents = []
                     try:
@@ -211,8 +211,8 @@ def main(directory, refresh):
                     except:
                         logging.debug("get_math_mode error with %s.", filename)
                     for mcontent in mathmode_contents:
-                        token_stream = parse_mathmode.tokenize(mcontent,
-                                                               filename=filename)
+                        token_stream = pm.tokenize(mcontent,
+                                                   filename=filename)
 
                         # Skip empty streams
                         if token_stream == ["<s>", "</s>"]:
@@ -229,7 +229,7 @@ def main(directory, refresh):
             # Serialize data
             with open(summary_file, 'wb') as handle:
                 pickle.dump({'ngrams': ngrams_t,
-                             'unknown_extensions': unknown_extensions_t},
+                             'unknown_extensions': unknown_exts_t},
                             handle,
                             protocol=pickle.HIGHEST_PROTOCOL)
         else:
