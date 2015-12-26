@@ -259,10 +259,22 @@ class TokenStream(object):
 
 
 class Token(unicode):
+    """
+    The smallest entity of a mathmode environment.
+    """
     def __init__(self, name):
         self.name = name
 
     def tokenize(self):
+        """
+        Convenience method as other objects have also a tokenize method (which
+        is more interesting).
+
+        Returns
+        -------
+        list
+            List with only itself.
+        """
         return [self.name]
 
     def __repr__(self):
@@ -270,12 +282,27 @@ class Token(unicode):
 
 
 class Environment(object):
+    """
+    LaTeX environment, e.g. "align".
+
+    Parameters
+    ----------
+    name : str
+        Name of the environment, e.g. "align".
+    """
     def __init__(self, name):
         self.name = name
         self.commands = []
         self.tokens = []
 
     def append(self, token):
+        """
+        Append a token.
+
+        Parameters
+        ----------
+        token : str
+        """
         self.tokens.append(token)
 
     def __repr__(self):
@@ -288,10 +315,22 @@ class Environment(object):
 
 
 class Block(object):
+    """
+    A block is a list of tokens which are treated in a similar way.
+
+    For example, in $e^{1+2}$ the sub-expression "{1+2}" is a block.
+    """
     def __init__(self):
         self.tokens = []
 
     def append(self, token):
+        """
+        Append a token to this block.
+
+        Parameters
+        ----------
+        token : str
+        """
         if isinstance(token, collections.Iterable):
             self.tokens.append(token)
             # for element in token:
@@ -300,6 +339,14 @@ class Block(object):
             self.tokens.append(token)
 
     def tokenize(self):
+        """
+        Return a list of tokens which represents this block.
+
+        Returns
+        -------
+        list
+            List of tokens
+        """
         if len(self.tokens) == 1:
             return self.tokens
         else:
@@ -316,6 +363,17 @@ class Block(object):
 
 
 class Consumer(object):
+    """
+    A consumer is an object like \mathcal which will use / be applied to the
+    next token.
+
+    Parameters
+    ----------
+    name : str
+        Name of the consumer, e.g. \mathcal
+    splitting : bool
+        TODO
+    """
     def __init__(self, name, splitting=True):
         self.name = name
         self.splitting = splitting
@@ -323,10 +381,21 @@ class Consumer(object):
         self.is_saturated_state = False
 
     def consume(self, token):
+        """
+        Consume the next token.
+
+        Parameters
+        ----------
+        token : Token
+        """
         self.consumed.append(token)
         self.is_saturated_state = True
 
     def is_saturated(self):
+        """
+        is_saturated indicates if this Consumer has already consumed enough.
+        All Consumers consume exactly one element.
+        """
         return self.is_saturated_state
 
     def tokenize(self):
@@ -352,12 +421,26 @@ class Consumer(object):
 
 
 class MultiConsumer(object):
+    """
+    A MultiConsumer object is for example \frac{}{} or \over{}{}.
+
+    Parameters
+    ----------
+    name : str
+    """
     def __init__(self, name):
         self.name = name
         self.consumed = []
         self.is_saturated_state = False
 
     def consume(self, token):
+        """
+        Consume the next token.
+
+        Parameters
+        ----------
+        token : Token
+        """
         block = Block()
         block.append(token)
         self.consumed.append(block)
@@ -365,6 +448,10 @@ class MultiConsumer(object):
             self.is_saturated_state = True
 
     def is_saturated(self):
+        """
+        is_saturated indicates if this Consumer has already consumed enough.
+        All Consumers consume exactly one element.
+        """
         return self.is_saturated_state
 
     def tokenize(self):
@@ -508,6 +595,13 @@ def tokenize(text, filename=""):
 
 
 def main(filename):
+    """
+    Get all mathmode environments in filename and parse all tokens from it.
+
+    Parameters
+    ----------
+    filename : str
+    """
     import find_mathmode
     math_mode = find_mathmode.get_math_mode(filename)
     for i, el in enumerate(math_mode, start=1):
@@ -516,8 +610,8 @@ def main(filename):
 
 
 def is_valid_file(parser, arg):
-    """Check if arg is a valid file that already exists on the file
-       system.
+    """
+    Check if arg is a valid file that already exists on the file system.
     """
     arg = os.path.abspath(arg)
     if not os.path.exists(arg):
@@ -527,6 +621,12 @@ def is_valid_file(parser, arg):
 
 
 def get_parser():
+    """
+    Returns
+    -------
+    ArgumentParser :
+        Parser object for parse_mathmode.py
+    """
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
