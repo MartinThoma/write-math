@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+"""
+Import data from Detexify into a MySQL database.
+"""
+
 import json
 import sys
 sys.path.append("/var/www/write-math/website/clients/python")
-from HandwrittenData import HandwrittenData
+from hwrt.handwritten_data import HandwrittenData
 import pymysql
 import pymysql.cursors
 from dbconfig import mysql
@@ -11,12 +15,24 @@ import os
 
 
 def process_single_symbol(filename):
+    """
+    Parameters
+    ----------
+    filename : str
+        Path to a file
+
+    Returns
+    -------
+    tuple
+        (rawdata, symbol) where raw_data is a list and symbol is an id.
+    """
     with open(filename) as f:
         content = f.read()
     try:
         f = json.loads(content)
-    except Exception, e:
+    except Exception as e:
         f = {'doc': content}
+        print(e)
 
     if 'data' in f['doc']:
         rawdata, symbol = f['doc']['data'], f['doc']['id']
@@ -41,6 +57,13 @@ def parse_detexify_id(detexify_id):
 
 
 def main(folder):
+    """
+    Orchestrate the downloading
+
+    Parameters
+    ----------
+    folder : str
+    """
     # Get IDs from server
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
@@ -95,9 +118,10 @@ def main(folder):
                 cursor.execute(sql)
                 connection.commit()
                 os.rename(rawdatafile_full, "done/"+rawdatafile)
-            except Exception, e:
+            except Exception as e:
                 print("Skip - duplicate content?")
                 os.rename(rawdatafile_full, "skipped/"+rawdatafile)
+                print(e)
         if i % 200 == 0:
             print(i)
         if i % 50000 == 0:

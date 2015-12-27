@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+Read the unicode.xml
+"""
+
 import logging
 import sys
 
@@ -14,6 +18,18 @@ import re
 
 
 def simplify_latex(latex):
+    """
+    Simplify LaTeX code, e.g. by removing surrounding "\mbox".
+
+    Parameters
+    ----------
+    latex : str
+
+    Returns
+    -------
+    str
+        A simplified version of the original LaTeX string.
+    """
     latex = latex.strip()
     pattern = re.compile("^\\\mbox\{(.*?)\}$")
     matches = pattern.findall(latex)
@@ -23,6 +39,15 @@ def simplify_latex(latex):
 
 
 def read():
+    """
+    Read the unicode.xml
+
+    Returns
+    -------
+    dict :
+        Maps LaTeX to a dictionalry. This dictionary contains the unicode
+        decimal code point 'dec' and a description 'desc'.
+    """
     latex2unicode_dec = {}
 
     xmldoc = minidom.parse('unicode.xml')
@@ -72,6 +97,14 @@ def read():
 
 
 def get_formula_datasets():
+    """
+    Get the mapping from LaTeX to the write-math.com ID.
+
+    Returns
+    -------
+    dict :
+        Maps LaTeX to the ID on write-math.com
+    """
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
@@ -89,6 +122,17 @@ def get_formula_datasets():
 
 
 def update(latex2unicode, formula_datasets):
+    """
+    Add the unicode code point as well as an description on write-math.com.
+
+    Parameters
+    ----------
+    latex2unicode : dict
+        Maps LaTeX to a dictionary which contains the unicode code point 'dec'
+        and a description 'desc'.
+    formula_datasets : dict
+        Maps LaTeX to write-math-ID
+    """
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
@@ -114,6 +158,9 @@ def update(latex2unicode, formula_datasets):
 
 
 def main():
+    """
+    Orchestrate the downloading.
+    """
     # 1. Download all data (id, latex)
     formula_datasets = get_formula_datasets()
     logging.info("Got %i datasets from server.", len(formula_datasets))
