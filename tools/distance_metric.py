@@ -7,7 +7,8 @@ import numpy
 
 
 def softmax(w, t=1.0):
-    """Calculate the softmax of a list of numbers w.
+    """
+    Calculate the softmax of a list of numbers w.
 
     Parameters
     ----------
@@ -34,7 +35,8 @@ def softmax(w, t=1.0):
 
 
 def point_distance(p1, p2, squared=False):
-    """ Calculate the squared eucliden distance of two points.
+    """
+    Calculate the squared eucliden distance of two points.
 
     Parameters
     ----------
@@ -61,6 +63,17 @@ def point_distance(p1, p2, squared=False):
 
 
 def handwritten_data_greedy_matching_distance(a, b):
+    """
+    Parameters
+    ----------
+    a : HandwrittenData object
+    b : HandwrittenData object
+
+    Returns
+    -------
+    float
+        Distance of a and b
+    """
     assert isinstance(a, handwritten_data.HandwrittenData), \
         "handwritten data is not of type HandwrittenData, but of %r" % \
         type(a)

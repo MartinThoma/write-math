@@ -24,6 +24,19 @@ import hwrt.utils as utils
 
 
 def get_constraind_str(creation_str, table_name):
+    """
+    Find all constraints in `creatinon_str` which are related to `table_name`.
+
+    Parameters
+    ----------
+    creation_str : str
+    table_name : str
+
+    Returns
+    -------
+    str :
+        Constraints of the table
+    """
     constr = "--\n"
     constr += "-- Constraints der Tabelle `%s`\n" % table_name
     constr += "--\n"
@@ -135,7 +148,15 @@ def dump_structure(mysql_cfg,
 
 
 def db_dump_table(mysql_cfg, table_name, filename):
-    """Dump a single table."""
+    """
+    Dump a single table.
+
+    Parameters
+    ----------
+    mysql_cfg : dict
+    table_name : str
+    filename : str
+    """
     connection = pymysql.connect(host=mysql_cfg['host'],
                                  user=mysql_cfg['user'],
                                  passwd=mysql_cfg['passwd'],
@@ -200,6 +221,7 @@ def db_dump_table(mysql_cfg, table_name, filename):
 
 
 def main():
+    """Orchestrate the db_dump script."""
     cfg = utils.get_database_configuration()
     mysql = cfg['mysql_online']
     logging.info("Start dumping structure and constraints...")
@@ -209,7 +231,8 @@ def main():
                             filename_strucutre=(("%s/database/structure/"
                                                  "write-math.sql") % dir_s),
                             filename_constraints=(("%s/database/structure/"
-                                                   "foreign-keys.sql") % dir_s))
+                                                   "foreign-keys.sql") %
+                                                  dir_s))
     logging.info(tables)
     # for table_name in tables:
     #     if "raw_draw_data" not in table_name:

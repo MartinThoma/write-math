@@ -204,6 +204,7 @@ def write_prob(counts, filename):
 
 
 def get_parser():
+    """Get parser object for get_probabilities_of_stroke_counts.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

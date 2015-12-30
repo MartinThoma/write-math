@@ -16,6 +16,14 @@ import hwrt.utils as utils
 
 
 def main(mysql):
+    """Orchestrate normalize_formulas_online.py.
+
+    Parameters
+    ----------
+    mysql : dict
+        Dictionary with connection credentials to a MySQL database. It has to
+        have the keys 'host', 'user', 'passwd', 'db'.
+    """
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
