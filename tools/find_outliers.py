@@ -23,6 +23,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def main(symbol_id=None):
+    """
+    Parameters
+    ----------
+    symbol_id : int, optional
+        If this is set, all recordings of this single symbol will be checked
+        for outliers. Otherwise, all symbols will be checked.
+    """
     cfg = hwrt.utils.get_database_configuration()
     mysql = cfg['mysql_online']
 
@@ -147,7 +154,8 @@ def get_recordings(mysql, symbol_id):
 
 
 def get_features(recordings, preprocessing_queue):
-    """Calculate features for each recording.
+    """
+    Calculate features for each recording.
 
     Parameters
     ----------
@@ -178,6 +186,11 @@ def get_features(recordings, preprocessing_queue):
 
 
 def append_dtw(recordings):
+    """
+    Parameters
+    ----------
+    recordings : list
+    """
     n = len(recordings)
     dtw_matrix = numpy.zeros((n, n))
     max_dist_noninf = 0
@@ -236,6 +249,7 @@ def get_outliers(recordings):
 
 
 def get_parser():
+    """Get parser object for find_outliers.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

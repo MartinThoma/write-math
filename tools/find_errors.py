@@ -28,6 +28,15 @@ from misc import HandwrittenDataM
 
 
 def update_data(cfg, a, unaccept=False):
+    """
+    Parameters
+    ----------
+    cfg : dict
+        Configuration
+    a : HandwrittenData object
+    unaccept : bool, optional
+        Reset the accepted formula (default is False)
+    """
     mysql = cfg['mysql_online']
     connection_local = pymysql.connect(host=mysql['host'],
                                        user=mysql['user'],
@@ -108,6 +117,13 @@ def update_data(cfg, a, unaccept=False):
 
 
 def main(cfg, raw_data_start_id):
+    """
+    Parameters
+    ----------
+    cfg : dict
+        Configuration
+    raw_data_start_id : int
+    """
     mysql = cfg['mysql_online']
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],

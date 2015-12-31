@@ -13,6 +13,14 @@ from misc import HandwrittenDataM
 
 
 def main(cfg, raw_data_start_id):
+    """
+    Parameters
+    ----------
+    cfg : dict
+        Configuration
+    raw_data_start_id : int
+        Only check data with raw_data_id > raw_data_start_id
+    """
     cfg = utils.get_database_configuration()
     mysql = cfg['mysql_online']
     connection = pymysql.connect(host=mysql['host'],
