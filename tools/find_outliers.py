@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Find outliers in the data of a given class.
+"""
+Find outliers in the data of a given class.
 
 This script was written to detect misclassified recordings.
 """

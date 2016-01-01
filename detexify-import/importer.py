@@ -48,7 +48,18 @@ def process_single_symbol(filename):
 
 
 def parse_detexify_id(detexify_id):
-    """Parse an id from Detexify into package, encoding and symbol."""
+    """
+    Parse an id from Detexify into package, encoding and symbol.
+
+    Parameters
+    ----------
+    detexify_id : int
+
+    Returns
+    -------
+    tuple
+        (package, encoding, symbol)
+    """
     splitted = detexify_id.split("-")
     package, encoding, symbol = splitted[0], splitted[1], splitted[2:]
     symbol = "-".join(symbol)

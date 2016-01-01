@@ -45,12 +45,18 @@ def main():
 
 
 def store_symbols(symbols):
+    """
+    Parameters
+    ----------
+    symbols : list
+    """
     with codecs.open('vocabulary.txt', 'w', 'utf-8') as f:
         for symbol in symbols:
             f.write("%s\n" % symbol['formula_in_latex'])
 
 
 def get_parser():
+    """Get parser object for script get_vocabulary.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

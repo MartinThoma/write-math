@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Sync the `wm_raw_draw_data`.`user_answers_count` and
-   `wm_raw_draw_data`.`automated_answers_count` with the actual counts.
+"""
+Sync the `wm_raw_draw_data`.`user_answers_count` and
+`wm_raw_draw_data`.`automated_answers_count` with the actual counts.
 """
 
 import pymysql.cursors
@@ -18,6 +19,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def main(chunk_size=100):
+    """
+    Parameters
+    ----------
+    chunk_size : int, >= 1
+    """
+    assert chunk_size >= 1
     cfg = hwrt.utils.get_database_configuration()
     mysql = cfg['mysql_online']
 

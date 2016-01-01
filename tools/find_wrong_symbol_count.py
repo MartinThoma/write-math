@@ -21,12 +21,22 @@ from hwrt import utils
 
 
 def main():
+    """
+    Orchestrate finding of recordings where the symbol count does not match the
+    segmentation.
+    """
     cfg = utils.get_database_configuration()
     mysql = cfg['mysql_online']
     find_wrong_count(mysql)
 
 
 def find_wrong_count(mysql):
+    """
+    Parameters
+    ----------
+    mysql : dict
+        Connection information
+    """
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],
@@ -72,6 +82,15 @@ def find_wrong_count(mysql):
 
 
 def fix_symbol_count(mysql, wid, correct_count):
+    """
+    Parameters
+    ----------
+    mysql : dict
+        Connection information
+    wid : int
+        ID on write-math.com
+    correct_count : int
+    """
     connection = pymysql.connect(host=mysql['host'],
                                  user=mysql['user'],
                                  passwd=mysql['passwd'],

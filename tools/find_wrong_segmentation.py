@@ -26,6 +26,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def main(raw_pickle):
+    """
+    Parameters
+    ----------
+    raw_pickle : str
+        Path to a pickle file
+    """
     logging.info('Start loading raw datasets...')
     raw_datasets = load_raw(raw_pickle)
     logging.info('Start analyzing...')
@@ -40,6 +46,17 @@ def main(raw_pickle):
 
 
 def check_single(raw_dataset):
+    """
+    Parameters
+    ----------
+    raw_dataset : dict
+        with key 'handwriting'
+
+    Returns
+    -------
+    tuple or int
+        (raw_dataset, seg_predict) or -1 to be exact (TODO)
+    """
     strokelist = raw_dataset['handwriting'].get_sorted_pointlist()
     if len(strokelist) > 8:
         logging.warning('%i strokes in %s',
@@ -60,14 +77,34 @@ def check_single(raw_dataset):
 
 
 def load_raw(path_to_data):
-    loaded = pickle.load(open(path_to_data, "rb"))
+    """
+    Parameters
+    ----------
+    path_to_data : str
+
+    Returns
+    -------
+    list
+        HandwrittenData objects
+    """
+    with open(path_to_data, "rb") as f:
+        loaded = pickle.load(f)
     raw_datasets = loaded['handwriting_datasets']
     return raw_datasets
 
 
 def is_valid_file(parser, arg):
-    """Check if arg is a valid file that already exists on the file
-       system.
+    """
+    Check if arg is a valid file that already exists on the file system.
+
+    Parameters
+    ----------
+    parser : argparse object
+    arg : str
+
+    Returns
+    -------
+    arg
     """
     arg = os.path.abspath(arg)
     if not os.path.exists(arg):
@@ -88,6 +125,7 @@ def _get_default_pickle():
 
 
 def get_parser():
+    """Get parser object for find_wrong_segmentation.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

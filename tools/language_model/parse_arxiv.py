@@ -53,6 +53,12 @@ from gzip import FEXTRA, FNAME
 
 
 def read_gzip_info(gzipfile):
+    """
+    Parameters
+    ----------
+    gzipfile : str
+        Path to a gzipfile
+    """
     gf = gzipfile.fileobj
     pos = gf.tell()
 
@@ -159,6 +165,12 @@ def update_ngrams(ngrams, filename, token_stream):
 
 
 def main(directory, refresh):
+    """
+    Parameters
+    ----------
+    directory : str
+    refresh : bool
+    """
     vocabulary = get_vocabulary()
     ngrams_g = {'unknown': {},
                 'unigrams': {},
@@ -455,6 +467,12 @@ def write_ngrams(ngrams, filename):
 
 
 def get_vocabulary():
+    """
+    Returns
+    -------
+    list
+        Of strings
+    """
     vocabulary_file = pkg_resources.resource_filename('hwrt',
                                                       'misc/vocabulary.txt')
     with codecs.open(vocabulary_file, 'r', 'utf-8') as f:
@@ -525,6 +543,7 @@ def get_data(directory, tar_filename):
 
 
 def get_parser():
+    """Get parser object for parse_arxiv.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)

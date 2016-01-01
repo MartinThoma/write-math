@@ -79,17 +79,36 @@ def extract_environments(env, text):
 
 
 def extract_document_body(text):
+    """
+    Parameters
+    ----------
+    text : str
+        Where to get the body from
+
+    Returns
+    -------
+    str
+    """
     return extract_environments('document', text)
 
 
-def unfold_math(expression):
+def unfold_math(expression):  # TODO
     tree = {}
     return tree
 
 
 def is_valid_file(parser, arg):
-    """Check if arg is a valid file that already exists on the file
-       system.
+    """
+    Check if arg is a valid file that already exists on the file system.
+
+    Parameters
+    ----------
+    parser : argparse object
+    arg : str
+
+    Returns
+    -------
+    arg
     """
     arg = os.path.abspath(arg)
     if not os.path.exists(arg):
@@ -99,6 +118,7 @@ def is_valid_file(parser, arg):
 
 
 def get_parser():
+    """Get parser object for script find_mathmode.py."""
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
