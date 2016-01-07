@@ -80,14 +80,26 @@ class Parser(object):
         self._command_arguments = {'\\newcommand': 2, '\\documentclass': 1}
 
     def _append_command(self):
+        """
+        Append the currently handled command to the tree.
+        """
         new_node = Tree(self._strbuffer, self._current_node)
         self._current_node.append(new_node)
         self._current_node = new_node
 
     def _ascend(self):
+        """
+        Go up in the tree to the parent.
+        """
         self._current_node = self._current_node.parent
 
     def _print_status(self, line, char):
+        """
+        Parameters
+        ----------
+        line : int
+        char : str
+        """
         print("This should not happen (line %i)" % line)
         print("strbuffer:\t%s" % self._strbuffer)
         print("char:\t%s" % char)
@@ -104,6 +116,9 @@ class Parser(object):
         sys.exit(-1)
 
     def _handle_backslash(self):
+        """
+        A backslash was just seen. Deal with it.
+        """
         if self._command_name_started:
             if self._strbuffer == "\\":
                 # It's a \\
@@ -128,6 +143,9 @@ class Parser(object):
             self._strbuffer = "\\"
 
     def _handle_dollar(self):
+        """
+        A dollar sign was just seen. Deal with it.
+        """
         if self._strbuffer == "\\":
             # escaped dollar sign
             self._strbuffer += "$"
@@ -154,7 +172,9 @@ class Parser(object):
             self._command_name_started = False
 
     def _handle_open_bracket(self):
-        """ for '[' """
+        """
+        A '[' was just seen. Deal with it.
+        """
         if self._current_node.is_mathmode:
             self._strbuffer += "["
         elif self._strbuffer == "\\":
@@ -174,6 +194,9 @@ class Parser(object):
             self._print_status(122, "[")
 
     def _handle_close_bracket(self):
+        """
+        A ']' was just seen. Deal with it.
+        """
         if self._current_node.is_mathmode:
             if self._strbuffer == "\\":
                 # Finished math mode
@@ -191,6 +214,9 @@ class Parser(object):
             self._strbuffer += "]"
 
     def _handle_space(self):
+        """
+        A ' ' was just seen. Deal with it.
+        """
         self._current_node.append(Tree(self._strbuffer, self._current_node))
         self._strbuffer = ""
         self._command_name_started = False
@@ -198,6 +224,9 @@ class Parser(object):
             self._print_status(self, 146, " ")
 
     def _handle_open_curly(self):
+        """
+        A '{' was just seen. Deal with it.
+        """
         if self._command_name_started:
             if self._strbuffer == "\\begin":
                 self._environment_name_started = True
@@ -214,6 +243,9 @@ class Parser(object):
             self._argument_started = True
 
     def _handle_close_curly(self):
+        """
+        A '}' was just seen. Deal with it.
+        """
         if self._command_name_started:
             if self._strbuffer == "\\begin":
                 self._environment_name_started = True
@@ -246,12 +278,18 @@ class Parser(object):
             self._print_status(210, "}")
 
     def _handle_percentage(self):
+        """
+        A '%' was just seen. Deal with it.
+        """
         if self._strbuffer.endswith("\\"):
             self._strbuffer += "%"
         else:
             self._current_node.is_comment = True
 
     def _handle_newline(self):
+        """
+        A '\n' was just seen. Deal with it.
+        """
         if self._current_node.is_comment:
             # self._ascend
             pass

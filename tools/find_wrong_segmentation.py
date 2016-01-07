@@ -114,6 +114,14 @@ def is_valid_file(parser, arg):
 
 
 def _get_default_pickle():
+    """
+    Get a raw dataset.
+
+    Returns
+    -------
+    None or str
+        Path to a model.pickle file.
+    """
     project_root = utils.get_project_root()
     raw_dir = os.path.join(project_root, "raw-datasets")
     models = filter(lambda n: n.endswith(".pickle"), os.listdir(raw_dir))

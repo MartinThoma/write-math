@@ -10,6 +10,14 @@ import logging
 
 
 def main(filename):
+    """
+    Get all mathmode environments within a file and print them.
+
+    Parameters
+    ----------
+    filename : str
+        Path to a LaTeX file.
+    """
     math_mode = get_math_mode(filename)
     for i, el in enumerate(math_mode):
         print("%i.\t%s" % (i, el.replace('\n', '\\n')))
