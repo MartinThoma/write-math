@@ -489,7 +489,26 @@ def get_data(directory, tar_filename):
     extracted = []
     with tarfile.open(tar_filename) as tar:
         extracted = tar.getnames()
-        tar.extractall(path=working_directory)
+        def is_within_directory(directory, target):
+            
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+        
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+            
+            return prefix == abs_directory
+        
+        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        
+            for member in tar.getmembers():
+                member_path = os.path.join(path, member.name)
+                if not is_within_directory(path, member_path):
+                    raise Exception("Attempted Path Traversal in Tar File")
+        
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
+            
+        
+        safe_extract(tar, path=working_directory)
     extracted = [os.path.join(working_directory, f)
                  for f in extracted if f.endswith('.gz')]
 
@@ -502,7 +521,26 @@ def get_data(directory, tar_filename):
                 if not os.path.exists(sub_workdir):
                     os.makedirs(sub_workdir)
                 ext = tar.getnames()
-                tar.extractall(path=sub_workdir)
+                def is_within_directory(directory, target):
+                    
+                    abs_directory = os.path.abspath(directory)
+                    abs_target = os.path.abspath(target)
+                
+                    prefix = os.path.commonprefix([abs_directory, abs_target])
+                    
+                    return prefix == abs_directory
+                
+                def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+                
+                    for member in tar.getmembers():
+                        member_path = os.path.join(path, member.name)
+                        if not is_within_directory(path, member_path):
+                            raise Exception("Attempted Path Traversal in Tar File")
+                
+                    tar.extractall(path, members, numeric_owner=numeric_owner) 
+                    
+                
+                safe_extract(tar, path=sub_workdir)
             for filename in ext:
                 full_path_filename = os.path.join(sub_workdir, filename)
                 extracted_by_project[-1].append(full_path_filename)
