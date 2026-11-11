@@ -2,6 +2,7 @@
 #
 #   make run     serve the app locally (and on your LAN, e.g. for your phone)
 #   make build   assemble the deployable static site in dist/
+#   make github  build and publish to GitHub Pages (gh-pages branch of origin)
 #   make test    check JS preprocessing + inference against Python
 #   make model   retrain the model from scratch (download, prepare, train, export)
 
@@ -13,7 +14,7 @@ VPY     := $(VENV)/bin/python
 DATA    := training/data
 
 
-.PHONY: help run build test model clean distclean
+.PHONY: help run build github test model clean distclean
 
 help:
 	@sed -n 's/^#   //p' $(MAKEFILE_LIST)
@@ -45,6 +46,7 @@ build: test
 	@rm -rf $(DIST)
 	@mkdir -p $(DIST)
 	@cp -R docs/. $(DIST)/
+	@touch $(DIST)/.nojekyll
 	@hash=$$(cd docs && find . -type f ! -name sw.js -print0 | sort -z | xargs -0 cat | sha256sum | cut -c1-12); \
 	sed -i.bak "s/^const CACHE = \".*\";/const CACHE = \"write-math-$$hash\";/" $(DIST)/sw.js && rm -f $(DIST)/sw.js.bak; \
 	echo ""; \
@@ -55,6 +57,13 @@ build: test
 	echo "  needed for offline mode). Try it locally with:"; \
 	echo "    $(PYTHON) -m http.server --directory $(DIST) $(PORT)"; \
 	echo ""
+
+# Commits dist/ to the gh-pages branch of origin and pushes it. GitHub Pages
+# serves that branch at http://<owner>.github.io/<repo>/ (redirected to the
+# owner's custom domain, if their user site has one).
+github: build
+	@scripts/publish-gh-pages.sh $(DIST) origin gh-pages
+	@scripts/pages-url.sh origin
 
 test: docs/model/model.json
 	@node tests/parity.mjs

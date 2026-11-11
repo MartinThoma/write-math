@@ -49,16 +49,18 @@ cache itself. `make model` retrains everything from scratch (see below).
 
 ## Hosting on GitHub Pages
 
-`.github/workflows/pages.yml` runs `make build` on every push to the
-`symbol-recognizer` branch and publishes `dist/` with GitHub Pages. To turn
-it on:
+```sh
+make github
+```
 
-1. In **Settings → Pages**, set *Source* to **GitHub Actions**.
-2. In **Settings → Environments → github-pages**, add `symbol-recognizer` to
-   the allowed deployment branches. By default only the default branch may deploy.
-3. Optionally set a **custom domain** in Settings → Pages, e.g.
-   `write-math.example.com`. You also need a DNS `CNAME` record pointing it
-   at `<user>.github.io`.
+This runs `make build`, commits `dist/` as one new commit on the `gh-pages`
+branch of `origin`, and pushes it. Nothing is pushed if the site is unchanged.
+It does not touch your checkout or push the source branch. GitHub Pages then
+serves the site at `http://<owner>.github.io/<repo>/`. If the owner's user
+site has a custom domain, that address redirects to the same path on that domain.
+
+One-time setup: in **Settings → Pages**, set *Source* to **Deploy from a
+branch**, and choose `gh-pages` and `/ (root)`.
 
 All paths in the app are relative, so it works at a domain root as well as
 under a sub-path such as `/write-math/`.
