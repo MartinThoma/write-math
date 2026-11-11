@@ -121,6 +121,7 @@ function drawPreview(img) {
 }
 
 function update() {
+  reloadIfIdle(); // a new version is waiting and the canvas just became empty
   const has = strokes.length > 0;
   $("undo").disabled = !has;
   $("clear").disabled = !has;
@@ -196,23 +197,77 @@ async function copy(text) {
     // fall through to the legacy path
   }
   if (!ok) ok = legacyCopy(text);
-  const msg = ok ? `Copied ${text}` : `Copy failed: ${text}`;
+  showToast(ok ? `Copied ${text}` : `Copy failed: ${text}`);
+}
+
+function showToast(msg, ms = 1600) {
   const t = $("toast");
   t.textContent = msg;
   t.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+  toastTimer = setTimeout(() => t.classList.remove("show"), ms);
 }
 
-// ---------------------------------------------------------------- startup
+// ---------------------------------------------------------------- install / offline
 
-function setOnlineStatus() {
+const installBtn = $("install");
+let installPrompt = null; // deferred `beforeinstallprompt` event (Chromium browsers)
+let offlineReady = false; // service worker has cached the app and the model
+
+// Service workers (and thus offline use and installation) need https:// or localhost.
+const offlineCapable = "serviceWorker" in navigator && window.isSecureContext;
+
+const isInstalled = () =>
+  matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+// Browsers without `beforeinstallprompt` can still install the app from their
+// own menus; tell the user where.
+function manualInstallSteps() {
+  const ua = navigator.userAgent;
+  const iOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  if (iOS) return "Tap the Share button in the toolbar, then “Add to Home Screen”.";
+  if (/Android/.test(ua) && /Firefox/.test(ua)) return "Open the browser menu (⋮) and tap “Install”.";
+  const safari = /Safari/.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Firefox/.test(ua);
+  if (safari && /Macintosh/.test(ua)) return "In the menu bar, choose File → “Add to Dock”.";
+  return null;
+}
+
+function updateStatus() {
   if (!model) return;
-  // Service workers (and thus offline use) need https:// or localhost.
-  const offlineCapable = "serviceWorker" in navigator && window.isSecureContext;
   if (!navigator.onLine) status.textContent = "Offline · ready";
-  else status.textContent = offlineCapable ? "Ready · works offline" : "Ready · offline use needs HTTPS";
+  else if (isInstalled()) status.textContent = "Installed · works offline";
+  else if (!offlineCapable) status.textContent = "Ready · offline use needs HTTPS";
+  else if (offlineReady) status.textContent = "Ready · available offline";
+  else status.textContent = "Ready";
+  installBtn.hidden = !(offlineCapable && !isInstalled() && (installPrompt || manualInstallSteps()));
 }
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault(); // show our own button instead of the browser's mini-infobar
+  installPrompt = e;
+  updateStatus();
+});
+
+window.addEventListener("appinstalled", () => {
+  installPrompt = null;
+  showToast("Installed. Write Math now also works offline.", 3000);
+  updateStatus();
+});
+
+installBtn.addEventListener("click", async () => {
+  if (installPrompt) {
+    const prompt = installPrompt;
+    installPrompt = null; // a prompt can only be shown once
+    prompt.prompt();
+    await prompt.userChoice;
+    updateStatus();
+    return;
+  }
+  $("install-steps").textContent = manualInstallSteps();
+  $("install-help").showModal();
+});
+
+matchMedia("(display-mode: standalone)").addEventListener("change", updateStatus);
 
 worker.onmessage = ({ data }) => {
   if (data.type === "ready") {
@@ -221,7 +276,7 @@ worker.onmessage = ({ data }) => {
     $("modelinfo").textContent = acc
       ? `The model knows ${data.labels} symbols (test accuracy ${(acc.top1 * 100).toFixed(1)}% top-1, ${(acc.top3 * 100).toFixed(1)}% top-3).`
       : `The model knows ${data.labels} symbols.`;
-    setOnlineStatus();
+    updateStatus();
     update();
   } else if (data.type === "result") {
     // Ignore answers to requests that were superseded by a newer stroke.
@@ -232,12 +287,59 @@ worker.onmessage = ({ data }) => {
   }
 };
 
-window.addEventListener("online", setOnlineStatus);
-window.addEventListener("offline", setOnlineStatus);
+window.addEventListener("online", updateStatus);
+window.addEventListener("offline", updateStatus);
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch((err) => {
+// ---------------------------------------------------------------- updates
+//
+// A new deploy is picked up by the service worker in the background; once it
+// has cached the complete new version it takes control (skipWaiting +
+// clients.claim) and we reload into it. To never throw away a half-drawn
+// symbol, the reload waits until the canvas is empty.
+
+let reloadPending = false;
+const UPDATED_FLAG = "write-math-updated";
+
+function reloadIfIdle() {
+  if (!reloadPending || strokes.length > 0 || current) return;
+  try { sessionStorage.setItem(UPDATED_FLAG, "1"); } catch { /* private mode etc. */ }
+  location.reload();
+}
+
+if (offlineCapable) {
+  // On the very first visit the worker also takes control, but that is not an update.
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloadPending) return;
+    reloadPending = true;
+    reloadIfIdle();
+  });
+
+  navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).then((reg) => {
+    // Installed apps can stay open for days; look for a new version whenever
+    // the app comes back to the foreground (at most once an hour).
+    let lastCheck = Date.now();
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible" || Date.now() - lastCheck < 3600e3) return;
+      lastCheck = Date.now();
+      reg.update().catch(() => {});
+    });
+  }).catch((err) => {
     console.warn("Service worker registration failed", err);
   });
+
+  // `ready` resolves once a worker is active, i.e. its install step has
+  // cached the whole app including the model.
+  navigator.serviceWorker.ready.then(() => {
+    offlineReady = true;
+    updateStatus();
+  });
+
+  try {
+    if (sessionStorage.getItem(UPDATED_FLAG)) {
+      sessionStorage.removeItem(UPDATED_FLAG);
+      showToast("Updated to the latest version.", 2500);
+    }
+  } catch { /* storage unavailable */ }
 }
 

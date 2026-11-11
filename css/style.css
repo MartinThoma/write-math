@@ -5,6 +5,7 @@
   --muted: #6b6d74;
   --line: #dddbd3;
   --accent: #2b59c3;
+  --on-accent: #ffffff;
   --bar: #c9d6f2;
   --pad-ink: #1d1e22;
   --radius: 12px;
@@ -19,6 +20,7 @@
     --muted: #9a9ca3;
     --line: #34363c;
     --accent: #8fb0ff;
+    --on-accent: #10172b;
     --bar: #2e3b5c;
     --pad-ink: #ececea;
     color-scheme: dark;
@@ -47,16 +49,61 @@ header, main, footer {
 }
 
 header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 2px;
   padding-top: 20px;
   padding-bottom: 12px;
 }
 
-h1 { font-size: 1.25rem; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: 1.375rem; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+
+/* Narrow screens: status goes under the title, button to the right of both. */
+@media (max-width: 480px) {
+  header { grid-template-columns: minmax(0, 1fr) auto; }
+  header .status { grid-column: 1; grid-row: 2; }
+  header .install { grid-column: 2; grid-row: 1 / span 2; }
+}
 
 .status { color: var(--muted); font-size: 0.875rem; }
+
+[hidden] { display: none !important; }
+
+header .install {
+  grid-column: 3;
+  align-self: center;
+  white-space: nowrap;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  padding: 8px 14px;
+}
+
+@media (hover: hover) {
+  header .install:hover { filter: brightness(1.08); border-color: var(--accent); }
+}
+
+dialog {
+  max-width: min(420px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 20px;
+}
+
+dialog::backdrop { background: rgb(0 0 0 / 0.35); }
+
+dialog h2 { font-size: 1.25rem; margin: 0 0 8px; }
+
+dialog p { margin: 0 0 12px; }
+
+dialog .note { color: var(--muted); font-size: 0.875rem; }
+
+dialog form { display: flex; justify-content: flex-end; margin: 0; }
 
 main {
   flex: 1;
@@ -159,7 +206,7 @@ button:focus-visible, .results li button:focus-visible {
   align-items: center;
   gap: 12px;
   text-align: left;
-  padding: 6px 12px;
+  padding: 8px 12px;
   position: relative;
   overflow: hidden;
 }
