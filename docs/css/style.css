@@ -58,7 +58,7 @@ header {
   padding-bottom: 12px;
 }
 
-h1 { font-size: 1.25rem; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+h1 { font-size: 1.375rem; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
 
 /* Narrow screens: status goes under the title, button to the right of both. */
 @media (max-width: 480px) {
@@ -79,7 +79,7 @@ header .install {
   border-color: var(--accent);
   color: var(--on-accent);
   font-weight: 600;
-  padding: 6px 14px;
+  padding: 8px 14px;
 }
 
 @media (hover: hover) {
@@ -97,7 +97,7 @@ dialog {
 
 dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 
-dialog h2 { font-size: 1.0625rem; margin: 0 0 8px; }
+dialog h2 { font-size: 1.25rem; margin: 0 0 8px; }
 
 dialog p { margin: 0 0 12px; }
 
@@ -206,7 +206,7 @@ button:focus-visible, .results li button:focus-visible {
   align-items: center;
   gap: 12px;
   text-align: left;
-  padding: 6px 12px;
+  padding: 8px 12px;
   position: relative;
   overflow: hidden;
 }
