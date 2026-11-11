@@ -1,0 +1,13 @@
+{
+  "name": "Write Math",
+  "short_name": "Write Math",
+  "description": "Draw a mathematical symbol and get its LaTeX command. Works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

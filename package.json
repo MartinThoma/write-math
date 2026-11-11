@@ -1,0 +1,11 @@
+{
+  "name": "write-math-recognizer",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first handwritten math symbol recognizer (static page)",
+  "scripts": {
+    "test": "node tests/parity.mjs",
+    "serve": "python3 -m http.server -d docs 8000"
+  },
+  "license": "MIT"
+}

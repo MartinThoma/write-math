@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Write Math</title>
+  <meta name="description" content="Draw a mathematical symbol and get its LaTeX command. Runs entirely in your browser, works offline.">
+  <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Write Math</h1>
+    <span id="status" class="status" role="status">Loading model…</span>
+  </header>
+
+  <main>
+    <section class="pad" aria-label="Drawing area">
+      <div class="canvas-wrap">
+        <canvas id="canvas" aria-label="Draw a symbol here"></canvas>
+        <p id="hint" class="hint">Draw a symbol</p>
+      </div>
+      <div class="toolbar">
+        <button id="undo" type="button" disabled>Undo stroke</button>
+        <button id="clear" type="button" disabled>Clear</button>
+        <span class="spacer"></span>
+        <canvas id="preview" width="32" height="32" title="What the model sees (32×32)" aria-hidden="true"></canvas>
+      </div>
+    </section>
+
+    <section class="results" aria-label="Recognition results">
+      <ol id="results"></ol>
+      <p id="empty" class="empty">Candidates appear here after the first stroke. Click one to copy its LaTeX command.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Recognition runs locally in your browser; nothing you draw leaves the device.
+      Trained on the <a href="https://zenodo.org/records/50022">HWRT database</a>
+      of handwritten symbols (most of it from Daniel Kirsch's
+      <a href="https://github.com/kirel/detexify-data">detexify-data</a>).
+      <span id="modelinfo"></span>
+    </p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

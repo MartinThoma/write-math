@@ -1,0 +1,220 @@
+import { rasterize, SIZE } from "./raster.js";
+
+const $ = (id) => document.getElementById(id);
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+const preview = $("preview");
+const pctx = preview.getContext("2d");
+const status = $("status");
+const resultsEl = $("results");
+
+const TOP_K = 10;
+let model = null; // {labels, metrics} once the worker has loaded the model
+let requestId = 0;
+const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
+let strokes = [];
+let current = null;
+
+// ---------------------------------------------------------------- drawing
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  redraw();
+}
+
+function inkColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue("--pad-ink").trim() || "#000";
+}
+
+function drawStroke(s) {
+  if (s.length === 0) return;
+  ctx.beginPath();
+  if (s.length === 1) {
+    ctx.arc(s[0].x, s[0].y, ctx.lineWidth / 2, 0, 2 * Math.PI);
+    ctx.fill();
+    return;
+  }
+  ctx.moveTo(s[0].x, s[0].y);
+  for (let i = 1; i < s.length; i++) ctx.lineTo(s[i].x, s[i].y);
+  ctx.stroke();
+}
+
+function redraw() {
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = ctx.fillStyle = inkColor();
+  for (const s of strokes) drawStroke(s);
+  if (current) drawStroke(current);
+}
+
+function point(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top, time: Math.round(e.timeStamp) };
+}
+
+canvas.addEventListener("pointerdown", (e) => {
+  if (e.button !== 0) return;
+  canvas.setPointerCapture(e.pointerId);
+  current = [point(e)];
+  $("hint").classList.add("hidden");
+  redraw();
+});
+
+canvas.addEventListener("pointermove", (e) => {
+  if (!current) return;
+  const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of events.length ? events : [e]) current.push(point(ev));
+  redraw();
+});
+
+function endStroke() {
+  if (!current) return;
+  strokes.push(current);
+  current = null;
+  redraw();
+  update();
+}
+
+canvas.addEventListener("pointerup", endStroke);
+canvas.addEventListener("pointercancel", endStroke);
+
+$("undo").addEventListener("click", () => {
+  strokes.pop();
+  redraw();
+  update();
+});
+
+$("clear").addEventListener("click", () => {
+  strokes = [];
+  redraw();
+  update();
+});
+
+window.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+    e.preventDefault();
+    $("undo").click();
+  } else if (e.key === "Escape") {
+    $("clear").click();
+  }
+});
+
+new ResizeObserver(resizeCanvas).observe(canvas);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
+
+// ---------------------------------------------------------------- recognition
+
+function drawPreview(img) {
+  const data = pctx.createImageData(SIZE, SIZE);
+  for (let i = 0; i < img.length; i++) {
+    const v = Math.round(img[i] * 255);
+    data.data.set([v, v, v, 255], i * 4);
+  }
+  pctx.putImageData(data, 0, 0);
+}
+
+function update() {
+  const has = strokes.length > 0;
+  $("undo").disabled = !has;
+  $("clear").disabled = !has;
+  $("hint").classList.toggle("hidden", has);
+  $("empty").classList.toggle("hidden", has && model);
+  if (!has) {
+    resultsEl.replaceChildren();
+    pctx.clearRect(0, 0, SIZE, SIZE);
+    return;
+  }
+  const img = rasterize(strokes);
+  drawPreview(img);
+  if (!model) return;
+  worker.postMessage({ id: ++requestId, image: img, k: TOP_K });
+}
+
+function renderResults(top) {
+  const items = top.map((r) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.title = `Copy ${r.latex}`;
+    const bar = document.createElement("span");
+    bar.className = "bar";
+    bar.style.width = `${(r.p * 100).toFixed(1)}%`;
+    const glyph = document.createElement("span");
+    glyph.className = "glyph";
+    glyph.textContent = r.unicode || "";
+    const code = document.createElement("span");
+    code.className = "code";
+    code.textContent = r.latex;
+    if (r.package) {
+      const pkg = document.createElement("span");
+      pkg.className = "pkg";
+      pkg.textContent = `\\usepackage{${r.package}}`;
+      code.append(pkg);
+    }
+    const prob = document.createElement("span");
+    prob.className = "prob";
+    prob.textContent = r.p >= 0.001 ? `${(r.p * 100).toFixed(1)}%` : "<0.1%";
+    b.append(bar, glyph, code, prob);
+    b.addEventListener("click", () => copy(r.latex));
+    li.append(b);
+    return li;
+  });
+  resultsEl.replaceChildren(...items);
+}
+
+let toastTimer;
+async function copy(text) {
+  let msg = `Copied ${text}`;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    msg = `Copy failed: ${text}`;
+  }
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+}
+
+// ---------------------------------------------------------------- startup
+
+function setOnlineStatus() {
+  if (!model) return;
+  status.textContent = navigator.onLine ? "Ready · works offline" : "Offline · ready";
+}
+
+worker.onmessage = ({ data }) => {
+  if (data.type === "ready") {
+    model = data;
+    const acc = data.metrics;
+    $("modelinfo").textContent = acc
+      ? `The model knows ${data.labels} symbols (test accuracy ${(acc.top1 * 100).toFixed(1)}% top-1, ${(acc.top3 * 100).toFixed(1)}% top-3).`
+      : `The model knows ${data.labels} symbols.`;
+    setOnlineStatus();
+    update();
+  } else if (data.type === "result") {
+    // Ignore answers to requests that were superseded by a newer stroke.
+    if (data.id === requestId && strokes.length > 0) renderResults(data.top);
+  } else if (data.type === "error") {
+    console.error(data.message);
+    status.textContent = "Could not load the model. Reload to retry.";
+  }
+};
+
+window.addEventListener("online", setOnlineStatus);
+window.addEventListener("offline", setOnlineStatus);
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch((err) => {
+    console.warn("Service worker registration failed", err);
+  });
+}
+
