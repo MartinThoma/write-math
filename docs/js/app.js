@@ -121,6 +121,7 @@ function drawPreview(img) {
 }
 
 function update() {
+  reloadIfIdle(); // a new version is waiting and the canvas just became empty
   const has = strokes.length > 0;
   $("undo").disabled = !has;
   $("clear").disabled = !has;
@@ -289,15 +290,56 @@ worker.onmessage = ({ data }) => {
 window.addEventListener("online", updateStatus);
 window.addEventListener("offline", updateStatus);
 
+// ---------------------------------------------------------------- updates
+//
+// A new deploy is picked up by the service worker in the background; once it
+// has cached the complete new version it takes control (skipWaiting +
+// clients.claim) and we reload into it. To never throw away a half-drawn
+// symbol, the reload waits until the canvas is empty.
+
+let reloadPending = false;
+const UPDATED_FLAG = "write-math-updated";
+
+function reloadIfIdle() {
+  if (!reloadPending || strokes.length > 0 || current) return;
+  try { sessionStorage.setItem(UPDATED_FLAG, "1"); } catch { /* private mode etc. */ }
+  location.reload();
+}
+
 if (offlineCapable) {
-  navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch((err) => {
+  // On the very first visit the worker also takes control, but that is not an update.
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloadPending) return;
+    reloadPending = true;
+    reloadIfIdle();
+  });
+
+  navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).then((reg) => {
+    // Installed apps can stay open for days; look for a new version whenever
+    // the app comes back to the foreground (at most once an hour).
+    let lastCheck = Date.now();
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible" || Date.now() - lastCheck < 3600e3) return;
+      lastCheck = Date.now();
+      reg.update().catch(() => {});
+    });
+  }).catch((err) => {
     console.warn("Service worker registration failed", err);
   });
+
   // `ready` resolves once a worker is active, i.e. its install step has
   // cached the whole app including the model.
   navigator.serviceWorker.ready.then(() => {
     offlineReady = true;
     updateStatus();
   });
+
+  try {
+    if (sessionStorage.getItem(UPDATED_FLAG)) {
+      sessionStorage.removeItem(UPDATED_FLAG);
+      showToast("Updated to the latest version.", 2500);
+    }
+  } catch { /* storage unavailable */ }
 }
 
