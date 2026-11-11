@@ -14,6 +14,10 @@ const SHELL = [
   "js/worker.js",
   "manifest.webmanifest",
   "icon.svg",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/maskable-512.png",
+  "icons/apple-touch-icon.png",
   "model/model.json",
 ];
 

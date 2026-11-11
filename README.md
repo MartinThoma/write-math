@@ -2,8 +2,10 @@
 
 Draw a mathematical symbol, get its LaTeX command. A single static page with
 no server and no third-party scripts. Once the page has loaded, it keeps
-working offline: a service worker caches the app and the model, and you can
-install it as a PWA.
+working offline: a service worker caches the app and the model. The
+**Install app** button adds it to the home screen or app list. Chrome, Edge
+and Android open their own install dialog. Safari and Firefox for Android
+show the steps from their menus instead.
 
 The recognizer is a small convolutional network trained on the
 [HWRT database of handwritten symbols](https://zenodo.org/records/50022)

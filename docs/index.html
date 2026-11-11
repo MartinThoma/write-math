@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Write Math">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/app.js"></script>
@@ -16,6 +18,7 @@
   <header>
     <h1>Write Math</h1>
     <span id="status" class="status" role="status">Loading model…</span>
+    <button id="install" class="install" type="button" hidden>Install app</button>
   </header>
 
   <main>
@@ -47,6 +50,13 @@
       <span id="modelinfo"></span>
     </p>
   </footer>
+
+  <dialog id="install-help" aria-labelledby="install-help-title">
+    <h2 id="install-help-title">Install Write Math</h2>
+    <p id="install-steps"></p>
+    <p class="note">Once installed, it opens like an app and works without an internet connection.</p>
+    <form method="dialog"><button type="submit">OK</button></form>
+  </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
