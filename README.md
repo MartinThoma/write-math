@@ -34,14 +34,18 @@ tests/parity.mjs         checks JS preprocessing + inference against Python
 
 ## Running the app
 
-Any static file server works:
-
 ```sh
-python3 -m http.server -d docs 8000
-# open http://localhost:8000
+make run      # serves docs/ on port 8000 and prints the URLs for this
+              # computer and for your phone on the same network
+make build    # runs the parity test, then writes the deployable site to dist/
 ```
 
-Service workers need `https://` or `localhost`.
+Copy the contents of `dist/` to any static web server. `make build` stamps
+the service worker's cache name with a hash of the site's contents, so a
+deployment with changes replaces cached copies in browsers that already
+have the app. Offline mode (the service worker) needs `https://` or
+`localhost`. Over plain `http://` on your LAN, the app works but does not
+cache itself. `make model` retrains everything from scratch (see below).
 
 ## Training the model
 

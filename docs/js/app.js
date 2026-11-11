@@ -170,13 +170,33 @@ function renderResults(top) {
 }
 
 let toastTimer;
+// The async clipboard API only exists on https:// and localhost; fall back to
+// a hidden textarea + execCommand so copying also works over plain http on a LAN.
+function legacyCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;font-size:16px";
+  document.body.append(ta);
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  const ok = document.execCommand("copy");
+  ta.remove();
+  return ok;
+}
+
 async function copy(text) {
-  let msg = `Copied ${text}`;
+  let ok = false;
   try {
-    await navigator.clipboard.writeText(text);
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    }
   } catch {
-    msg = `Copy failed: ${text}`;
+    // fall through to the legacy path
   }
+  if (!ok) ok = legacyCopy(text);
+  const msg = ok ? `Copied ${text}` : `Copy failed: ${text}`;
   const t = $("toast");
   t.textContent = msg;
   t.classList.add("show");
@@ -188,7 +208,10 @@ async function copy(text) {
 
 function setOnlineStatus() {
   if (!model) return;
-  status.textContent = navigator.onLine ? "Ready · works offline" : "Offline · ready";
+  // Service workers (and thus offline use) need https:// or localhost.
+  const offlineCapable = "serviceWorker" in navigator && window.isSecureContext;
+  if (!navigator.onLine) status.textContent = "Offline · ready";
+  else status.textContent = offlineCapable ? "Ready · works offline" : "Ready · offline use needs HTTPS";
 }
 
 worker.onmessage = ({ data }) => {
